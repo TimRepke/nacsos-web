@@ -1,4 +1,6 @@
-# nacsos-web
+# NACSOS Web Interface
+This repository hosts the client-side interface code for the NACSOS platform.
+Steps to set up your local development environment are described below.
 
 ## Project setup
 ```
