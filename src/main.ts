@@ -1,9 +1,6 @@
-import {createApp} from 'vue'
-import App from './App.vue'
+import { createApp } from 'vue';
+import App from './App.vue';
+import router from './router';
+import store from './store';
 
-// eslint-disable-next-line no-unused-vars
-var app=createApp(App).mount('#app')
-setTimeout(() => {
-app.$
-    App.components.NacsosLogo.methods.setAnimationState(true);
-}, 2000)
+createApp(App).use(store).use(router).mount('#app');
