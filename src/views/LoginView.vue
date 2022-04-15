@@ -1,6 +1,6 @@
 <template>
   <div class="wrapper">
-    <NacsosLogo :width="200" class="position-absolute top-0 start-50 translate-middle-x mt-5"/>
+    <NacsosLogo style="height: 200px;width:200px;" class="position-absolute top-0 start-50 translate-middle-x mt-5"/>
     <div
       class="bg-body bg-opacity-75 rounded position-absolute top-50 start-50
              translate-middle p-5 col-lg-4 col-md-6 col-sm-8 col-12">

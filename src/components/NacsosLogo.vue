@@ -1,12 +1,8 @@
 <template>
-  <div id="nacsos-logo"
-       :style="{
-          height: `${width}px`,
-          width: `${width}px`
-       }">
+  <div id="nacsos-logo">
     <svg
-      :width="width"
-      :height="width"
+      width="100%"
+      height="100%"
       viewBox="0 0 100 100"
       version="1.1"
       id="svg5"
@@ -111,16 +107,8 @@
           id="logo-n-foot-outline"/>
       </g>
     </svg>
-    <div class="spinframe" :class="{spin:loading}"
-         :style="{
-          height: `${width}px`,
-          width: `${width}px`
-       }" id="nacsos-logo-spinframe1"></div>
-    <div class="spinframe" :class="{spin:loading}"
-         :style="{
-          height: `${width}px`,
-          width: `${width}px`
-       }" id="nacsos-logo-spinframe2"></div>
+    <div class="spinframe" :class="{spin:loading}" style="height: 100%;width: 100%;" id="nacsos-logo-spinframe1"></div>
+    <div class="spinframe" :class="{spin:loading}" style="height: 100%;width: 100%;" id="nacsos-logo-spinframe2"></div>
   </div>
 </template>
 
@@ -131,10 +119,6 @@ export default {
     animated: {
       type: Boolean,
       default: false,
-    },
-    width: {
-      type: Number,
-      default: 100,
     },
   },
   data() {
