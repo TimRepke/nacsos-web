@@ -1,0 +1,21 @@
+<template>
+  <nav v-if="$router.currentRoute.value.path !== '/login'"> <!-- FIXME change to state == logged-in-->
+    <router-link to="/">Home</router-link>
+    |
+    <router-link to="/about">About</router-link>
+    |
+    <router-link to="/login">Login</router-link>
+  </nav>
+</template>
+
+<script>
+export default {
+  name: 'NavBar',
+};
+</script>
+
+<style scoped>
+nav {
+  border: 1px solid gray;
+}
+</style>
