@@ -1,7 +1,21 @@
 <template>
-  <NavBar/>
-  <router-view/>
+  <!-- FIXME change v-if to state == logged-in-->
+  <TopBar v-if="$router.currentRoute.value.path !== '/login'"/>
+  <div class="row g-0">
+    <!-- FIXME change v-if to state == logged-in-->
+    <SideBar v-if="$router.currentRoute.value.path !== '/login'"/>
+    <router-view class="col router-wrapper"/>
+  </div>
 </template>
+
+<script>
+import TopBar from '@/components/TopBar.vue';
+import SideBar from '@/components/SideBar.vue';
+
+export default {
+  components: { SideBar, TopBar },
+};
+</script>
 
 <style lang="scss">
 #app {
@@ -24,11 +38,12 @@ nav {
     }
   }
 }
-</style>
-<script>
-import NavBar from '@/components/NavBar.vue';
 
-export default {
-  components: { NavBar },
-};
-</script>
+.router-wrapper {
+  height: 100vh;
+  margin-top: -3rem;
+  padding-top: 3rem;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+</style>

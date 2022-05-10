@@ -14,11 +14,11 @@ module.exports = {
   rules: {
     'no-console': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
     'no-debugger': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
-    'max-len': ['error', {
+    'max-len': ['error', { // maximum length of lines
       code: 140,
-      ignorePattern: '(d|style)="[^"]*"',
+      ignorePattern: '(d|style)="[^"]*"', // do this to ignore long lines for svg paths and long styles
       ignoreStrings: true,
-      ignoreTrailingComments: true,
+      ignoreTrailingComments: true, // allow comments to be longer than max. line length
     }],
     'vuejs-accessibility/label-has-for': ['error', {
       required: {
@@ -26,5 +26,11 @@ module.exports = {
       },
       allowChildren: false,
     }],
+    'object-curly-newline': ['error', {
+      ObjectPattern: 'never',
+    }],
+    'class-methods-use-this': 'off',
+    'prefer-promise-reject-errors': 'off',
+    'vuejs-accessibility/click-events-have-key-events': 'off',
   },
 };

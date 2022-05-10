@@ -1,6 +1,7 @@
 <template>
   <div class="home">
-    <img alt="Vue logo" src="../assets/logo.png">
+    <font-awesome-icon :icon="['fas', 'phone']" />
+    <router-link to="/about" class="nav-link">About</router-link>
     <HelloWorld msg="Welcome to Your Vue.js + TypeScript App"/>
   </div>
 </template>

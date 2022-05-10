@@ -1,18 +1,29 @@
 <template>
   <div class="wrapper">
-    <NacsosLogo style="height: 200px;width:200px;" class="position-absolute top-0 start-50 translate-middle-x mt-5"/>
-    <div
-      class="bg-body bg-opacity-75 rounded position-absolute top-50 start-50
-             translate-middle p-5 col-lg-4 col-md-6 col-sm-8 col-12">
-      <div class="form-floating mb-3">
-        <input type="email" class="form-control" id="floatingInput" placeholder="name@example.com">
-        <label for="floatingInput">Email address</label>
+    <div class="row justify-content-center mt-2 mt-sm-5">
+      <NacsosLogo style="height: 200px; width:200px;" class="p-0"/>
+    </div>
+    <div class="row justify-content-center">
+      <div class="bg-body bg-opacity-75 rounded p-5 col-lg-4 col-md-6 col-sm-8 col-12 mt-2 mt-sm-5">
+        <form @submit.prevent>
+          <div class="form-floating mb-3">
+            <input type="text" class="form-control" id="usernameInput" placeholder="Username" v-model="username"/>
+            <label for="usernameInput">Username</label>
+          </div>
+          <div class="form-floating mb-3">
+            <input type="password" class="form-control" id="passwordInput" placeholder="Password" v-model="password"/>
+            <label for="passwordInput">Password</label>
+          </div>
+          <div class="alert alert-danger d-flex align-items-center" :class="{'d-none': !error}" role="alert">
+            <font-awesome-icon :icon="['fas', 'triangle-exclamation']"
+                               class="flex-shrink-0 me-2" style="font-size: 1.5em; vertical-align: middle;"/>
+            <div class="text-start ms-3">
+              Computer says no. <br/>Please double-check username and password.
+            </div>
+          </div>
+          <button type="submit" class="btn btn-outline-dark w-100" @click="login">LOGIN</button>
+        </form>
       </div>
-      <div class="form-floating mb-3">
-        <input type="password" class="form-control" id="floatingPassword" placeholder="Password">
-        <label for="floatingPassword">Password</label>
-      </div>
-      <button type="button" class="btn btn-outline-dark w-100">LOGIN</button>
     </div>
     <div class="license">
       Picture:
@@ -24,10 +35,36 @@
 
 <script>
 import NacsosLogo from '@/components/NacsosLogo.vue';
+import { currentUserStore } from '@/stores';
+import { AuthFailedEvent, AuthTokenReceivedEvent, LoginSuccessEvent } from '@/plugins/events/baseEvent';
 
 export default {
   name: 'LoginView',
   components: { NacsosLogo },
+  created() {
+    this.$eventBus.on(AuthFailedEvent, () => {
+      this.error = true;
+    });
+    this.$eventBus.on(AuthTokenReceivedEvent, () => {
+      this.error = false;
+    });
+    this.$eventBus.once(LoginSuccessEvent, () => {
+      this.$router.push('/');
+    });
+  },
+  data() {
+    return {
+      username: '',
+      password: '',
+      error: false,
+    };
+  },
+  methods: {
+    login() {
+      this.error = false;
+      currentUserStore.login(this.username, this.password);
+    },
+  },
 };
 </script>
 
@@ -35,10 +72,13 @@ export default {
 input {
   --bs-bg-opacity: 0.9;
 }
+
 .wrapper {
   background-image: url('@/assets/img/Portara_Naxos_26.jpg');
   height: 100vh;
   width: 100vw;
+  margin: 0 !important;
+  padding: 0 !important;
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center
