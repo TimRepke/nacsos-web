@@ -1,9 +1,16 @@
 import { defineStore } from 'pinia';
 import { useStorage, RemovableRef } from '@vueuse/core';
-import { User, UserSerializer } from '@/types/user.model';
-import { callLoginEndpoint, callCurrentUserEndpoint } from '@/plugins/api/login';
+import type { User } from '@/types/user.d';
+import Serializer from '@/types/serializer';
 import { EventBus } from '@/plugins/events';
-import { AuthFailedEvent, AuthTokenReceivedEvent, LoginSuccessEvent } from '@/plugins/events/baseEvent';
+import {
+  AuthFailedEvent,
+  AuthTokenReceivedEvent,
+  LoginSuccessEvent,
+} from '@/plugins/events/events/auth';
+import { callCurrentUserEndpoint, callLoginEndpoint } from '@/plugins/api/login';
+
+const UserSerializer = Serializer<User>();
 
 export type CurrentUserStoreType = {
   user?: RemovableRef<User>,
@@ -21,41 +28,31 @@ export const useCurrentUserStore = defineStore('CurrentUserStore', {
     accessToken: useStorage<string>('accessToken', null),
   } as CurrentUserStoreType),
   actions: {
+    clear() {
+      this.logout();
+    },
     logout() {
       this.accessToken = undefined;
       this.user = undefined;
-      this.$router.push('login');
     },
-    login(username: string, password: string) {
-      // hook event listener, so that once valid token arrives, additional data is populated
-      EventBus.once(AuthTokenReceivedEvent, () => {
-        this.populateCurrentUser();
-      }, this);
+    async login(username: string, password: string) {
+      try {
+        const loginResponse = await callLoginEndpoint({ username, password });
+        const accessToken = loginResponse.payload?.accessToken;
+        this.accessToken = accessToken;
+        EventBus.emit(new AuthTokenReceivedEvent(this.accessToken));
 
-      callLoginEndpoint({ username, password }).then(
-        (response) => {
-          this.accessToken = response.payload?.accessToken;
-        },
-        (error) => {
-          console.error(error);
-          EventBus.emit(new AuthFailedEvent());
-        },
-      );
-    },
-    populateCurrentUser() {
-      callCurrentUserEndpoint().then(
-        (response) => {
-          this.user = response.payload;
-          EventBus.emit(new LoginSuccessEvent(this.user));
-        },
-        (error) => {
-          console.log(error);
-          EventBus.emit(new AuthFailedEvent());
-        },
-      );
+        const currentUserResponse = await callCurrentUserEndpoint();
+        this.user = currentUserResponse.payload;
+
+        EventBus.emit(new LoginSuccessEvent(this.user));
+      } catch (error) {
+        console.error(error);
+        EventBus.emit(new AuthFailedEvent());
+      }
     },
   },
   getters: {
-    isLoggedIn: (state): boolean => !!state.user || !!state.accessToken,
+    isLoggedIn: (state): boolean => !!state.user && !!state.accessToken,
   },
 });

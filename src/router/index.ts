@@ -21,6 +21,26 @@ const routes: Array<RouteRecordRaw> = [
     name: 'login',
     component: () => import(/* webpackChunkName: "about" */ '../views/LoginView.vue'),
   },
+  {
+    path: '/project-list',
+    name: 'project-list',
+    component: () => import(/* webpackChunkName: "about" */ '../views/Projects/ProjectListView.vue'),
+  },
+  {
+    path: '/project/overview',
+    name: 'project-overview',
+    component: () => import(/* webpackChunkName: "about" */ '../views/Projects/ProjectOverviewView.vue'),
+  },
+  {
+    path: '/project/dataset',
+    name: 'project-dataset',
+    component: () => import(/* webpackChunkName: "about" */ '../views/Projects/ProjectDataView.vue'),
+  },
+  {
+    path: '/project/config/annotations',
+    name: 'annotation-config',
+    component: () => import(/* webpackChunkName: "about" */ '../views/Annotations/AnnotationConfigView.vue'),
+  },
 ];
 
 const router = createRouter({

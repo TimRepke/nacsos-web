@@ -1,5 +1,5 @@
-import { Endpoint, EndpointFunction, ResponseReason } from '@/plugins/api/types';
-import { callEndpointFactory, RequestGateway } from '@/plugins/api/index';
+import { Endpoint, EndpointFunction, ResponseReason } from '@/plugins/api/types.d';
+import { callEndpointFactory } from '@/plugins/api/index';
 
 const PingEndpoint: Endpoint<ResponseReason, string> = {
   method: 'GET',

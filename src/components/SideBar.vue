@@ -1,14 +1,37 @@
 <template>
-  <div class="col-8 col-md-2 sidebar d-md-block d-none">
-    Sidebar<br/>
-    Sidebar<br/>
-    Sidebar<br/>
-    Sidebar<br/>
-    Sidebar<br/>
-    Sidebar<br/>
-    Sidebar<br/>
-    Sidebar<br/>
-    Sidebar<br/>
+  <div class="col-8 col-md-2 sidebar"
+       :class="{ 'd-none': !isOpen }">
+    <div class="list-group rounded-0">
+      <!-- TODO: hide items based on permissions -->
+      <router-link to="/project/overview" class="list-group-item list-group-item-action border-end-0"
+                   active-class="active">Overview
+      </router-link>
+      <router-link to="/project/queries" class="list-group-item list-group-item-action border-end-0"
+                   active-class="active"> Queries
+      </router-link>
+      <router-link to="/project/dataset" class="list-group-item list-group-item-action border-end-0"
+                   active-class="active"> Dataset
+      </router-link>
+      <router-link to="/project/annotations" class="list-group-item list-group-item-action border-end-0"
+                   active-class="active"> Annotations
+      </router-link>
+      <router-link to="/project/artefacts" class="list-group-item list-group-item-action border-end-0"
+                   active-class="active"> Artefacts
+      </router-link>
+      <router-link to="/project/pipelines" class="list-group-item list-group-item-action border-end-0"
+                   active-class="active"> Pipelines
+      </router-link>
+      <router-link to="/project/config/annotations" class="list-group-item list-group-item-action border-end-0"
+                   active-class="active">
+        <font-awesome-icon icon="gear"/>
+        Annotations
+      </router-link>
+      <router-link to="/project/config/project" class="list-group-item list-group-item-action border-end-0"
+                   active-class="active">
+        <font-awesome-icon icon="gear"/>
+        Project
+      </router-link>
+    </div>
   </div>
   <a id="sidebar-toggle" class="border border-start-0 rounded-end col-auto mt-4"
      aria-label="test"
@@ -20,30 +43,36 @@
 <script lang="ts">
 export default {
   name: 'SideBar',
-  props: {
-    open: {
-      type: Boolean,
-      default: true,
-    },
-  },
   data(): object {
     return {
-      visible: this.open as boolean,
+      visible: undefined,
+      windowWidth: window.innerWidth,
     };
   },
   computed: {
+    isOpen(): boolean {
+      // bootstrap "md" breakpoint is >=768
+      if (this.visible !== undefined) {
+        return this.visible;
+      }
+      return this.windowWidth >= 768;
+    },
     iconButton(): string[] {
-      return ['fas', this.visible ? 'caret-left' : 'caret-right'];
+      return ['fas', this.isOpen ? 'caret-left' : 'caret-right'];
     },
   },
   methods: {
     toggleVisibility(): void {
-      this.visible = !this.visible;
-      this.$router.push({ path: '/about' });
+      this.visible = (this.visible === undefined) ? false : !this.visible;
     },
     setVisibility(newState: boolean): void {
       this.visible = newState;
     },
+  },
+  mounted() {
+    window.onresize = () => {
+      this.windowWidth = window.innerWidth;
+    };
   },
 };
 </script>

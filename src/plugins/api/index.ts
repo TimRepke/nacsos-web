@@ -1,8 +1,9 @@
 import { App } from 'vue';
 import axios, { AxiosInstance, AxiosRequestHeaders } from 'axios';
-import { Endpoint, EndpointFunction, RequestResult } from '@/plugins/api/types';
+import { Endpoint, EndpointFunction, RequestResult } from '@/plugins/api/types.d';
 import { EventBus } from '@/plugins/events';
-import { AuthTokenReceivedEvent, RequestSubmittedEvent } from '@/plugins/events/baseEvent';
+import { RequestSubmittedEvent } from '@/plugins/events/events/auth';
+import { RemovableRef, useStorage } from '@vueuse/core';
 
 interface TransformedPayload<REQUEST> {
   params: REQUEST | URLSearchParams | FormData | null;
@@ -51,20 +52,18 @@ class RequestGateway {
 
   protected pendingRequests: number;
 
+  protected accessToken: RemovableRef<string>;
+
   private constructor() {
     const baseUrl = 'http://localhost:8081';
+    this.accessToken = useStorage<string>('accessToken', null);
     this.pendingRequests = 0;
     this.httpClient = axios.create({
       baseURL: `${baseUrl}/api`,
     });
     this.defaultHeaders = {
-      Host: baseUrl,
+      // Origin: baseUrl,
     };
-
-    EventBus.getInstance().on(AuthTokenReceivedEvent, (payload: AuthTokenReceivedEvent) => {
-      const { authToken } = payload;
-      this.defaultHeaders.Authorization = `Bearer ${authToken}`;
-    }, this);
   }
 
   static getInstance() {
@@ -87,12 +86,17 @@ class RequestGateway {
     EventBus.emit(new RequestSubmittedEvent(path));
     this.pendingRequests += 1;
 
+    const baseHeaders = this.defaultHeaders;
+    if (this.accessToken.value) {
+      baseHeaders.Authorization = `Bearer ${this.accessToken.value}`;
+    }
+
     return new Promise((resolve, reject) => {
       this.httpClient.request({
         method: endpoint.method,
         url: path,
         data: params,
-        headers: { ...this.defaultHeaders, ...endpoint.customHeaders },
+        headers: { ...baseHeaders, ...endpoint.customHeaders },
       }).then((response) => {
         this.pendingRequests -= 1;
         try {

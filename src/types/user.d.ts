@@ -7,8 +7,3 @@ export interface User {
   is_superuser: boolean;
   is_active: boolean;
 }
-
-export const UserSerializer = {
-  read: (u: string): User => (u ? JSON.parse(u) : undefined),
-  write: (u: User): string => JSON.stringify(u),
-};

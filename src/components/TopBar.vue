@@ -14,11 +14,14 @@
       <div class="collapse navbar-collapse justify-content-end bg-light" id="navbarNavDropdown">
         <ul class="navbar-nav">
           <li class="nav-item">
-            <router-link to="/about" class="nav-link">About</router-link>
+            <router-link to="/project-list" class="nav-link">Projects</router-link>
           </li>
           <li class="nav-item">
-            <router-link to="/login" class="nav-link">Login</router-link>
+            <router-link to="/about" class="nav-link">About</router-link>
           </li>
+          <!--li class="nav-item">
+            <router-link to="/login" class="nav-link">Login</router-link>
+          </li-->
           <!--li class="nav-item">
             <router-link to="/projects" class="nav-link">Projects</router-link>
           </li-->
@@ -55,8 +58,14 @@ export default {
     const { logout } = store;
     return {
       user,
-      logout,
+      storeLogout: logout,
     };
+  },
+  methods: {
+    logout() {
+      this.$router.push('login');
+      this.storeLogout();
+    },
   },
 };
 </script>

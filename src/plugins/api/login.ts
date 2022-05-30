@@ -1,8 +1,8 @@
-import { Endpoint, EndpointFunction, ResponseReason } from '@/plugins/api/types';
+import { Endpoint, EndpointFunction, ResponseReason } from '@/plugins/api/types.d';
 import { callEndpointFactory } from '@/plugins/api/index';
-import { User } from '@/types/user.model';
+import { User } from '@/types/user.d';
 import { EventBus } from '@/plugins/events';
-import { AuthTokenReceivedEvent } from '@/plugins/events/baseEvent';
+import { AuthTokenReceivedEvent } from '@/plugins/events/events/auth';
 
 export type AuthResponseReason =
   | ResponseReason

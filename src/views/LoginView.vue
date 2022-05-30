@@ -36,7 +36,7 @@
 <script>
 import NacsosLogo from '@/components/NacsosLogo.vue';
 import { currentUserStore } from '@/stores';
-import { AuthFailedEvent, AuthTokenReceivedEvent, LoginSuccessEvent } from '@/plugins/events/baseEvent';
+import { AuthFailedEvent, AuthTokenReceivedEvent, LoginSuccessEvent } from '@/plugins/events/events/auth';
 
 export default {
   name: 'LoginView',

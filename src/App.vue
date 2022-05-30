@@ -4,7 +4,26 @@
   <div class="row g-0">
     <!-- FIXME change v-if to state == logged-in-->
     <SideBar v-if="$router.currentRoute.value.path !== '/login'"/>
-    <router-view class="col router-wrapper"/>
+
+    <RouterView v-slot="{ Component }" class="col router-wrapper">
+      <template v-if="Component">
+        <Transition mode="out-in">
+          <KeepAlive>
+            <Suspense>
+              <!-- main content -->
+              <component :is="Component"></component>
+
+              <!-- loading state -->
+              <template #fallback>
+                Loading...
+              </template>
+            </Suspense>
+          </KeepAlive>
+        </Transition>
+      </template>
+    </RouterView>
+
+    <!--router-view class="col router-wrapper"/-->
   </div>
 </template>
 
@@ -41,7 +60,7 @@ nav {
 
 .router-wrapper {
   height: 100vh;
-  margin-top: -3rem;
+  /*margin-top: -3rem;*/
   padding-top: 3rem;
   overflow-x: hidden;
   overflow-y: auto;

@@ -1,13 +1,16 @@
 <template>
   <div>
-    Hi
+    hiu
   </div>
 </template>
-
 <script lang="ts">
 import { defineComponent } from 'vue';
 
 export default defineComponent({
-  name: 'HomeView',
+  name: 'AnnotationConfigView',
 });
 </script>
+
+<style scoped>
+
+</style>
