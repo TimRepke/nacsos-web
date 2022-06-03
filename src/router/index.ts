@@ -19,27 +19,37 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: '/login',
     name: 'login',
-    component: () => import(/* webpackChunkName: "about" */ '../views/LoginView.vue'),
+    component: () => import(/* webpackChunkName: "LoginView" */ '../views/LoginView.vue'),
   },
   {
     path: '/project-list',
     name: 'project-list',
-    component: () => import(/* webpackChunkName: "about" */ '../views/Projects/ProjectListView.vue'),
+    component: () => import(/* webpackChunkName: "ProjectListView" */ '../views/Projects/ProjectListView.vue'),
   },
   {
     path: '/project/overview',
     name: 'project-overview',
-    component: () => import(/* webpackChunkName: "about" */ '../views/Projects/ProjectOverviewView.vue'),
+    component: () => import(/* webpackChunkName: "ProjectOverviewView" */ '../views/Projects/ProjectOverviewView.vue'),
   },
   {
     path: '/project/dataset',
     name: 'project-dataset',
-    component: () => import(/* webpackChunkName: "about" */ '../views/Projects/ProjectDataView.vue'),
+    component: () => import(/* webpackChunkName: "ProjectDataView" */ '../views/Projects/ProjectDataView.vue'),
   },
   {
-    path: '/project/config/annotations',
-    name: 'annotation-config',
-    component: () => import(/* webpackChunkName: "about" */ '../views/Annotations/AnnotationConfigView.vue'),
+    path: '/project/annotate',
+    name: 'project-annotate',
+    component: () => import(/* webpackChunkName: "AnnotationView" */ '../views/Annotations/AnnotationView.vue'),
+  },
+  {
+    path: '/project/config/annotations/list',
+    name: 'config-annotation-task-list',
+    component: () => import(/* webpackChunkName: "AnnotationConfigListView" */ '../views/Annotations/AnnotationConfigListView.vue'),
+  },
+  {
+    path: '/project/config/annotations/edit/:task_id',
+    name: 'config-annotation-task-edit',
+    component: () => import(/* webpackChunkName: "AnnotationConfigEditView" */ '../views/Annotations/AnnotationConfigEditView.vue'),
   },
 ];
 

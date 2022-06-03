@@ -1,8 +1,8 @@
 <template>
   <div>
-    <ul>
+    <ul class="text-start">
       <li v-for="project in projectList" :key="project.project_id">
-        <span @click="selectProject(project.project_id)"> {{ project.name }}</span>
+        <a @click="selectProject(project.project_id)" role="button" tabindex="0"> {{ project.name }}</a>
       </li>
     </ul>
   </div>

@@ -12,8 +12,8 @@
       <router-link to="/project/dataset" class="list-group-item list-group-item-action border-end-0"
                    active-class="active"> Dataset
       </router-link>
-      <router-link to="/project/annotations" class="list-group-item list-group-item-action border-end-0"
-                   active-class="active"> Annotations
+      <router-link to="/project/annotate" class="list-group-item list-group-item-action border-end-0"
+                   active-class="active"> Annotation
       </router-link>
       <router-link to="/project/artefacts" class="list-group-item list-group-item-action border-end-0"
                    active-class="active"> Artefacts
@@ -21,7 +21,7 @@
       <router-link to="/project/pipelines" class="list-group-item list-group-item-action border-end-0"
                    active-class="active"> Pipelines
       </router-link>
-      <router-link to="/project/config/annotations" class="list-group-item list-group-item-action border-end-0"
+      <router-link to="/project/config/annotations/list" class="list-group-item list-group-item-action border-end-0"
                    active-class="active">
         <font-awesome-icon icon="gear"/>
         Annotations

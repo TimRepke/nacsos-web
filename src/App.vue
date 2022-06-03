@@ -37,6 +37,11 @@ export default {
 </script>
 
 <style lang="scss">
+:root {
+  --topnav-height: 3rem;
+  --body-height: calc(100vh - var(--topnav-height));
+}
+
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -56,13 +61,5 @@ nav {
       color: #42b983;
     }
   }
-}
-
-.router-wrapper {
-  height: 100vh;
-  /*margin-top: -3rem;*/
-  padding-top: 3rem;
-  overflow-x: hidden;
-  overflow-y: auto;
 }
 </style>
