@@ -1,125 +1,234 @@
 <template>
-  <li class="border m-2 p-2 position-relative">
-    <div role="button" class="position-absolute top-0 end-0 m-2"><font-awesome-icon :icon="['fas', 'trash-can']"/></div>
-    <div class="hstack gap-2 mb-2">
-      <div class="hstack gap-1">
-        <span role="button" class="align-middle"><font-awesome-icon :icon="['fas', 'down-long']"/></span>
-        <span role="button"><font-awesome-icon :icon="['fas', 'up-long']"/></span>
-      </div>
-      <div>
+  <!-- FIXME Fix duplicate element ids (keep in mind this is all looped) -->
+  <div>
+    <ul class="ps-0 list-unstyled">
+      <li class="border m-2 p-2 position-relative" v-for="(taskLabel, taskLabelIndex) in taskLabels"
+          :key="taskLabel.key">
+        <div role="button" class="position-absolute top-0 end-0 m-2" @click="removeLabel(taskLabelIndex)" tabindex="0">
+          <font-awesome-icon :icon="['fas', 'trash-can']"/>
+        </div>
+        <div>
+          <div class="hstack gap-2 mb-2">
+            <div class="hstack gap-1">
+              <span role="button" class="align-middle" tabindex="0" @click="moveLabelDown(taskLabelIndex)">
+                <font-awesome-icon :icon="['fas', 'down-long']"/>
+              </span>
+              <span role="button" tabindex="0" @click="moveLabelUp(taskLabelIndex)">
+                <font-awesome-icon :icon="['fas', 'up-long']"/>
+              </span>
+            </div>
+            <div>
         <span class="input-group">
           <span class="input-group-text" id="basic-addon1"><font-awesome-icon :icon="['fas', 'eye']"/></span>
           <input type="text" class="form-control" placeholder="Visible name" aria-label="Visible name"
                  aria-describedby="basic-addon1" v-model="taskLabel.name">
         </span>
-      </div>
-      <div>
+            </div>
+            <div>
         <span class="input-group">
           <span class="input-group-text" id="basic-addon1"><font-awesome-icon :icon="['fas', 'tag']"/></span>
           <input type="text" class="form-control" placeholder="Unique key" aria-label="Unique key"
                  aria-describedby="basic-addon1" v-model="taskLabel.key">
         </span>
-      </div>
-      <div>
-        <div class="input-group">
-          <span class="input-group-text" id="basic-addon1"><font-awesome-icon :icon="['fas', 'circle-info']"/></span>
-          <input type="text" class="form-control" placeholder="Hint message" aria-label="Hint message"
-                 aria-describedby="basic-addon1" v-model="taskLabel.hint">
-        </div>
-      </div>
-    </div>
-    <div class="row mb-2 w-lg-50">
-      <div class="col-auto">
-        <label for="autoSizingSelect">Type</label>
-        <ToolTip>
-          <strong>bool</strong> – boolean toggle<br>
-          <strong>str</strong> – free string input<br>
-          <strong>int</strong> – free integer input<br>
-          <strong>float</strong> – free float input<br>
-          <strong>single</strong> – pre-defined choices (only one can be selected)<br>
-          <strong>multi</strong> – pre-defined choices (multiple can be selected)<br>
-        </ToolTip>
-        <select class="form-select" id="autoSizingSelect" v-model="taskLabel.kind">
-          <option v-for="kind in annotationTaskLabelKinds" :key="kind" :value="kind">{{ kind }}</option>
-        </select>
-      </div>
-      <div class="col-auto">
-        <label for="autoSizingSelect">Max. Repeat</label>
-        <input type="number" class="form-control" v-model="taskLabel.max_repeat"/>
-      </div>
-      <div class="col-auto">
-        <div class="form-check form-switch">
-          <input class="form-check-input" v-model="taskLabel.required" type="checkbox" role="switch"
-                 id="flexSwitchCheckDefault" aria-checked="false">
-          <label class="form-check-label" for="flexSwitchCheckDefault">Required</label>
-        </div>
-      </div>
-    </div>
-    <div class="row ms-2" v-if="label.choices !== null">
-      <strong>Choices:</strong>
-      <ul class="ps-2 ms-2 list-unstyled">
-        <li v-for="(choice, i) in label.choices" :key="i">
-          <div class="row mb-2">
+            </div>
+            <div>
+              <div class="input-group">
+                  <span class="input-group-text" id="basic-addon1"><font-awesome-icon
+                    :icon="['fas', 'circle-info']"/></span>
+                <input type="text" class="form-control" placeholder="Hint message" aria-label="Hint message"
+                       aria-describedby="basic-addon1" v-model="taskLabel.hint">
+              </div>
+            </div>
+          </div>
+          <div class="row mb-2 w-lg-50">
             <div class="col-auto">
+              <label for="autoSizingSelect">Type</label>
+              <ToolTip>
+                <strong>bool</strong> – boolean toggle<br>
+                <strong>str</strong> – free string input<br>
+                <strong>int</strong> – free integer input<br>
+                <strong>float</strong> – free float input<br>
+                <strong>single</strong> – pre-defined choices (only one can be selected)<br>
+                <strong>multi</strong> – pre-defined choices (multiple can be selected)<br>
+              </ToolTip>
+              <select class="form-select" id="autoSizingSelect" v-model="taskLabel.kind">
+                <option v-for="kind in annotationTaskLabelKinds" :key="kind" :value="kind">{{ kind }}</option>
+              </select>
+            </div>
+            <div class="col-auto">
+              <label for="autoSizingSelect">Max. Repeat</label>
+              <input type="number" class="form-control" v-model="taskLabel.max_repeat"/>
+            </div>
+            <div class="col-auto">
+              <div class="form-check form-switch">
+                <input class="form-check-input" v-model="taskLabel.required" type="checkbox" role="switch"
+                       id="flexSwitchCheckDefault" aria-checked="false">
+                <label class="form-check-label" for="flexSwitchCheckDefault">Required</label>
+              </div>
+            </div>
+          </div>
+          <!-- BEGIN List label choices for pre-defined choices -->
+          <div class="row ms-2" v-if="taskLabel.kind === 'single' || taskLabel.kind === 'multi'">
+            <strong>Choices:</strong>
+            <ul class="ps-2 ms-2 list-unstyled">
+              <li v-for="(choice, choiceIndex) in taskLabel.choices" :key="taskLabel.key+choice.value">
+                <div class="row mb-2">
+                  <div class="col-auto">
               <span class="input-group">
                 <span class="input-group-text" id="basic-addon1"><font-awesome-icon :icon="['fas', 'eye']"/></span>
                 <input type="text" class="form-control" placeholder="Visible name" aria-label="Visible name"
                        aria-describedby="basic-addon1" v-model="choice.name">
               </span>
-            </div>
-            <div class="col-3 col-lg-2">
+                  </div>
+                  <div class="col-3 col-lg-2">
               <span class="input-group">
                 <span class="input-group-text" id="basic-addon1"><font-awesome-icon :icon="['fas', 'key']"/></span>
                 <input type="number" class="form-control" placeholder="Value" aria-label="Value"
                        aria-describedby="basic-addon1" v-model="choice.value">
               </span>
-            </div>
-            <div class="col-auto">
+                  </div>
+                  <div class="col-auto">
               <span class="input-group">
-                <span class="input-group-text" id="basic-addon1"><font-awesome-icon
-                  :icon="['fas', 'circle-info']"/></span>
+                <span class="input-group-text" id="basic-addon1">
+                  <font-awesome-icon :icon="['fas', 'circle-info']"/>
+                </span>
                 <input type="text" class="form-control" placeholder="Hint message" aria-label="Hint message"
                        aria-describedby="basic-addon1" v-model="choice.hint">
               </span>
-            </div>
-            <div class="col-auto align-middle">
-              <span role="button" class="align-middle"><font-awesome-icon :icon="['fas', 'down-long']"/></span>&nbsp;
-              <span role="button"><font-awesome-icon :icon="['fas', 'up-long']"/></span>
-            </div>
-          </div>
-          <div class="row ms-2" v-if="choice.children !== null">
-            <strong>Sub-annotations:</strong>
-            <ul class="ps-0 list-unstyled">
-              <AnnotationLabelEditor v-for="child in choice.children" :key="child.key" :label="child"/>
+                  </div>
+                  <div class="col-auto align-middle">
+                    <span role="button" class="align-middle" tabindex="0"
+                          @click="moveChoiceDown(taskLabelIndex, choiceIndex)">
+                      <font-awesome-icon :icon="['fas', 'down-long']"/>
+                    </span>&nbsp;
+                    <span role="button" tabindex="0" @click="moveChoiceUp(taskLabelIndex, choiceIndex)">
+                      <font-awesome-icon :icon="['fas', 'up-long']"/>
+                    </span>&nbsp;
+                    <span role="button" tabindex="0" @click="removeChoice(taskLabelIndex, choiceIndex)">
+                      <font-awesome-icon :icon="['fas', 'trash-can']"/>
+                    </span>&nbsp;
+                    <span role="button" class="nacsos-tooltip" tabindex="0"
+                          v-if="choice.children === null || choice.children.length === 0"
+                          @click="addChild(taskLabelIndex, choiceIndex)">
+                      <font-awesome-icon :icon="['fas', 'diagram-predecessor']"/>
+                      <span class="nacsos-tooltiptext small">
+                        Add sub-labels
+                      </span>
+                    </span>
+                  </div>
+                </div>
+                <div class="row ms-2" v-if="choice.children !== null && choice.children.length > 0">
+                  <strong>Sub-annotations:</strong>
+                  <AnnotationTaskLabelsEditor :labels="choice.children"/>
+                </div>
+              </li>
             </ul>
+            <div>
+              <button class="btn btn-outline-secondary" @click="addChoice(taskLabelIndex)">Add choice</button>
+            </div>
           </div>
-        </li>
-      </ul>
+          <!-- /END List label choices for pre-defined choices -->
+        </div>
+      </li>
+    </ul>
+    <div>
+      <button class="btn btn-outline-primary mb-2" @click="addLabel()">Add Label</button>
     </div>
-
-  </li>
+  </div>
 </template>
 
 <script lang="ts">
 import { AnnotationTaskLabel } from '@/types/annotation.d';
-import { AnnotationTaskLabelKinds } from '@/plugins/api/annotations';
 import { PropType } from 'vue';
 import ToolTip from '@/components/ToolTip.vue';
+import { AnnotationTaskLabelKinds } from '@/plugins/api/annotations';
 
-console.log(AnnotationTaskLabelKinds);
+// TODO flatten list of all keys and make sure they are all unique (probably in AnnotationConfigEditView)
+
 export default {
-  name: 'AnnotationLabelEditor',
+  name: 'AnnotationTaskLabelsEditor',
   components: { ToolTip },
   props: {
-    label: {
-      type: Object as PropType<AnnotationTaskLabel>,
+    labels: {
+      type: Object as PropType<AnnotationTaskLabel[]>,
     },
   },
   data() {
     return {
       annotationTaskLabelKinds: AnnotationTaskLabelKinds,
-      taskLabel: this.label,
+      taskLabels: this.labels,
     };
+  },
+  methods: {
+    addLabel() {
+      this.taskLabels.push({
+        name: '',
+        key: 'newKey',
+        hint: '',
+        required: false,
+        max_repeat: 1,
+        kind: 'bool',
+        choices: [],
+      } as AnnotationTaskLabel);
+    },
+    removeLabel(index: number) {
+      this.taskLabels.splice(index, 1);
+    },
+    addChild(labelIndex: number, choiceIndex: number) {
+      // TODO
+      this.taskLabels[labelIndex].choices[choiceIndex].children = [{
+        name: '',
+        key: 'newKey',
+        hint: '',
+        required: false,
+        max_repeat: 1,
+        kind: 'bool',
+        choices: [],
+      } as AnnotationTaskLabel];
+    },
+    addChoice(taskLabelIndex: number) {
+      this.taskLabels[taskLabelIndex].choices.push({
+        children: null,
+        hint: null,
+        name: '',
+        value: this.taskLabels[taskLabelIndex].choices.length,
+      });
+    },
+    removeChoice(taskLabelIndex: number, choiceIndex: number) {
+      this.taskLabels[taskLabelIndex].choices.splice(choiceIndex, 1);
+    },
+    moveChoiceUp(taskLabelIndex: number, currentChoiceIndex: number) {
+      if (currentChoiceIndex > 0) {
+        // This looks like sorcery, but it essentially just swaps two elements in an array.
+        [this.taskLabels[taskLabelIndex].choices[currentChoiceIndex],
+          this.taskLabels[taskLabelIndex].choices[currentChoiceIndex - 1]] = [
+          this.taskLabels[taskLabelIndex].choices[currentChoiceIndex - 1],
+          this.taskLabels[taskLabelIndex].choices[currentChoiceIndex]];
+      }
+    },
+    moveChoiceDown(taskLabelIndex: number, currentChoiceIndex: number) {
+      if (currentChoiceIndex < (this.taskLabels[taskLabelIndex].choices.length - 1)) {
+        // This looks like sorcery, but it essentially just swaps two elements in an array.
+        [this.taskLabels[taskLabelIndex].choices[currentChoiceIndex],
+          this.taskLabels[taskLabelIndex].choices[currentChoiceIndex + 1]] = [
+          this.taskLabels[taskLabelIndex].choices[currentChoiceIndex + 1],
+          this.taskLabels[taskLabelIndex].choices[currentChoiceIndex]];
+      }
+    },
+    moveLabelUp(currentTaskLabelIndex: number) {
+      if (currentTaskLabelIndex > 0) {
+        // This looks like sorcery, but it essentially just swaps two elements in an array.
+        [this.taskLabels[currentTaskLabelIndex], this.taskLabels[currentTaskLabelIndex - 1]] = [
+          this.taskLabels[currentTaskLabelIndex - 1], this.taskLabels[currentTaskLabelIndex]];
+      }
+    },
+    moveLabelDown(currentTaskLabelIndex: number) {
+      if (currentTaskLabelIndex < (this.taskLabels.length - 1)) {
+        // This looks like sorcery, but it essentially just swaps two elements in an array.
+        [this.taskLabels[currentTaskLabelIndex], this.taskLabels[currentTaskLabelIndex + 1]] = [
+          this.taskLabels[currentTaskLabelIndex + 1], this.taskLabels[currentTaskLabelIndex]];
+      }
+    },
   },
 };
 </script>

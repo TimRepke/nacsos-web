@@ -1,5 +1,12 @@
 <template>
   <div class="text-start p-3 position-relative">
+    <!-- FIXME make the following message pretty and conditional on scopes existing for this task -->
+    <span class="text-warning">
+      <font-awesome-icon :icon="['fas', 'triangle-exclamation']"/>
+      Please note that editing the scheme may break the database if assignments and/or annotations were already made.
+      <font-awesome-icon :icon="['fas', 'triangle-exclamation']"/>
+    </span>
+
     <!-- Annotation Task Name -->
     <template v-if="nameEditMode">
       <div class="input-group mb-3 w-lg-50">
