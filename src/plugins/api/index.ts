@@ -54,9 +54,12 @@ class RequestGateway {
 
   protected accessToken: RemovableRef<string>;
 
+  protected currentProjectId: RemovableRef<string>;
+
   private constructor() {
     const baseUrl = 'http://localhost:8081';
     this.accessToken = useStorage<string>('accessToken', null);
+    this.currentProjectId = useStorage<string>('currentProjectId', null);
     this.pendingRequests = 0;
     this.httpClient = axios.create({
       baseURL: `${baseUrl}/api`,
@@ -89,6 +92,7 @@ class RequestGateway {
     const baseHeaders = this.defaultHeaders;
     if (this.accessToken.value) {
       baseHeaders.Authorization = `Bearer ${this.accessToken.value}`;
+      baseHeaders['x-project-id'] = this.currentProjectId.value;
     }
 
     return new Promise((resolve, reject) => {

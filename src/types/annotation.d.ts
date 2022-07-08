@@ -19,6 +19,7 @@ export interface AnnotationTaskLabel {
   required: boolean;
   kind: AnnotationTaskLabelKind;
   choices?: AnnotationTaskLabelChoice[]; // to be used in single or multi, which are dropdown menus
+  annotation?: Annotation;
 }
 
 export interface AnnotationTask {
@@ -36,12 +37,23 @@ export interface AssignmentScope {
   description?: string;
 }
 
+export interface UserProjectAssignmentScope {
+    scope: AssignmentScope;
+    num_assignments: number;
+    num_open: number;
+    num_partial: number;
+    num_completed: number;
+}
+
+export type AssignmentStatus = 'FULL' | 'PARTIAL' | 'OPEN' | 'INVALID'
+
 export interface Assignment {
   assignment_id?: string;
   assignment_scope_id: string;
   user_id: string;
   item_id: string;
   task_id: string;
+  status: AssignmentStatus;
   order: int;
 }
 
@@ -55,6 +67,7 @@ export interface Annotation {
   task_id: string;
   key: string;
   repeat: number;
+  parent?: string;
   value_int?: number;
   value_bool?: boolean;
   value_float?: number;
