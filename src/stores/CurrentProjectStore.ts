@@ -10,12 +10,18 @@ const ProjectSerializer = Serializer<Project>();
 const ProjectPermissionSerializer = Serializer<ProjectPermissions>();
 
 export type CurrentProjectStoreType = {
-  project?: RemovableRef<Project>,
-  projectPermissions?: RemovableRef<ProjectPermissions>,
+  projectId: RemovableRef<string>,
+  project: RemovableRef<Project>,
+  projectPermissions: RemovableRef<ProjectPermissions>,
 }
 
 export const useCurrentProjectStore = defineStore('CurrentProjectStore', {
   state: () => ({
+    projectId: useStorage<string>(
+      'currentProjectId',
+      null,
+      undefined,
+    ),
     project: useStorage<Project>(
       'currentProject',
       null,
@@ -31,6 +37,7 @@ export const useCurrentProjectStore = defineStore('CurrentProjectStore', {
   } as CurrentProjectStoreType),
   actions: {
     clear() {
+      this.projectId = undefined;
       this.project = undefined;
       this.projectPermissions = undefined;
     },
@@ -45,6 +52,7 @@ export const useCurrentProjectStore = defineStore('CurrentProjectStore', {
           if (projectInfo.status === 'fulfilled' && projectPermissions.status === 'fulfilled') {
             this.project = projectInfo.value.payload;
             this.projectPermissions = projectPermissions.value.payload;
+            this.projectId = projectInfo.value.payload?.project_id;
             EventBus.emit(new CurrentProjectSetEvent(this.project, this.projectPermissions));
           } else {
             console.error(values);
