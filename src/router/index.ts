@@ -39,17 +39,43 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: '/project/annotate',
     name: 'project-annotate',
-    component: () => import(/* webpackChunkName: "AnnotationView" */ '../views/Annotations/AnnotationView.vue'),
+    component: () => import(/* webpackChunkName: "AnnotationView" */ '../views/Annotations/Annotations/AnnotationsView.vue'),
+    children: [
+      {
+        path: '',
+        alias: ['', 'scopes'],
+        name: 'project-annotate-assignments',
+        component: () => import(/* webpackChunkName: "AnnotationView" */ '../views/Annotations/Annotations/AssignmentScopesView.vue'),
+      },
+      {
+        path: 'item/:scope_id/:assignment_id?',
+        name: 'project-annotate-item',
+        component: () => import(/* webpackChunkName: "AnnotationView" */ '../views/Annotations/Annotations/AnnotationView.vue'),
+      },
+    ],
   },
   {
-    path: '/project/config/annotations/list',
-    name: 'config-annotation-task-list',
-    component: () => import(/* webpackChunkName: "AnnotationConfigListView" */ '../views/Annotations/AnnotationConfigListView.vue'),
-  },
-  {
-    path: '/project/config/annotations/edit/:task_id',
-    name: 'config-annotation-task-edit',
-    component: () => import(/* webpackChunkName: "AnnotationConfigEditView" */ '../views/Annotations/AnnotationConfigEditView.vue'),
+    path: '/project/config/annotations',
+    name: 'config-annotation-tasks',
+    component: () => import(/* webpackChunkName: "AnnotationConfigListView" */ '../views/Annotations/AnnotationConfigs/AnnotationConfigsView.vue'),
+    children: [
+      {
+        path: '',
+        alias: ['', 'list'],
+        name: 'config-annotation-task-list',
+        component: () => import(/* webpackChunkName: "AssignmentScopesConfigView" */ '../views/Annotations/AnnotationConfigs/AnnotationConfigListView.vue'),
+      },
+      {
+        path: 'scope/:scope_id',
+        name: 'config-annotation-task-scope',
+        component: () => import(/* webpackChunkName: "AssignmentScopesConfigView" */ '../views/Annotations/AnnotationConfigs/AssignmentScopeConfigView.vue'),
+      },
+      {
+        path: 'task/:task_id',
+        name: 'config-annotation-task-edit',
+        component: () => import(/* webpackChunkName: "AnnotationConfigEditView" */ '../views/Annotations/AnnotationConfigs/AnnotationConfigEditView.vue'),
+      },
+    ],
   },
 ];
 
