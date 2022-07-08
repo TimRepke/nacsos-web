@@ -1,12 +1,12 @@
 .sidebar {
-    width: 380px;
+    min-width: 200px;
+    width: 16.6%;
     box-shadow: 0 0.5em 1.5em rgb(0 0 0 / 10%), 0 0.125em 0.5em rgb(0 0 0 / 15%);
     margin-right: 1rem;
 }
 
-
 .router-wrapper {
-    z-index: 2000;
+    /*z-index: 2000;*/
     height: var(--body-height);
     /*margin-top: -3rem;
     padding-top: 3rem;*/
@@ -38,6 +38,7 @@
 
 .nacsos-tooltip > .small {
     width: 10rem;
+    margin: -1rem 0 0 -100%;
 }
 
 .nacsos-tooltip > .medium {
@@ -51,4 +52,44 @@
 /* Show the tooltip text when you mouse over the tooltip container */
 .nacsos-tooltip:hover .nacsos-tooltiptext {
     visibility: visible;
+}
+
+
+.collapsible > input[type='checkbox'] {
+    display: none;
+}
+
+.collapsible > .lbl-toggle {
+    display: block;
+    transition: all 0.25s ease-out;
+}
+
+.collapsible > .lbl-toggle:hover {
+    text-decoration: underline;
+}
+
+.collapsible > .lbl-toggle::before {
+    content: ' ';
+    display: inline-block;
+    border-top: 5px solid transparent;
+    border-bottom: 5px solid transparent;
+    border-left: 5px solid currentColor;
+    vertical-align: middle;
+    margin-right: .7rem;
+    transform: translateY(-2px);
+    transition: transform .2s ease-out;
+}
+
+.collapsible > .toggle:checked + .lbl-toggle::before {
+    transform: rotate(90deg) translateX(-3px);
+}
+
+.collapsible > .collapsible-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height .25s ease-in-out;
+}
+
+.collapsible > .toggle:checked + .lbl-toggle + .collapsible-content {
+    max-height: 350px;
 }

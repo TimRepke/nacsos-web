@@ -1,14 +1,13 @@
 <template>
   <nav class="navbar navbar-light bg-light ps-0 p-0 p-sm-1 navbar-expand-sm sticky-sm-top">
     <div class="container-fluid">
-      <router-link to="/" class="navbar-brand">
-        <NacsosLogo style="height: 4rem; width: 4rem" class="mt-0 mt-sm-4"/>
-      </router-link>
+<!--      <router-link to="/" class="navbar-brand">-->
+<!--        <NacsosLogo style="height: 4rem; width: 4rem" class="mt-0 mt-sm-4"/>-->
+<!--      </router-link>-->
       <!-- burger menu button, which will appear on narrow screens -->
       <!-- TODO make the burger menu actually work-->
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown"
-              aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation"
-              style="margin-top: -1.5rem;">
+              aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
       <div class="collapse navbar-collapse justify-content-end bg-light" id="navbarNavDropdown">
@@ -35,7 +34,7 @@
             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdownMenuLink">
               <li><a class="dropdown-item" href="#">Edit Profile</a></li>
               <li><a class="dropdown-item" href="#">Another action</a></li>
-              <li><a class="dropdown-item" @click="logout">Log out</a></li>
+              <li class="dropdown-item" type="button" @click="logout">Log out</li>
             </ul>
           </li>
         </ul>
@@ -45,13 +44,13 @@
 </template>
 
 <script>
-import NacsosLogo from '@/components/NacsosLogo.vue';
+// import NacsosLogo from '@/components/NacsosLogo.vue';
 import { useCurrentUserStore } from '@/stores/CurrentUserStore';
 import { storeToRefs } from 'pinia';
 
 export default {
   name: 'TopBar',
-  components: { NacsosLogo },
+  // components: { NacsosLogo },
   setup() {
     const store = useCurrentUserStore();
     const { user } = storeToRefs(store);
@@ -63,6 +62,7 @@ export default {
   },
   methods: {
     logout() {
+      console.log('logiunt');
       this.$router.push('login');
       this.storeLogout();
     },

@@ -1,6 +1,11 @@
 <template>
   <div class="col-8 col-md-2 sidebar"
-       :class="{ 'd-none': !isOpen }">
+       :class="{ 'd-none': !isOpen }"
+       :style="logoSize">
+    <router-link to="/" class="text-decoration-none text-nowrap position-absolute d-inline-block mt-1 top-0"
+                 style="z-index: 2000; left:1rem;">
+      <NacsosLogo class="mt-0"/>
+    </router-link>
     <div class="list-group rounded-0">
       <!-- TODO: hide items based on permissions -->
       <router-link to="/project/overview" class="list-group-item list-group-item-action border-end-0"
@@ -21,7 +26,7 @@
       <router-link to="/project/pipelines" class="list-group-item list-group-item-action border-end-0"
                    active-class="active"> Pipelines
       </router-link>
-      <router-link to="/project/config/annotations/list" class="list-group-item list-group-item-action border-end-0"
+      <router-link to="/project/config/annotations" class="list-group-item list-group-item-action border-end-0"
                    active-class="active">
         <font-awesome-icon icon="gear"/>
         Annotations
@@ -41,12 +46,18 @@
 </template>
 
 <script lang="ts">
+import NacsosLogo from '@/components/NacsosLogo.vue';
+
 export default {
   name: 'SideBar',
+  components: { NacsosLogo },
   data(): object {
     return {
       visible: undefined,
       windowWidth: window.innerWidth,
+      logoSize: {
+        '--logo-size': '4rem',
+      },
     };
   },
   computed: {
@@ -78,11 +89,21 @@ export default {
 </script>
 
 <style scoped>
+:root {
+  --logo-size: 4rem;
+}
+
+#nacsos-logo {
+  width: var(--logo-size);
+  height: var(--logo-size);
+}
+
 .sidebar {
   border-right: 1px solid gray;
   height: 100vh;
   margin-top: -3rem;
-  padding-top: 5rem;
+  padding-top: calc(var(--logo-size) + 1rem);
+  margin-right: 0 !important;
   overflow-x: hidden;
   overflow-y: auto;
 }
@@ -95,5 +116,6 @@ export default {
   font-weight: bold;
   line-height: 2rem;
   cursor: pointer;
+  background: white;
 }
 </style>
