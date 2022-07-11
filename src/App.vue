@@ -25,14 +25,16 @@
 
     <!--router-view class="col router-wrapper"/-->
   </div>
+  <ToastsViewer/>
 </template>
 
 <script>
 import TopBar from '@/components/TopBar.vue';
 import SideBar from '@/components/SideBar.vue';
+import ToastsViewer from '@/components/ToastsViewer.vue';
 
 export default {
-  components: { SideBar, TopBar },
+  components: { SideBar, TopBar, ToastsViewer },
 };
 </script>
 

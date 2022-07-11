@@ -62,7 +62,6 @@ export default {
   },
   methods: {
     logout() {
-      console.log('logiunt');
       this.$router.push('login');
       this.storeLogout();
     },
