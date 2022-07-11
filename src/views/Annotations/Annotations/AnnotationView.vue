@@ -51,7 +51,7 @@
         </div>
         <div class="row g-0 border-top pt-2">
           <div class="col text-start">
-            <button class="btn btn-outline-secondary" @click="saveAndPrevious()">Save & Previous</button>
+            <button class="btn btn-outline-secondary" @click="saveAndPrevious()" disabled>Save & Previous</button>
           </div>
           <div class="col text-end">
             <button class="btn btn-primary" @click="saveAndNext()">Save & Next</button>
@@ -74,8 +74,38 @@ import {
 import { TwitterItem } from '@/types/items/twitter.d';
 import TwitterItemComponent from '@/components/items/TwitterItem.vue';
 import AnnotationLabels from '@/components/annotations/AnnotationLabels.vue';
-import { AnnotationTaskLabel } from '@/types/annotation.d';
+import { AnnotationTaskLabel, AssignmentStatus } from '@/types/annotation.d';
 import { useRoute } from 'vue-router';
+import { EventBus } from '@/plugins/events';
+import { ToastEvent } from '@/plugins/events/events/toast';
+
+const motivationalQuotes = [
+  // https://www.howmuchisthefish.de/
+  'The chase is better than the catch. – Scooter',
+  'It’s the first page of the second chapter – Scooter',
+  'Let’s blow a hole in the bowl – Scooter',
+  'Our lyrics fly like birds in the sky – Scooter',
+  // https://kanye.rest/
+  'Distraction is the enemy of vision – Kanye West',
+  'I love sleep; it’s my favorite. – Kanye West',
+  'Keep squares out yo circle – Kanye West',
+  // https://www.briantracy.com/blog/personal-success/inspirational-quotes/
+  'The bad news is time flies. The good news is you’re the pilot. – Michael Altshuler',
+  'The best way to get started is to quit talking and begin doing. ― Walt Disney',
+  'Act as if what you do makes a difference. It does. – William James',
+  'If you can change your mind, you can change your life. – William James',
+  'Life is like riding a bicycle. To keep your balance, you must keep moving. – Albert Einstein',
+  'If you don’t like the road you’re walking, start paving another one. – Dolly Parton',
+  'Don’t count the days. Make the days count. – Muhammad Ali',
+  'Every moment is a fresh beginning. – T.S. Eliot',
+  'Believe you can and you’re halfway there. – Theodore Roosevelt',
+  'You get what you give. – Jennifer Lopez',
+  'Your life only gets better when you get better. – Brian Tracy',
+  'Happiness is not by chance, but by choice. – Jim Rohn',
+  'Change the world by being yourself. – Amy Poehler',
+  'Change the game, don’t let the game change you. – Macklemore',
+  // https://pypi.org/project/quotes-generator/
+];
 
 export default {
   name: 'AnnotationView',
@@ -164,7 +194,37 @@ export default {
         task,
         assignment: this.assignment,
       };
-      await callSaveAnnotationEndpoint(payload);
+      callSaveAnnotationEndpoint(payload)
+        .then((reason) => {
+          console.log(reason);
+          if ((reason.payload as AssignmentStatus) === 'PARTIAL') {
+            EventBus.emit(new ToastEvent(
+              'WARN',
+              'This annotation wasn\'t quite done yet...',
+            ));
+          }
+          EventBus.emit(new ToastEvent(
+            'SUCCESS',
+            'Successfully saved your annotation!',
+          ));
+        })
+        .catch((reason) => {
+          // TODO: set up proper response reasons
+          EventBus.emit(new ToastEvent(
+            'ERROR',
+            'Failed to save your annotation. Sorry. '
+            + 'Please try reloading the page and saving again.',
+          ));
+        })
+        .finally(() => {
+          if (Math.random() < 0.2) {
+            const quoteIndex = Math.floor(Math.random() * (motivationalQuotes.length + 1));
+            EventBus.emit(new ToastEvent(
+              'INFO',
+              motivationalQuotes[quoteIndex],
+            ));
+          }
+        });
     },
     async setCurrentAssignment(annotationItem: AnnotationItemResponse) {
       // update all the data

@@ -1,6 +1,12 @@
 import { Endpoint, EndpointFunction, ResponseReason } from '@/plugins/api/types.d';
 import { callEndpointFactory } from '@/plugins/api/index';
-import { AnnotationTask, Assignment, AssignmentScope, UserProjectAssignmentScope } from '@/types/annotation.d';
+import {
+  AnnotationTask,
+  Assignment,
+  AssignmentScope,
+  AssignmentStatus,
+  UserProjectAssignmentScope,
+} from '@/types/annotation.d';
 import { BaseItem } from '@/types/items/index.d';
 import { TwitterItem } from '@/types/items/twitter.d';
 
@@ -119,7 +125,7 @@ const ScopeAssignmentsEndpoint: Endpoint<ResponseReason, Assignment[]> = {
   },
 };
 
-const SaveAnnotationEndpoint: Endpoint<ResponseReason, null> = {
+const SaveAnnotationEndpoint: Endpoint<ResponseReason, AssignmentStatus> = {
   method: 'POST',
   path: '/annotations/annotate/save',
   paramsEncoding: 'BODY',
@@ -132,7 +138,7 @@ const SaveAnnotationEndpoint: Endpoint<ResponseReason, null> = {
 };
 
 export const callSaveAnnotationEndpoint:
-  EndpointFunction<AnnotatedItemRequestPayload, ResponseReason, null> = callEndpointFactory(SaveAnnotationEndpoint);
+  EndpointFunction<AnnotatedItemRequestPayload, ResponseReason, AssignmentStatus> = callEndpointFactory(SaveAnnotationEndpoint);
 
 export const callProjectUserScopesEndpoint:
   EndpointFunction<ProjectTasksRequestPayload, ResponseReason,
