@@ -33,12 +33,15 @@ export interface AnnotationTask {
 export interface AssignmentScope {
   assignment_scope_id?: string;
   task_id: string;
+  time_created?: string; // TODO datetime
   name: string;
   description?: string;
 }
 
 export interface UserProjectAssignmentScope {
     scope: AssignmentScope;
+    task_name: string;
+    task_description: string;
     num_assignments: number;
     num_open: number;
     num_partial: number;

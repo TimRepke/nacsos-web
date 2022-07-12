@@ -194,9 +194,9 @@ export default {
         task,
         assignment: this.assignment,
       };
+      // TODO: set up proper response reasons for this endpoint
       callSaveAnnotationEndpoint(payload)
         .then((reason) => {
-          console.log(reason);
           if ((reason.payload as AssignmentStatus) === 'PARTIAL') {
             EventBus.emit(new ToastEvent(
               'WARN',
@@ -209,7 +209,6 @@ export default {
           ));
         })
         .catch((reason) => {
-          // TODO: set up proper response reasons
           EventBus.emit(new ToastEvent(
             'ERROR',
             'Failed to save your annotation. Sorry. '

@@ -1,18 +1,22 @@
 <template>
   <div class="text-start p-2">
-    <h1>List of Assignments</h1>
+    <h2>List of Assignments</h2>
     <ul>
       <li v-for="scope in annotationScopes" :key="scope.scope.assignment_scope_id">
-        <router-link :to="{ name:'project-annotate-item', params: { scope_id: scope.scope.assignment_scope_id } }">
-          {{ scope.scope.name }}
+        {{ scope.task_name }}
+        <em>({{ scope.scope.name }})</em>&nbsp;
+        <router-link :to="{ name:'project-annotate-item', params: { scope_id: scope.scope.assignment_scope_id } }"
+                     class="link-secondary">
+          <font-awesome-icon :icon="['fas', 'tags']"/>
         </router-link>
-        |
+        <br/>
         Assignments:
         <InlineToolTip info="Completed assignments">{{ scope.num_completed }}</InlineToolTip>
         /
         <InlineToolTip info="Partially completed assignments">{{ scope.num_partial }}</InlineToolTip>
         /
-        <InlineToolTip info="Number of assignments">{{ scope.num_assignments }}</InlineToolTip>
+        <InlineToolTip info="Number of assignments"><strong>{{ scope.num_assignments }}</strong></InlineToolTip>
+        ({{ ((scope.num_completed / scope.num_assignments) * 100).toFixed(0) }}%)
       </li>
     </ul>
   </div>

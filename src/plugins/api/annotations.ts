@@ -65,6 +65,18 @@ const ProjectUserScopesEndpoint: Endpoint<ResponseReason, UserProjectAssignmentS
   },
 };
 
+const ProjectScopesEndpoint: Endpoint<ResponseReason, AssignmentScope[]> = {
+  method: 'GET',
+  path: '/annotations/annotate/scopes/',
+  paramsEncoding: 'PATH',
+  transformResponse: (response) => {
+    if (response.data) {
+      return ['SUCCESS', 'SUCCESS', response.data];
+    }
+    return ['FAILED', 'POSTPROCESSING_FAILED'];
+  },
+};
+
 const ProjectTasksEndpoint: Endpoint<ResponseReason, AnnotationTask[]> = {
   method: 'GET',
   path: '/annotations/tasks/list/{projectId}',
@@ -143,6 +155,10 @@ export const callSaveAnnotationEndpoint:
 export const callProjectUserScopesEndpoint:
   EndpointFunction<ProjectTasksRequestPayload, ResponseReason,
     UserProjectAssignmentScope[]> = callEndpointFactory(ProjectUserScopesEndpoint);
+
+export const callProjectScopesEndpoint:
+  EndpointFunction<null, ResponseReason,
+    AssignmentScope[]> = callEndpointFactory(ProjectScopesEndpoint);
 
 export const callTaskDefinitionEndpoint:
   EndpointFunction<TaskDefinitionRequestPayload, ResponseReason, AnnotationTask> = callEndpointFactory(TaskDefinitionEndpoint);
