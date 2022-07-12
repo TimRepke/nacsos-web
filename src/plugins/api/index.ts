@@ -4,6 +4,7 @@ import { Endpoint, EndpointFunction, RequestResult } from '@/plugins/api/types.d
 import { EventBus } from '@/plugins/events';
 import { RequestSubmittedEvent } from '@/plugins/events/events/auth';
 import { RemovableRef, useStorage } from '@vueuse/core';
+import { RequestGatewayStatusChangeEvent } from '@/plugins/events/events/general';
 
 interface TransformedPayload<REQUEST> {
   params: REQUEST | URLSearchParams | FormData | null;
@@ -80,6 +81,11 @@ class RequestGateway {
     return this.pendingRequests > 0;
   }
 
+  updateState(counter: number) {
+    this.pendingRequests += counter;
+    EventBus.emit(new RequestGatewayStatusChangeEvent(this.isBusy(), this.pendingRequests));
+  }
+
   request<REQUEST, REASON extends string, RESPONSE>(
     payload: REQUEST,
     endpoint: Endpoint<REASON, RESPONSE>,
@@ -87,7 +93,7 @@ class RequestGateway {
     const { path, params } = transformPayload<REQUEST, REASON, RESPONSE>(payload, endpoint);
 
     EventBus.emit(new RequestSubmittedEvent(path));
-    this.pendingRequests += 1;
+    this.updateState(1);
 
     const baseHeaders = this.defaultHeaders;
     if (this.accessToken.value) {
@@ -102,7 +108,7 @@ class RequestGateway {
         data: params,
         headers: { ...baseHeaders, ...endpoint.customHeaders },
       }).then((response) => {
-        this.pendingRequests -= 1;
+        this.updateState(-1);
         try {
           const [status, reason, responsePayload] = endpoint.transformResponse(response);
           if (status === 'SUCCESS') {
@@ -125,7 +131,7 @@ class RequestGateway {
           } as RequestResult<REASON, RESPONSE>);
         }
       }).catch((error) => {
-        this.pendingRequests -= 1;
+        this.updateState(-1);
         return reject({
           status: 'FAILED',
           info: { error },

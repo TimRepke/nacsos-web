@@ -107,12 +107,14 @@
           id="logo-n-foot-outline"/>
       </g>
     </svg>
-    <div class="spinframe" :class="{spin:loading}" style="height: 100%;width: 100%;" id="nacsos-logo-spinframe1"></div>
-    <div class="spinframe" :class="{spin:loading}" style="height: 100%;width: 100%;" id="nacsos-logo-spinframe2"></div>
+    <div class="spinframe" :class="{spin: loading}" style="height: 100%;width: 100%;" id="nacsos-logo-spinframe1"></div>
+    <div class="spinframe" :class="{spin: loading}" style="height: 100%;width: 100%;" id="nacsos-logo-spinframe2"></div>
   </div>
 </template>
 
-<script>
+<script lang="ts">
+import { RequestGatewayStatusChangeEvent } from '@/plugins/events/events/general';
+
 export default {
   name: 'NacsosLogo',
   props: {
@@ -121,14 +123,20 @@ export default {
       default: false,
     },
   },
+  created() {
+    this.$eventBus.on(RequestGatewayStatusChangeEvent, (event: RequestGatewayStatusChangeEvent) => {
+      console.log(event);
+      this.activeRequests = event.newState;
+    });
+  },
   data() {
     return {
-      loading: this.animated,
+      activeRequests: false,
     };
   },
-  methods: {
-    setAnimationState: (newState) => {
-      this.loading = newState;
+  computed: {
+    loading() {
+      return this.animated || this.activeRequests;
     },
   },
 };

@@ -15,7 +15,8 @@
 
               <!-- loading state -->
               <template #fallback>
-                Loading...
+                Loading...<br/>
+                If this takes longer than expected, something might be wrong.
               </template>
             </Suspense>
           </KeepAlive>
