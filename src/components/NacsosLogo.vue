@@ -125,7 +125,6 @@ export default {
   },
   created() {
     this.$eventBus.on(RequestGatewayStatusChangeEvent, (event: RequestGatewayStatusChangeEvent) => {
-      console.log(event);
       this.activeRequests = event.newState;
     });
   },

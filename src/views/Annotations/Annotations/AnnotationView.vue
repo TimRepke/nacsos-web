@@ -1,7 +1,7 @@
 <template>
   <div class="row g-0 text-start">
     <template v-if="!assignments">
-      Error loading data.
+      Loading next assignment for annotation. If this takes longer than expected, something went wrong.
     </template>
     <template v-else>
       <div class="col-12 col-md overflow-auto h-md-100">
@@ -9,7 +9,7 @@
           <ul class="d-flex list-unstyled">
             <li v-for="assignmentLI in assignments" :key="assignmentLI.assignment_id"
                 class="me-0 assignments-step flex-fill"
-                :class="[assignmentLI.status, (assignmentLI.assignment_id === assignment.assignment_id) ? 'current' :'']"
+                :class="[assignmentLI.status, (assignmentLI.assignment_id === assignment.assignment_id) ? 'current' : '']"
                 type="button"
                 @click="saveAndGoto(assignmentLI.assignment_id)">
             </li>
