@@ -26,15 +26,17 @@
     <!--router-view class="col router-wrapper"/-->
   </div>
   <ToastsViewer/>
+  <ConfirmationModal/>
 </template>
 
 <script>
 import TopBar from '@/components/TopBar.vue';
 import SideBar from '@/components/SideBar.vue';
 import ToastsViewer from '@/components/ToastsViewer.vue';
+import ConfirmationModal from '@/components/ConfirmationModal.vue';
 
 export default {
-  components: { SideBar, TopBar, ToastsViewer },
+  components: { ConfirmationModal, SideBar, TopBar, ToastsViewer },
 };
 </script>
 
