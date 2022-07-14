@@ -2,8 +2,8 @@
   <!-- FIXME Fix duplicate element ids (keep in mind this is all looped) -->
   <div>
     <ul class="ps-0 list-unstyled">
-      <li class="border m-2 p-2 position-relative" v-for="(taskLabel, taskLabelIndex) in taskLabels"
-          :key="taskLabel.key">
+      <li class="border m-2 p-2 position-relative" v-for="(taskLabel, taskLabelIndex) in taskLabelsWithKey"
+          :key="taskLabel.tmpKey">
         <div role="button" class="position-absolute top-0 end-0 m-2" @click="removeLabel(taskLabelIndex)" tabindex="0">
           <font-awesome-icon :icon="['fas', 'trash-can']"/>
         </div>
@@ -71,7 +71,7 @@
           <div class="row ms-2" v-if="taskLabel.kind === 'single' || taskLabel.kind === 'multi'">
             <strong>Choices:</strong>
             <ul class="ps-2 ms-2 list-unstyled">
-              <li v-for="(choice, choiceIndex) in taskLabel.choices" :key="taskLabel.key+choice.value">
+              <li v-for="(choice, choiceIndex) in taskLabel.choices" :key="choice.tmpKey">
                 <div class="row mb-2">
                   <div class="col-auto">
               <span class="input-group">
@@ -162,6 +162,7 @@ export default {
   methods: {
     addLabel() {
       this.taskLabels.push({
+        tmpKey: crypto.randomUUID(),
         name: '',
         key: 'newKey',
         hint: '',
@@ -177,6 +178,7 @@ export default {
     addChild(labelIndex: number, choiceIndex: number) {
       // TODO
       this.taskLabels[labelIndex].choices[choiceIndex].children = [{
+        tmpKey: crypto.randomUUID(),
         name: '',
         key: 'newKey',
         hint: '',
@@ -188,6 +190,7 @@ export default {
     },
     addChoice(taskLabelIndex: number) {
       this.taskLabels[taskLabelIndex].choices.push({
+        tmpKey: crypto.randomUUID(),
         children: null,
         hint: null,
         name: '',
@@ -228,6 +231,15 @@ export default {
         [this.taskLabels[currentTaskLabelIndex], this.taskLabels[currentTaskLabelIndex + 1]] = [
           this.taskLabels[currentTaskLabelIndex + 1], this.taskLabels[currentTaskLabelIndex]];
       }
+    },
+  },
+  computed: {
+    taskLabelsWithKey() {
+      return this.taskLabels.map((taskLabel: AnnotationTaskLabel) => {
+        // eslint-disable-next-line no-param-reassign
+        taskLabel.tmpKey = crypto.randomUUID();
+        return taskLabel;
+      });
     },
   },
 };
