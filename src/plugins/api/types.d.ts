@@ -11,6 +11,7 @@ export type ResponseStatus =
 
 export type RequestEncoding =
   | 'URL'
+  | 'QUERY'
   | 'PATH'
   | 'BODY'
   | 'FORM';

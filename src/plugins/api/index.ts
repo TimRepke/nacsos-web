@@ -16,10 +16,14 @@ function transformPayload<REQUEST, REASON, RESPONSE>(params: REQUEST, endpoint: 
   if (!params) return { params: null, path: endpoint.path };
   const encoding = endpoint.paramsEncoding || 'BODY';
 
-  if (encoding === 'URL') {
+  if (encoding === 'URL' || encoding === 'QUERY') {
     const payload = new URLSearchParams();
     Object.entries(params).forEach(([key, value]) => {
-      payload.append(key, value);
+      if (value instanceof Array) {
+        value.forEach((val: string) => payload.append(key, val));
+      } else {
+        payload.append(key, value);
+      }
     });
     return { params: payload, path: endpoint.path };
   }
@@ -102,12 +106,15 @@ class RequestGateway {
     }
 
     return new Promise((resolve, reject) => {
-      this.httpClient.request({
+      const requestConfig = {
         method: endpoint.method,
         url: path,
+        params: (params instanceof URLSearchParams) ? params : undefined,
         data: params,
         headers: { ...baseHeaders, ...endpoint.customHeaders },
-      }).then((response) => {
+      };
+
+      this.httpClient.request(requestConfig).then((response) => {
         this.updateState(-1);
         try {
           const [status, reason, responsePayload] = endpoint.transformResponse(response);

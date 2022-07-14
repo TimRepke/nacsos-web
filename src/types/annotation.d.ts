@@ -1,6 +1,7 @@
 /* eslint no-use-before-define: ["off"] */
 
 export interface AnnotationTaskLabelChoice {
+  tmpKey?: string; // only used in GUI as :key reference
   name: string;
   hint?: string;
   value: number;
@@ -12,6 +13,7 @@ export interface AnnotationTaskLabelChoice {
 export type AnnotationTaskLabelKind = 'bool' | 'str' | 'int' | 'float' | 'single' | 'multi';
 
 export interface AnnotationTaskLabel {
+  tmpKey?: string; // only used in GUI as :key reference
   name: string;
   key: string;
   hint?: string;
@@ -30,6 +32,18 @@ export interface AnnotationTask {
   labels: AnnotationTaskLabel[];
 }
 
+export type AssignmentScopeConfigType = 'random';
+
+export interface RandomAssignmentConfig {
+  users?: string[];
+  config_type: AssignmentScopeConfigType;
+  num_items: number;
+  min_assignments_per_item: number;
+  max_assignments_per_item: number;
+  num_multi_coded_items: number;
+  random_seed: number;
+}
+
 export interface AssignmentScope {
   assignment_scope_id?: string;
   task_id: string;
@@ -39,13 +53,13 @@ export interface AssignmentScope {
 }
 
 export interface UserProjectAssignmentScope {
-    scope: AssignmentScope;
-    task_name: string;
-    task_description: string;
-    num_assignments: number;
-    num_open: number;
-    num_partial: number;
-    num_completed: number;
+  scope: AssignmentScope;
+  task_name: string;
+  task_description: string;
+  num_assignments: number;
+  num_open: number;
+  num_partial: number;
+  num_completed: number;
 }
 
 export type AssignmentStatus = 'FULL' | 'PARTIAL' | 'OPEN' | 'INVALID'

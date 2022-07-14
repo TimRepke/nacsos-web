@@ -4,7 +4,7 @@ import {
   AnnotationTask,
   Assignment,
   AssignmentScope,
-  AssignmentStatus,
+  AssignmentStatus, RandomAssignmentConfig,
   UserProjectAssignmentScope,
 } from '@/types/annotation.d';
 import { BaseItem } from '@/types/items/index.d';
@@ -39,6 +39,13 @@ export interface AnnotationItemResponse {
   assignment: Assignment;
   scope: AssignmentScope;
   item: TwitterItem | BaseItem;
+}
+
+export interface MakeAssignmentsRequestPayload {
+  task_id: string;
+  scope_id: string;
+  config: RandomAssignmentConfig;
+  save: boolean;
 }
 
 const TaskDefinitionEndpoint: Endpoint<ResponseReason, AnnotationTask> = {
@@ -148,6 +155,21 @@ const SaveAnnotationEndpoint: Endpoint<ResponseReason, AssignmentStatus> = {
     return ['FAILED', 'POSTPROCESSING_FAILED'];
   },
 };
+
+const MakeAssignmentsEndpoint: Endpoint<ResponseReason, Assignment[]> = {
+  method: 'POST',
+  path: '/annotations/config/assignments/',
+  paramsEncoding: 'BODY',
+  transformResponse: (response) => {
+    if (response.data) {
+      return ['SUCCESS', 'SUCCESS', response.data];
+    }
+    return ['FAILED', 'POSTPROCESSING_FAILED'];
+  },
+};
+
+export const callMakeAssignmentsEndpoint:
+  EndpointFunction<MakeAssignmentsRequestPayload, ResponseReason, Assignment[]> = callEndpointFactory(MakeAssignmentsEndpoint);
 
 export const callSaveAnnotationEndpoint:
   EndpointFunction<AnnotatedItemRequestPayload, ResponseReason, AssignmentStatus> = callEndpointFactory(SaveAnnotationEndpoint);
