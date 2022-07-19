@@ -1,30 +1,31 @@
 <template>
-  <div aria-live="polite" aria-atomic="true" class="position-absolute top-0 end-0 p-3 pt-5 mh-100 overflow-auto">
+  <!--  <div aria-live="polite" aria-atomic="true" class="position-absolute top-0 end-0 p-3 pt-5 mh-100 overflow-auto">-->
+  <div class="toast-container position-absolute top-0 end-0 p-3 pt-5 mh-100 overflow-auto"
+       role="alert" aria-live="assertive" aria-atomic="true">
     <template v-for="toast in toasts" :key="toast.key">
-      <div class="toast-container mt-2" role="alert" aria-live="assertive" aria-atomic="true">
-        <div class="toast align-items-center border-0 show"
-             :class="[toast.bg, toast.col]"
-             role="alert" aria-live="assertive" aria-atomic="true">
-          <div class="d-flex">
-            <div class="toast-body">
-              {{ toast.message }}
-            </div>
-            <button @click="remove(toast.key)" type="button" class="btn-close btn-close-white me-2 m-auto"
-                    aria-label="Close"></button>
-          </div>
+      <div class="toast align-items-center border-0 show mb-2"
+           :class="[toast.bg, toast.col]"
+           role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="d-flex">
+          <div class="toast-body text-start" v-html="toast.htmlMessage"></div>
+          <button @click="remove(toast.key)" type="button" class="btn-close btn-close-white me-2 m-auto"
+                  aria-label="Close"></button>
         </div>
       </div>
     </template>
   </div>
+  <!--  </div>-->
 </template>
 
 <script lang="ts">
 import { ToastEvent, ToastType } from '@/plugins/events/events/toast';
+import { marked } from 'marked';
 
 interface Toast {
   key: number;
   level: ToastType;
   message: string;
+  htmlMessage: string;
   bg: string;
   col: string;
 }
@@ -49,6 +50,7 @@ export default {
         key: this.runningCount,
         level: event.level,
         message: event.message,
+        htmlMessage: marked(event.message),
         bg: backgroundClass[event.level],
         col: textColorClass[event.level],
       };

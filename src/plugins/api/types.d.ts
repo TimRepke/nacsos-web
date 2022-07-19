@@ -24,7 +24,7 @@ export interface Endpoint<REASON, RESPONSE> {
   path: string;
   paramsEncoding?: RequestEncoding;
   customHeaders?: AxiosRequestHeaders;
-  transformResponse: ResponseTransformFunction<REASON, RESPONSE>;
+  transformResponse?: ResponseTransformFunction<REASON, RESPONSE>;
 }
 
 export interface RequestResult<REASON, RESPONSE> {

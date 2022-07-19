@@ -1,6 +1,6 @@
 import { App } from 'vue';
-import axios, { AxiosInstance, AxiosRequestHeaders } from 'axios';
-import { Endpoint, EndpointFunction, RequestResult } from '@/plugins/api/types.d';
+import axios, { AxiosInstance, AxiosRequestHeaders, AxiosResponse } from 'axios';
+import { Endpoint, EndpointFunction, RequestResult, ResponseStatus } from '@/plugins/api/types.d';
 import { EventBus } from '@/plugins/events';
 import { RequestSubmittedEvent } from '@/plugins/events/events/auth';
 import { RemovableRef, useStorage } from '@vueuse/core';
@@ -117,7 +117,15 @@ class RequestGateway {
       this.httpClient.request(requestConfig).then((response) => {
         this.updateState(-1);
         try {
-          const [status, reason, responsePayload] = endpoint.transformResponse(response);
+          const transformResponse = (endpoint.transformResponse) ? endpoint.transformResponse
+            : (res: AxiosResponse): [ResponseStatus, REASON, RESPONSE?] => {
+              if (response.data) {
+                return ['SUCCESS', 'SUCCESS' as REASON, res.data];
+              }
+              return ['FAILED', 'POSTPROCESSING_FAILED' as REASON];
+            };
+          const [status, reason, responsePayload] = transformResponse(response);
+
           if (status === 'SUCCESS') {
             const res: RequestResult<REASON, RESPONSE> = {
               status: 'SUCCESS',

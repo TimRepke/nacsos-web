@@ -2,8 +2,8 @@ import { Endpoint, EndpointFunction, ResponseReason } from '@/plugins/api/types.
 import { callEndpointFactory } from '@/plugins/api/index';
 import {
   AnnotationTask,
-  Assignment,
-  AssignmentScope,
+  Assignment, AssignmentConfigType,
+  AssignmentScope, AssignmentScopeCounts,
   AssignmentStatus, RandomAssignmentConfig,
   UserProjectAssignmentScope,
 } from '@/types/annotation.d';
@@ -41,10 +41,14 @@ export interface AnnotationItemResponse {
   item: TwitterItem | BaseItem;
 }
 
+export interface AssignmentScopeRequestPayload {
+  assignmentScopeId: string;
+}
+
 export interface MakeAssignmentsRequestPayload {
   task_id: string;
   scope_id: string;
-  config: RandomAssignmentConfig;
+  config: AssignmentConfigType;
   save: boolean;
 }
 
@@ -52,95 +56,83 @@ const TaskDefinitionEndpoint: Endpoint<ResponseReason, AnnotationTask> = {
   method: 'GET',
   path: '/annotations/tasks/definition/{taskId}',
   paramsEncoding: 'PATH',
-  transformResponse: (response) => {
-    if (response.data) {
-      return ['SUCCESS', 'SUCCESS', response.data];
-    }
-    return ['FAILED', 'POSTPROCESSING_FAILED'];
-  },
 };
 
 const ProjectUserScopesEndpoint: Endpoint<ResponseReason, UserProjectAssignmentScope[]> = {
   method: 'GET',
   path: '/annotations/annotate/scopes/{projectId}',
   paramsEncoding: 'PATH',
-  transformResponse: (response) => {
-    if (response.data) {
-      return ['SUCCESS', 'SUCCESS', response.data];
-    }
-    return ['FAILED', 'POSTPROCESSING_FAILED'];
-  },
 };
 
 const ProjectScopesEndpoint: Endpoint<ResponseReason, AssignmentScope[]> = {
   method: 'GET',
   path: '/annotations/annotate/scopes/',
   paramsEncoding: 'PATH',
-  transformResponse: (response) => {
-    if (response.data) {
-      return ['SUCCESS', 'SUCCESS', response.data];
-    }
-    return ['FAILED', 'POSTPROCESSING_FAILED'];
-  },
+};
+
+const ScopeEndpoint: Endpoint<ResponseReason, AssignmentScope> = {
+  method: 'GET',
+  path: '/annotations/annotate/scope/{assignmentScopeId}',
+  paramsEncoding: 'PATH',
+};
+
+const ScopeCountsEndpoint: Endpoint<ResponseReason, AssignmentScopeCounts> = {
+  method: 'GET',
+  path: '/annotations/annotate/scope/counts/{assignmentScopeId}',
+  paramsEncoding: 'PATH',
 };
 
 const ProjectTasksEndpoint: Endpoint<ResponseReason, AnnotationTask[]> = {
   method: 'GET',
   path: '/annotations/tasks/list/{projectId}',
   paramsEncoding: 'PATH',
-  transformResponse: (response) => {
-    if (response.data) {
-      return ['SUCCESS', 'SUCCESS', response.data];
-    }
-    return ['FAILED', 'POSTPROCESSING_FAILED'];
-  },
 };
 
 const NextOpenAnnotationItemEndpoint: Endpoint<ResponseReason, AnnotationItemResponse> = {
   method: 'GET',
   path: '/annotations/annotate/next/{assignmentScopeId}',
   paramsEncoding: 'PATH',
-  transformResponse: (response) => {
-    if (response.data) {
-      return ['SUCCESS', 'SUCCESS', response.data];
-    }
-    return ['FAILED', 'POSTPROCESSING_FAILED'];
-  },
 };
 
 const NextAnnotationItemEndpoint: Endpoint<ResponseReason, AnnotationItemResponse> = {
   method: 'GET',
   path: '/annotations/annotate/next/{assignmentScopeId}/{currentAssignmentId}',
   paramsEncoding: 'PATH',
-  transformResponse: (response) => {
-    if (response.data) {
-      return ['SUCCESS', 'SUCCESS', response.data];
-    }
-    return ['FAILED', 'POSTPROCESSING_FAILED'];
-  },
 };
 
 const AnnotationItemEndpoint: Endpoint<ResponseReason, AnnotationItemResponse> = {
   method: 'GET',
   path: '/annotations/annotate/assignment/{assignmentId}',
   paramsEncoding: 'PATH',
-  transformResponse: (response) => {
-    if (response.data) {
-      return ['SUCCESS', 'SUCCESS', response.data];
-    }
-    return ['FAILED', 'POSTPROCESSING_FAILED'];
-  },
+};
+
+const ScopeUserAssignmentsEndpoint: Endpoint<ResponseReason, Assignment[]> = {
+  method: 'GET',
+  path: '/annotations/annotate/assignments/{assignmentScopeId}',
+  paramsEncoding: 'PATH',
 };
 
 const ScopeAssignmentsEndpoint: Endpoint<ResponseReason, Assignment[]> = {
   method: 'GET',
-  path: '/annotations/annotate/assignments/{assignmentScopeId}',
+  path: '/annotations/annotate/assignments/scope/{assignmentScopeId}',
+  paramsEncoding: 'PATH',
+};
+
+const SaveAssignmentScopeEndpoint: Endpoint<ResponseReason, string> = {
+  method: 'PUT',
+  path: '/annotations/annotate/scope/',
+  paramsEncoding: 'BODY',
+};
+
+const RemoveAssignmentScopeEndpoint: Endpoint<ResponseReason, null> = {
+  method: 'DELETE',
+  path: '/annotations/annotate/scope/{assignmentScopeId}',
   paramsEncoding: 'PATH',
   transformResponse: (response) => {
     if (response.data) {
-      return ['SUCCESS', 'SUCCESS', response.data];
+      return ['FAILED', 'REQUEST_FAILED', response.data.detail];
     }
-    return ['FAILED', 'POSTPROCESSING_FAILED'];
+    return ['SUCCESS', 'SUCCESS'];
   },
 };
 
@@ -148,24 +140,12 @@ const SaveAnnotationEndpoint: Endpoint<ResponseReason, AssignmentStatus> = {
   method: 'POST',
   path: '/annotations/annotate/save',
   paramsEncoding: 'BODY',
-  transformResponse: (response) => {
-    if (response.data) {
-      return ['SUCCESS', 'SUCCESS', response.data];
-    }
-    return ['FAILED', 'POSTPROCESSING_FAILED'];
-  },
 };
 
 const MakeAssignmentsEndpoint: Endpoint<ResponseReason, Assignment[]> = {
   method: 'POST',
   path: '/annotations/config/assignments/',
   paramsEncoding: 'BODY',
-  transformResponse: (response) => {
-    if (response.data) {
-      return ['SUCCESS', 'SUCCESS', response.data];
-    }
-    return ['FAILED', 'POSTPROCESSING_FAILED'];
-  },
 };
 
 export const callMakeAssignmentsEndpoint:
@@ -179,8 +159,19 @@ export const callProjectUserScopesEndpoint:
     UserProjectAssignmentScope[]> = callEndpointFactory(ProjectUserScopesEndpoint);
 
 export const callProjectScopesEndpoint:
-  EndpointFunction<null, ResponseReason,
-    AssignmentScope[]> = callEndpointFactory(ProjectScopesEndpoint);
+  EndpointFunction<null, ResponseReason, AssignmentScope[]> = callEndpointFactory(ProjectScopesEndpoint);
+
+export const callScopeEndpoint:
+  EndpointFunction<AssignmentScopeRequestPayload, ResponseReason, AssignmentScope> = callEndpointFactory(ScopeEndpoint);
+
+export const callSaveAssignmentScopeEndpoint:
+  EndpointFunction<AssignmentScope, ResponseReason, string> = callEndpointFactory(SaveAssignmentScopeEndpoint);
+
+export const callRemoveAssignmentScopeEndpoint:
+  EndpointFunction<AssignmentScopeRequestPayload, ResponseReason, null> = callEndpointFactory(RemoveAssignmentScopeEndpoint);
+
+export const callScopeCountsEndpoint:
+  EndpointFunction<AssignmentScopeRequestPayload, ResponseReason, AssignmentScopeCounts> = callEndpointFactory(ScopeCountsEndpoint);
 
 export const callTaskDefinitionEndpoint:
   EndpointFunction<TaskDefinitionRequestPayload, ResponseReason, AnnotationTask> = callEndpointFactory(TaskDefinitionEndpoint);
@@ -189,9 +180,10 @@ export const callProjectTasksEndpoint:
   EndpointFunction<ProjectTasksRequestPayload, ResponseReason, AnnotationTask[]> = callEndpointFactory(ProjectTasksEndpoint);
 
 export const callScopeAssignmentsEndpoint:
-  EndpointFunction<NextAnnotationItemRequestPayload,
-    ResponseReason,
-    Assignment[]> = callEndpointFactory(ScopeAssignmentsEndpoint);
+  EndpointFunction<AssignmentScopeRequestPayload, ResponseReason, Assignment[]> = callEndpointFactory(ScopeAssignmentsEndpoint);
+
+export const callScopeUserAssignmentsEndpoint:
+  EndpointFunction<AssignmentScopeRequestPayload, ResponseReason, Assignment[]> = callEndpointFactory(ScopeUserAssignmentsEndpoint);
 
 export const callNextAnnotationItemEndpoint:
   EndpointFunction<NextAnnotationItemRequestPayload,

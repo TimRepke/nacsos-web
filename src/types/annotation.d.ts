@@ -44,12 +44,22 @@ export interface RandomAssignmentConfig {
   random_seed: number;
 }
 
+export type AssignmentConfigType = RandomAssignmentConfig;
+
 export interface AssignmentScope {
   assignment_scope_id?: string;
   task_id: string;
   time_created?: string; // TODO datetime
   name: string;
   description?: string;
+  config?: AssignmentConfigType;
+}
+
+export interface AssignmentScopeCounts {
+  num_total: number;
+  num_open: number;
+  num_partial: number;
+  num_full: number;
 }
 
 export interface UserProjectAssignmentScope {

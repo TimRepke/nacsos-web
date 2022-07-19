@@ -22,6 +22,8 @@ import { Assignment } from '@/types/annotation.d';
 import { PropType } from 'vue';
 import { callUsersDetailsEndpoint } from '@/plugins/api/users';
 import { User } from '@/types/user.d';
+import { EventBus } from '@/plugins/events';
+import { ToastEvent } from '@/plugins/events/events/toast';
 
 export default {
   name: 'AssignmentsVisualiser',
@@ -30,6 +32,9 @@ export default {
       type: Object as PropType<Assignment[]>,
       default: (): Assignment[] => [] as Assignment[],
     },
+  },
+  async mounted() {
+    this.fetchUserInfos();
   },
   data() {
     return {
@@ -55,17 +60,22 @@ export default {
     },
     userLookup() {
       return this.users.reduce((acc: { [key: string]: User }, user: User) => {
-        acc[user.user_id!] = user;
+        acc[user.user_id as string] = user;
         return acc;
       }, {});
     },
   },
   watch: {
     async userIds(userIds: string[]) {
-      this.users = (await callUsersDetailsEndpoint({ user_id: userIds })).payload;
+      this.fetchUserInfos();
     },
   },
   methods: {
+    fetchUserInfos() {
+      callUsersDetailsEndpoint({ user_id: this.userIds })
+        .then((result) => { this.users = result.payload; })
+        .catch((result) => { EventBus.emit(new ToastEvent('WARN', 'Failed to load usernames')); });
+    },
     tryGetAssignment(userId: string, itemId: string): Assignment | undefined {
       return this.lookup[itemId]?.find((assignment: Assignment) => assignment.user_id === userId);
     },

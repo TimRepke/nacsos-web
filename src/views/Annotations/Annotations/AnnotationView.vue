@@ -69,9 +69,8 @@ import {
   callNextAnnotationItemEndpoint,
   callSaveAnnotationEndpoint,
   callAnnotationItemEndpoint,
-  callScopeAssignmentsEndpoint, AnnotationItemResponse,
+  callScopeUserAssignmentsEndpoint, AnnotationItemResponse,
 } from '@/plugins/api/annotations';
-import { TwitterItem } from '@/types/items/twitter.d';
 import TwitterItemComponent from '@/components/items/TwitterItem.vue';
 import AnnotationLabels from '@/components/annotations/AnnotationLabels.vue';
 import { AnnotationTaskLabel, AssignmentStatus } from '@/types/annotation.d';
@@ -234,7 +233,7 @@ export default {
       this.labels = this.populateEmptyAnnotations(this.task.labels);
 
       // update the assignments progress bar
-      this.assignments = (await callScopeAssignmentsEndpoint({
+      this.assignments = (await callScopeUserAssignmentsEndpoint({
         assignmentScopeId: annotationItem.scope.assignment_scope_id as string,
       })).payload;
 

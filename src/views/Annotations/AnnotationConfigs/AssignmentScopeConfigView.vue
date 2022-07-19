@@ -1,122 +1,177 @@
 <template>
-  <div class="text-start p-2">
-    <div class="mb-3 pb-3 border-bottom">
-      <h1 v-if="newScope">Create new assignment scope</h1>
+  <div class="text-start p-2 container-fluid">
+    <div class="row pb-2 mb-2 border-bottom g-0">
+      <h1 v-if="isNewScope">Create new assignment scope</h1>
       <h1 v-else>Monitor assignment scope</h1>
       <h6>
         The assignment scope for an annotation task is used to annotate in multiple
         batches or subsets and keep track of that reference.
       </h6>
     </div>
-    <div class="mb-3 pb-3 border-bottom">
-      <h4>General settings</h4>
-      <div class="mb-3">
-        <label for="scopeName" class="form-label">Scope Name</label>
-        <input type="text" class="form-control" id="scopeName" placeholder="Name for this scope"
-               v-model="annotationScope.name"/>
-      </div>
-      <div>
-        <label for="scopeDescription" class="form-label">Scope description</label>
-        <textarea class="form-control" id="scopeDescription" rows="3" v-model="annotationScope.description"></textarea>
+    <div class="row pb-2 mb-2 border-bottom g-0">
+      <div class="col-md-6">
+        <h4>General settings</h4>
+        <div class="mb-3">
+          <label for="scopeName" class="form-label">Scope Name</label>
+          <input type="text" class="form-control" id="scopeName" placeholder="Name for this scope"
+                 v-model="assignmentScope.name"/>
+        </div>
+        <div>
+          <label for="scopeDescription" class="form-label">Scope description</label>
+          <textarea class="form-control" id="scopeDescription" rows="3"
+                    v-model="assignmentScope.description"></textarea>
+        </div>
       </div>
     </div>
-    <div class="mb-3 pb-3 border-bottom">
+    <div class="row pb-2 mb-2 border-bottom g-0" v-if="!scopeHasAssignments">
       <h4>User pool</h4>
-      <div class="row">
+      <template v-if="!users || users.length === 0">
+        <div class="col">
+          <button class="btn btn-outline-secondary btn-sm" @click="loadListOfUsers">
+            <font-awesome-icon v-if="users === undefined" :icon="['fas', 'spinner']" class="fa-pulse"/>
+            <font-awesome-icon v-else :icon="['fas', 'arrows-down-to-people']"/>
+            Load list of users
+          </button>
+        </div>
+      </template>
+      <template v-else>
         <div class="col-lg-5 col-md-7">
-          <template v-if="users && users.length > 0">
-            <label for="userSearch" class="visually-hidden">Search for users</label>
-            <input type="text" class="form-control mb-1" id="userSearch" placeholder="Search" v-model="userSearch"/>
-            <ul style="max-height: 15rem" class="list-group overflow-auto">
-              <li v-for="user in searchFilteredUsers" :key="user.user_id"
-                  class="list-group-item d-flex justify-content-between align-items-start"
-                  :class="{'list-group-item-info': selectedUserIds.indexOf(user.user_id) >= 0 }">
-                <div class="me-auto">
-                  {{ user.full_name }}
-                  <span class="text-muted ms-2"
-                        style="font-size: calc(0.876*var(--bs-body-font-size))">
+          <div class="m-0">
+            <input type="text" class="form-control mb-1" placeholder="Search..." v-model="userSearch"
+                   aria-label="Search for users"/>
+          </div>
+          <ul style="max-height: 15rem" class="list-group overflow-auto">
+            <li v-for="user in searchFilteredUsers" :key="user.user_id"
+                class="list-group-item d-flex justify-content-between align-items-start"
+                :class="{'list-group-item-info': selectedUserIds.indexOf(user.user_id) >= 0 }">
+              <div class="me-auto">
+                {{ user.full_name }}
+                <span class="text-muted ms-2"
+                      style="font-size: calc(0.876*var(--bs-body-font-size))">
                     {{ user.affiliation }} | {{ user.email }} | {{ user.username }}
                   </span>
-                </div>
-                <span role="button" class="link-secondary" tabindex="0" @click="selectUser(user)">
+              </div>
+              <span role="button" class="link-secondary" tabindex="0" @click="selectUser(user)">
                   <font-awesome-icon :icon="['fas', 'user-plus']"/>
                 </span>
-              </li>
-            </ul>
-          </template>
-          <template v-else>
-            <button class="btn btn-outline-secondary btn-sm" @click="loadListOfUsers()">
-              <font-awesome-icon v-if="users === undefined" :icon="['fas', 'spinner']" class="fa-pulse"/>
-              <font-awesome-icon v-else :icon="['fas', 'arrows-down-to-people']"/>
-              Load list of users
-            </button>
-          </template>
+            </li>
+          </ul>
         </div>
-        <div class="col-md-5 mt-2 mt-md-0" v-if="selectedUsers.length > 0">
-          <strong>Selected users</strong>
-          <div v-for="user in selectedUsers" :key="user.user_id" class="ms-2">
-            {{ user.username }}
-            <span role="button" class="link-secondary" tabindex="0" @click="unselectUser(user)">
-              <font-awesome-icon :icon="['fas', 'user-minus']"/>
-            </span>
+        <div class="col-md-5 mt-2 mt-md-0">
+          <div class="row g-0 ms-2">
+            <template v-if="selectedUsers.length === 0">
+              Please use the list on the left to select users that should receive annotation assignments in this scope.
+            </template>
+            <template v-else>
+              <strong>Selected users</strong>
+              <ul class="list-unstyled">
+                <li v-for="user in selectedUsers" :key="user.user_id" class="ms-2">
+                  {{ user.username }}
+                  <span role="button" class="link-secondary" tabindex="0" @click="unselectUser(user)">
+                  <font-awesome-icon :icon="['fas', 'user-minus']"/>
+                </span>
+                </li>
+              </ul>
+            </template>
           </div>
         </div>
+      </template>
+    </div>
+    <div class="row pb-2 mb-2 border-bottom g-0">
+      <div class="col">
+        <h4>Assignment strategy settings</h4>
+        <div class="mb-2">
+          <select v-model="strategyConfigType" aria-label="Strategy Config Option" :disabled="scopeHasAssignments">
+            <option disabled :value="undefined">Select strategy</option>
+            <option value="random">Random assignment</option>
+          </select>
+        </div>
+        <div class="mb-2">
+          <RandomAssignmentConfig v-if="strategyConfigType === 'random'"
+                                  :existing-config="assignmentScope.config"
+                                  :editable="!scopeHasAssignments"
+                                  @config-changed="updateConfig($event)"/>
+        </div>
+        <button class="btn btn-outline-secondary"
+                v-if="strategyConfigType !== undefined"
+                :disabled="scopeHasAssignments"
+                @click="createAssignments">
+          Make assignments
+        </button>
       </div>
     </div>
-    <div class="mb-3 pb-3 border-bottom">
-      <h4>Assignment strategy settings</h4>
-      <label for="strategyConfigPicker" class="visually-hidden">Strategy Config Option</label>
-      <select id="strategyConfigPicker" v-model="strategyConfigComponent">
-        <option disabled :value="undefined">Select strategy</option>
-        <option value="RandomAssignmentConfig">Random assignment</option>
-      </select><br/>
-      <component :is="strategyConfigComponent"></component>
-      <button class="btn btn-outline-secondary"
-              v-show="strategyConfigComponent !== undefined"
-              :disabled="scopeIsActive"
-              @click="createAssignments">Make assignments
-      </button>
-    </div>
-    <div class="mb-3">
-      <h4>Results</h4>
-      TODO: for each user, show num assignments and progress<br/>
-      TODO: some basic stats<br/>
-      TODO: a few export buttons<br/>
+    <div class="row pb-2 mb-2 border-bottom g-0">
+      <div class="col">
+        <h4>Results</h4>
+        <button class="btn btn-sm btn-outline-secondary" @click="loadResults">
+          <font-awesome-icon :icon="['fas', 'rotate']"/>
+          (Re)load stats
+        </button>
+        <div class="mt-2 mb-2">
+          Assignments: {{ assignmentCounts.num_total }}
+          (
+          open: <span class="bg-info bg-opacity-50 p-1">{{ assignmentCounts.num_open }}</span> |
+          partial: <span class="bg-warning bg-opacity-50 p-1">{{ assignmentCounts.num_partial }}</span> |
+          done: <span class="bg-success bg-opacity-50 p-1">{{ assignmentCounts.num_full }}</span>)
+        </div>
+        <template v-if="statsLoaded">
+          <AssignmentsVisualiser :assignments="assignments"/>
+        </template>
+        <div class="mt-2 ms-2 text-warning">
+          TODO: for each user, show num assignments and progress<br/>
+          TODO: some basic stats<br/>
+          TODO: a few export buttons<br/>
+        </div>
+      </div>
     </div>
     <button class="btn btn-success position-fixed" style="top: 4rem; right: 1rem;" @click="save()">Save</button>
   </div>
 </template>
 
 <script lang="ts">
-// import { callProjectTasksEndpoint, callTaskDefinitionEndpoint } from '@/plugins/api/annotations';
 import { ref } from 'vue';
 import { useRoute } from 'vue-router';
 import RandomAssignmentConfig from '@/components/annotations/assignments/RandomAssignmentConfig.vue';
 import { EventBus } from '@/plugins/events';
 import { ConfirmationRequestEvent } from '@/plugins/events/events/confirmation';
-import { AssignmentScope } from '@/types/annotation.d';
+import {
+  Assignment,
+  AssignmentScope,
+  AssignmentScopeConfigType,
+  AssignmentConfigType,
+  AssignmentScopeCounts,
+} from '@/types/annotation.d';
 import { User } from '@/types/user.d';
-import { callUsersListEndpoint } from '@/plugins/api/users';
+import { callAllProjectUsersListEndpoint } from '@/plugins/api/users';
+import {
+  callMakeAssignmentsEndpoint,
+  callScopeEndpoint,
+  callScopeCountsEndpoint,
+  callSaveAssignmentScopeEndpoint, callScopeAssignmentsEndpoint,
+} from '@/plugins/api/annotations';
+import AssignmentsVisualiser from '@/components/annotations/assignments/AssignmentsVisualiser.vue';
+import { useCurrentProjectStore } from '@/stores/CurrentProjectStore';
+import { ToastEvent } from '@/plugins/events/events/toast';
 
 export default {
   name: 'AssignmentScopeConfigView',
-  components: { RandomAssignmentConfig },
+  components: { AssignmentsVisualiser, RandomAssignmentConfig },
   async setup() {
     const route = useRoute();
-    const scopeId = route.params.scope_id;
-    const taskId = route.query.task_id;
+    const scopeId = route.params.scope_id as string;
+    const taskId = route.query.task_id as string;
 
     let scope: AssignmentScope;
+    let counts: AssignmentScopeCounts | undefined;
     if (scopeId) {
-      // TODO load current scope config
-      // const response = await callAssignmentScopeEndpoint({ scopeId: currentAssignmentScopeId });
-      scope = {
-        assignment_scope_id: scopeId as string,
-        task_id: taskId as string,
-        time_created: undefined,
-        name: '',
-        description: '',
-      };
+      const result = await callScopeEndpoint({ assignmentScopeId: scopeId });
+      if (!result.payload) {
+        EventBus.emit(new ToastEvent('ERROR', 'Failed to load assignment scope info. Please try reloading.'));
+        throw Error('Something went wrong. Please tell the admin how you got here.');
+      } else {
+        scope = result.payload;
+        counts = (await callScopeCountsEndpoint({ assignmentScopeId: scopeId })).payload;
+      }
     } else if (taskId) {
       scope = {
         assignment_scope_id: undefined,
@@ -128,40 +183,120 @@ export default {
     } else {
       throw Error('Something went wrong. Please tell the admin how you got here.');
     }
-
     return {
-      newScope: !scopeId && taskId,
-      annotationScope: ref(scope),
+      assignmentScope: ref(scope),
+      // indicates whether this is (or will be) a newly created scope
+      isNewScope: !scopeId && taskId,
+      // indicates whether assignments were already performed in this scope
+      scopeHasAssignments: !!counts && counts.num_total > 0,
+      // holds the assignment counts (or undefined if none exist)
+      assignmentCounts: counts as AssignmentScopeCounts,
     };
   },
   data() {
+    let strategy: AssignmentScopeConfigType | undefined;
+    if (this.assignmentScope.config) {
+      strategy = this.assignmentScope.config.config_type;
+    }
+    const selectedUsers: User[] = this.assignmentScope.config?.users || [];
     return {
-      userSearch: '',
-      users: [] as User[],
-      selectedUsers: [] as User[],
-      scopeIsActive: false, // indicates whether assignments were already performed in this scope
-      strategyConfigComponent: undefined, // the component for configuring the assignment strategy
+      assignments: [] as Assignment[],
+      users: [] as User[], // list of all users in the system
+      userSearch: '', // search query for filtering list of users
+      selectedUsers, // users selected to be in the query pool
+      strategyConfigType: strategy, // assignment strategy type
     };
   },
   methods: {
     createAssignments() {
-      if (!this.scopeIsActive) {
+      if (!this.assignmentScope.config) {
+        EventBus.emit(new ToastEvent('WARN', 'You have to configure the assignment strategy first!'));
+      } else if (!this.selectedUsers || this.selectedUsers.length === 0) {
+        EventBus.emit(new ToastEvent('WARN', 'You have to select users who should receive assignments!'));
+      } else if (this.scopeHasAssignments) {
+        EventBus.emit(new ToastEvent('WARN', 'This assignment scope already has assignments!'));
+      } else if (this.isNewScope) {
+        EventBus.emit(new ToastEvent('WARN', 'You have to first save the assignment scope!'));
+      } else {
         EventBus.emit(new ConfirmationRequestEvent(
           'Once you create and send out assignments, you cannot make any further changes.\n\n'
           + 'Are you sure you want to proceed?',
           (response) => {
             if (response === 'ACCEPT') {
-              this.scopeIsActive = true;
-              // TODO implement trigger for assigning tasks
+              const payload = {
+                task_id: this.assignmentScope.task_id,
+                scope_id: this.assignmentScope.assignment_scope_id,
+                save: true,
+                config: JSON.parse(JSON.stringify(this.assignmentScope.config)),
+              };
+              payload.config.users = this.selectedUserIds;
+              callMakeAssignmentsEndpoint(payload)
+                .then((res) => {
+                  EventBus.emit(new ToastEvent(
+                    'SUCCESS',
+                    `Successfully created ${res.payload?.length} assignments.`,
+                  ));
+                  this.scopeHasAssignments = true;
+                  this.assignments = res.payload;
+                })
+                .catch((res) => {
+                  EventBus.emit(new ToastEvent('ERROR', 'Something failed while creating assignments.'));
+                  console.error(res);
+                });
             }
           },
           'Create assignments',
         ));
       }
     },
+    save() {
+      EventBus.emit(new ConfirmationRequestEvent(
+        'Saving the scope does not create or change assignments.',
+        (response) => {
+          if (response === 'ACCEPT') {
+            const scope = JSON.parse(JSON.stringify(this.assignmentScope));
+            if (scope.config) {
+              scope.config.users = this.selectedUserIds;
+            }
+            callSaveAssignmentScopeEndpoint(scope)
+              .then((res) => {
+                EventBus.emit(new ToastEvent(
+                  'SUCCESS',
+                  `Save assignment scope details.  \n**ID:** ${res.payload}`,
+                ));
+                if (this.isNewScope) {
+                  this.isNewScope = false;
+                  this.$router.replace({ name: 'config-annotation-task-scope', params: { scope_id: res.payload } });
+                }
+              })
+              .catch((res) => {
+                EventBus.emit(new ToastEvent(
+                  'ERROR',
+                  `Failed to save assignment scope details. (${res.reason})`,
+                ));
+              });
+          } else {
+            EventBus.emit(new ToastEvent('WARN', 'Did not save the assignment scope details.'));
+          }
+        },
+        'Save assignment scope',
+        'Ok, save.',
+        'Don´t save yet.',
+      ));
+    },
+    loadResults() {
+      if (this.assignmentScope.assignment_scope_id) {
+        callScopeCountsEndpoint({ assignmentScopeId: this.assignmentScope.assignment_scope_id })
+          .then((result) => { this.assignmentCounts = result.payload; })
+          .catch((result) => { EventBus.emit(new ToastEvent('ERROR', 'Failed to load assignment counts.')); });
+        callScopeAssignmentsEndpoint({ assignmentScopeId: this.assignmentScope.assignment_scope_id })
+          .then((result) => { this.assignments = result.payload; })
+          .catch((result) => { EventBus.emit(new ToastEvent('ERROR', 'Failed to load assignments.')); });
+      }
+    },
     async loadListOfUsers() {
       this.users = undefined;
-      this.users = (await callUsersListEndpoint()).payload;
+      this.users = (await callAllProjectUsersListEndpoint({ projectId: useCurrentProjectStore().projectId })).payload;
     },
     selectUser(user: User) {
       this.selectedUsers.push(user);
@@ -170,9 +305,12 @@ export default {
       const userIndex = this.selectedUserIds.indexOf(user.user_id);
       this.selectedUsers.splice(userIndex, 1);
     },
+    updateConfig(eventPayload: AssignmentConfigType | undefined) {
+      this.assignmentScope.config = eventPayload;
+    },
   },
   computed: {
-    searchFilteredUsers() {
+    searchFilteredUsers(): User[] {
       if (this.users) {
         // TODO make the search more sophisticated
         //      e.g. by including institution, email, username, substring matches
@@ -180,11 +318,14 @@ export default {
       }
       return this.users;
     },
-    selectedUserIds() {
+    selectedUserIds(): string[] {
       if (this.selectedUsers && this.selectedUsers.length > 0) {
         return this.selectedUsers.map((user: User) => user.user_id);
       }
       return [];
+    },
+    statsLoaded(): boolean {
+      return this.assignments && this.assignments.length > 0 && this.assignmentCounts;
     },
   },
 };
