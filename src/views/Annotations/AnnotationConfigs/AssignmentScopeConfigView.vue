@@ -25,17 +25,14 @@
     </div>
     <div class="row pb-2 mb-2 border-bottom g-0" v-if="!scopeHasAssignments">
       <h4>User pool</h4>
-      <template v-if="!users || users.length === 0">
-        <div class="col">
-          <button class="btn btn-outline-secondary btn-sm" @click="loadListOfUsers">
-            <font-awesome-icon v-if="users === undefined" :icon="['fas', 'spinner']" class="fa-pulse"/>
-            <font-awesome-icon v-else :icon="['fas', 'arrows-down-to-people']"/>
-            Load list of users
-          </button>
-        </div>
-      </template>
-      <template v-else>
-        <div class="col-lg-5 col-md-7">
+      <div class="col-lg-5 col-md-7">
+        <button v-if="!users || users.length === 0"
+                class="btn btn-outline-secondary btn-sm" @click="loadListOfUsers">
+          <font-awesome-icon v-if="users === undefined" :icon="['fas', 'spinner']" class="fa-pulse"/>
+          <font-awesome-icon v-else :icon="['fas', 'arrows-down-to-people']"/>
+          Load list of users
+        </button>
+        <div v-else>
           <div class="m-0">
             <input type="text" class="form-control mb-1" placeholder="Search..." v-model="userSearch"
                    aria-label="Search for users"/>
@@ -43,7 +40,7 @@
           <ul style="max-height: 15rem" class="list-group overflow-auto">
             <li v-for="user in searchFilteredUsers" :key="user.user_id"
                 class="list-group-item d-flex justify-content-between align-items-start"
-                :class="{'list-group-item-info': selectedUserIds.indexOf(user.user_id) >= 0 }">
+                :class="{'list-group-item-info': isSelected(user) }">
               <div class="me-auto">
                 {{ user.full_name }}
                 <span class="text-muted ms-2"
@@ -51,31 +48,32 @@
                     {{ user.affiliation }} | {{ user.email }} | {{ user.username }}
                   </span>
               </div>
-              <span role="button" class="link-secondary" tabindex="0" @click="selectUser(user)">
+              <span role="button" class="link-secondary" tabindex="0"
+                    @click="selectUser(user)" v-show="!isSelected(user)">
                   <font-awesome-icon :icon="['fas', 'user-plus']"/>
                 </span>
             </li>
           </ul>
         </div>
-        <div class="col-md-5 mt-2 mt-md-0">
-          <div class="row g-0 ms-2">
-            <template v-if="selectedUsers.length === 0">
-              Please use the list on the left to select users that should receive annotation assignments in this scope.
-            </template>
-            <template v-else>
-              <strong>Selected users</strong>
-              <ul class="list-unstyled">
-                <li v-for="user in selectedUsers" :key="user.user_id" class="ms-2">
-                  {{ user.username }}
-                  <span role="button" class="link-secondary" tabindex="0" @click="unselectUser(user)">
+      </div>
+      <div class="col-md-5 mt-2 mt-md-0">
+        <div class="row g-0 ms-2">
+          <template v-if="!selectedUsers || selectedUsers.length === 0">
+            Please use the list on the left to select users that should receive annotation assignments in this scope.
+          </template>
+          <template v-else>
+            <strong>Selected users</strong>
+            <ul class="list-unstyled">
+              <li v-for="user in selectedUsers" :key="user.user_id" class="ms-2">
+                {{ user.username }}
+                <span role="button" class="link-secondary" tabindex="0" @click="unselectUser(user)">
                   <font-awesome-icon :icon="['fas', 'user-minus']"/>
                 </span>
-                </li>
-              </ul>
-            </template>
-          </div>
+              </li>
+            </ul>
+          </template>
         </div>
-      </template>
+      </div>
     </div>
     <div class="row pb-2 mb-2 border-bottom g-0">
       <div class="col">
@@ -100,7 +98,7 @@
         </button>
       </div>
     </div>
-    <div class="row pb-2 mb-2 border-bottom g-0">
+    <div class="row pb-2 mb-2 border-bottom g-0" v-if="scopeHasAssignments">
       <div class="col">
         <h4>Results</h4>
         <button class="btn btn-sm btn-outline-secondary" @click="loadResults">
@@ -142,7 +140,10 @@ import {
   AssignmentScopeCounts,
 } from '@/types/annotation.d';
 import { User } from '@/types/user.d';
-import { callAllProjectUsersListEndpoint } from '@/plugins/api/users';
+import {
+  callAllProjectUsersListEndpoint,
+  callUsersDetailsEndpoint,
+} from '@/plugins/api/users';
 import {
   callMakeAssignmentsEndpoint,
   callScopeEndpoint,
@@ -163,12 +164,16 @@ export default {
 
     let scope: AssignmentScope;
     let counts: AssignmentScopeCounts | undefined;
+    let selectedUsers: User[] = [];
+
     if (scopeId) {
       const result = await callScopeEndpoint({ assignmentScopeId: scopeId });
       if (result.status === 'SUCCESS' && result.payload) {
         scope = result.payload;
         counts = (await callScopeCountsEndpoint({ assignmentScopeId: scopeId })).payload;
-        // TODO if config exists and users were chosen previously, convert list of user ids to list of users
+        if (scope.config?.users && scope.config?.users.length > 0) {
+          selectedUsers = (await callUsersDetailsEndpoint({ user_id: scope.config.users })).payload as User[];
+        }
       } else {
         EventBus.emit(new ToastEvent('ERROR', 'Failed to load assignment scope info. Please try reloading.'));
         throw Error('Something went wrong. Please tell the admin how you got here.');
@@ -187,11 +192,13 @@ export default {
     return {
       assignmentScope: ref(scope),
       // indicates whether this is (or will be) a newly created scope
-      isNewScope: !scopeId && taskId,
+      isNewScope: ref(!scopeId && taskId),
       // indicates whether assignments were already performed in this scope
-      scopeHasAssignments: !!counts && counts.num_total > 0,
+      scopeHasAssignments: ref(!!counts && counts.num_total > 0),
       // holds the assignment counts (or undefined if none exist)
-      assignmentCounts: counts as AssignmentScopeCounts,
+      assignmentCounts: ref(counts as AssignmentScopeCounts),
+      // users selected to be in the query pool
+      selectedUsers: ref(selectedUsers),
     };
   },
   data() {
@@ -199,12 +206,10 @@ export default {
     if (this.assignmentScope.config) {
       strategy = this.assignmentScope.config.config_type;
     }
-    const selectedUsers: User[] = this.assignmentScope.config?.users || [];
     return {
       assignments: [] as Assignment[],
       users: [] as User[], // list of all users in the system
       userSearch: '', // search query for filtering list of users
-      selectedUsers, // users selected to be in the query pool
       strategyConfigType: strategy, // assignment strategy type
     };
   },
@@ -300,7 +305,9 @@ export default {
       this.users = (await callAllProjectUsersListEndpoint({ projectId: useCurrentProjectStore().projectId })).payload;
     },
     selectUser(user: User) {
-      this.selectedUsers.push(user);
+      if (!this.isSelected(user)) {
+        this.selectedUsers.push(user);
+      }
     },
     unselectUser(user: User) {
       const userIndex = this.selectedUserIds.indexOf(user.user_id);
@@ -308,6 +315,9 @@ export default {
     },
     updateConfig(eventPayload: AssignmentConfigType | undefined) {
       this.assignmentScope.config = eventPayload;
+    },
+    isSelected(user: User) {
+      return this.selectedUserIds.indexOf(user.user_id) >= 0;
     },
   },
   computed: {
