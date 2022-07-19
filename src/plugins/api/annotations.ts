@@ -2,9 +2,11 @@ import { Endpoint, EndpointFunction, ResponseReason } from '@/plugins/api/types.
 import { callEndpointFactory } from '@/plugins/api/index';
 import {
   AnnotationTask,
-  Assignment, AssignmentConfigType,
-  AssignmentScope, AssignmentScopeCounts,
-  AssignmentStatus, RandomAssignmentConfig,
+  Assignment,
+  AssignmentConfigType,
+  AssignmentScope,
+  AssignmentScopeCounts,
+  AssignmentStatus,
   UserProjectAssignmentScope,
 } from '@/types/annotation.d';
 import { BaseItem } from '@/types/items/index.d';
@@ -56,6 +58,24 @@ const TaskDefinitionEndpoint: Endpoint<ResponseReason, AnnotationTask> = {
   method: 'GET',
   path: '/annotations/tasks/definition/{taskId}',
   paramsEncoding: 'PATH',
+};
+
+const SaveAnnotationTaskEndpoint: Endpoint<ResponseReason, string> = {
+  method: 'PUT',
+  path: '/annotations/tasks/definition/',
+  paramsEncoding: 'BODY',
+};
+
+const RemoveAnnotationTaskEndpoint: Endpoint<ResponseReason, null> = {
+  method: 'DELETE',
+  path: '/annotations/tasks/definition/{taskId}',
+  paramsEncoding: 'PATH',
+  transformResponse: (response) => {
+    if (response.data) {
+      return ['FAILED', 'REQUEST_FAILED', response.data.detail];
+    }
+    return ['SUCCESS', 'SUCCESS'];
+  },
 };
 
 const ProjectUserScopesEndpoint: Endpoint<ResponseReason, UserProjectAssignmentScope[]> = {
@@ -175,6 +195,12 @@ export const callScopeCountsEndpoint:
 
 export const callTaskDefinitionEndpoint:
   EndpointFunction<TaskDefinitionRequestPayload, ResponseReason, AnnotationTask> = callEndpointFactory(TaskDefinitionEndpoint);
+
+export const callSaveAnnotationTaskEndpoint:
+  EndpointFunction<AnnotationTask, ResponseReason, string> = callEndpointFactory(SaveAnnotationTaskEndpoint);
+
+export const callRemoveAnnotationTaskEndpoint:
+  EndpointFunction<TaskDefinitionRequestPayload, ResponseReason, null> = callEndpointFactory(RemoveAnnotationTaskEndpoint);
 
 export const callProjectTasksEndpoint:
   EndpointFunction<ProjectTasksRequestPayload, ResponseReason, AnnotationTask[]> = callEndpointFactory(ProjectTasksEndpoint);

@@ -53,10 +53,11 @@
         </router-link>
       </li>
     </ul>
-    <button class="btn btn-outline-primary mb-2 btn-sm" @click="createNewTask()">
+    <router-link :to="{ name:'config-annotation-task-edit' }"
+                 role="button" class="btn btn-outline-primary m-2 btn-sm">
       <font-awesome-icon :icon="['far', 'square-plus']"/>
       Create new annotation task
-    </button>
+    </router-link>
   </div>
 </template>
 
@@ -64,7 +65,7 @@
 import { ref } from 'vue';
 import {
   callProjectScopesEndpoint,
-  callProjectTasksEndpoint,
+  callProjectTasksEndpoint, callRemoveAnnotationTaskEndpoint,
   callRemoveAssignmentScopeEndpoint,
 } from '@/plugins/api/annotations';
 import { AnnotationTask, AssignmentScope } from '@/types/annotation.d';
@@ -83,16 +84,11 @@ export default {
     )).payload as AnnotationTask[];
     const projectScopes: AssignmentScope[] = (await callProjectScopesEndpoint()).payload as AssignmentScope[];
     return {
-      projectTasks,
+      projectTasks: ref(projectTasks),
       projectScopes: ref(projectScopes),
     };
   },
   methods: {
-    createNewTask() {
-      // TODO create new task in db
-      // TODO push new task id to router
-      EventBus.emit(new ToastEvent('WARN', 'Not implemented yet, sorry.'));
-    },
     copyTask(task: AnnotationTask) {
       // TODO
       EventBus.emit(new ToastEvent('WARN', 'Not implemented yet, sorry.'));
@@ -109,8 +105,21 @@ export default {
         + 'This may result in deletion of all associated assignments and annotations or at least make them meaningless!',
         (response) => {
           if (response === 'ACCEPT') {
-            // TODO implement annotation task deletion
-            EventBus.emit(new ToastEvent('WARN', 'Not implemented yet, sorry.'));
+            callRemoveAnnotationTaskEndpoint({ taskId: task.annotation_task_id as string })
+              .then((res) => {
+                EventBus.emit(new ToastEvent('SUCCESS', 'Annotation task deleted!'));
+                const index = this.projectTasks
+                  .findIndex((projectTask: AnnotationTask) => projectTask.annotation_task_id === task.annotation_task_id);
+                if (index >= 0) {
+                  this.projectTasks.splice(index, 1);
+                }
+              })
+              .catch((res) => {
+                EventBus.emit(new ToastEvent(
+                  'ERROR',
+                  'Failed to delete annotation task!',
+                ));
+              });
           }
         },
         'Delete annotation task',

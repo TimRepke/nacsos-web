@@ -71,7 +71,7 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import(/* webpackChunkName: "AssignmentScopesConfigView" */ '../views/Annotations/AnnotationConfigs/AssignmentScopeConfigView.vue'),
       },
       {
-        path: 'task/:task_id',
+        path: 'task/:task_id?',
         name: 'config-annotation-task-edit',
         component: () => import(/* webpackChunkName: "AnnotationConfigEditView" */ '../views/Annotations/AnnotationConfigs/AnnotationConfigEditView.vue'),
       },

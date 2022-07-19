@@ -1,11 +1,10 @@
 <template>
   <div class="text-start p-3 position-relative">
-    <!-- FIXME make the following message pretty and conditional on scopes existing for this task -->
-    <span class="text-warning">
-      <font-awesome-icon :icon="['fas', 'triangle-exclamation']"/>
-      Please note that editing the scheme may break the database if assignments and/or annotations were already made.
-      <font-awesome-icon :icon="['fas', 'triangle-exclamation']"/>
-    </span>
+    <!--    <span class="text-warning">-->
+    <!--      <font-awesome-icon :icon="['fas', 'triangle-exclamation']"/>-->
+    <!--      Please note that editing the scheme may break the database if assignments and/or annotations were already made.-->
+    <!--      <font-awesome-icon :icon="['fas', 'triangle-exclamation']"/>-->
+    <!--    </span>-->
 
     <!-- Annotation Task Name -->
     <template v-if="nameEditMode">
@@ -41,7 +40,7 @@
     </template>
     <template v-else>
       <div class="hstack mb-2 align-items-start">
-        <div class="w-lg-50" v-html="markdownDescription()"></div>
+        <div class="w-lg-50" v-html="htmlDescription"></div>
         <span role="button" tabindex="0" @click="descriptionEditMode=true">
           <font-awesome-icon class="fs-6" :icon="['fas', 'pen']"/>
         </span>
@@ -49,21 +48,57 @@
     </template>
 
     <!-- Annotation Task Labels (root level) -->
-    <AnnotationTaskLabelsEditor :labels="task.labels" />
+    <AnnotationTaskLabelsEditor :labels="task.labels"/>
     <button class="btn btn-success position-fixed" style="top: 4rem; right: 1rem;" @click="save()">Save</button>
   </div>
 </template>
 
 <script lang="ts">
+import { ref } from 'vue';
 import { useRoute } from 'vue-router';
-import { callTaskDefinitionEndpoint } from '@/plugins/api/annotations';
+import {
+  callSaveAnnotationTaskEndpoint,
+  callTaskDefinitionEndpoint,
+} from '@/plugins/api/annotations';
 import { marked } from 'marked';
 import { AnnotationTask } from '@/types/annotation.d';
 import AnnotationTaskLabelsEditor from '@/components/annotations/AnnotationTaskLabelsEditor.vue';
+import { EventBus } from '@/plugins/events';
+import { ToastEvent } from '@/plugins/events/events/toast';
+import { useCurrentProjectStore } from '@/stores/CurrentProjectStore';
+import { ConfirmationRequestEvent } from '@/plugins/events/events/confirmation';
 
 export default {
   name: 'AnnotationConfigEditView',
   components: { AnnotationTaskLabelsEditor },
+  async setup() {
+    const route = useRoute();
+    const taskId = route.params.task_id as string;
+    const { projectId } = useCurrentProjectStore();
+
+    let task: AnnotationTask;
+    if (taskId) {
+      const result = await callTaskDefinitionEndpoint({ taskId });
+      if (result.status === 'SUCCESS' && result.payload) {
+        task = result.payload;
+      } else {
+        EventBus.emit(new ToastEvent('ERROR', 'Failed to load assignment scope info. Please try reloading.'));
+        throw Error('Something went wrong. Please tell the admin how you got here.');
+      }
+    } else {
+      task = {
+        project_id: projectId,
+        name: 'New annotation task',
+        description: 'Description for new task.',
+        labels: [],
+      };
+    }
+
+    return {
+      task: ref(task),
+      isNewTask: !taskId,
+    };
+  },
   created() {
     // noop
   },
@@ -73,20 +108,43 @@ export default {
       descriptionEditMode: false,
     };
   },
-  async setup() {
-    const route = useRoute();
-    const currentAnnotationTaskId = route.params.task_id;
-    const response = await callTaskDefinitionEndpoint({ taskId: currentAnnotationTaskId as string });
-    return {
-      task: response.payload as AnnotationTask,
-    };
-  },
   methods: {
-    markdownDescription() {
-      return marked(this.task.description);
-    },
     save() {
-      // TODO implement
+      EventBus.emit(new ConfirmationRequestEvent(
+        'Editing the annotation task after assignment scopes, assignments, or annotations already exist for it '
+        + 'can lead to very unexpected behaviour. Are you sure you want to proceed?',
+        (response) => {
+          if (response === 'ACCEPT') {
+            callSaveAnnotationTaskEndpoint(this.task)
+              .then((res) => {
+                EventBus.emit(new ToastEvent(
+                  'SUCCESS',
+                  `Saved annotation task.  \n**ID:** ${res.payload}`,
+                ));
+                if (this.isNewTask) {
+                  this.isNewTask = false;
+                  this.$router.replace({ name: 'config-annotation-task-edit', params: { task_id: res.payload } });
+                }
+              })
+              .catch((res) => {
+                EventBus.emit(new ToastEvent(
+                  'ERROR',
+                  `Failed to save the annotation task. (${res.reason})`,
+                ));
+              });
+          } else {
+            EventBus.emit(new ToastEvent('WARN', 'Did not save the annotation task.'));
+          }
+        },
+        'Save annotation task',
+        'Yes, save!',
+        'Nope!',
+      ));
+    },
+  },
+  computed: {
+    htmlDescription() {
+      return marked(this.task.description);
     },
   },
 };

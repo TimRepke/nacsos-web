@@ -107,7 +107,7 @@
           <font-awesome-icon :icon="['fas', 'rotate']"/>
           (Re)load stats
         </button>
-        <div class="mt-2 mb-2">
+        <div class="mt-2 mb-2" v-if="assignmentCounts">
           Assignments: {{ assignmentCounts.num_total }}
           (
           open: <span class="bg-info bg-opacity-50 p-1">{{ assignmentCounts.num_open }}</span> |
@@ -165,12 +165,13 @@ export default {
     let counts: AssignmentScopeCounts | undefined;
     if (scopeId) {
       const result = await callScopeEndpoint({ assignmentScopeId: scopeId });
-      if (!result.payload) {
-        EventBus.emit(new ToastEvent('ERROR', 'Failed to load assignment scope info. Please try reloading.'));
-        throw Error('Something went wrong. Please tell the admin how you got here.');
-      } else {
+      if (result.status === 'SUCCESS' && result.payload) {
         scope = result.payload;
         counts = (await callScopeCountsEndpoint({ assignmentScopeId: scopeId })).payload;
+        // TODO if config exists and users were chosen previously, convert list of user ids to list of users
+      } else {
+        EventBus.emit(new ToastEvent('ERROR', 'Failed to load assignment scope info. Please try reloading.'));
+        throw Error('Something went wrong. Please tell the admin how you got here.');
       }
     } else if (taskId) {
       scope = {
@@ -237,7 +238,7 @@ export default {
                     `Successfully created ${res.payload?.length} assignments.`,
                   ));
                   this.scopeHasAssignments = true;
-                  this.assignments = res.payload;
+                  this.loadResults();
                 })
                 .catch((res) => {
                   EventBus.emit(new ToastEvent('ERROR', 'Something failed while creating assignments.'));
