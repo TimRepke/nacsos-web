@@ -67,6 +67,7 @@ import {
   callProjectScopesEndpoint,
   callProjectTasksEndpoint, callRemoveAnnotationTaskEndpoint,
   callRemoveAssignmentScopeEndpoint,
+  callSaveAnnotationTaskEndpoint,
 } from '@/plugins/api/annotations';
 import { AnnotationTask, AssignmentScope } from '@/types/annotation.d';
 import { currentProjectStore } from '@/stores';
@@ -90,8 +91,17 @@ export default {
   },
   methods: {
     copyTask(task: AnnotationTask) {
-      // TODO
-      EventBus.emit(new ToastEvent('WARN', 'Not implemented yet, sorry.'));
+      const copy: AnnotationTask = JSON.parse(JSON.stringify(task));
+      copy.annotation_task_id = undefined;
+      copy.name = `[COPY] ${task.name}`;
+      callSaveAnnotationTaskEndpoint(copy)
+        .then((result) => {
+          EventBus.emit(new ToastEvent('SUCCESS', `Created copy of the annotation task "${task.name}".`));
+          callProjectTasksEndpoint({ projectId: currentProjectStore.project!.project_id! })
+            .then((res) => { this.projectTasks = res.payload; })
+            .catch((res) => { EventBus.emit(new ToastEvent('ERROR', 'Failed to refresh data, try reloading the page.')); });
+        })
+        .catch((result) => { EventBus.emit(new ToastEvent('ERROR', `Failed to copy annotation task "${task.name}".`)); });
     },
     exportData(task: AnnotationTask) {
       // TODO
