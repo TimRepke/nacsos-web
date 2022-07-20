@@ -28,24 +28,18 @@ const ProjectTweetsListEndpoint: Endpoint<ResponseReason, TwitterItem[]> = {
   method: 'GET',
   path: '/project/{projectId}/items/twitter/list',
   paramsEncoding: 'PATH',
-  transformResponse: (response) => {
-    if (response.data) {
-      return ['SUCCESS', 'SUCCESS', response.data];
-    }
-    return ['FAILED', 'POSTPROCESSING_FAILED'];
-  },
+};
+
+const ProjectItemCountEndpoint: Endpoint<ResponseReason, number> = {
+  method: 'GET',
+  path: '/project/{projectId}/items/count',
+  paramsEncoding: 'PATH',
 };
 
 const ProjectItemDetailsEndpoint: Endpoint<ResponseReason, TwitterItem | BaseItem> = {
   method: 'GET',
   path: '/project/{projectId}/items/detail/{itemId}',
   paramsEncoding: 'PATH',
-  transformResponse: (response) => {
-    if (response.data) {
-      return ['SUCCESS', 'SUCCESS', response.data];
-    }
-    return ['FAILED', 'POSTPROCESSING_FAILED'];
-  },
 };
 
 export const callProjectItemsListEndpoint:
@@ -53,6 +47,9 @@ export const callProjectItemsListEndpoint:
 
 export const callProjectTweetsListEndpoint:
   EndpointFunction<ProjectItemsRequestPayload, ResponseReason, TwitterItem[]> = callEndpointFactory(ProjectTweetsListEndpoint);
+
+export const callProjectItemCountEndpoint:
+  EndpointFunction<ProjectItemsRequestPayload, ResponseReason, number> = callEndpointFactory(ProjectItemCountEndpoint);
 
 export const callProjectItemDetailsEndpoint:
   EndpointFunction<ProjectDetailRequestPayload, ResponseReason, TwitterItem | BaseItem> = callEndpointFactory(ProjectItemDetailsEndpoint);

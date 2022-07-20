@@ -19,10 +19,19 @@
           TODO: Search by import (aka query)
         </div>
         <div class="row m-2 mt-0">
+          TODO: Search by assignment scopes
+        </div>
+        <div class="row m-2 mt-0">
+          TODO: Search by user assignments
+        </div>
+        <div class="row m-2 mt-0">
           TODO: Search by user annotations
         </div>
         <div class="row m-2 mt-0">
           TODO: Search by import (aka query)
+        </div>
+        <div class="row m-2 mt-0">
+          TODO: Overlap with other project
         </div>
       </div>
 
@@ -41,18 +50,47 @@
           <!-- Pagination footer -->
           <nav aria-label="Page navigation" class="d-flex flex-row justify-content-center m-2 p-0">
             <ul class="pagination p-0 m-0">
-              <li class="page-item disabled">
-                <a class="page-link fw-normal" href="#" aria-label="Previous">
-                  <span aria-hidden="true">&laquo;</span>
-                </a>
+              <li class="page-item" :class="{disabled: pagination.isFirstPage}">
+                <div @click="pagination.currentPage = 1" role="button" tabindex="0" class="page-link fw-normal"
+                     aria-label="First page">
+                  <font-awesome-icon :icon="['fas', 'angles-left']" style="font-size: 0.7em"/>
+                </div>
               </li>
-              <li class="page-item"><a class="page-link fw-normal" href="#">1</a></li>
-              <li class="page-item active"><a class="page-link fw-normal" href="#">2</a></li>
-              <li class="page-item"><a class="page-link fw-normal" href="#">3</a></li>
-              <li class="page-item">
-                <a class="page-link fw-normal" href="#" aria-label="Next">
-                  <span aria-hidden="true">&raquo;</span>
-                </a>
+              <li class="page-item" :class="{disabled: pagination.isFirstPage}">
+                <div @click="pagination.prev" role="button" class="page-link fw-normal" aria-label="Previous page">
+                  <font-awesome-icon :icon="['fas', 'angle-left']" style="font-size: 0.7em"/>
+                </div>
+              </li>
+              <li class="page-item disabled" v-show="pagination.currentPage > navPagesWindowSize">
+                <div role="button" class="page-link fw-normal">
+                  &hellip;
+                </div>
+              </li>
+              <li class="page-item"
+                  v-for="pageIt in navPages"
+                  :key="pageIt"
+                  :class="{active: pagination.currentPage === pageIt}">
+                <div @click="pagination.currentPage = pageIt" role="button"
+                     class="page-link fw-normal" tabindex="0" :aria-label="`Page ${pageIt}`">
+                  {{ pageIt }}
+                </div>
+              </li>
+              <li class="page-item disabled"
+                  v-show="(pagination.pageCount - pagination.currentPage) > navPagesWindowSize">
+                <div role="button" class="page-link fw-normal">
+                  &hellip;
+                </div>
+              </li>
+              <li class="page-item" :class="{disabled: pagination.isLastPage}">
+                <div @click="pagination.next" role="button" class="page-link fw-normal" aria-label="Next page">
+                  <font-awesome-icon :icon="['fas', 'angle-right']" style="font-size: 0.7em"/>
+                </div>
+              </li>
+              <li class="page-item" :class="{disabled: pagination.isLastPage}">
+                <div @click="pagination.currentPage = pagination.pageCount" role="button" tabindex="0" class="page-link fw-normal"
+                     aria-label="Last page">
+                  <font-awesome-icon :icon="['fas', 'angles-right']" style="font-size: 0.7em"/>
+                </div>
               </li>
             </ul>
           </nav>
@@ -67,30 +105,72 @@
 </template>
 
 <script lang="ts">
-import { callProjectTweetsListEndpoint } from '@/plugins/api/project/items';
+import { callProjectItemCountEndpoint, callProjectTweetsListEndpoint } from '@/plugins/api/project/items';
 import { BaseItem } from '@/types/items/index.d';
 import { TwitterItem } from '@/types/items/twitter.d';
 import { currentProjectStore } from '@/stores';
 import TwitterItemComponent from '@/components/items/TwitterItem.vue';
+import { useOffsetPagination } from '@vueuse/core';
+import { ToastEvent } from '@/plugins/events/events/toast';
+import { EventBus } from '@/plugins/events';
+import { range } from '@/utils';
+
+type ItemList = BaseItem[] | TwitterItem[];
+
+interface FetchDataParams {
+  currentPage: number;
+  currentPageSize: number;
+  pageCount?: number;
+}
 
 export default {
   name: 'ProjectDataView',
   components: { TwitterItemComponent },
   async setup() {
-    const currentProject = currentProjectStore.project;
-    const response = await callProjectTweetsListEndpoint({ projectId: currentProject.project_id as string });
-    const itemList: TwitterItem[] | BaseItem[] | undefined = response.payload;
     return {
-      itemList,
-      projectType: currentProject.type,
+      totalNumItems: (await callProjectItemCountEndpoint({ projectId: currentProjectStore.project.project_id as string })).payload,
     };
   },
   data() {
+    console.log(this.totalNumItems);
     return {
+      projectType: currentProjectStore.project.type,
+      itemList: [],
       showSearchBar: true,
+      navPagesWindowSize: 3,
+      pagination: useOffsetPagination({
+        total: 10000,
+        page: this.$route.query.page || 30,
+        pageSize: this.$route.query.pageSize || 50,
+        onPageChange: this.fetchData,
+        onPageSizeChange: this.fetchData,
+      }),
     };
   },
-  methods: {},
+  methods: {
+    fetchData({ currentPage, currentPageSize }: FetchDataParams): ItemList | void {
+      callProjectTweetsListEndpoint({ projectId: currentProjectStore.project.project_id as string })
+        .then((response) => {
+          this.itemList = response.payload;
+          this.$router.push({ query: { page: currentPage, pageSize: currentPageSize } });
+        })
+        .catch((response) => {
+          EventBus.emit(new ToastEvent('ERROR', 'Failed to load data.'));
+        });
+    },
+  },
+  computed: {
+    navPages(): number[] {
+      const start = (this.pagination.currentPage <= this.navPagesWindowSize)
+        ? 1
+        : this.pagination.currentPage - this.navPagesWindowSize;
+      const end = ((this.pagination.pageCount - this.pagination.currentPage) <= this.navPagesWindowSize)
+        ? this.pagination.pageCount
+        : this.pagination.currentPage + this.navPagesWindowSize;
+
+      return [...range(start, end)];
+    },
+  },
 };
 </script>
 
