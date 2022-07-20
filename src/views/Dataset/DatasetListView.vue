@@ -39,11 +39,19 @@
         <div class="d-flex flex-column flex-shrink-1 item-container">
           <!-- Item viewer container -->
           <div class="d-flex flex-row flex-wrap p-2 overflow-auto">
-            <template v-if="projectType === 'twitter'">
-              <TwitterItemComponent
-                v-for="(tweet) in itemList"
-                :key="tweet.item_id"
-                :tweet="tweet"/>
+            <template v-if="this.itemList && this.itemList.length > 0">
+              <template v-if="projectType === 'twitter'">
+                <TwitterItemComponent
+                  v-for="(tweet) in itemList"
+                  :key="tweet.item_id"
+                  :tweet="tweet"/>
+              </template>
+              <template v-else>
+                This type of data can not be rendered. Sorry.
+              </template>
+            </template>
+            <template v-else>
+              No data loaded yet or no data available.
             </template>
           </div>
 
@@ -87,7 +95,8 @@
                 </div>
               </li>
               <li class="page-item" :class="{disabled: pagination.isLastPage}">
-                <div @click="pagination.currentPage = pagination.pageCount" role="button" tabindex="0" class="page-link fw-normal"
+                <div @click="pagination.currentPage = pagination.pageCount" role="button" tabindex="0"
+                     class="page-link fw-normal"
                      aria-label="Last page">
                   <font-awesome-icon :icon="['fas', 'angles-right']" style="font-size: 0.7em"/>
                 </div>
@@ -105,23 +114,21 @@
 </template>
 
 <script lang="ts">
-import { callProjectItemCountEndpoint, callProjectTweetsListEndpoint } from '@/plugins/api/project/items';
+import {
+  callProjectItemCountEndpoint,
+  callProjectPagedTweetsListEndpoint,
+  callProjectTweetsListEndpoint,
+} from '@/plugins/api/project/items';
 import { BaseItem } from '@/types/items/index.d';
 import { TwitterItem } from '@/types/items/twitter.d';
 import { currentProjectStore } from '@/stores';
 import TwitterItemComponent from '@/components/items/TwitterItem.vue';
-import { useOffsetPagination } from '@vueuse/core';
+import { useOffsetPagination, UseOffsetPaginationReturn } from '@vueuse/core';
 import { ToastEvent } from '@/plugins/events/events/toast';
 import { EventBus } from '@/plugins/events';
 import { range } from '@/utils';
 
 type ItemList = BaseItem[] | TwitterItem[];
-
-interface FetchDataParams {
-  currentPage: number;
-  currentPageSize: number;
-  pageCount?: number;
-}
 
 export default {
   name: 'ProjectDataView',
@@ -139,7 +146,7 @@ export default {
       showSearchBar: true,
       navPagesWindowSize: 3,
       pagination: useOffsetPagination({
-        total: 10000,
+        total: this.totalNumItems,
         page: this.$route.query.page || 30,
         pageSize: this.$route.query.pageSize || 50,
         onPageChange: this.fetchData,
@@ -147,9 +154,16 @@ export default {
       }),
     };
   },
+  mounted() {
+    this.fetchData(this.pagination);
+  },
   methods: {
-    fetchData({ currentPage, currentPageSize }: FetchDataParams): ItemList | void {
-      callProjectTweetsListEndpoint({ projectId: currentProjectStore.project.project_id as string })
+    fetchData({ currentPage, currentPageSize }: UseOffsetPaginationReturn): ItemList | void {
+      callProjectPagedTweetsListEndpoint({
+        projectId: currentProjectStore.project.project_id as string,
+        page: this.pagination.currentPage,
+        pageSize: this.pagination.currentPageSize,
+      })
         .then((response) => {
           this.itemList = response.payload;
           this.$router.push({ query: { page: currentPage, pageSize: currentPageSize } });

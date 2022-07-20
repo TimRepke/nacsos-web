@@ -7,6 +7,12 @@ export interface ProjectItemsRequestPayload {
   projectId: string;
 }
 
+export interface ProjectPagedItemsRequestPayload {
+  projectId: string;
+  page: number;
+  pageSize: number;
+}
+
 export interface ProjectDetailRequestPayload {
   projectId: string;
   itemId: string;
@@ -30,6 +36,12 @@ const ProjectTweetsListEndpoint: Endpoint<ResponseReason, TwitterItem[]> = {
   paramsEncoding: 'PATH',
 };
 
+const ProjectPagedTweetsListEndpoint: Endpoint<ResponseReason, TwitterItem[]> = {
+  method: 'GET',
+  path: '/project/{projectId}/items/twitter/list/{page}/{pageSize}',
+  paramsEncoding: 'PATH',
+};
+
 const ProjectItemCountEndpoint: Endpoint<ResponseReason, number> = {
   method: 'GET',
   path: '/project/{projectId}/items/count',
@@ -47,6 +59,9 @@ export const callProjectItemsListEndpoint:
 
 export const callProjectTweetsListEndpoint:
   EndpointFunction<ProjectItemsRequestPayload, ResponseReason, TwitterItem[]> = callEndpointFactory(ProjectTweetsListEndpoint);
+
+export const callProjectPagedTweetsListEndpoint:
+  EndpointFunction<ProjectPagedItemsRequestPayload, ResponseReason, TwitterItem[]> = callEndpointFactory(ProjectPagedTweetsListEndpoint);
 
 export const callProjectItemCountEndpoint:
   EndpointFunction<ProjectItemsRequestPayload, ResponseReason, number> = callEndpointFactory(ProjectItemCountEndpoint);
