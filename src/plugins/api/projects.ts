@@ -14,60 +14,30 @@ export interface ProjectPermissionRequestPayload {
 const ProjectsListEndpoint: Endpoint<ResponseReason, Project[]> = {
   method: 'GET',
   path: '/projects/list',
-  transformResponse: (response) => {
-    if (response.data) {
-      return ['SUCCESS', 'SUCCESS', response.data];
-    }
-    return ['FAILED', 'POSTPROCESSING_FAILED'];
-  },
 };
 
 const ProjectInfoEndpoint: Endpoint<ResponseReason, Project> = {
   method: 'GET',
   path: '/project/{projectId}/info/',
   paramsEncoding: 'PATH',
-  transformResponse: (response) => {
-    if (response.data) {
-      return ['SUCCESS', 'SUCCESS', response.data];
-    }
-    return ['FAILED', 'POSTPROCESSING_FAILED'];
-  },
 };
 
 const UserProjectPermissionsEndpoint: Endpoint<ResponseReason, ProjectPermissions> = {
   method: 'GET',
   path: '/project/{projectId}/permissions/me',
   paramsEncoding: 'PATH',
-  transformResponse: (response) => {
-    if (response.data) {
-      return ['SUCCESS', 'SUCCESS', response.data];
-    }
-    return ['FAILED', 'POSTPROCESSING_FAILED'];
-  },
 };
 
 const ListProjectPermissionsEndpoint: Endpoint<ResponseReason, ProjectPermissions[]> = {
   method: 'GET',
   path: '/project/{projectId}/permissions/list',
   paramsEncoding: 'PATH',
-  transformResponse: (response) => {
-    if (response.data) {
-      return ['SUCCESS', 'SUCCESS', response.data];
-    }
-    return ['FAILED', 'POSTPROCESSING_FAILED'];
-  },
 };
 
 const ProjectPermissionsEndpoint: Endpoint<ResponseReason, ProjectPermissions> = {
   method: 'GET',
   path: '/project/{projectId}/permissions/{projectPermissionId}',
   paramsEncoding: 'PATH',
-  transformResponse: (response) => {
-    if (response.data) {
-      return ['SUCCESS', 'SUCCESS', response.data];
-    }
-    return ['FAILED', 'POSTPROCESSING_FAILED'];
-  },
 };
 
 export const callProjectsListEndpoint:

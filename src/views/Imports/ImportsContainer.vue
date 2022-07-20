@@ -1,0 +1,26 @@
+<template>
+  <div v-if="projectPermissions.dataset_edit">
+    <router-view></router-view>
+  </div>
+  <div v-else>
+    Unfortunately, you don't have permission to access this page.
+  </div>
+</template>
+
+<script lang="ts">
+import { currentProjectStore } from '@/stores';
+import { ProjectPermissions } from '@/types/project.d';
+
+export default {
+  name: 'ImportsContainer',
+  data() {
+    return {
+      projectPermissions: currentProjectStore.projectPermissions as ProjectPermissions,
+    };
+  },
+};
+</script>
+
+<style scoped>
+
+</style>

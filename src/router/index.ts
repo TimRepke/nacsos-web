@@ -24,7 +24,7 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: '/project-list',
     name: 'project-list',
-    component: () => import(/* webpackChunkName: "ProjectListView" */ '../views/Projects/ProjectListView.vue'),
+    component: () => import(/* webpackChunkName: "ProjectListView" */ '../views/Projects/ProjectsListView.vue'),
   },
   {
     path: '/project/overview',
@@ -32,9 +32,30 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import(/* webpackChunkName: "ProjectOverviewView" */ '../views/Projects/ProjectOverviewView.vue'),
   },
   {
+    path: '/project/imports',
+    name: 'project-imports',
+    component: () => import(/* webpackChunkName: "ProjectDataView" */ '../views/Imports/ImportsContainer.vue'),
+    children: [
+      {
+        path: '',
+        alias: ['', 'list'],
+        name: 'project-imports-list',
+        component: () => import(/* webpackChunkName: "AnnotationView" */ '../views/Imports/ImportsListView.vue'),
+      },
+    ],
+  },
+  {
     path: '/project/dataset',
     name: 'project-dataset',
-    component: () => import(/* webpackChunkName: "ProjectDataView" */ '../views/Projects/ProjectDataView.vue'),
+    component: () => import(/* webpackChunkName: "ProjectDataView" */ '../views/Dataset/DatasetContainer.vue'),
+    children: [
+      {
+        path: '',
+        alias: ['', 'list'],
+        name: 'project-dataset-list',
+        component: () => import(/* webpackChunkName: "AnnotationView" */ '../views/Dataset/DatasetListView.vue'),
+      },
+    ],
   },
   {
     path: '/project/annotate',

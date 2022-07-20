@@ -45,6 +45,12 @@ export default {
 :root {
   --topnav-height: 3rem;
   --body-height: calc(100vh - var(--topnav-height));
+  --bs-break-xs: 0;
+  --bs-break-sm: 576px;
+  --bs-break-md: 768px;
+  --bs-break-lg: 992px;
+  --bs-break-xl: 1200px;
+  --bs-break-xxl: 1400px;
 }
 
 #app {

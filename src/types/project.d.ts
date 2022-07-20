@@ -1,7 +1,10 @@
+export type ProjectTypes = 'twitter' | 'academic' | 'patents'
+
 export interface Project {
   project_id?: string;
   name: string;
   description: string;
+  type: ProjectTypes;
 }
 
 export interface ProjectPermissions {
