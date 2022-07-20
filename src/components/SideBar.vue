@@ -11,8 +11,8 @@
       <router-link to="/project/overview" class="list-group-item list-group-item-action border-end-0"
                    active-class="active">Overview
       </router-link>
-      <router-link to="/project/queries" class="list-group-item list-group-item-action border-end-0"
-                   active-class="active"> Queries
+      <router-link to="/project/imports" class="list-group-item list-group-item-action border-end-0"
+                   active-class="active"> Imports
       </router-link>
       <router-link to="/project/dataset" class="list-group-item list-group-item-action border-end-0"
                    active-class="active"> Dataset

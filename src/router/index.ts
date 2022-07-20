@@ -50,14 +50,14 @@ const routes: Array<RouteRecordRaw> = [
       {
         path: 'item/:scope_id/:assignment_id?',
         name: 'project-annotate-item',
-        component: () => import(/* webpackChunkName: "AnnotationView" */ '../views/Annotations/Annotations/AnnotationView.vue'),
+        component: () => import(/* webpackChunkName: "AnnotationView" */ '../views/Annotations/Annotations/AnnotationsContainer.vue'),
       },
     ],
   },
   {
     path: '/project/config/annotations',
     name: 'config-annotation-tasks',
-    component: () => import(/* webpackChunkName: "AnnotationConfigListView" */ '../views/Annotations/AnnotationConfigs/AnnotationConfigsView.vue'),
+    component: () => import(/* webpackChunkName: "AnnotationConfigListView" */ '../views/Annotations/AnnotationConfigs/AnnotationConfigsContainer.vue'),
     children: [
       {
         path: '',

@@ -11,7 +11,7 @@
 import { currentProjectStore } from '@/stores';
 
 export default {
-  name: 'AnnotationConfigsView',
+  name: 'AnnotationConfigsContainer',
   data() {
     return {
       projectPermissions: currentProjectStore.projectPermissions,

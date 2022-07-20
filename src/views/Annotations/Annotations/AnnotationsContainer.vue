@@ -107,7 +107,7 @@ const motivationalQuotes = [
 ];
 
 export default {
-  name: 'AnnotationView',
+  name: 'AnnotationsContainer',
   components: { AnnotationLabels, TwitterItemComponent },
   data() {
     return {
