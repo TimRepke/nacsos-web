@@ -7,6 +7,15 @@
           <h3>Search options</h3>
         </div>
         <div class="row m-2 mt-0">
+          TODO: Tiny stats of dataset size and applied filters
+          <p>
+            <ClosablePill class="m-1">contains:Search term</ClosablePill>
+            <ClosablePill colour="info" class="m-1">year: 2010-2013</ClosablePill>
+            <ClosablePill colour="warning" class="m-1">query: "import 32"</ClosablePill>
+            <ClosablePill colour="info" class="m-1">year: 2015-2018</ClosablePill>
+          </p>
+        </div>
+        <div class="row m-2 mt-0">
           <div class="input-group p-0">
             <input id="search" class="form-control" aria-label="Fulltext search" placeholder="Search..." type="text"
                    style="padding-right: 3rem !important;">
@@ -32,6 +41,12 @@
         </div>
         <div class="row m-2 mt-0">
           TODO: Overlap with other project
+        </div>
+        <div class="row m-2 mt-0">
+          TODO: Search by year (maybe with little histogram?)
+        </div>
+        <div class="row m-2 mt-0">
+          TODO: Search author of paper / user for tweet
         </div>
       </div>
 
@@ -127,19 +142,19 @@ import { useOffsetPagination, UseOffsetPaginationReturn } from '@vueuse/core';
 import { ToastEvent } from '@/plugins/events/events/toast';
 import { EventBus } from '@/plugins/events';
 import { range } from '@/utils';
+import ClosablePill from '@/components/ClosablePill.vue';
 
 type ItemList = BaseItem[] | TwitterItem[];
 
 export default {
   name: 'ProjectDataView',
-  components: { TwitterItemComponent },
+  components: { ClosablePill, TwitterItemComponent },
   async setup() {
     return {
       totalNumItems: (await callProjectItemCountEndpoint({ projectId: currentProjectStore.project.project_id as string })).payload,
     };
   },
   data() {
-    console.log(this.totalNumItems);
     return {
       projectType: currentProjectStore.project.type,
       itemList: [],
@@ -147,8 +162,8 @@ export default {
       navPagesWindowSize: 3,
       pagination: useOffsetPagination({
         total: this.totalNumItems,
-        page: this.$route.query.page || 30,
-        pageSize: this.$route.query.pageSize || 50,
+        page: this.$route.query.page || 1,
+        pageSize: this.$route.query.pageSize || 20,
         onPageChange: this.fetchData,
         onPageSizeChange: this.fetchData,
       }),

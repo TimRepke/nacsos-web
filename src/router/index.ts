@@ -42,6 +42,11 @@ const routes: Array<RouteRecordRaw> = [
         name: 'project-imports-list',
         component: () => import(/* webpackChunkName: "AnnotationView" */ '../views/Imports/ImportsListView.vue'),
       },
+      {
+        path: 'details/:import_id?',
+        name: 'project-imports-details',
+        component: () => import(/* webpackChunkName: "AnnotationView" */ '../views/Imports/ImportDetailsView.vue'),
+      },
     ],
   },
   {

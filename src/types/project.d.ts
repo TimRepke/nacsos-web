@@ -1,10 +1,11 @@
-export type ProjectTypes = 'twitter' | 'academic' | 'patents'
+export const projectTypes = ['basic', 'twitter', 'academic', 'patents'] as const;
+export type ProjectTypeLiteral = typeof projectTypes[number];
 
 export interface Project {
   project_id?: string;
   name: string;
   description: string;
-  type: ProjectTypes;
+  type: ProjectTypeLiteral;
 }
 
 export interface ProjectPermissions {
@@ -14,8 +15,8 @@ export interface ProjectPermissions {
   owner: boolean;
   dataset_read: boolean;
   dataset_edit: boolean;
-  queries_read: boolean;
-  queries_edit: boolean;
+  imports_read: boolean;
+  imports_edit: boolean;
   annotations_read: boolean;
   annotations_edit: boolean;
   pipelines_read: boolean;

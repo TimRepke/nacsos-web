@@ -12,7 +12,8 @@ import {
 import { BaseItem } from '@/types/items/index.d';
 import { TwitterItem } from '@/types/items/twitter.d';
 
-export const AnnotationTaskLabelKinds = ['bool', 'str', 'int', 'float', 'single', 'multi'];
+export const AnnotationTaskLabelKinds = ['bool', 'str', 'int', 'float', 'single', 'multi'] as const;
+export type AnnotationTaskLabelKindsType = typeof AnnotationTaskLabelKinds[number];
 
 export interface TaskDefinitionRequestPayload {
   taskId: string;
