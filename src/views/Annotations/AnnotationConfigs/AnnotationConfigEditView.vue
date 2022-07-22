@@ -54,8 +54,6 @@
 </template>
 
 <script lang="ts">
-import { ref } from 'vue';
-import { useRoute } from 'vue-router';
 import {
   callSaveAnnotationTaskEndpoint,
   callTaskDefinitionEndpoint,
@@ -65,48 +63,40 @@ import { AnnotationTask } from '@/types/annotation.d';
 import AnnotationTaskLabelsEditor from '@/components/annotations/AnnotationTaskLabelsEditor.vue';
 import { EventBus } from '@/plugins/events';
 import { ToastEvent } from '@/plugins/events/events/toast';
-import { useCurrentProjectStore } from '@/stores/CurrentProjectStore';
 import { ConfirmationRequestEvent } from '@/plugins/events/events/confirmation';
+import { currentProjectStore } from '@/stores';
+import { ref } from 'vue';
 
 export default {
   name: 'AnnotationConfigEditView',
   components: { AnnotationTaskLabelsEditor },
-  async setup() {
-    const route = useRoute();
-    const taskId = route.params.task_id as string;
-    const { projectId } = useCurrentProjectStore();
+  data() {
+    const { projectId } = currentProjectStore;
+    const taskId = this.$route.params.task_id;
 
-    let task: AnnotationTask;
-    if (taskId) {
-      const result = await callTaskDefinitionEndpoint({ taskId });
-      if (result.status === 'SUCCESS' && result.payload) {
-        task = result.payload;
-      } else {
-        EventBus.emit(new ToastEvent('ERROR', 'Failed to load assignment scope info. Please try reloading.'));
-        throw Error('Something went wrong. Please tell the admin how you got here.');
-      }
-    } else {
-      task = {
+    return {
+      taskId,
+      isNewTask: !taskId,
+      nameEditMode: false,
+      descriptionEditMode: false,
+      task: ref({
         project_id: projectId,
         name: 'New annotation task',
         description: 'Description for new task.',
         labels: [],
-      };
+      } as AnnotationTask),
+    };
+  },
+  async mounted() {
+    if (!this.isNewTask) {
+      const result = await callTaskDefinitionEndpoint({ taskId: this.taskId });
+      if (result.status === 'SUCCESS' && result.payload) {
+        this.task = ref(result.payload);
+      } else {
+        EventBus.emit(new ToastEvent('ERROR', 'Failed to load assignment scope info. Please try reloading.'));
+        throw Error('Something went wrong. Please tell the admin how you got here.');
+      }
     }
-
-    return {
-      task: ref(task),
-      isNewTask: !taskId,
-    };
-  },
-  created() {
-    // noop
-  },
-  data() {
-    return {
-      nameEditMode: false,
-      descriptionEditMode: false,
-    };
   },
   methods: {
     save() {

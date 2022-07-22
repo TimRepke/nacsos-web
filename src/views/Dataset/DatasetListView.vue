@@ -149,27 +149,27 @@ type ItemList = BaseItem[] | TwitterItem[];
 export default {
   name: 'ProjectDataView',
   components: { ClosablePill, TwitterItemComponent },
-  async setup() {
-    return {
-      totalNumItems: (await callProjectItemCountEndpoint({ projectId: currentProjectStore.project.project_id as string })).payload,
-    };
-  },
   data() {
     return {
       projectType: currentProjectStore.project.type,
       itemList: [],
       showSearchBar: true,
       navPagesWindowSize: 3,
-      pagination: useOffsetPagination({
-        total: this.totalNumItems,
-        page: this.$route.query.page || 1,
-        pageSize: this.$route.query.pageSize || 20,
-        onPageChange: this.fetchData,
-        onPageSizeChange: this.fetchData,
-      }),
+      totalNumItems: 0,
+      pagination: useOffsetPagination({}),
     };
   },
-  mounted() {
+  async mounted() {
+    this.totalNumItems = (await callProjectItemCountEndpoint({
+      projectId: currentProjectStore.project.project_id as string,
+    })).payload;
+    this.pagination = useOffsetPagination({
+      total: this.totalNumItems,
+      page: this.$route.query.page || 1,
+      pageSize: this.$route.query.pageSize || 20,
+      onPageChange: this.fetchData,
+      onPageSizeChange: this.fetchData,
+    });
     this.fetchData(this.pagination);
   },
   methods: {

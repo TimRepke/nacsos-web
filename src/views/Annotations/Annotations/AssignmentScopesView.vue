@@ -1,7 +1,7 @@
 <template>
   <div class="text-start p-2">
     <h2>List of Assignments</h2>
-    <ul>
+    <ul v-if="annotationScopes.length > 0">
       <li v-for="scope in annotationScopes" :key="scope.scope.assignment_scope_id">
         {{ scope.task_name }}
         <em>({{ scope.scope.name }})</em>&nbsp;
@@ -19,6 +19,9 @@
         ({{ ((scope.num_completed / scope.num_assignments) * 100).toFixed(0) }}%)
       </li>
     </ul>
+    <div v-else>
+      Loading assignments (or you have none)...
+    </div>
   </div>
 </template>
 
@@ -26,16 +29,19 @@
 import { callProjectUserScopesEndpoint } from '@/plugins/api/annotations';
 import { currentProjectStore } from '@/stores';
 import InlineToolTip from '@/components/InlineToolTip.vue';
+import { UserProjectAssignmentScope } from '@/types/annotation.d';
 
 export default {
   name: 'AssignmentScopesView',
   components: { InlineToolTip },
-  async setup() {
-    const currentProjectId = currentProjectStore.projectId!;
-    const response = await callProjectUserScopesEndpoint({ projectId: currentProjectId });
+  data() {
     return {
-      annotationScopes: response.payload,
+      annotationScopes: [] as UserProjectAssignmentScope[],
     };
+  },
+  async mounted() {
+    const currentProjectId = currentProjectStore.projectId;
+    this.annotationScopes = (await callProjectUserScopesEndpoint({ projectId: currentProjectId })).payload;
   },
   methods: {
     // none

@@ -144,6 +144,7 @@ import ToolTip from '@/components/ToolTip.vue';
 import { AnnotationTaskLabelKinds } from '@/plugins/api/annotations';
 
 // TODO flatten list of all keys and make sure they are all unique (probably in AnnotationConfigEditView)
+// TODO general input validation
 
 export default {
   name: 'AnnotationTaskLabelsEditor',
@@ -240,6 +241,16 @@ export default {
         taskLabel.tmpKey = crypto.randomUUID();
         return taskLabel;
       });
+    },
+  },
+  watch: {
+    labels: {
+      // FIXME: somehow the props reference between taskLabels and props.labels broke
+      //        this should be fixed, since this watch hack makes the config very slow!
+      handler(labels: AnnotationTaskLabel[]) {
+        this.taskLabels = labels;
+      },
+      // deep: true,
     },
   },
 };

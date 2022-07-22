@@ -79,15 +79,16 @@ import { ToastEvent } from '@/plugins/events/events/toast';
 export default {
   name: 'AnnotationConfigListView',
   components: { InlineToolTip },
-  async setup() {
-    const projectTasks: AnnotationTask[] = (await callProjectTasksEndpoint(
-      { projectId: currentProjectStore.project!.project_id! },
-    )).payload as AnnotationTask[];
-    const projectScopes: AssignmentScope[] = (await callProjectScopesEndpoint()).payload as AssignmentScope[];
+  data() {
     return {
-      projectTasks: ref(projectTasks),
-      projectScopes: ref(projectScopes),
+      projectTasks: [] as AnnotationTask[],
+      projectScopes: [] as AssignmentScope[],
     };
+  },
+  async mounted() {
+    const { projectId } = currentProjectStore;
+    this.projectTasks = (await callProjectTasksEndpoint({ projectId })).payload;
+    this.projectScopes = (await callProjectScopesEndpoint()).payload;
   },
   methods: {
     copyTask(task: AnnotationTask) {

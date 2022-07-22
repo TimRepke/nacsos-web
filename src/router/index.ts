@@ -65,7 +65,7 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: '/project/annotate',
     name: 'project-annotate',
-    component: () => import(/* webpackChunkName: "AnnotationView" */ '../views/Annotations/Annotations/AnnotationsView.vue'),
+    component: () => import(/* webpackChunkName: "AnnotationView" */ '../views/Annotations/Annotations/AnnotationsContainer.vue'),
     children: [
       {
         path: '',
@@ -76,7 +76,7 @@ const routes: Array<RouteRecordRaw> = [
       {
         path: 'item/:scope_id/:assignment_id?',
         name: 'project-annotate-item',
-        component: () => import(/* webpackChunkName: "AnnotationView" */ '../views/Annotations/Annotations/AnnotationsContainer.vue'),
+        component: () => import(/* webpackChunkName: "AnnotationView" */ '../views/Annotations/Annotations/AnnotationsView.vue'),
       },
     ],
   },

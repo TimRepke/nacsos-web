@@ -157,61 +157,56 @@ import { ToastEvent } from '@/plugins/events/events/toast';
 export default {
   name: 'AssignmentScopeConfigView',
   components: { AssignmentsVisualiser, RandomAssignmentConfig },
-  async setup() {
-    const route = useRoute();
-    const scopeId = route.params.scope_id as string;
-    const taskId = route.query.task_id as string;
+  data() {
+    const scopeId = this.$route.params.scope_id;
+    const taskId = this.$route.query.task_id;
 
-    let scope: AssignmentScope;
-    let counts: AssignmentScopeCounts | undefined;
-    let selectedUsers: User[] = [];
-
-    if (scopeId) {
-      const result = await callScopeEndpoint({ assignmentScopeId: scopeId });
-      if (result.status === 'SUCCESS' && result.payload) {
-        scope = result.payload;
-        counts = (await callScopeCountsEndpoint({ assignmentScopeId: scopeId })).payload;
-        if (scope.config?.users && scope.config?.users.length > 0) {
-          selectedUsers = (await callUsersDetailsEndpoint({ user_id: scope.config.users })).payload as User[];
-        }
-      } else {
-        EventBus.emit(new ToastEvent('ERROR', 'Failed to load assignment scope info. Please try reloading.'));
-        throw Error('Something went wrong. Please tell the admin how you got here.');
-      }
-    } else if (taskId) {
-      scope = {
+    return {
+      scopeId,
+      taskId,
+      // list of all users in the system
+      users: [] as User[],
+      // search query for filtering list of users
+      userSearch: '',
+      // users selected to be in the query pool
+      selectedUsers: [] as User[],
+      // assignment strategy type
+      strategyConfigType: undefined as AssignmentScopeConfigType | undefined,
+      // indicates whether this is (or will be) a newly created scope
+      isNewScope: !scopeId && taskId,
+      // holds the assignment counts (or undefined if none exist)
+      assignmentCounts: undefined as AssignmentScopeCounts | undefined,
+      assignments: [] as Assignment[],
+      assignmentScope: {
         assignment_scope_id: undefined,
-        task_id: taskId as string,
+        task_id: taskId,
         time_created: undefined,
         name: '',
         description: '',
-      };
-    } else {
-      throw Error('Something went wrong. Please tell the admin how you got here.');
-    }
-    return {
-      assignmentScope: ref(scope),
-      // indicates whether this is (or will be) a newly created scope
-      isNewScope: ref(!scopeId && taskId),
-      // indicates whether assignments were already performed in this scope
-      scopeHasAssignments: ref(!!counts && counts.num_total > 0),
-      // holds the assignment counts (or undefined if none exist)
-      assignmentCounts: ref(counts as AssignmentScopeCounts),
-      // users selected to be in the query pool
-      selectedUsers: ref(selectedUsers),
+      } as AssignmentScope,
     };
   },
-  data() {
-    let strategy: AssignmentScopeConfigType | undefined;
-    if (this.assignmentScope.config) {
-      strategy = this.assignmentScope.config.config_type;
+  async mounted() {
+    if (!this.isNewScope) {
+      const scopeReq = await callScopeEndpoint({ assignmentScopeId: this.scopeId });
+      const countsReq = await callScopeCountsEndpoint({ assignmentScopeId: this.scopeId });
+
+      if (scopeReq.status === 'SUCCESS' && scopeReq.payload && countsReq.status === 'SUCCESS' && countsReq.payload) {
+        this.assignmentScope = scopeReq.payload;
+        this.assignmentCounts = countsReq.payload;
+
+        if (this.assignmentScope.config && this.assignmentScope.config.users) {
+          const usersReq = await callUsersDetailsEndpoint({ user_id: this.assignmentScope.config.users });
+          if (usersReq.status === 'SUCCESS' && usersReq.payload) {
+            this.selectedUsers = usersReq.payload;
+          } else {
+            EventBus.emit(new ToastEvent('ERROR', 'Failed to load list of users. Please try reloading.'));
+          }
+        }
+      } else {
+        EventBus.emit(new ToastEvent('ERROR', 'Failed to load assignment scope info. Please try reloading.'));
+      }
     }
-    return {
-      assignments: [] as Assignment[],
-      users: [] as User[], // list of all users in the system
-      userSearch: '', // search query for filtering list of users
-      strategyConfigType: strategy, // assignment strategy type
-    };
   },
   methods: {
     createAssignments() {
@@ -337,6 +332,10 @@ export default {
     },
     statsLoaded(): boolean {
       return this.assignments && this.assignments.length > 0 && this.assignmentCounts;
+    },
+    // indicates whether assignments were already performed in this scope
+    scopeHasAssignments(): boolean {
+      return !!this.counts && this.counts.num_total > 0;
     },
   },
 };
