@@ -1,12 +1,14 @@
 <template>
   <div class="text-start p-2 container-fluid">
     <div class="row pb-2 mb-2 border-bottom g-0">
-      <h1 v-if="isNewScope">Create new assignment scope</h1>
-      <h1 v-else>Monitor assignment scope</h1>
-      <h6>
-        The assignment scope for an annotation task is used to annotate in multiple
-        batches or subsets and keep track of that reference.
-      </h6>
+      <div class="col-md-8">
+        <h1 v-if="isNewScope">Create new assignment scope</h1>
+        <h1 v-else>Monitor assignment scope</h1>
+        <h6>
+          The assignment scope for an annotation task is used to annotate in multiple
+          batches or subsets and keep track of that reference.
+        </h6>
+      </div>
     </div>
     <div class="row pb-2 mb-2 border-bottom g-0">
       <div class="col-md-6">
@@ -195,7 +197,7 @@ export default {
         this.assignmentScope = scopeReq.payload;
         this.assignmentCounts = countsReq.payload;
 
-        if (this.assignmentScope.config && this.assignmentScope.config.users) {
+        if (this.assignmentScope.config && this.assignmentScope.config.users && this.assignmentScope.config.users.length > 0) {
           const usersReq = await callUsersDetailsEndpoint({ user_id: this.assignmentScope.config.users });
           if (usersReq.status === 'SUCCESS' && usersReq.payload) {
             this.selectedUsers = usersReq.payload;
@@ -335,7 +337,7 @@ export default {
     },
     // indicates whether assignments were already performed in this scope
     scopeHasAssignments(): boolean {
-      return !!this.counts && this.counts.num_total > 0;
+      return !!this.assignmentCounts && this.assignmentCounts.num_total > 0;
     },
   },
 };

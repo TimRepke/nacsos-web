@@ -143,6 +143,7 @@ import { ToastEvent } from '@/plugins/events/events/toast';
 import { EventBus } from '@/plugins/events';
 import { range } from '@/utils';
 import ClosablePill from '@/components/ClosablePill.vue';
+import { reactive } from 'vue';
 
 type ItemList = BaseItem[] | TwitterItem[];
 
@@ -156,7 +157,7 @@ export default {
       showSearchBar: true,
       navPagesWindowSize: 3,
       totalNumItems: 0,
-      pagination: useOffsetPagination({}),
+      pagination: reactive(useOffsetPagination({ total: 0 })),
     };
   },
   async mounted() {

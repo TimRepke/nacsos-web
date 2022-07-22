@@ -18,8 +18,14 @@ const ListProjectImportsEndpoint: Endpoint<ResponseReason, ImportModel[]> = {
 
 const ImportItemCountEndpoint: Endpoint<ResponseReason, number> = {
   method: 'GET',
-  path: '/imports/import/{importId}/count',
+  path: '/imports/import/{importId}/count/',
   paramsEncoding: 'PATH',
+  transformResponse: (response) => {
+    if (!!response.data || response.data === 0) {
+      return ['SUCCESS', 'SUCCESS', response.data];
+    }
+    return ['FAILED', 'POSTPROCESSING_FAILED'];
+  },
 };
 
 const ImportDetailsEndpoint: Endpoint<ResponseReason, ImportModel> = {
@@ -30,7 +36,7 @@ const ImportDetailsEndpoint: Endpoint<ResponseReason, ImportModel> = {
 
 const SaveImportEndpoint: Endpoint<ResponseReason, string> = {
   method: 'PUT',
-  path: '/imports/import/',
+  path: '/imports/import',
   paramsEncoding: 'BODY',
 };
 

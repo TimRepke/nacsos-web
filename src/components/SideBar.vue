@@ -12,27 +12,27 @@
                    active-class="active">Overview
       </router-link>
       <router-link to="/project/imports" class="list-group-item list-group-item-action border-end-0"
-                   active-class="active"> Imports
+                   active-class="active" v-if="projectPermissions.imports_read"> Imports
       </router-link>
       <router-link to="/project/dataset" class="list-group-item list-group-item-action border-end-0"
-                   active-class="active"> Dataset
+                   active-class="active" v-if="projectPermissions.dataset_read"> Dataset
       </router-link>
       <router-link to="/project/annotate" class="list-group-item list-group-item-action border-end-0"
-                   active-class="active"> Annotation
+                   active-class="active" v-if="projectPermissions.annotations_read"> Annotation
       </router-link>
       <router-link to="/project/artefacts" class="list-group-item list-group-item-action border-end-0"
-                   active-class="active"> Artefacts
+                   active-class="active" v-if="projectPermissions.artefacts_read"> Artefacts
       </router-link>
       <router-link to="/project/pipelines" class="list-group-item list-group-item-action border-end-0"
-                   active-class="active"> Pipelines
+                   active-class="active" v-if="projectPermissions.pipelines_read"> Pipelines
       </router-link>
       <router-link to="/project/config/annotations" class="list-group-item list-group-item-action border-end-0"
-                   active-class="active">
+                   active-class="active" v-if="projectPermissions.annotations_edit">
         <font-awesome-icon icon="gear"/>
         Annotations
       </router-link>
       <router-link to="/project/config/project" class="list-group-item list-group-item-action border-end-0"
-                   active-class="active">
+                   active-class="active" v-if="projectPermissions.owner">
         <font-awesome-icon icon="gear"/>
         Project
       </router-link>
@@ -47,12 +47,15 @@
 
 <script lang="ts">
 import NacsosLogo from '@/components/NacsosLogo.vue';
+import { currentProjectStore } from '@/stores';
+import { ProjectPermissions } from '@/types/project.d';
 
 export default {
   name: 'SideBar',
   components: { NacsosLogo },
   data(): object {
     return {
+      projectPermissions: currentProjectStore.projectPermissions as ProjectPermissions,
       visible: undefined,
       windowWidth: window.innerWidth,
       logoSize: {

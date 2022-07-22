@@ -13,8 +13,8 @@
             <font-awesome-icon :icon="['fas', 'circle-question']" class="text-muted"/>
           </a>
         </label>
-        <input type="text" class="form-control" id="twitterQuery" v-model="config.query"
-               :class="{ 'is-valid': !v$.config.query.$error, 'is-invalid': v$.config.query.$error }" required>
+        <input type="text" class="form-control" id="twitterQuery" v-model="config.query" :disabled="!editable"
+               :class="{ 'is-valid': !v$.config.query.$error, 'is-invalid': v$.config.query.$error }" required/>
         <div class="invalid-feedback" v-if="v$.config.query.$error">
           {{ errorsToString(v$.config.query) }}
         </div>
@@ -28,7 +28,8 @@
           </a>
         </label>
         <input type="text" class="form-control" id="twitterMaxResults" v-model="config.max_results"
-               :class="{ 'is-valid': !v$.config.max_results.$error, 'is-invalid': v$.config.max_results.$error }">
+               :disabled="!editable"
+               :class="{ 'is-valid': !v$.config.max_results.$error, 'is-invalid': v$.config.max_results.$error }"/>
         <div class="invalid-feedback" v-if="v$.config.max_results.$error">
           {{ errorsToString(v$.config.max_results) }}
         </div>
@@ -41,8 +42,8 @@
             <font-awesome-icon :icon="['fas', 'circle-question']" class="text-muted"/>
           </a>
         </label>
-        <input type="text" class="form-control" id="twitterNextToken" v-model="config.next_token"
-               :class="{ 'is-valid': !v$.config.next_token.$error, 'is-invalid': v$.config.next_token.$error }">
+        <input type="text" class="form-control" id="twitterNextToken" v-model="config.next_token" :disabled="!editable"
+               :class="{ 'is-valid': !v$.config.next_token.$error, 'is-invalid': v$.config.next_token.$error }"/>
         <div class="invalid-feedback" v-if="v$.config.next_token.$error">
           {{ errorsToString(v$.config.next_token) }}
         </div>
@@ -55,8 +56,9 @@
             <font-awesome-icon :icon="['fas', 'circle-question']" class="text-muted"/>
           </a>
         </label>
-        <input type="text" class="form-control" id="twitterSinceId" v-model="config.since_id" placeholder="Tweet ID"
-               :class="{ 'is-valid': !v$.config.since_id.$error, 'is-invalid': v$.config.since_id.$error }">
+        <input type="text" class="form-control" id="twitterSinceId"
+               v-model="config.since_id" placeholder="Tweet ID" :disabled="!editable"
+               :class="{ 'is-valid': !v$.config.since_id.$error, 'is-invalid': v$.config.since_id.$error }"/>
         <div class="invalid-feedback" v-if="v$.config.since_id.$error">
           {{ errorsToString(v$.config.since_id) }}
         </div>
@@ -69,8 +71,9 @@
             <font-awesome-icon :icon="['fas', 'circle-question']" class="text-muted"/>
           </a>
         </label>
-        <input type="text" class="form-control" id="twitterUntilId" v-model="config.until_id" placeholder="Tweet ID"
-               :class="{ 'is-valid': !v$.config.until_id.$error, 'is-invalid': v$.config.until_id.$error }">
+        <input type="text" class="form-control" id="twitterUntilId"
+               v-model="config.until_id" placeholder="Tweet ID" :disabled="!editable"
+               :class="{ 'is-valid': !v$.config.until_id.$error, 'is-invalid': v$.config.until_id.$error }"/>
         <div class="invalid-feedback" v-if="v$.config.until_id.$error">
           {{ errorsToString(v$.config.until_id) }}
         </div>
@@ -83,9 +86,9 @@
             <font-awesome-icon :icon="['fas', 'circle-question']" class="text-muted"/>
           </a>
         </label>
-        <input type="text" class="form-control" id="twitterStartTime" v-model="config.start_time"
+        <input type="text" class="form-control" id="twitterStartTime" v-model="config.start_time" :disabled="!editable"
                placeholder="YYYY-MM-DDTHH:mm:ssZ"
-               :class="{ 'is-valid': !v$.config.start_time.$error, 'is-invalid': v$.config.start_time.$error }">
+               :class="{ 'is-valid': !v$.config.start_time.$error, 'is-invalid': v$.config.start_time.$error }"/>
         <div class="invalid-feedback" v-if="v$.config.start_time.$error">
           {{ errorsToString(v$.config.start_time) }}
         </div>
@@ -98,9 +101,9 @@
             <font-awesome-icon :icon="['fas', 'circle-question']" class="text-muted"/>
           </a>
         </label>
-        <input type="text" class="form-control" id="twitterEndTime" v-model="config.end_time"
+        <input type="text" class="form-control" id="twitterEndTime" v-model="config.end_time" :disabled="!editable"
                placeholder="YYYY-MM-DDTHH:mm:ssZ"
-               :class="{ 'is-valid': !v$.config.end_time.$error, 'is-invalid': v$.config.end_time.$error }">
+               :class="{ 'is-valid': !v$.config.end_time.$error, 'is-invalid': v$.config.end_time.$error }"/>
         <div class="invalid-feedback" v-if="v$.config.end_time.$error">
           {{ errorsToString(v$.config.end_time) }}
         </div>
@@ -113,7 +116,8 @@
             <font-awesome-icon :icon="['fas', 'circle-question']" class="text-muted"/>
           </a>
         </label>
-        <select class="form-select" id="twitterSortOrder" aria-describedby="twitterSortOrder" v-model="config.sort_order">
+        <select class="form-select" id="twitterSortOrder" aria-describedby="twitterSortOrder"
+                v-model="config.sort_order" :disabled="!editable">
           <option value="relevancy">Relevance</option>
           <option value="recency">Recency</option>
         </select>
