@@ -21,10 +21,12 @@
       </div>
     </div>
     <div class="row pb-2 mb-2 border-bottom g-0" v-if="importConfigComponent !== undefined">
-      <component :is="importConfigComponent"
-                 :existing-config="importDetails.config"
-                 :editable="!importStarted"
-                 @config-changed="updateConfig($event)"></component>
+      <div class="col">
+        <component :is="importConfigComponent"
+                   :existing-config="importDetails.config"
+                   :editable="!importStarted"
+                   @config-changed="updateConfig($event)"></component>
+      </div>
     </div>
     <div class="row pb-2 mb-2 border-bottom g-0">
       <h4>Import progress</h4>
@@ -70,48 +72,38 @@ const type2component: ComponentMapping = {
 export default {
   name: 'ImportDetailsView',
   components: { ConfigRIS, ConfigJSONL, ConfigTwitter },
-  async setup() {
-    const route = useRoute();
-    const importId = route.params.import_id as string;
+  data() {
     const { project } = useCurrentProjectStore();
+    const importId: string = this.$route.params.import_id;
     const userId = useCurrentUserStore().user?.user_id;
 
-    let importDetails: ImportModel;
-    let numItems: number;
-
-    if (importId) {
-      const requestResult = await callImportDetailsEndpoint({ importId });
-      if (requestResult.status === 'SUCCESS' && requestResult.payload) {
-        importDetails = requestResult.payload;
-        numItems = (await callImportItemCountEndpoint()).payload as number;
-      } else {
-        EventBus.emit(new ToastEvent('ERROR', 'Failed to load import details. Please try reloading.'));
-        throw Error('Something went wrong. Please tell the admin how you got here.');
-      }
-    }
-
-    if (!importDetails) {
-      importDetails = {
-        project_id: project.project_id!,
+    return {
+      importId,
+      isNewImport: ref(!importId), // indicates whether this is (or will be) a newly created import
+      currentProject: project as Project,
+      numItems: 0 as number,
+      importStarted: false, // indicates, whether this import was already performed (or started)
+      importDetails: {
+        project_id: project.project_id,
         user_id: userId,
         type: undefined,
         name: '',
         description: '',
         config: undefined,
-      };
-    }
-    if (!numItems) {
-      numItems = 0;
-    }
-
-    return {
-      importDetails: ref(importDetails),
-      numItems,
-      // indicates whether this is (or will be) a newly created import
-      isNewImport: ref(!importId),
-      importStarted: ref(false),
-      currentProject: project as Project,
+      } as ImportModel,
     };
+  },
+  async mounted() {
+    if (this.importId) {
+      const requestResult = await callImportDetailsEndpoint({ importId: this.importId });
+      if (requestResult.status === 'SUCCESS' && requestResult.payload) {
+        this.importDetails = requestResult.payload;
+        this.numItems = (await callImportItemCountEndpoint()).payload as number;
+      } else {
+        EventBus.emit(new ToastEvent('ERROR', 'Failed to load import details. Please try reloading.'));
+        throw Error('Something went wrong. Please tell the admin how you got here.');
+      }
+    }
   },
   methods: {
     updateConfig(eventPayload: ImportConfig | undefined) {

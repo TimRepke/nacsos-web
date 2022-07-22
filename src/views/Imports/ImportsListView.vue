@@ -49,14 +49,13 @@ import { ToastEvent } from '@/plugins/events/events/toast';
 export default {
   name: 'ProjectListView',
   components: { InlineToolTip },
-  created() {
-    // pass
-  },
-  async setup() {
-    const imports: ImportModel[] = (await callListProjectImportsEndpoint()).payload as ImportModel[];
+  data() {
     return {
-      imports: ref(imports),
+      imports: [] as ImportModel[],
     };
+  },
+  async mounted() {
+    this.imports = (await callListProjectImportsEndpoint()).payload;
   },
   methods: {
     copyImport(importDetails: ImportModel) {
