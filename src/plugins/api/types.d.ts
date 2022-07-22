@@ -14,7 +14,8 @@ export type RequestEncoding =
   | 'QUERY'
   | 'PATH'
   | 'BODY'
-  | 'FORM';
+  | 'FORM'
+  | 'MULTI';
 
 export type ResponseTransformFunction<REASON, RESPONSE> =
   (response: AxiosResponse) => [ResponseStatus, REASON, RESPONSE?];
@@ -35,4 +36,4 @@ export interface RequestResult<REASON, RESPONSE> {
 }
 
 export type EndpointFunction<REQUEST, REASON, RESPONSE> =
-  (options?: REQUEST) => Promise<RequestResult<REASON, RESPONSE>>;
+  (payload?: REQUEST, customRequestConfig?:AxiosRequestConfig<REQUEST>) => Promise<RequestResult<REASON, RESPONSE>>;

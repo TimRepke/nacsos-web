@@ -34,6 +34,12 @@ const SaveImportEndpoint: Endpoint<ResponseReason, string> = {
   paramsEncoding: 'BODY',
 };
 
+const UploadImportFileEndpoint: Endpoint<ResponseReason, string> = { // FIXME type properly
+  method: 'POST',
+  path: '/imports/files/upload',
+  paramsEncoding: 'MULTI',
+};
+
 export const callListProjectImportsEndpoint:
   EndpointFunction<never, ResponseReason, ImportModel[]> = callEndpointFactory(ListProjectImportsEndpoint);
 
@@ -45,3 +51,6 @@ export const callImportDetailsEndpoint:
 
 export const callSaveImportEndpoint:
   EndpointFunction<ImportModel, ResponseReason, string> = callEndpointFactory(SaveImportEndpoint);
+
+export const callUploadImportFileEndpoint:
+  EndpointFunction<File, ResponseReason, string> = callEndpointFactory(UploadImportFileEndpoint);

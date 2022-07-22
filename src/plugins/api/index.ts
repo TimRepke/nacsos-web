@@ -1,5 +1,5 @@
 import { App } from 'vue';
-import axios, { AxiosInstance, AxiosRequestHeaders, AxiosResponse } from 'axios';
+import axios, { AxiosInstance, AxiosRequestConfig, AxiosRequestHeaders, AxiosResponse } from 'axios';
 import { Endpoint, EndpointFunction, RequestResult, ResponseStatus } from '@/plugins/api/types.d';
 import { EventBus } from '@/plugins/events';
 import { RequestSubmittedEvent } from '@/plugins/events/events/auth';
@@ -9,6 +9,7 @@ import { RequestGatewayStatusChangeEvent } from '@/plugins/events/events/general
 interface TransformedPayload<REQUEST> {
   params: REQUEST | URLSearchParams | FormData | null;
   path: string;
+  headers?: AxiosRequestHeaders;
 }
 
 function transformPayload<REQUEST, REASON, RESPONSE>(params: REQUEST, endpoint: Endpoint<REASON, RESPONSE>):
@@ -42,6 +43,14 @@ function transformPayload<REQUEST, REASON, RESPONSE>(params: REQUEST, endpoint: 
       path = path.replace(`{${key}}`, value);
     });
     return { params: null, path };
+  }
+
+  if (encoding === 'MULTI') {
+    const payload = new FormData();
+    Object.entries(params).forEach(([key, value]) => {
+      payload.append(key, value);
+    });
+    return { params: payload, path: endpoint.path, headers: { 'Content-Type': 'multipart/form-data' } };
   }
 
   // if (encoding === 'BODY')
@@ -93,8 +102,9 @@ class RequestGateway {
   request<REQUEST, REASON extends string, RESPONSE>(
     payload: REQUEST,
     endpoint: Endpoint<REASON, RESPONSE>,
+    customRequestConfig?: AxiosRequestConfig<REQUEST>,
   ): Promise<RequestResult<REASON, RESPONSE>> {
-    const { path, params } = transformPayload<REQUEST, REASON, RESPONSE>(payload, endpoint);
+    const { path, params, headers } = transformPayload<REQUEST, REASON, RESPONSE>(payload, endpoint);
 
     EventBus.emit(new RequestSubmittedEvent(path));
     this.updateState(1);
@@ -111,7 +121,8 @@ class RequestGateway {
         url: path,
         params: (params instanceof URLSearchParams) ? params : undefined,
         data: params,
-        headers: { ...baseHeaders, ...endpoint.customHeaders },
+        headers: { ...baseHeaders, ...headers, ...endpoint.customHeaders },
+        ...customRequestConfig,
       };
 
       this.httpClient.request(requestConfig).then((response) => {
@@ -159,9 +170,9 @@ class RequestGateway {
 
 function callEndpointFactory<REQUEST, REASON extends string, RESPONSE>(endpoint: Endpoint<REASON, RESPONSE>):
   EndpointFunction<REQUEST, REASON, RESPONSE> {
-  return (payload?: REQUEST) => {
+  return (payload?: REQUEST, customRequestConfig?: AxiosRequestConfig<REQUEST>) => {
     const requestGateway = RequestGateway.getInstance();
-    return requestGateway.request(payload, endpoint);
+    return requestGateway.request(payload, endpoint, customRequestConfig);
   };
 }
 
