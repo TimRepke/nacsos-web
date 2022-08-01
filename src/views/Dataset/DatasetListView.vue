@@ -56,10 +56,10 @@
           <div class="d-flex flex-row flex-wrap p-2 overflow-auto">
             <template v-if="this.itemList && this.itemList.length > 0">
               <template v-if="projectType === 'twitter'">
-                <TwitterItemComponent
-                  v-for="(tweet) in itemList"
-                  :key="tweet.item_id"
-                  :tweet="tweet"/>
+                <GenericItemComponent
+                  v-for="(item) in itemList"
+                  :key="item.item_id"
+                  :item="item"/>
               </template>
               <template v-else>
                 This type of data can not be rendered. Sorry.
@@ -131,29 +131,25 @@
 <script lang="ts">
 import {
   callProjectItemCountEndpoint,
-  callProjectPagedTweetsListEndpoint,
-  callProjectTweetsListEndpoint,
+  callProjectDataPagedListEndpoint,
 } from '@/plugins/api/project/items';
-import { BaseItem } from '@/types/items/index.d';
-import { TwitterItem } from '@/types/items/twitter.d';
 import { currentProjectStore } from '@/stores';
-import TwitterItemComponent from '@/components/items/TwitterItem.vue';
+import GenericItemComponent from '@/components/items/GenericItem.vue';
 import { useOffsetPagination, UseOffsetPaginationReturn } from '@vueuse/core';
 import { ToastEvent } from '@/plugins/events/events/toast';
 import { EventBus } from '@/plugins/events';
 import { range } from '@/utils';
 import ClosablePill from '@/components/ClosablePill.vue';
 import { reactive } from 'vue';
-
-type ItemList = BaseItem[] | TwitterItem[];
+import { AnyItem } from '@/types/items/index.d';
 
 export default {
   name: 'ProjectDataView',
-  components: { ClosablePill, TwitterItemComponent },
+  components: { ClosablePill, GenericItemComponent },
   data() {
     return {
       projectType: currentProjectStore.project.type,
-      itemList: [],
+      itemList: [] as AnyItem[],
       showSearchBar: true,
       navPagesWindowSize: 3,
       totalNumItems: 0,
@@ -174,17 +170,18 @@ export default {
     this.fetchData(this.pagination);
   },
   methods: {
-    fetchData({ currentPage, currentPageSize }: UseOffsetPaginationReturn): ItemList | void {
-      callProjectPagedTweetsListEndpoint({
+    fetchData({ currentPage, currentPageSize }: UseOffsetPaginationReturn): AnyItem[] | void {
+      callProjectDataPagedListEndpoint({
         projectId: currentProjectStore.project.project_id as string,
         page: this.pagination.currentPage,
         pageSize: this.pagination.currentPageSize,
+        itemType: currentProjectStore.project.type,
       })
         .then((response) => {
           this.itemList = response.payload;
           this.$router.push({ query: { page: currentPage, pageSize: currentPageSize } });
         })
-        .catch((response) => {
+        .catch(() => {
           EventBus.emit(new ToastEvent('ERROR', 'Failed to load data.'));
         });
     },
@@ -220,11 +217,5 @@ export default {
 }
 
 .item-container {
-}
-
-.clear-search-icon {
-  color: rgb(204, 204, 204);
-  z-index: 1000 !important;
-  margin-left: -3rem !important;
 }
 </style>

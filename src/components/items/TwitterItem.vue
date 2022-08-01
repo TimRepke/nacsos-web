@@ -3,9 +3,9 @@
     <div class="card-body">
       <p>
         <small class="text-muted">
-          <i class="bi-calendar4-event"></i> &nbsp; {{ tweet.created_at.slice(0, 19).replace('T', ' ') }}
+          <i class="bi-calendar4-event"></i> &nbsp; {{ item.created_at.slice(0, 19).replace('T', ' ') }}
         </small>
-        <a class="float-end" :href="`https://twitter.com/s/status/${tweet.twitter_id}`" target="_blank"
+        <a class="float-end" :href="`https://twitter.com/s/status/${item.twitter_id}`" target="_blank"
            aria-label="Tweet on Twitter">
           <!-- FIXME links to twitter ids stopped working, but they used to... -->
           <font-awesome-icon :icon="['fa-brands', 'twitter']"/>
@@ -16,13 +16,13 @@
     <div class="card-footer d-flex justify-content-between">
       <small class="text-muted">
         <font-awesome-icon :icon="['fas', 'retweet']"/>
-        {{ tweet.retweet_count }} &nbsp;
+        {{ item.retweet_count }} &nbsp;
         <font-awesome-icon :icon="['far', 'heart']"/>
-        {{ tweet.like_count }} &nbsp;
+        {{ item.like_count }} &nbsp;
         <font-awesome-icon :icon="['fas', 'reply']"/>
-        {{ tweet.reply_count }} &nbsp;
+        {{ item.reply_count }} &nbsp;
         <font-awesome-icon :icon="['fas', 'quote-left']"/>
-        {{ tweet.quote_count }}
+        {{ item.quote_count }}
       </small>
       <small class="text-muted">
         5
@@ -44,15 +44,15 @@ interface Replacement {
 export default {
   name: 'TwitterItem',
   props: {
-    tweet: {
+    item: {
       type: Object as PropType<TwitterItemModel>,
     },
   },
   computed: {
     renderedStatus() {
       const replacements: Replacement[] = [];
-      if (this.tweet.hashtags) {
-        this.tweet.hashtags.forEach((hashtag: Hashtag) => {
+      if (this.item.hashtags) {
+        this.item.hashtags.forEach((hashtag: Hashtag) => {
           replacements.push({
             start: hashtag.start,
             end: hashtag.end,
@@ -60,8 +60,8 @@ export default {
           });
         });
       }
-      if (this.tweet.mentions) {
-        this.tweet.mentions.forEach((mention: Mention) => {
+      if (this.item.mentions) {
+        this.item.mentions.forEach((mention: Mention) => {
           replacements.push({
             start: mention.start,
             end: mention.end,
@@ -69,8 +69,8 @@ export default {
           });
         });
       }
-      if (this.tweet.urls) {
-        this.tweet.urls.forEach((url: URL) => {
+      if (this.item.urls) {
+        this.item.urls.forEach((url: URL) => {
           replacements.push({
             start: url.start,
             end: url.end,
@@ -84,11 +84,11 @@ export default {
         .sort((a, b) => a.start - b.start)
         .forEach((replacement) => {
           // FIXME: something has to be done with the slicing offsets... sometimes they are off
-          ret += this.tweet.status.slice(prevEnd, replacement.start);
+          ret += this.item.status.slice(prevEnd, replacement.start);
           ret += replacement.html;
           prevEnd = replacement.end;
         });
-      ret += this.tweet.status.slice(prevEnd, this.tweet.status.length);
+      ret += this.item.status.slice(prevEnd, this.item.status.length);
       return ret;
     },
   },

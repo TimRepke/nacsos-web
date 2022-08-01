@@ -1,18 +1,35 @@
 <template>
-  <div>
-    <h3>{{item.item_id}}</h3>
-    <p>{{item.text}}</p>
+  <div class="card m-2 p-0 text-start">
+    <div class="card-body">
+      <p class="card-text" v-html="htmlText"></p>
+    </div>
+    <div class="card-footer d-flex justify-content-between small text-muted" v-if="item.meta">
+      <ul class="list-unstyled">
+        <template v-for="(value, key) in item.meta" :key="key">
+          <li v-if="!key.startsWith('_')">
+            <strong>{{ key }}:</strong> {{ value }}
+          </li>
+        </template>
+      </ul>
+    </div>
   </div>
 </template>
 
-<script>
-import { BaseItem as BaseItemModel } from '@/types/items/index.d';
+<script lang="ts">
+import { PropType } from 'vue';
+import { marked } from 'marked';
+import { BaseItem as BaseItemModel } from '@/types/items/basic.d';
 
 export default {
   name: 'BaseItem',
   props: {
     item: {
-      type: BaseItemModel,
+      type: Object as PropType<BaseItemModel>,
+    },
+  },
+  computed: {
+    htmlText() {
+      return marked(this.item.text);
     },
   },
 };

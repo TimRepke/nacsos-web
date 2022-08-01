@@ -1,44 +1,47 @@
 import { Endpoint, EndpointFunction, ResponseReason } from '@/plugins/api/types.d';
 import { callEndpointFactory } from '@/plugins/api';
-import { BaseItem } from '@/types/items/index.d';
+import { BaseItem } from '@/types/items/basic.d';
 import { TwitterItem } from '@/types/items/twitter.d';
+import { ProjectTypeLiteral } from '@/types/project.d';
+import { AnyItem } from '@/types/items/index.d';
 
-export interface ProjectItemsRequestPayload {
+export interface ProjectDataListRequestPayload {
   projectId: string;
+  itemType: ProjectTypeLiteral;
 }
 
-export interface ProjectPagedItemsRequestPayload {
+export interface ProjectDataPagedListRequestPayload {
   projectId: string;
   page: number;
   pageSize: number;
+  itemType: ProjectTypeLiteral;
 }
 
-export interface ProjectDetailRequestPayload {
+export interface ProjectDataDetailRequestPayload {
   projectId: string;
   itemId: string;
+  itemType: ProjectTypeLiteral;
 }
 
-const ProjectItemsListEndpoint: Endpoint<ResponseReason, BaseItem[]> = {
-  method: 'GET',
-  path: '/project/{projectId}/items/list/items',
-  paramsEncoding: 'PATH',
-  transformResponse: (response) => {
-    if (response.data) {
-      return ['SUCCESS', 'SUCCESS', response.data];
-    }
-    return ['FAILED', 'POSTPROCESSING_FAILED'];
-  },
-};
+export interface ProjectDataCountRequestPayload {
+  projectId: string;
+}
 
-const ProjectTweetsListEndpoint: Endpoint<ResponseReason, TwitterItem[]> = {
+const ProjectDataListEndpoint: Endpoint<ResponseReason, AnyItem[]> = {
   method: 'GET',
-  path: '/project/{projectId}/items/twitter/list',
+  path: '/project/{projectId}/items/{itemType}/list',
   paramsEncoding: 'PATH',
 };
 
-const ProjectPagedTweetsListEndpoint: Endpoint<ResponseReason, TwitterItem[]> = {
+const ProjectDataPagedListEndpoint: Endpoint<ResponseReason, AnyItem[]> = {
   method: 'GET',
-  path: '/project/{projectId}/items/twitter/list/{page}/{pageSize}',
+  path: '/project/{projectId}/items/{itemType}/list/{page}/{pageSize}',
+  paramsEncoding: 'PATH',
+};
+
+const ProjectDataDetailsEndpoint: Endpoint<ResponseReason, AnyItem> = {
+  method: 'GET',
+  path: '/project/{projectId}/items/{itemType}/detail/{itemId}',
   paramsEncoding: 'PATH',
 };
 
@@ -46,25 +49,22 @@ const ProjectItemCountEndpoint: Endpoint<ResponseReason, number> = {
   method: 'GET',
   path: '/project/{projectId}/items/count',
   paramsEncoding: 'PATH',
+  transformResponse: (response) => {
+    if (response.data || response.data === 0) {
+      return ['SUCCESS', 'SUCCESS', response.data];
+    }
+    return ['FAILED', 'POSTPROCESSING_FAILED'];
+  },
 };
 
-const ProjectItemDetailsEndpoint: Endpoint<ResponseReason, TwitterItem | BaseItem> = {
-  method: 'GET',
-  path: '/project/{projectId}/items/detail/{itemId}',
-  paramsEncoding: 'PATH',
-};
+export const callProjectDataListEndpoint:
+  EndpointFunction<ProjectDataListRequestPayload, ResponseReason, AnyItem[]> = callEndpointFactory(ProjectDataListEndpoint);
 
-export const callProjectItemsListEndpoint:
-  EndpointFunction<ProjectItemsRequestPayload, ResponseReason, BaseItem[]> = callEndpointFactory(ProjectItemsListEndpoint);
+export const callProjectDataPagedListEndpoint:
+  EndpointFunction<ProjectDataPagedListRequestPayload, ResponseReason, AnyItem[]> = callEndpointFactory(ProjectDataPagedListEndpoint);
 
-export const callProjectTweetsListEndpoint:
-  EndpointFunction<ProjectItemsRequestPayload, ResponseReason, TwitterItem[]> = callEndpointFactory(ProjectTweetsListEndpoint);
-
-export const callProjectPagedTweetsListEndpoint:
-  EndpointFunction<ProjectPagedItemsRequestPayload, ResponseReason, TwitterItem[]> = callEndpointFactory(ProjectPagedTweetsListEndpoint);
+export const callProjectDataDetailsEndpoint:
+  EndpointFunction<ProjectDataDetailRequestPayload, ResponseReason, AnyItem> = callEndpointFactory(ProjectDataDetailsEndpoint);
 
 export const callProjectItemCountEndpoint:
-  EndpointFunction<ProjectItemsRequestPayload, ResponseReason, number> = callEndpointFactory(ProjectItemCountEndpoint);
-
-export const callProjectItemDetailsEndpoint:
-  EndpointFunction<ProjectDetailRequestPayload, ResponseReason, TwitterItem | BaseItem> = callEndpointFactory(ProjectItemDetailsEndpoint);
+  EndpointFunction<ProjectDataCountRequestPayload, ResponseReason, number> = callEndpointFactory(ProjectItemCountEndpoint);

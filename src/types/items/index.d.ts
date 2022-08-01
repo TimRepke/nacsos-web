@@ -1,6 +1,6 @@
 /* eslint no-use-before-define: ["off"] */
 
-export interface BaseItem {
-  item_id?: string;
-  text: string;
-}
+import { BaseItem } from '@/types/items/basic.d';
+import { TwitterItem } from '@/types/items/twitter.d';
+
+export type AnyItem = BaseItem | TwitterItem;

@@ -60,23 +60,24 @@ function transformPayload<REQUEST, REASON, RESPONSE>(params: REQUEST, endpoint: 
 class RequestGateway {
   private static instance: RequestGateway; // eslint-disable-line no-use-before-define
 
+  private static pipelinesInstance: RequestGateway; // eslint-disable-line no-use-before-define
+
   protected httpClient: AxiosInstance;
 
   protected defaultHeaders: AxiosRequestHeaders;
 
   protected pendingRequests: number;
 
-  protected accessToken: RemovableRef<string>;
+  protected accessToken: RemovableRef<string> | null;
 
-  protected currentProjectId: RemovableRef<string>;
+  protected currentProjectId: RemovableRef<string> | null;
 
-  private constructor() {
-    const baseUrl = 'http://localhost:8081';
-    this.accessToken = useStorage<string>('accessToken', null);
-    this.currentProjectId = useStorage<string>('currentProjectId', null);
+  private constructor({ baseUrl = 'http://localhost:8081/api', accessToken = null as RemovableRef<string> | null, currentProjectId = null as RemovableRef<string> | null } = {}) {
+    this.accessToken = accessToken;
+    this.currentProjectId = currentProjectId;
     this.pendingRequests = 0;
     this.httpClient = axios.create({
-      baseURL: `${baseUrl}/api`,
+      baseURL: baseUrl,
     });
     this.defaultHeaders = {
       // Origin: baseUrl,
@@ -85,9 +86,21 @@ class RequestGateway {
 
   static getInstance() {
     if (!RequestGateway.instance) {
-      RequestGateway.instance = new RequestGateway();
+      RequestGateway.instance = new RequestGateway({
+        accessToken: useStorage<string>('accessToken', null),
+        currentProjectId: useStorage<string>('currentProjectId', null),
+      });
     }
     return RequestGateway.instance;
+  }
+
+  static getPipelinesInstance() {
+    if (!RequestGateway.pipelinesInstance) {
+      RequestGateway.pipelinesInstance = new RequestGateway({
+        baseUrl: 'http://127.0.0.1:8000',
+      });
+    }
+    return RequestGateway.pipelinesInstance;
   }
 
   isBusy(): boolean {
@@ -110,8 +123,10 @@ class RequestGateway {
     this.updateState(1);
 
     const baseHeaders = this.defaultHeaders;
-    if (this.accessToken.value) {
+    if (this.accessToken?.value) {
       baseHeaders.Authorization = `Bearer ${this.accessToken.value}`;
+    }
+    if (this.currentProjectId?.value) {
       baseHeaders['x-project-id'] = this.currentProjectId.value;
     }
 
@@ -176,11 +191,21 @@ function callEndpointFactory<REQUEST, REASON extends string, RESPONSE>(endpoint:
   };
 }
 
+function callPipelineEndpointFactory<REQUEST, REASON extends string, RESPONSE>(endpoint: Endpoint<REASON, RESPONSE>):
+  EndpointFunction<REQUEST, REASON, RESPONSE> {
+  return (payload?: REQUEST, customRequestConfig?: AxiosRequestConfig<REQUEST>) => {
+    const requestGateway = RequestGateway.getPipelinesInstance();
+    return requestGateway.request(payload, endpoint, customRequestConfig);
+  };
+}
+
 export default {
-  install(app: App, options: any) {
+  install(app: App) {
     // eslint-disable-next-line no-param-reassign
     app.config.globalProperties.$api = RequestGateway.getInstance();
+    // eslint-disable-next-line no-param-reassign
+    app.config.globalProperties.$pipelineAPI = RequestGateway.getPipelinesInstance();
   },
 };
 
-export { RequestGateway, callEndpointFactory };
+export { RequestGateway, callEndpointFactory, callPipelineEndpointFactory };

@@ -9,8 +9,7 @@ import {
   AssignmentStatus,
   UserProjectAssignmentScope,
 } from '@/types/annotation.d';
-import { BaseItem } from '@/types/items/index.d';
-import { TwitterItem } from '@/types/items/twitter.d';
+import { AnyItem } from '@/types/items/index.d';
 
 export const AnnotationTaskLabelKinds = ['bool', 'str', 'int', 'float', 'single', 'multi'] as const;
 export type AnnotationTaskLabelKindsType = typeof AnnotationTaskLabelKinds[number];
@@ -41,7 +40,7 @@ export interface AnnotationItemResponse {
   task: AnnotationTask;
   assignment: Assignment;
   scope: AssignmentScope;
-  item: TwitterItem | BaseItem;
+  item: AnyItem;
 }
 
 export interface AssignmentScopeRequestPayload {
