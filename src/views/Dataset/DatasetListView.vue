@@ -132,7 +132,7 @@
 import {
   callProjectItemCountEndpoint,
   callProjectDataPagedListEndpoint,
-} from '@/plugins/api/project/items';
+} from '@/plugins/api/items';
 import { currentProjectStore } from '@/stores';
 import GenericItemComponent from '@/components/items/GenericItem.vue';
 import { useOffsetPagination, UseOffsetPaginationReturn } from '@vueuse/core';
