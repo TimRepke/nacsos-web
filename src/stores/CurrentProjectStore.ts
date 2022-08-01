@@ -42,6 +42,7 @@ export const useCurrentProjectStore = defineStore('CurrentProjectStore', {
       this.projectPermissions = undefined;
     },
     setProject(projectId: string) {
+      this.clear();
       Promise
         .allSettled([
           callProjectInfoEndpoint({ projectId }),

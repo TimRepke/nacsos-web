@@ -32,6 +32,19 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import(/* webpackChunkName: "ProjectOverviewView" */ '../views/Projects/ProjectOverviewView.vue'),
   },
   {
+    path: '/project/pipelines',
+    name: 'project-pipelines',
+    component: () => import(/* webpackChunkName: "ProjectDataView" */ '../views/Pipelines/PipelinesContainer.vue'),
+    children: [
+      {
+        path: '',
+        alias: ['', 'setup'],
+        name: 'project-pipelines-setup',
+        component: () => import(/* webpackChunkName: "AnnotationView" */ '../views/Pipelines/PipelinesSetupView.vue'),
+      },
+    ],
+  },
+  {
     path: '/project/imports',
     name: 'project-imports',
     component: () => import(/* webpackChunkName: "ProjectDataView" */ '../views/Imports/ImportsContainer.vue'),
