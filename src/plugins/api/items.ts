@@ -1,7 +1,5 @@
 import { Endpoint, EndpointFunction, ResponseReason } from '@/plugins/api/types.d';
 import { callEndpointFactory } from '@/plugins/api';
-import { BaseItem } from '@/types/items/basic.d';
-import { TwitterItem } from '@/types/items/twitter.d';
 import { ProjectTypeLiteral } from '@/types/project.d';
 import { AnyItem } from '@/types/items/index.d';
 
