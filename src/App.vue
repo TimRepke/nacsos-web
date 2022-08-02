@@ -1,35 +1,35 @@
 <template>
-  <!-- FIXME change v-if to state == logged-in-->
-  <TopBar v-if="$router.currentRoute.value.path !== '/login'"/>
-  <div class="row g-0">
-    <!-- FIXME change v-if to state == logged-in-->
-    <template v-if="$route.name !== 'login' && $route.name !== 'project-list'">
-      <h1>ASDF</h1>
-      <SideBar/>
-    </template>
-    <RouterView v-slot="{ Component }" class="col router-wrapper">
-      <template v-if="Component">
-        <Transition mode="out-in">
-          <KeepAlive>
-            <Suspense>
-              <!-- main content -->
-              <component :is="Component"></component>
-
-              <!-- loading state -->
-              <template #fallback>
-                Loading...<br/>
-                If this takes longer than expected, something might be wrong.
-              </template>
-            </Suspense>
-          </KeepAlive>
-        </Transition>
+  <div>
+    <TopBar v-if="userStore.isLoggedIn"/>
+    <div class="row g-0">
+      <template v-if="projectStore.projectSelected && userStore.isLoggedIn">
+        <SideBar/>
       </template>
-    </RouterView>
 
-    <!--router-view class="col router-wrapper"/-->
+      <RouterView v-slot="{ Component }" class="col router-wrapper">
+        <template v-if="Component">
+          <Transition mode="out-in">
+            <KeepAlive>
+              <Suspense>
+                <!-- main content -->
+                <component :is="Component"></component>
+
+                <!-- loading state -->
+                <template #fallback>
+                  Loading...<br/>
+                  If this takes longer than expected, something might be wrong.
+                </template>
+              </Suspense>
+            </KeepAlive>
+          </Transition>
+        </template>
+      </RouterView>
+
+      <!--router-view class="col router-wrapper"/-->
+    </div>
+    <ToastsViewer/>
+    <ConfirmationModal/>
   </div>
-  <ToastsViewer/>
-  <ConfirmationModal/>
 </template>
 
 <script>
@@ -37,9 +37,21 @@ import TopBar from '@/components/TopBar.vue';
 import SideBar from '@/components/SideBar.vue';
 import ToastsViewer from '@/components/ToastsViewer.vue';
 import ConfirmationModal from '@/components/ConfirmationModal.vue';
+import { currentProjectStore, currentUserStore } from '@/stores';
 
 export default {
-  components: { ConfirmationModal, SideBar, TopBar, ToastsViewer },
+  components: {
+    ConfirmationModal,
+    SideBar,
+    TopBar,
+    ToastsViewer,
+  },
+  data() {
+    return {
+      projectStore: currentProjectStore,
+      userStore: currentUserStore,
+    };
+  },
 };
 </script>
 

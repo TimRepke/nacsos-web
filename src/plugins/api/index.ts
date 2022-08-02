@@ -3,8 +3,8 @@ import axios, { AxiosInstance, AxiosRequestConfig, AxiosRequestHeaders, AxiosRes
 import { Endpoint, EndpointFunction, RequestResult, ResponseStatus } from '@/plugins/api/types.d';
 import { EventBus } from '@/plugins/events';
 import { RequestSubmittedEvent } from '@/plugins/events/events/auth';
-import { RemovableRef, useStorage } from '@vueuse/core';
 import { RequestGatewayStatusChangeEvent } from '@/plugins/events/events/general';
+import { currentProjectStore, currentUserStore } from '@/stores';
 
 interface TransformedPayload<REQUEST> {
   params: REQUEST | URLSearchParams | FormData | null;
@@ -68,13 +68,7 @@ class RequestGateway {
 
   protected pendingRequests: number;
 
-  protected accessToken: RemovableRef<string> | null;
-
-  protected currentProjectId: RemovableRef<string> | null;
-
-  private constructor({ baseUrl = '', accessToken = null as RemovableRef<string> | null, currentProjectId = null as RemovableRef<string> | null } = {}) {
-    this.accessToken = accessToken;
-    this.currentProjectId = currentProjectId;
+  private constructor(baseUrl: string) {
     this.pendingRequests = 0;
     this.httpClient = axios.create({
       baseURL: baseUrl,
@@ -86,20 +80,14 @@ class RequestGateway {
 
   static getInstance() {
     if (!RequestGateway.instance) {
-      RequestGateway.instance = new RequestGateway({
-        baseUrl: 'http://localhost:8081/api',
-        accessToken: useStorage<string>('accessToken', null),
-        currentProjectId: useStorage<string>('currentProjectId', null),
-      });
+      RequestGateway.instance = new RequestGateway('http://localhost:8081/api');
     }
     return RequestGateway.instance;
   }
 
   static getPipelinesInstance() {
     if (!RequestGateway.pipelinesInstance) {
-      RequestGateway.pipelinesInstance = new RequestGateway({
-        baseUrl: 'http://localhost:8000/api',
-      });
+      RequestGateway.pipelinesInstance = new RequestGateway('http://localhost:8000/api');
     }
     return RequestGateway.pipelinesInstance;
   }
@@ -124,11 +112,11 @@ class RequestGateway {
     this.updateState(1);
 
     const baseHeaders = this.defaultHeaders;
-    if (this.accessToken?.value) {
-      baseHeaders.Authorization = `Bearer ${this.accessToken.value}`;
+    if (currentUserStore.isLoggedIn) {
+      baseHeaders.Authorization = `Bearer ${currentUserStore.accessToken}`;
     }
-    if (this.currentProjectId?.value) {
-      baseHeaders['x-project-id'] = this.currentProjectId.value;
+    if (currentProjectStore.projectId) {
+      baseHeaders['x-project-id'] = currentProjectStore.projectId;
     }
 
     return new Promise((resolve, reject) => {
