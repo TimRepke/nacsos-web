@@ -30,6 +30,7 @@ export default {
   methods: {
     selectProject(projectId: string) {
       console.log(projectId);
+      currentProjectStore.projectId = projectId;
       currentProjectStore.setProject(projectId);
     },
   },

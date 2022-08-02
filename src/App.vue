@@ -3,8 +3,10 @@
   <TopBar v-if="$router.currentRoute.value.path !== '/login'"/>
   <div class="row g-0">
     <!-- FIXME change v-if to state == logged-in-->
-    <SideBar v-if="$router.currentRoute.value.path !== '/login'"/>
-
+    <template v-if="$route.name !== 'login' && $route.name !== 'project-list'">
+      <h1>ASDF</h1>
+      <SideBar/>
+    </template>
     <RouterView v-slot="{ Component }" class="col router-wrapper">
       <template v-if="Component">
         <Transition mode="out-in">
