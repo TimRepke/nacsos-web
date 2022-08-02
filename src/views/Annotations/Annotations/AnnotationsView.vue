@@ -16,7 +16,7 @@
           </ul>
         </div>
         <div class="row g-0">
-          <TwitterItemComponent :tweet="item"/>
+          <GenericItemComponent :item="item"/>
         </div>
       </div>
       <div class="col border-start p-2 overflow-auto h-md-100 position-relative" :class="sidebarWidthClass">
@@ -69,9 +69,10 @@ import {
   callNextAnnotationItemEndpoint,
   callSaveAnnotationEndpoint,
   callAnnotationItemEndpoint,
-  callScopeUserAssignmentsEndpoint, AnnotationItemResponse,
+  callScopeUserAssignmentsEndpoint,
+  AnnotationItemResponse,
 } from '@/plugins/api/annotations';
-import TwitterItemComponent from '@/components/items/TwitterItem.vue';
+import GenericItemComponent from '@/components/items/GenericItem.vue';
 import AnnotationLabels from '@/components/annotations/AnnotationLabels.vue';
 import { AnnotationTaskLabel, AssignmentStatus } from '@/types/annotation.d';
 import { useRoute } from 'vue-router';
@@ -108,7 +109,7 @@ const motivationalQuotes = [
 
 export default {
   name: 'AnnotationsView',
-  components: { AnnotationLabels, TwitterItemComponent },
+  components: { AnnotationLabels, GenericItemComponent },
   data() {
     return {
       item: undefined,

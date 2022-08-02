@@ -72,7 +72,7 @@ class RequestGateway {
 
   protected currentProjectId: RemovableRef<string> | null;
 
-  private constructor({ baseUrl = 'http://localhost:8081/api', accessToken = null as RemovableRef<string> | null, currentProjectId = null as RemovableRef<string> | null } = {}) {
+  private constructor({ baseUrl = '', accessToken = null as RemovableRef<string> | null, currentProjectId = null as RemovableRef<string> | null } = {}) {
     this.accessToken = accessToken;
     this.currentProjectId = currentProjectId;
     this.pendingRequests = 0;
@@ -80,13 +80,14 @@ class RequestGateway {
       baseURL: baseUrl,
     });
     this.defaultHeaders = {
-      // Origin: baseUrl,
+      // empty
     };
   }
 
   static getInstance() {
     if (!RequestGateway.instance) {
       RequestGateway.instance = new RequestGateway({
+        baseUrl: 'http://localhost:8081/api',
         accessToken: useStorage<string>('accessToken', null),
         currentProjectId: useStorage<string>('currentProjectId', null),
       });
@@ -97,7 +98,7 @@ class RequestGateway {
   static getPipelinesInstance() {
     if (!RequestGateway.pipelinesInstance) {
       RequestGateway.pipelinesInstance = new RequestGateway({
-        baseUrl: 'http://127.0.0.1:8000',
+        baseUrl: 'http://localhost:8000/api',
       });
     }
     return RequestGateway.pipelinesInstance;

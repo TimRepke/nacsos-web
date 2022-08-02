@@ -257,7 +257,7 @@ export default {
         'Saving the scope does not create or change assignments.',
         (response) => {
           if (response === 'ACCEPT') {
-            const scope = JSON.parse(JSON.stringify(this.assignmentScope));
+            const scope = JSON.parse(JSON.stringify(this.assignmentScope)); // clone the object
             if (scope.config) {
               scope.config.users = this.selectedUserIds;
             }
