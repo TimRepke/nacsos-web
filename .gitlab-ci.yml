@@ -30,6 +30,8 @@ build-job:
         - pip install virtualenv
         - virtualenv venv
         - source venv/bin/activate
+        - pwd
+        - ls -lisah
         - pip install -r requirements.txt
         - pip install -r requirements_dev.txt
 
