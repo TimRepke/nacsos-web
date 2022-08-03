@@ -31,19 +31,19 @@ const routes: Array<RouteRecordRaw> = [
     name: 'project-overview',
     component: () => import(/* webpackChunkName: "ProjectOverviewView" */ '../views/Projects/ProjectOverviewView.vue'),
   },
-  // {
-  //   path: '/project/artefacts',
-  //   name: 'project-artefacts',
-  //   component: () => import(/* webpackChunkName: "ArtefactsContainer" */ '../views/Artefacts/ArtefactsContainer.vue'),
-  //   children: [
-  //     {
-  //       path: '',
-  //       alias: ['', 'list'],
-  //       name: 'project-artefacts-list',
-  //       component: () => import(/* webpackChunkName: "ArtefactsListView" */ '../views/Artefacts/ArtefactsListView.vue'),
-  //     },
-  //   ],
-  // },
+  {
+    path: '/project/artefacts',
+    name: 'project-artefacts',
+    component: () => import(/* webpackChunkName: "ArtefactsContainer" */ '../views/Artefacts/ArtefactsContainer.vue'),
+    children: [
+      {
+        path: '',
+        alias: ['', 'list'],
+        name: 'project-artefacts-list',
+        component: () => import(/* webpackChunkName: "ArtefactsListView" */ '../views/Artefacts/ArtefactsListView.vue'),
+      },
+    ],
+  },
   {
     path: '/project/pipelines',
     name: 'project-pipelines',
