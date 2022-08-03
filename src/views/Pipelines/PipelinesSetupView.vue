@@ -12,19 +12,39 @@
       </li>
     </ul>
     <div class="card" v-if="highlight !== undefined">
-      <div class="card-header">
-        {{ highlight.name }}
+      <div class="card-header d-flex">
+        <span>{{ highlight.name }}</span>
+        <button type="button" class="btn-close ms-auto" aria-label="Close" @click="highlight=undefined"></button>
       </div>
       <div class="card-body">
-        <span class="text-muted">
-          {{ highlight.module }}.
-          <strong>{{ highlight.function }}(</strong>
-          <span v-for="(tp, arg) in highlight.kwargs" :key="arg">
-            <strong>{{ arg }}:</strong> {{ tp2string(tp) }},
-          </span>
-          <strong>)</strong>
-        </span>
-        <div v-html="md2html(highlight.docstring)"></div>
+        <div class="d-flex flex-row flex-wrap">
+          <ul class="list-unstyled small text-muted">
+            <li>{{ highlight.module }}.<strong>{{ highlight.function }}(&sdot;)</strong></li>
+            <li><strong>Parameters:</strong>
+              <ul class="list-unstyled ms-2">
+                <li v-for="(tp, arg) in highlight.kwargs" :key="arg">
+                  <code>{{ arg }}:</code> {{ tp2string(tp) }}
+                </li>
+              </ul>
+            </li>
+            <li><strong>Location:</strong> {{ highlight.filepath_rel }}</li>
+            <li v-if="highlight.tags"><strong>Tags:</strong> {{ highlight.tags.join(', ') }}</li>
+            <li><strong>CPU load:</strong> {{ highlight.est_cpu_load }}</li>
+            <li v-if="highlight.recommended_lifetime"><strong>Artefact lifetime:</strong>
+              {{ highlight.recommended_lifetime }} days
+            </li>
+            <li>
+              <strong>Produced artefacts:</strong>
+              <ul class="list-unstyled ms-2">
+                <li v-for="(artefact, aKey) in highlight.artefacts" :key="aKey">
+                  <code>{{ aKey }}</code>:
+                  Artefact[{{ artefact.serializer }}, {{ artefact.dtype }}] @ "{{ artefact.filename }}"
+                </li>
+              </ul>
+            </li>
+          </ul>
+          <pre class="card ms-4 p-2 pb-0 flex-fill"><code v-html="md2html(highlight.docstring)"></code></pre>
+        </div>
       </div>
     </div>
   </div>
