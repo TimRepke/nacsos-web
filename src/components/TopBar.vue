@@ -1,9 +1,9 @@
 <template>
   <nav class="navbar navbar-light bg-light ps-0 p-0 p-sm-1 navbar-expand-sm sticky-sm-top">
     <div class="container-fluid">
-<!--      <router-link to="/" class="navbar-brand">-->
-<!--        <NacsosLogo style="height: 4rem; width: 4rem" class="mt-0 mt-sm-4"/>-->
-<!--      </router-link>-->
+      <!--      <router-link to="/" class="navbar-brand">-->
+      <!--        <NacsosLogo style="height: 4rem; width: 4rem" class="mt-0 mt-sm-4"/>-->
+      <!--      </router-link>-->
       <!-- burger menu button, which will appear on narrow screens -->
       <!-- TODO make the burger menu actually work-->
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown"
@@ -43,27 +43,24 @@
   </nav>
 </template>
 
-<script>
-// import NacsosLogo from '@/components/NacsosLogo.vue';
-import { useCurrentUserStore } from '@/stores/CurrentUserStore';
-import { storeToRefs } from 'pinia';
+<script lang="ts">
+
+import { User } from '@/types/user.d';
+import { currentUserStore } from '@/stores';
+import { EventBus } from '@/plugins/events';
+import { LoggedOutEvent } from '@/plugins/events/events/auth';
 
 export default {
   name: 'TopBar',
-  // components: { NacsosLogo },
-  setup() {
-    const store = useCurrentUserStore();
-    const { user } = storeToRefs(store);
-    const { logout } = store;
-    return {
-      user,
-      storeLogout: logout,
-    };
+  computed: {
+    user(): User {
+      return currentUserStore.user;
+    },
   },
   methods: {
     logout() {
-      this.$router.push('login');
-      this.storeLogout();
+      this.$router.push({ name: 'login' });
+      EventBus.emit(new LoggedOutEvent());
     },
   },
 };

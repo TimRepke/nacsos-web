@@ -11,6 +11,7 @@ import { createApp } from 'vue';
 import pinia from '@/stores';
 import router from '@/router';
 import EventBusPlugin from '@/plugins/events';
+import initEventHandlers from '@/plugins/events/EventHandlers';
 import RequestGatewayPlugin from '@/plugins/api';
 import App from './App.vue';
 
@@ -18,6 +19,9 @@ import App from './App.vue';
 library.add(fas);
 library.add(fab);
 library.add(far);
+
+// initialise all global event handlers
+initEventHandlers();
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const app = createApp(App)
