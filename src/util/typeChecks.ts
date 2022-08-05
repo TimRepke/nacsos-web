@@ -13,6 +13,13 @@ export function isFunctionInfo(obj: unknown) {
     && 'recommended_lifetime' in obj;
 }
 
+export function isArtefactOrSerializedArtefact(obj: unknown) {
+  if (typeof obj !== 'object' || !obj) return false;
+  return 'serializer' in obj
+    && 'dtype' in obj
+    && 'filename' in obj;
+}
+
 export function isNotImplemented() {
   return false;
 }

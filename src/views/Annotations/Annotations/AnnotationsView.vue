@@ -1,5 +1,5 @@
 <template>
-  <div class="row g-0 text-start">
+  <div class="row g-0 text-start h-100">
     <template v-if="!assignments">
       Loading next assignment for annotation. If this takes longer than expected, something went wrong.
     </template>

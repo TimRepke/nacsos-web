@@ -19,7 +19,7 @@
                 <div class="d-flex flex-row">
                   <div class="me-2" style="height: 1rem; width:1rem;">
                     <font-awesome-icon role="button" class="text-muted" @click="toggleEntry(entry)"
-                                       :icon="['fas',(entry.open) ? 'chevron-down' : 'chevron-right']"/>
+                                       :icon="['fas',(entry.showArtefacts) ? 'chevron-down' : 'chevron-right']"/>
                   </div>
                   <div>
                     {{ entry.info.name }}<br>

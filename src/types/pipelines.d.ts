@@ -16,6 +16,11 @@ export interface ArtefactReference {
   artefact: string;
 }
 
+export interface ComplexKWARG {
+  dtype: string;
+  params: { [index: string]: string | [string, object] };
+}
+
 export interface DeletionRequest {
   task_id: string;
   files: string[];
@@ -23,8 +28,15 @@ export interface DeletionRequest {
 
 export type ArtefactFile = [string, number];
 
-export type ParamsType = { [index: string]: string | number | ArtefactReference };
-export type KWArgsType = { [index: string]: string | [string, string | number | boolean] | SerializedArtefact };
+export type PythonPrimitives = 'str' | 'bool' | 'int' | 'float';
+export type ExtendedPythonPrimitives = PythonPrimitives | 'list[str]' | 'list[int]' | 'list[float]'
+export type ParamsType = { [index: string]: string | number | string[] | number[] | ArtefactReference };
+export type KWArgEntry =
+  ExtendedPythonPrimitives
+  | [PythonPrimitives, string | number | boolean]
+  | SerializedArtefact
+  | ComplexKWARG;
+export type KWArgsType = { [index: string]: KWArgEntry };
 export type CPULoadClassification = 'VHIGH' | 'HIGH' | 'MEDIUM' | 'LOW' | 'MINIMAL';
 export type ExecutionLocation = 'LOCAL' | 'PIK';
 
@@ -45,6 +57,8 @@ export interface FunctionInfo {
   recommended_lifetime?: number;
 }
 
+export type NestedLibrary = { [key: string]: NestedLibrary | FunctionInfo };
+
 export interface BaseTask {
   task_id: string;
   function_name: string;
@@ -56,6 +70,12 @@ export interface BaseTask {
 
 export interface SubmittedTask extends BaseTask {
   force_run: boolean;
+  forced_dependencies?: string[];
+}
+
+export interface TaskConfig {
+  task: SubmittedTask;
+  info: FunctionInfo;
 }
 
 export interface TaskInDB extends BaseTask {

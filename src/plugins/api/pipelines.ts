@@ -1,6 +1,6 @@
 import { Endpoint, EndpointFunction, ResponseReason } from '@/plugins/api/types.d';
 import { callPipelineEndpointFactory } from '@/plugins/api';
-import { Artefact, ArtefactFile, FunctionInfo, TaskInDB } from '@/types/pipelines.d';
+import { ArtefactFile, FunctionInfo, TaskInDB } from '@/types/pipelines.d';
 
 export interface ProjectRequestPayload {
   projectId: string;
