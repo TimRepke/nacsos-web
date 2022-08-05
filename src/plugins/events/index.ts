@@ -130,7 +130,7 @@ class EventBus {
 }
 
 export default {
-  install(app: App, options: any) {
+  install(app: App) {
     // eslint-disable-next-line no-param-reassign
     app.config.globalProperties.$eventBus = EventBus.getInstance();
   },

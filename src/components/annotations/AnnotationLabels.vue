@@ -130,7 +130,7 @@ export default {
       if (this.keyCounts[label.key] < label.max_repeat) {
         // copy the current label and remove irrelevant things
         const labelCopy = JSON.parse(JSON.stringify(label)) as AnnotationTaskLabel;
-        this.clearAnnotation(labelCopy.annotation!);
+        if (labelCopy.annotation) this.clearAnnotation(labelCopy.annotation);
 
         // eslint-disable-next-line vue/no-mutating-props
         this.labels.splice(labelIndex + 1, 0, labelCopy);
@@ -152,7 +152,7 @@ export default {
       let run = 1;
       this.labels.forEach((label: AnnotationTaskLabel) => {
         if (label.key === key) {
-          label.annotation!.repeat = run;
+          if (label.annotation) label.annotation.repeat = run;
           run += 1;
         }
       });
@@ -160,7 +160,7 @@ export default {
   },
   computed: {
     keyCounts() {
-      return this.labels.reduce((keyCounts: any, label: AnnotationTaskLabel) => {
+      return this.labels.reduce((keyCounts: { [key: string]: number }, label: AnnotationTaskLabel) => {
         if (!(label.key in keyCounts)) {
           keyCounts[label.key] = 0;
         }

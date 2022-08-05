@@ -138,7 +138,6 @@ import GenericItemComponent from '@/components/items/GenericItem.vue';
 import { useOffsetPagination, UseOffsetPaginationReturn } from '@vueuse/core';
 import { ToastEvent } from '@/plugins/events/events/toast';
 import { EventBus } from '@/plugins/events';
-import { range } from '@/utils';
 import ClosablePill from '@/components/ClosablePill.vue';
 import { reactive } from 'vue';
 import { AnyItem } from '@/types/items/index.d';
@@ -195,7 +194,7 @@ export default {
         ? this.pagination.pageCount
         : this.pagination.currentPage + this.navPagesWindowSize;
 
-      return [...range(start, end)];
+      return [...this.$util.range(start, end)];
     },
   },
 };

@@ -76,7 +76,7 @@
 </template>
 
 <script lang="ts">
-import { Artefact, FunctionInfo, TaskInDB, ArtefactFile } from '@/types/pipelines.d';
+import { FunctionInfo, TaskInDB, ArtefactFile } from '@/types/pipelines.d';
 import {
   callPipelineLibraryFunctionsEndpoint,
   callPipelineTaskArtefactsEndpoint,

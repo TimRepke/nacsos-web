@@ -90,10 +90,10 @@ export default {
           uploadFile.percentage = Math.round(100 * (event.loaded / event.total));
         },
       })
-        .then((response) => {
+        .then(() => {
           uploadFile.status = 'SUCCESS';
         })
-        .catch((response) => {
+        .catch(() => {
           uploadFile.status = 'FAILED';
           EventBus.emit(new ToastEvent('ERROR', `Failed to upload file "${uploadFile.file.name}"`));
         });
