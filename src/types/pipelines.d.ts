@@ -28,6 +28,7 @@ export interface DeletionRequest {
 
 export type ArtefactFile = [string, number];
 
+// FIXME what about Literals and things like that?
 export type PythonPrimitives = 'str' | 'bool' | 'int' | 'float';
 export type ExtendedPythonPrimitives = PythonPrimitives | 'list[str]' | 'list[int]' | 'list[float]'
 export type ParamsType = { [index: string]: string | number | string[] | number[] | ArtefactReference };
