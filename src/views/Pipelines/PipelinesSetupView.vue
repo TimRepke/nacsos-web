@@ -108,6 +108,7 @@ import { marked } from 'marked';
 import NestedExpandableComponent from '@/components/pipelines/NestedExpandableComponent.vue';
 import TaskConfigComponent from '@/components/pipelines/TaskConfig.vue';
 import { ConfirmationRequestEvent } from '@/plugins/events/events/confirmation';
+import { currentProjectStore, currentUserStore } from '@/stores';
 
 export default {
   name: 'PipelinesSetupView',
@@ -161,6 +162,9 @@ export default {
           task_id: crypto.randomUUID(),
           function_name: info.function,
           force_run: false,
+          params: {},
+          user_id: currentUserStore.user.user_id,
+          project_id: currentProjectStore.projectId,
         },
         info,
       });

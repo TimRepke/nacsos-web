@@ -12,7 +12,7 @@
         <div class="col" v-for="(dtype, key) in config.info.kwargs" :key="key">
           <template v-if="isPrimitiveType(dtype)">
             <label :for="`tk-${key}`">
-              <code>{{ key }}: {{ (Array.isArray(dtype)) ? `${dtype[0]}=${dtype[1]}` : dtype }}</code>
+              <code><strong>{{ key }}:</strong> {{ (Array.isArray(dtype)) ? `${dtype[0]}=${dtype[1]}` : dtype }}</code>
             </label>
             <input :type="dtype2input(dtype)" :id="`tk-${key}`" class="form-control" :aria-label="key">
             <!--                 v-model="config.num_items" :disabled="!editable"-->
@@ -20,9 +20,22 @@
           <template v-else-if="$util.isArtefactOrSerializedArtefact(dtype)">
             Artefact: {{ key }} | {{ dtype }}
           </template>
+          <template v-else-if="isList(dtype)">
+            <label :for="`tk-${key}`">
+              <code><strong>{{ key }}:</strong> {{ (Array.isArray(dtype)) ? `${dtype[0]}=${dtype[1]}` : dtype }}</code>
+            </label>
+            <ul v-if="config.task?.params[key]">
+              <li v-for="(val, it) in config.task?.params[key]" :key="`${it}-${val}`">{{ val }}</li>
+            </ul>
+            <div class="d-flex flex-row align-items-center">
+              <input :type="getListInputType(dtype)" :id="`tk-${key}`" class="form-control" :aria-label="key">
+              <font-awesome-icon role="button" class="btn btn-sm m-1 text-muted" :icon="['far','square-plus']"
+                                 @click="addListEntry(key, 'as')"/>
+            </div>
+          </template>
           <template v-else-if="isLiteral(dtype)">
             <label :for="`tk-${key}`">
-              <code>{{ key }}: {{ (Array.isArray(dtype)) ? `${dtype[0]}=${dtype[1]}` : dtype }}</code>
+              <code><strong>{{ key }}:</strong> {{ (Array.isArray(dtype)) ? `${dtype[0]}=${dtype[1]}` : dtype }}</code>
             </label>
             <select :id="`tk-${key}`" class="form-select">
               <option v-for="opt in getLiteralOptions(dtype)" :key="opt" :value="opt">{{ opt }}</option>
@@ -81,6 +94,20 @@ export default {
       }
       return false;
     },
+    isList(dtype: KWArgEntry): boolean {
+      const dt = this.getType(dtype);
+      if (typeof dt === 'string') {
+        return dt.startsWith('list') || dt.startsWith('List');
+      }
+      return false;
+    },
+    getListInputType(dtype: KWArgEntry): string {
+      let dt = this.getType(dtype);
+      if (dt.startsWith('list[')) dt = dt.replace('list[', '');
+      if (dt.startsWith('List[')) dt = dt.replace('List[', '');
+      dt = dt.replace(']', '');
+      return this.dtype2input(dt);
+    },
     getLiteralOptions(dtype: KWArgEntry): string[] | number[] {
       const dt = this.getType(dtype);
       if (dt.startsWith('Literal')) {
@@ -94,6 +121,14 @@ export default {
         });
       }
       return [];
+    },
+    addListEntry(key: string, value: string | number) {
+      if (!(key in this.config.task.params)) {
+        // eslint-disable-next-line vue/no-mutating-props
+        this.config.task.params[key] = [];
+      }
+      // eslint-disable-next-line vue/no-mutating-props
+      this.config.task.params[key].push(value);
     },
   },
 };
