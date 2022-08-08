@@ -190,9 +190,6 @@ export default {
   },
   async mounted() {
     this.library = (await callPipelineLibraryEndpoint()).payload;
-    // FIXME remove the following lines
-    this.addTask(this.library[1]);
-    // this.addTask(this.library[0]);
   },
   methods: {
     async reloadLibrary() {
