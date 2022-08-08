@@ -71,6 +71,6 @@ export function* range(start: number, end: number) {
 export default {
   install(app: App) {
     // eslint-disable-next-line no-param-reassign
-    app.config.globalProperties.$util = { isEmpty, range, isArray, isFunctionInfo, isArtefactOrSerializedArtefact };
+    app.config.globalProperties.$util = { isEmpty, range, isObject, isArray, isFunctionInfo, isArtefactOrSerializedArtefact };
   },
 };

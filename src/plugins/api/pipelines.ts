@@ -1,6 +1,6 @@
 import { Endpoint, EndpointFunction, ResponseReason } from '@/plugins/api/types.d';
 import { callPipelineEndpointFactory } from '@/plugins/api';
-import { ArtefactFile, FunctionInfo, TaskInDB } from '@/types/pipelines.d';
+import { ArtefactFile, FunctionInfo, SubmittedTask, TaskInDB } from '@/types/pipelines.d';
 
 export interface ProjectRequestPayload {
   projectId: string;
@@ -76,6 +76,11 @@ const PipelineTaskSearchEndpoint: Endpoint<ResponseReason, TaskInDB[]> = {
   path: '/queue/search',
   paramsEncoding: 'QUERY',
 };
+const PipelineTasksSubmitEndpoint: Endpoint<ResponseReason, string[]> = {
+  method: 'PUT',
+  path: '/queue/submit/tasks',
+  paramsEncoding: 'BODY',
+};
 
 const PipelineTaskArtefactsEndpoint: Endpoint<ResponseReason, ArtefactFile[]> = {
   method: 'GET',
@@ -96,6 +101,8 @@ export const callPipelineRefreshLibraryEndpoint:
 // PIPELINE_API/api/queue/*
 export const callPipelineTaskSearchEndpoint:
   EndpointFunction<SearchRequestPayload, ResponseReason, TaskInDB[]> = callPipelineEndpointFactory(PipelineTaskSearchEndpoint);
+export const callPipelineTasksSubmitEndpoint:
+  EndpointFunction<SubmittedTask[], ResponseReason, string[]> = callPipelineEndpointFactory(PipelineTasksSubmitEndpoint);
 
 // PIPELINE_API/api/artefacts/*
 export const callPipelineTaskArtefactsEndpoint:

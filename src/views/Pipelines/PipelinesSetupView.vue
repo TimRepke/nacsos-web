@@ -30,7 +30,8 @@
             </div>
 
             <template v-for="config in configs" :key="config.task.task_id">
-              <TaskConfigComponent :config="config" class="mb-2"/>
+              <TaskConfigComponent :config="config" class="mb-2" ref="taskConfigs"
+                                   @showInfo="highlight=$event" @pickArtefactReference="pickReference($event)"/>
             </template>
           </div>
         </div>
@@ -90,18 +91,81 @@
       <div class="modal-backdrop fade show"></div>
     </div>
     <!-- /FunctionInfo Card -->
+
+    <!-- Artefact Reference Picker -->
+    <div v-if="artefactQuery !== undefined">
+      <div class="modal fade show" tabindex="-1" style="display: block" data-bs-backdrop="static">
+        <div class="modal-dialog modal-dialog-centered modal-xl">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">Pick reference for artefact</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+                      @click="resolveReferenceQuery(false)"></button>
+            </div>
+            <div class="modal-body text-start">
+              <font-awesome-icon type="button" class="btn ms-auto small text-muted" :icon="['fas','rotate-right']"
+                                 @click="loadQueuedTasks"/>
+              <ul class="list-group">
+
+                <!-- List of tasks currently configured -->
+                <li class="list-group-item list-group-item-warning"
+                    v-for="config in configs" :key="config.task.task_id">
+                  <strong>{{ config.task.task_id }}</strong> {{ config.info.name }}
+                  <code>{{ config.info.function }}(&sdot;)</code><br/>
+                  <button type="button" class="btn btn-outline-secondary btn-sm"
+                          v-for="(atype, art) in config.info.artefacts" :key="art"
+                          @click="selectReference(config.task.task_id, art)">
+                    <strong>{{ art }}:</strong> <code>Artefact[{{ atype.serializer }}, {{ atype.dtype }}]</code>
+                  </button>
+                </li>
+
+                <!-- List of tasks in the DB -->
+                <li class="list-group-item list-group-item-info"
+                    v-for="task in queuedTasks" :key="task.task_id">
+                  <strong>{{ task.task_id }}</strong>
+                  <code>{{ task.function_name }}(&sdot;)</code><br/>
+                  {{ task.comment }}
+                  <button type="button" class="btn btn-outline-secondary btn-sm"
+                          v-for="(atype, art) in getInfoByName(task.function_name).artefacts" :key="art"
+                          @click="selectReference(task.task_id, art)">
+                    <strong>{{ art }}:</strong> <code>Artefact[{{ atype.serializer }}, {{ atype.dtype }}]</code>
+                  </button>
+                </li>
+              </ul>
+              <h5 class="mt-2">Selected:</h5>
+              <ul class="list-unstyled">
+                <li><strong>Task:</strong> {{ artefactQueryReference.task_id || '[REF?]' }}</li>
+                <li><strong>Artefact:</strong> {{ artefactQueryReference.artefact || '[REF?]' }}</li>
+              </ul>
+              <div class="d-flex justify-content-end">
+                <button class="btn btn-outline-secondary m-2" @click="resolveReferenceQuery(false)">Cancel</button>
+                <button class="btn btn-success m-2" @click="resolveReferenceQuery(true)">Select</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-backdrop fade show"></div>
+    </div>
+    <!-- /Artefact Reference Picker -->
   </div>
 </template>
 
 <script lang="ts">
 import {
+  ArtefactCallback, ArtefactReference,
   ComplexKWARG,
   FunctionInfo,
-  SerializedArtefact,
   NestedLibrary,
+  SerializedArtefact,
   TaskConfig,
+  TaskInDB,
 } from '@/types/pipelines.d';
-import { callPipelineLibraryEndpoint, callPipelineRefreshLibraryEndpoint } from '@/plugins/api/pipelines';
+import {
+  callPipelineLibraryEndpoint,
+  callPipelineRefreshLibraryEndpoint,
+  callPipelineTaskSearchEndpoint, callPipelineTasksSubmitEndpoint,
+} from '@/plugins/api/pipelines';
 import { EventBus } from '@/plugins/events';
 import { ToastEvent } from '@/plugins/events/events/toast';
 import { marked } from 'marked';
@@ -117,14 +181,18 @@ export default {
     return {
       library: [] as FunctionInfo[],
       highlight: undefined as FunctionInfo | undefined,
+      artefactQuery: undefined as SerializedArtefact | undefined,
+      artefactQueryCallback: undefined as ArtefactCallback | undefined,
+      artefactQueryReference: undefined as ArtefactReference | undefined,
+      queuedTasks: [] as TaskInDB[],
       configs: [] as TaskConfig[],
     };
   },
   async mounted() {
     this.library = (await callPipelineLibraryEndpoint()).payload;
     // FIXME remove the following lines
-    this.addTask(this.library[0]);
     this.addTask(this.library[1]);
+    // this.addTask(this.library[0]);
   },
   methods: {
     async reloadLibrary() {
@@ -156,11 +224,42 @@ export default {
       }
       return JSON.stringify(tp);
     },
+    async loadQueuedTasks() {
+      // TODO: Add type matching -> Only show tasks where an output artefact matches the type of the param artefact type
+      // FIXME: Add some filters? Ideally configurable in the interface (only this project, only current user).
+      const response = (await callPipelineTaskSearchEndpoint()).payload;
+      if (response) this.queuedTasks = response;
+      else EventBus.emit(new ToastEvent('ERROR', 'Failed to load task queue.'));
+    },
+    pickReference(query: [SerializedArtefact, ArtefactReference]) {
+      const [artefact, cb] = query;
+      this.artefactQuery = artefact;
+      this.artefactQueryCallback = cb;
+      this.artefactQueryReference = {
+        task_id: undefined,
+        artefact: undefined,
+      };
+    },
+    selectReference(taskId: string, artefact: string) {
+      this.artefactQueryReference.task_id = taskId;
+      this.artefactQueryReference.artefact = artefact;
+    },
+    resolveReferenceQuery(respond = true) {
+      if (respond) {
+        this.artefactQueryCallback(JSON.parse(JSON.stringify(this.artefactQueryReference)));
+      }
+      this.artefactQuery = undefined;
+      this.artefactQueryReference = undefined;
+      this.artefactQueryCallback = undefined;
+    },
+    getInfoByName(functionName: string) {
+      return this.library.find((info: FunctionInfo) => `${info.module}.${info.function}` === functionName);
+    },
     addTask(info: FunctionInfo) {
       this.configs.push({
         task: {
-          task_id: crypto.randomUUID(),
-          function_name: info.function,
+          task_id: crypto.randomUUID().replaceAll('-', ''),
+          function_name: `${info.module}.${info.function}`,
           force_run: false,
           params: {},
           user_id: currentUserStore.user.user_id,
@@ -177,7 +276,24 @@ export default {
         (response) => {
           if (response === 'ACCEPT') {
             // TODO implement
-            EventBus.emit(new ToastEvent('WARN', 'Lol, not implemented yet.'));
+
+            const tasks = JSON.parse(JSON.stringify(Object.fromEntries(
+              this.configs.map((config: TaskConfig) => [config.task.task_id, config.task]),
+            )));
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            this.$refs.taskConfigs.forEach((config: any) => {
+              tasks[config.config.task.task_id].params = config.getTaskParams();
+            });
+
+            callPipelineTasksSubmitEndpoint(Object.values(tasks))
+              .then((res) => {
+                console.log(res.payload);
+                EventBus.emit(new ToastEvent('SUCCESS', `Submitted ${res.payload?.length} tasks to the queue!`));
+              })
+              .catch((reason) => {
+                EventBus.emit(new ToastEvent('ERROR', 'Failed to submit tasks!'));
+                console.error(reason);
+              });
           }
         },
         'Submission of Task(s)',

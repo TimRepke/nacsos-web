@@ -16,6 +16,8 @@ export interface ArtefactReference {
   artefact: string;
 }
 
+export type ArtefactCallback = (artefactRef: ArtefactReference) => void;
+
 export interface ComplexKWARG {
   dtype: string;
   params: { [index: string]: string | [string, object] };
@@ -90,5 +92,6 @@ export interface TaskInDB extends BaseTask {
   est_cpu_load: CPULoadClassification;
   rec_expunge?: string;
   dependencies?: string[];
+  comment: string;
   status: TaskStatus;
 }
