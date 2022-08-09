@@ -62,7 +62,6 @@
 </template>
 
 <script lang="ts">
-import { ref } from 'vue';
 import {
   callProjectScopesEndpoint,
   callProjectTasksEndpoint, callRemoveAnnotationTaskEndpoint,
@@ -96,16 +95,17 @@ export default {
       copy.annotation_task_id = undefined;
       copy.name = `[COPY] ${task.name}`;
       callSaveAnnotationTaskEndpoint(copy)
-        .then((result) => {
+        .then(() => {
           EventBus.emit(new ToastEvent('SUCCESS', `Created copy of the annotation task "${task.name}".`));
-          callProjectTasksEndpoint({ projectId: currentProjectStore.project!.project_id! })
+          callProjectTasksEndpoint({ projectId: currentProjectStore.projectId })
             .then((res) => { this.projectTasks = res.payload; })
-            .catch((res) => { EventBus.emit(new ToastEvent('ERROR', 'Failed to refresh data, try reloading the page.')); });
+            .catch(() => { EventBus.emit(new ToastEvent('ERROR', 'Failed to refresh data, try reloading the page.')); });
         })
-        .catch((result) => { EventBus.emit(new ToastEvent('ERROR', `Failed to copy annotation task "${task.name}".`)); });
+        .catch(() => { EventBus.emit(new ToastEvent('ERROR', `Failed to copy annotation task "${task.name}".`)); });
     },
     exportData(task: AnnotationTask) {
       // TODO
+      console.log(task);
       EventBus.emit(new ToastEvent('WARN', 'Not implemented yet, sorry.'));
     },
     removeTask(task: AnnotationTask) {
@@ -117,7 +117,7 @@ export default {
         (response) => {
           if (response === 'ACCEPT') {
             callRemoveAnnotationTaskEndpoint({ taskId: task.annotation_task_id as string })
-              .then((res) => {
+              .then(() => {
                 EventBus.emit(new ToastEvent('SUCCESS', 'Annotation task deleted!'));
                 const index = this.projectTasks
                   .findIndex((projectTask: AnnotationTask) => projectTask.annotation_task_id === task.annotation_task_id);
@@ -125,7 +125,7 @@ export default {
                   this.projectTasks.splice(index, 1);
                 }
               })
-              .catch((res) => {
+              .catch(() => {
                 EventBus.emit(new ToastEvent(
                   'ERROR',
                   'Failed to delete annotation task!',
@@ -145,7 +145,7 @@ export default {
         (response) => {
           if (response === 'ACCEPT') {
             callRemoveAssignmentScopeEndpoint({ assignmentScopeId: scope.assignment_scope_id as string })
-              .then((res) => {
+              .then(() => {
                 EventBus.emit(new ToastEvent('SUCCESS', 'Assignment scope deleted!'));
                 const index = this.projectScopes
                   .findIndex((assignmentScope: AssignmentScope) => assignmentScope.assignment_scope_id === scope.assignment_scope_id);
@@ -154,7 +154,7 @@ export default {
                   this.projectScopes.splice(index, 1);
                 }
               })
-              .catch((res) => {
+              .catch(() => {
                 EventBus.emit(new ToastEvent(
                   'ERROR',
                   'Failed to delete assignment scope!',

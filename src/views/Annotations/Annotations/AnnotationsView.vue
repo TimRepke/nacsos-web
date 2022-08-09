@@ -1,5 +1,5 @@
 <template>
-  <div class="row g-0 text-start">
+  <div class="row g-0 text-start h-100">
     <template v-if="!assignments">
       Loading next assignment for annotation. If this takes longer than expected, something went wrong.
     </template>
@@ -75,7 +75,6 @@ import {
 import GenericItemComponent from '@/components/items/GenericItem.vue';
 import AnnotationLabels from '@/components/annotations/AnnotationLabels.vue';
 import { AnnotationTaskLabel, AssignmentStatus } from '@/types/annotation.d';
-import { useRoute } from 'vue-router';
 import { EventBus } from '@/plugins/events';
 import { ToastEvent } from '@/plugins/events/events/toast';
 
@@ -207,7 +206,7 @@ export default {
             'Successfully saved your annotation!',
           ));
         })
-        .catch((reason) => {
+        .catch(() => {
           EventBus.emit(new ToastEvent(
             'ERROR',
             'Failed to save your annotation. Sorry. '

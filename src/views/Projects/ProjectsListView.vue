@@ -11,26 +11,30 @@
 <script lang="ts">
 import { callProjectsListEndpoint } from '@/plugins/api/projects';
 import { Project } from '@/types/project.d';
-import { currentProjectStore } from '@/stores';
-import { CurrentProjectSetEvent } from '@/plugins/events/events/projects';
+import { EventBus } from '@/plugins/events';
+import { CurrentProjectSelectedEvent, CurrentProjectSetEvent } from '@/plugins/events/events/projects';
 
 export default {
   name: 'ProjectListView',
-  created() {
-    this.$eventBus.once(CurrentProjectSetEvent, () => {
-      this.$router.push('/project/overview');
-    });
-  },
-  async setup() {
-    const projectList: Project[] | undefined = (await callProjectsListEndpoint()).payload;
+  data() {
     return {
-      projectList,
+      projectList: [] as Project[],
     };
+  },
+  async mounted() {
+    // clear the currentProjectStore to prevent side effects
+    // currentProjectStore.clear();
+    // get all projects from the server (that we have permission to access)
+    const projects = (await callProjectsListEndpoint()).payload;
+    if (projects) this.projectList = projects;
   },
   methods: {
     selectProject(projectId: string) {
       console.log(projectId);
-      currentProjectStore.setProject(projectId);
+      EventBus.emit(new CurrentProjectSelectedEvent(projectId));
+      EventBus.once(CurrentProjectSetEvent, () => {
+        this.$router.push({ name: 'project-overview' });
+      });
     },
   },
 };

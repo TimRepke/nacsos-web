@@ -66,7 +66,7 @@ export default {
     },
   },
   watch: {
-    async userIds(userIds: string[]) {
+    async userIds() {
       this.fetchUserInfos();
     },
   },
@@ -74,7 +74,7 @@ export default {
     fetchUserInfos() {
       callUsersDetailsEndpoint({ user_id: this.userIds })
         .then((result) => { this.users = result.payload; })
-        .catch((result) => { EventBus.emit(new ToastEvent('WARN', 'Failed to load usernames')); });
+        .catch(() => { EventBus.emit(new ToastEvent('WARN', 'Failed to load usernames')); });
     },
     tryGetAssignment(userId: string, itemId: string): Assignment | undefined {
       return this.lookup[itemId]?.find((assignment: Assignment) => assignment.user_id === userId);

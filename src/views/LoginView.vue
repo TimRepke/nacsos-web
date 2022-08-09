@@ -35,23 +35,12 @@
 
 <script>
 import NacsosLogo from '@/components/NacsosLogo.vue';
-import { currentUserStore } from '@/stores';
-import { AuthFailedEvent, AuthTokenReceivedEvent, LoginSuccessEvent } from '@/plugins/events/events/auth';
+import { EventBus } from '@/plugins/events';
+import { AuthFailedEvent, UserLoginEvent, LoginSuccessEvent } from '@/plugins/events/events/auth';
 
 export default {
   name: 'LoginView',
   components: { NacsosLogo },
-  created() {
-    this.$eventBus.on(AuthFailedEvent, () => {
-      this.error = true;
-    });
-    this.$eventBus.on(AuthTokenReceivedEvent, () => {
-      this.error = false;
-    });
-    this.$eventBus.once(LoginSuccessEvent, () => {
-      this.$router.push('/');
-    });
-  },
   data() {
     return {
       username: '',
@@ -59,10 +48,18 @@ export default {
       error: false,
     };
   },
+  mounted() {
+    EventBus.on(AuthFailedEvent, () => {
+      this.error = true;
+    });
+  },
   methods: {
-    login() {
+    async login() {
       this.error = false;
-      currentUserStore.login(this.username, this.password);
+      EventBus.emit(new UserLoginEvent(this.username, this.password));
+      EventBus.once(LoginSuccessEvent, () => {
+        this.$router.push({ name: 'project-list' });
+      });
     },
   },
 };

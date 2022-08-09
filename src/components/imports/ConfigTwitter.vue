@@ -129,7 +129,7 @@
 <script lang="ts">
 import { PropType } from 'vue';
 import useVuelidate, { BaseValidation, ValidationRule } from '@vuelidate/core';
-import { required, between, alphaNum, integer, helpers } from '@vuelidate/validators';
+import { required, between, alphaNum, integer } from '@vuelidate/validators';
 import { ImportConfigTwitter } from '@/types/imports.d';
 
 const isValidISO8601: ValidationRule = {

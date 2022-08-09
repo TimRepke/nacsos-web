@@ -129,8 +129,6 @@
 </template>
 
 <script lang="ts">
-import { ref } from 'vue';
-import { useRoute } from 'vue-router';
 import RandomAssignmentConfig from '@/components/annotations/assignments/RandomAssignmentConfig.vue';
 import { EventBus } from '@/plugins/events';
 import { ConfirmationRequestEvent } from '@/plugins/events/events/confirmation';
@@ -292,10 +290,10 @@ export default {
       if (this.assignmentScope.assignment_scope_id) {
         callScopeCountsEndpoint({ assignmentScopeId: this.assignmentScope.assignment_scope_id })
           .then((result) => { this.assignmentCounts = result.payload; })
-          .catch((result) => { EventBus.emit(new ToastEvent('ERROR', 'Failed to load assignment counts.')); });
+          .catch(() => { EventBus.emit(new ToastEvent('ERROR', 'Failed to load assignment counts.')); });
         callScopeAssignmentsEndpoint({ assignmentScopeId: this.assignmentScope.assignment_scope_id })
           .then((result) => { this.assignments = result.payload; })
-          .catch((result) => { EventBus.emit(new ToastEvent('ERROR', 'Failed to load assignments.')); });
+          .catch(() => { EventBus.emit(new ToastEvent('ERROR', 'Failed to load assignments.')); });
       }
     },
     async loadListOfUsers() {
