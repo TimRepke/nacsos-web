@@ -80,7 +80,7 @@
                     </ul>
                   </li>
                 </ul>
-                <pre class="card p-2 pb-0 flex-fill">
+                <pre class="card p-2 pb-0 flex-fill col-md-6">
                   <code v-html="md2html(highlight.docstring)"></code>
                 </pre>
               </div>
