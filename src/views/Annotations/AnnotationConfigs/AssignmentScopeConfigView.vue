@@ -198,6 +198,7 @@ export default {
         this.assignmentCounts = countsReq.payload;
 
         if (this.assignmentScope.config && this.assignmentScope.config.users && this.assignmentScope.config.users.length > 0) {
+          this.strategyConfigType = this.assignmentScope.config.config_type;
           const usersReq = await callUsersDetailsEndpoint({ user_id: this.assignmentScope.config.users });
           if (usersReq.status === 'SUCCESS' && usersReq.payload) {
             this.selectedUsers = usersReq.payload;
