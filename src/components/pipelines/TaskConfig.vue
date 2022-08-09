@@ -103,7 +103,12 @@ export default {
           // eslint-disable-next-line prefer-destructuring
           defaultValue = dtype[1];
         }
-        if (this.isPrimitiveType(dtype)) return [[key, this.getTypedPrimitive(dt, defaultValue)]];
+        if (this.isPrimitiveType(dtype)) {
+          return [[key, this.getTypedPrimitive(dt, defaultValue)]];
+        }
+        if (this.isLiteral(dtype)){
+          return [[key, this.getTypedPrimitive('str', defaultValue)]];
+        }
         if (this.isList(dtype)) {
           return [[key, undefined], [`__${key}-value`, this.getTypedPrimitive(this.getListType(dtype), defaultValue)]];
         }

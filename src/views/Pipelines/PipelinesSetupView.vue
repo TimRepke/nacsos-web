@@ -42,8 +42,8 @@
 
     <!-- FunctionInfo Card -->
     <div v-if="highlight !== undefined">
-      <div class="modal fade show" tabindex="-1" style="display: block" data-bs-backdrop="static"
-           @click="highlight=undefined">
+      <!-- FIXME @click="highlight=undefined"  -->
+      <div class="modal fade show" tabindex="-1" style="display: block" data-bs-backdrop="static">
         <div class="modal-dialog modal-dialog-centered modal-xl">
           <div class="modal-content">
             <div class="modal-header">
@@ -279,7 +279,7 @@ export default {
             )));
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             this.$refs.taskConfigs.forEach((config: any) => {
-              tasks[config.config.task.task_id].params = config.getTaskParams();
+              tasks[config.config.task.task_id].params = JSON.stringify(config.getTaskParams());
             });
 
             callPipelineTasksSubmitEndpoint(Object.values(tasks))
