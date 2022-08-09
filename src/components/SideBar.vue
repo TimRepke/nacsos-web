@@ -26,6 +26,14 @@
       <router-link to="/project/pipelines" class="list-group-item list-group-item-action border-end-0"
                    active-class="active" v-if="projectPermissions.pipelines_read"> Pipelines
       </router-link>
+      <router-link to="/project/pipelines/setup"
+                   class="list-group-item list-group-item-action list-group-item-info border-end-0 sub-link"
+                   active-class="active" v-if="projectPermissions.annotations_read && isActive('project-pipelines')"> Task Configuration
+      </router-link>
+      <router-link to="/project/pipelines/presets"
+                   class="list-group-item list-group-item-action list-group-item-info border-end-0 sub-link"
+                   active-class="active" v-if="projectPermissions.annotations_read && isActive('project-pipelines')"> Presets
+      </router-link>
       <router-link to="/project/config/annotations" class="list-group-item list-group-item-action border-end-0"
                    active-class="active" v-if="projectPermissions.annotations_edit">
         <font-awesome-icon icon="gear"/>
@@ -76,6 +84,9 @@ export default {
     },
   },
   methods: {
+    isActive(parentName: string): boolean {
+      return this.$router.currentRoute.value.matched.some(({ name }) => name === parentName);
+    },
     toggleVisibility(): void {
       this.visible = (this.visible === undefined) ? false : !this.visible;
     },
@@ -120,5 +131,11 @@ export default {
   line-height: 2rem;
   cursor: pointer;
   background: white;
+}
+
+.sub-link {
+  margin-left: 1rem !important;
+  width: calc(100% - 1rem) !important;
+  border: 0 !important;
 }
 </style>
