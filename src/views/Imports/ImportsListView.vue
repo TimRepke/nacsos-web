@@ -39,7 +39,6 @@
 </template>
 
 <script lang="ts">
-import { ref } from 'vue';
 import { callListProjectImportsEndpoint } from '@/plugins/api/imports';
 import { ImportModel } from '@/types/imports.d';
 import InlineToolTip from '@/components/InlineToolTip.vue';
@@ -60,14 +59,17 @@ export default {
   methods: {
     copyImport(importDetails: ImportModel) {
       // TODO
+      console.log(importDetails);
       EventBus.emit(new ToastEvent('WARN', 'Not implemented yet, sorry.'));
     },
     removeImport(importDetails: ImportModel) {
       // TODO
+      console.log(importDetails);
       EventBus.emit(new ToastEvent('WARN', 'Not implemented yet, sorry.'));
     },
     exportData(importDetails: ImportModel) {
       // TODO
+      console.log(importDetails);
       EventBus.emit(new ToastEvent('WARN', 'Not implemented yet, sorry.'));
     },
   },

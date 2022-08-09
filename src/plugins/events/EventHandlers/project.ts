@@ -3,7 +3,6 @@ import { CurrentProjectSelectedEvent, CurrentProjectSetEvent } from '@/plugins/e
 import { callProjectInfoEndpoint, callUserProjectPermissionsEndpoint } from '@/plugins/api/projects';
 import { currentProjectStore } from '@/stores';
 import { LoggedOutEvent } from '@/plugins/events/events/auth';
-import { useRouter } from 'vue-router';
 
 export default () => {
   EventBus.on(CurrentProjectSelectedEvent, (event: CurrentProjectSelectedEvent) => {

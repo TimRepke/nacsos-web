@@ -2,7 +2,6 @@ import { EventBus } from '@/plugins/events';
 import { AuthFailedEvent, LoggedOutEvent, LoginSuccessEvent, UserLoginEvent } from '@/plugins/events/events/auth';
 import { callCurrentUserEndpoint, callLoginEndpoint } from '@/plugins/api/login';
 import { currentUserStore } from '@/stores';
-import { useRouter } from 'vue-router';
 
 export default () => {
   EventBus.on(UserLoginEvent, (event: UserLoginEvent) => {
