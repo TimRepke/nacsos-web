@@ -106,7 +106,7 @@ export default {
         if (this.isPrimitiveType(dtype)) {
           return [[key, this.getTypedPrimitive(dt, defaultValue)]];
         }
-        if (this.isLiteral(dtype)){
+        if (this.isLiteral(dtype)) {
           return [[key, this.getTypedPrimitive('str', defaultValue)]];
         }
         if (this.isList(dtype)) {

@@ -153,7 +153,7 @@ export default {
                 EventBus.emit(new ToastEvent('ERROR', `Failed to save your import settings. (${res.reason})`));
               });
           } else {
-            EventBus.emit(new ToastEvent('WARN', 'Did not save the annotation task.'));
+            EventBus.emit(new ToastEvent('WARN', 'Did not save your import config.'));
           }
         },
         'Save import job',

@@ -35,11 +35,11 @@
           <h3>Annotation Panel</h3>
           <div class="collapsible">
             <input id="annotation-description" class="toggle" type="checkbox">
-            <label for="annotation-description" class="lbl-toggle" role="button">Show task description</label>
+            <label for="annotation-description" class="lbl-toggle" role="button">Show scheme description</label>
             <div class="collapsible-content">
               <div class="content-inner">
-                <strong>Annotation task:</strong> {{ task.name }}
-                <p v-html="markdown(task.description)"></p>
+                <strong>Annotation scheme:</strong> {{ scheme.name }}
+                <p v-html="markdown(scheme.description)"></p>
                 <strong>Assignment scope:</strong> {{ scope.name }}
                 <p v-html="markdown(scope.description)"></p>
               </div>
@@ -74,7 +74,7 @@ import {
 } from '@/plugins/api/annotations';
 import GenericItemComponent from '@/components/items/GenericItem.vue';
 import AnnotationLabels from '@/components/annotations/AnnotationLabels.vue';
-import { AnnotationTaskLabel, AssignmentStatus } from '@/types/annotation.d';
+import { AnnotationSchemeLabel, AssignmentStatus } from '@/types/annotation.d';
 import { EventBus } from '@/plugins/events';
 import { ToastEvent } from '@/plugins/events/events/toast';
 
@@ -114,7 +114,7 @@ export default {
       item: undefined,
       assignment: undefined,
       assignments: undefined,
-      task: undefined,
+      scheme: undefined,
       scope: undefined,
       sidebarWidth: 5,
       labels: undefined,
@@ -136,15 +136,15 @@ export default {
     markdown(md: string) {
       return marked(md);
     },
-    populateEmptyAnnotations(labels: AnnotationTaskLabel[]) {
-      return labels.map((label: AnnotationTaskLabel) => {
+    populateEmptyAnnotations(labels: AnnotationSchemeLabel[]) {
+      return labels.map((label: AnnotationSchemeLabel) => {
         if (!label.annotation) {
           // eslint-disable-next-line no-param-reassign
           label.annotation = {
             assignment_id: this.assignment.assignment_id,
             user_id: this.assignment.user_id,
             item_id: this.assignment.item_id,
-            task_id: this.assignment.task_id,
+            annotation_scheme_id: this.assignment.annotation_scheme_id,
             key: label.key,
             repeat: 1,
             parent: undefined,
@@ -164,10 +164,10 @@ export default {
     async save() {
       // copy relevant data to break references
       const labels = JSON.parse(JSON.stringify(this.labels));
-      const task = JSON.parse(JSON.stringify(this.task));
+      const scheme = JSON.parse(JSON.stringify(this.scheme));
 
       // first, remove all empty annotations again
-      const removeEmptyAnnotations = (subLabels: AnnotationTaskLabel[]) => subLabels.map((label: AnnotationTaskLabel) => {
+      const removeEmptyAnnotations = (subLabels: AnnotationSchemeLabel[]) => subLabels.map((label: AnnotationSchemeLabel) => {
         if (label.annotation?.value_int === undefined
           && label.annotation?.value_str === undefined
           && label.annotation?.value_bool === undefined
@@ -185,11 +185,11 @@ export default {
         }
         return label;
       });
-      task.labels = removeEmptyAnnotations(labels);
+      scheme.labels = removeEmptyAnnotations(labels);
 
       // Send data to the server
       const payload = {
-        task,
+        scheme,
         assignment: this.assignment,
       };
       // TODO: set up proper response reasons for this endpoint
@@ -226,10 +226,10 @@ export default {
     async setCurrentAssignment(annotationItem: AnnotationItemResponse) {
       // update all the data
       this.assignment = annotationItem.assignment;
-      this.task = annotationItem.task;
+      this.scheme = annotationItem.scheme;
       this.scope = annotationItem.scope;
       this.item = annotationItem.item;
-      this.labels = this.populateEmptyAnnotations(this.task.labels);
+      this.labels = this.populateEmptyAnnotations(this.scheme.labels);
 
       // update the assignments progress bar
       this.assignments = (await callScopeUserAssignmentsEndpoint({

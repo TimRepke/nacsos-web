@@ -98,7 +98,7 @@
 <script lang="ts">
 /* eslint no-param-reassign: "off" */
 
-import { Annotation, AnnotationTaskLabel, Assignment } from '@/types/annotation.d';
+import { Annotation, AnnotationSchemeLabel, Assignment } from '@/types/annotation.d';
 import { PropType } from 'vue';
 import InlineToolTip from '@/components/InlineToolTip.vue';
 
@@ -107,7 +107,7 @@ export default {
   components: { InlineToolTip },
   props: {
     labels: {
-      type: Object as PropType<AnnotationTaskLabel[]>,
+      type: Object as PropType<AnnotationSchemeLabel[]>,
     },
     assignment: {
       type: Object as PropType<Assignment>,
@@ -126,10 +126,10 @@ export default {
         || annotation.value_bool !== undefined
         || annotation.value_float !== undefined;
     },
-    duplicateLabel(label: AnnotationTaskLabel, labelIndex: number) {
+    duplicateLabel(label: AnnotationSchemeLabel, labelIndex: number) {
       if (this.keyCounts[label.key] < label.max_repeat) {
         // copy the current label and remove irrelevant things
-        const labelCopy = JSON.parse(JSON.stringify(label)) as AnnotationTaskLabel;
+        const labelCopy = JSON.parse(JSON.stringify(label)) as AnnotationSchemeLabel;
         if (labelCopy.annotation) this.clearAnnotation(labelCopy.annotation);
 
         // eslint-disable-next-line vue/no-mutating-props
@@ -139,7 +139,7 @@ export default {
         this.updateRepeatCounts(label.key);
       }
     },
-    deleteLabel(label: AnnotationTaskLabel, labelIndex: number) {
+    deleteLabel(label: AnnotationSchemeLabel, labelIndex: number) {
       if (this.keyCounts[label.key] > 1) {
         // eslint-disable-next-line vue/no-mutating-props
         this.labels.splice(labelIndex, 1);
@@ -150,7 +150,7 @@ export default {
     },
     updateRepeatCounts(key: string) {
       let run = 1;
-      this.labels.forEach((label: AnnotationTaskLabel) => {
+      this.labels.forEach((label: AnnotationSchemeLabel) => {
         if (label.key === key) {
           if (label.annotation) label.annotation.repeat = run;
           run += 1;
@@ -160,7 +160,7 @@ export default {
   },
   computed: {
     keyCounts() {
-      return this.labels.reduce((keyCounts: { [key: string]: number }, label: AnnotationTaskLabel) => {
+      return this.labels.reduce((keyCounts: { [key: string]: number }, label: AnnotationSchemeLabel) => {
         if (!(label.key in keyCounts)) {
           keyCounts[label.key] = 0;
         }

@@ -5,7 +5,7 @@
         <h1 v-if="isNewScope">Create new assignment scope</h1>
         <h1 v-else>Monitor assignment scope</h1>
         <h6>
-          The assignment scope for an annotation task is used to annotate in multiple
+          The assignment scope for an annotation scheme is used to annotate in multiple
           batches or subsets and keep track of that reference.
         </h6>
       </div>
@@ -159,11 +159,11 @@ export default {
   components: { AssignmentsVisualiser, RandomAssignmentConfig },
   data() {
     const scopeId = this.$route.params.scope_id;
-    const taskId = this.$route.query.task_id;
+    const annotationSchemeId = this.$route.query.annotation_scheme_id;
 
     return {
       scopeId,
-      taskId,
+      annotationSchemeId,
       // list of all users in the system
       users: [] as User[],
       // search query for filtering list of users
@@ -173,13 +173,13 @@ export default {
       // assignment strategy type
       strategyConfigType: undefined as AssignmentScopeConfigType | undefined,
       // indicates whether this is (or will be) a newly created scope
-      isNewScope: !scopeId && taskId,
+      isNewScope: !scopeId && annotationSchemeId,
       // holds the assignment counts (or undefined if none exist)
       assignmentCounts: undefined as AssignmentScopeCounts | undefined,
       assignments: [] as Assignment[],
       assignmentScope: {
         assignment_scope_id: undefined,
-        task_id: taskId,
+        annotation_scheme_id: annotationSchemeId,
         time_created: undefined,
         name: '',
         description: '',
@@ -226,7 +226,7 @@ export default {
           (response) => {
             if (response === 'ACCEPT') {
               const payload = {
-                task_id: this.assignmentScope.task_id,
+                annotation_scheme_id: this.assignmentScope.annotation_scheme_id,
                 scope_id: this.assignmentScope.assignment_scope_id,
                 save: true,
                 config: JSON.parse(JSON.stringify(this.assignmentScope.config)),
@@ -268,7 +268,7 @@ export default {
                 ));
                 if (this.isNewScope) {
                   this.isNewScope = false;
-                  this.$router.replace({ name: 'config-annotation-task-scope', params: { scope_id: res.payload } });
+                  this.$router.replace({ name: 'config-annotation-scheme-scope', params: { scope_id: res.payload } });
                 }
               })
               .catch((res) => {

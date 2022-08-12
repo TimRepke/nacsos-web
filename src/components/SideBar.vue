@@ -28,11 +28,13 @@
       </router-link>
       <router-link to="/project/pipelines/setup"
                    class="list-group-item list-group-item-action list-group-item-info border-end-0 sub-link"
-                   active-class="active" v-if="projectPermissions.annotations_read && isActive('project-pipelines')"> Task Configuration
+                   active-class="active" v-if="projectPermissions.annotations_read && isActive('project-pipelines')">
+        Task Configuration
       </router-link>
       <router-link to="/project/pipelines/presets"
                    class="list-group-item list-group-item-action list-group-item-info border-end-0 sub-link"
-                   active-class="active" v-if="projectPermissions.annotations_read && isActive('project-pipelines')"> Presets
+                   active-class="active" v-if="projectPermissions.annotations_read && isActive('project-pipelines')">
+        Presets
       </router-link>
       <router-link to="/project/config/annotations" class="list-group-item list-group-item-action border-end-0"
                    active-class="active" v-if="projectPermissions.annotations_edit">
@@ -57,6 +59,7 @@
 import NacsosLogo from '@/components/NacsosLogo.vue';
 import { currentProjectStore } from '@/stores';
 import { ProjectPermissions } from '@/types/project.d';
+import { RouteLocationMatched } from 'vue-router';
 
 export default {
   name: 'SideBar',
@@ -85,7 +88,7 @@ export default {
   },
   methods: {
     isActive(parentName: string): boolean {
-      return this.$router.currentRoute.value.matched.some(({ name }) => name === parentName);
+      return this.$router.currentRoute.value.matched.some((route: RouteLocationMatched) => route.name === parentName);
     },
     toggleVisibility(): void {
       this.visible = (this.visible === undefined) ? false : !this.visible;

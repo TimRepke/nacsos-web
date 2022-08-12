@@ -1,37 +1,37 @@
 <template>
   <div class="text-start">
-    <h1>Annotation Tasks and Assignment Scopes</h1>
+    <h1>Annotation Schemes and Assignment Scopes</h1>
     <!-- TODO make pretty -->
     <ul>
-      <li v-for="task in projectTasks" :key="task.annotation_task_id">
-        {{ task.name }}
-        <router-link :to="{ name:'config-annotation-task-edit', params: { task_id: task.annotation_task_id } }"
+      <li v-for="scheme in projectSchemes" :key="scheme.annotation_scheme_id">
+        {{ scheme.name }}
+        <router-link :to="{ name:'config-annotation-scheme-edit', params: { annotation_scheme_id: scheme.annotation_scheme_id } }"
                      class="link-secondary me-1">
-          <InlineToolTip info="Edit task">
+          <InlineToolTip info="Edit scheme">
             <font-awesome-icon :icon="['fas', 'pen']"/>
           </InlineToolTip>
         </router-link>
-        <a @click="copyTask(task)" tabindex="0" aria-label="Copy task" class="link-secondary me-1" role="button">
+        <a @click="copyScheme(scheme)" tabindex="0" aria-label="Copy scheme" class="link-secondary me-1" role="button">
           <InlineToolTip info="Copy">
             <font-awesome-icon :icon="['far', 'clone']"/>
           </InlineToolTip>
         </a>
-        <a @click="removeTask(task)" tabindex="0" aria-label="Delete task" class="link-secondary me-1" role="button">
+        <a @click="removeScheme(scheme)" tabindex="0" aria-label="Delete scheme" class="link-secondary me-1" role="button">
           <InlineToolTip info="Delete">
             <font-awesome-icon :icon="['fas', 'trash-can']"/>
           </InlineToolTip>
         </a>
-        <a @click="exportData(task)" tabindex="0" aria-label="Export annotations" class="link-secondary me-1"
+        <a @click="exportData(scheme)" tabindex="0" aria-label="Export annotations" class="link-secondary me-1"
            role="button">
           <InlineToolTip info="Export data">
             <font-awesome-icon :icon="['fas', 'file-export']"/>
           </InlineToolTip>
         </a>
         <ul>
-          <li v-for="scope in (scopesLookup[task.annotation_task_id] || [])"
+          <li v-for="scope in (scopesLookup[scheme.annotation_scheme_id] || [])"
               :key="scope.assignment_scope_id">
             {{ scope.name }}
-            <router-link :to="{ name:'config-annotation-task-scope', params: { scope_id: scope.assignment_scope_id } }"
+            <router-link :to="{ name:'config-annotation-scheme-scope', params: { scope_id: scope.assignment_scope_id } }"
                          class="link-secondary me-1">
               <InlineToolTip info="View and set up assignments">
                 <font-awesome-icon :icon="['fas', 'screwdriver-wrench']"/>
@@ -46,17 +46,17 @@
           </li>
         </ul>
 
-        <router-link :to="{ name:'config-annotation-task-scope', query: { task_id: task.annotation_task_id } }"
+        <router-link :to="{ name:'config-annotation-scheme-scope', query: { annotation_scheme_id: scheme.annotation_scheme_id } }"
                      role="button" class="btn btn-outline-secondary m-2 btn-sm">
           <font-awesome-icon :icon="['far', 'square-plus']"/>
-          Add scope to "{{ task.name }}"
+          Add scope to "{{ scheme.name }}"
         </router-link>
       </li>
     </ul>
-    <router-link :to="{ name:'config-annotation-task-edit' }"
+    <router-link :to="{ name:'config-annotation-scheme-edit' }"
                  role="button" class="btn btn-outline-primary m-2 btn-sm">
       <font-awesome-icon :icon="['far', 'square-plus']"/>
-      Create new annotation task
+      Create new annotation scheme
     </router-link>
   </div>
 </template>
@@ -64,11 +64,12 @@
 <script lang="ts">
 import {
   callProjectScopesEndpoint,
-  callProjectTasksEndpoint, callRemoveAnnotationTaskEndpoint,
+  callProjectSchemesEndpoint,
+  callRemoveAnnotationSchemeEndpoint,
   callRemoveAssignmentScopeEndpoint,
-  callSaveAnnotationTaskEndpoint,
+  callSaveAnnotationSchemeEndpoint,
 } from '@/plugins/api/annotations';
-import { AnnotationTask, AssignmentScope } from '@/types/annotation.d';
+import { AnnotationScheme, AssignmentScope } from '@/types/annotation.d';
 import { currentProjectStore } from '@/stores';
 import { EventBus } from '@/plugins/events';
 import { ConfirmationRequestEvent } from '@/plugins/events/events/confirmation';
@@ -80,60 +81,60 @@ export default {
   components: { InlineToolTip },
   data() {
     return {
-      projectTasks: [] as AnnotationTask[],
+      projectSchemes: [] as AnnotationScheme[],
       projectScopes: [] as AssignmentScope[],
     };
   },
   async mounted() {
     const { projectId } = currentProjectStore;
-    this.projectTasks = (await callProjectTasksEndpoint({ projectId })).payload;
+    this.projectSchemes = (await callProjectSchemesEndpoint({ projectId })).payload;
     this.projectScopes = (await callProjectScopesEndpoint()).payload;
   },
   methods: {
-    copyTask(task: AnnotationTask) {
-      const copy: AnnotationTask = JSON.parse(JSON.stringify(task));
-      copy.annotation_task_id = undefined;
-      copy.name = `[COPY] ${task.name}`;
-      callSaveAnnotationTaskEndpoint(copy)
+    copyScheme(scheme: AnnotationScheme) {
+      const copy: AnnotationScheme = JSON.parse(JSON.stringify(scheme));
+      copy.annotation_scheme_id = undefined;
+      copy.name = `[COPY] ${scheme.name}`;
+      callSaveAnnotationSchemeEndpoint(copy)
         .then(() => {
-          EventBus.emit(new ToastEvent('SUCCESS', `Created copy of the annotation task "${task.name}".`));
-          callProjectTasksEndpoint({ projectId: currentProjectStore.projectId })
-            .then((res) => { this.projectTasks = res.payload; })
+          EventBus.emit(new ToastEvent('SUCCESS', `Created copy of the annotation scheme "${scheme.name}".`));
+          callProjectSchemesEndpoint({ projectId: currentProjectStore.projectId })
+            .then((res) => { this.projectSchemes = res.payload; })
             .catch(() => { EventBus.emit(new ToastEvent('ERROR', 'Failed to refresh data, try reloading the page.')); });
         })
-        .catch(() => { EventBus.emit(new ToastEvent('ERROR', `Failed to copy annotation task "${task.name}".`)); });
+        .catch(() => { EventBus.emit(new ToastEvent('ERROR', `Failed to copy annotation scheme "${scheme.name}".`)); });
     },
-    exportData(task: AnnotationTask) {
+    exportData(scheme: AnnotationScheme) {
       // TODO
-      console.log(task);
+      console.log(scheme);
       EventBus.emit(new ToastEvent('WARN', 'Not implemented yet, sorry.'));
     },
-    removeTask(task: AnnotationTask) {
+    removeScheme(scheme: AnnotationScheme) {
       EventBus.emit(new ConfirmationRequestEvent(
-        'Do you really want to **permanently delete**  the following annotation task?\n'
-        + `- "${task.name}"\n`
-        + `- ID: ${task.annotation_task_id}\n\n`
+        'Do you really want to **permanently delete**  the following annotation scheme?\n'
+        + `- "${scheme.name}"\n`
+        + `- ID: ${scheme.annotation_scheme_id}\n\n`
         + 'This may result in deletion of all associated assignments and annotations or at least make them meaningless!',
         (response) => {
           if (response === 'ACCEPT') {
-            callRemoveAnnotationTaskEndpoint({ taskId: task.annotation_task_id as string })
+            callRemoveAnnotationSchemeEndpoint({ annotationSchemeId: scheme.annotation_scheme_id as string })
               .then(() => {
-                EventBus.emit(new ToastEvent('SUCCESS', 'Annotation task deleted!'));
-                const index = this.projectTasks
-                  .findIndex((projectTask: AnnotationTask) => projectTask.annotation_task_id === task.annotation_task_id);
+                EventBus.emit(new ToastEvent('SUCCESS', 'Annotation scheme deleted!'));
+                const index = this.projectSchemes
+                  .findIndex((projectScheme: AnnotationScheme) => projectScheme.annotation_scheme_id === scheme.annotation_scheme_id);
                 if (index >= 0) {
-                  this.projectTasks.splice(index, 1);
+                  this.projectSchemes.splice(index, 1);
                 }
               })
               .catch(() => {
                 EventBus.emit(new ToastEvent(
                   'ERROR',
-                  'Failed to delete annotation task!',
+                  'Failed to delete annotation scheme!',
                 ));
               });
           }
         },
-        'Delete annotation task',
+        'Delete annotation scheme',
       ));
     },
     removeScope(scope: AssignmentScope) {
@@ -169,11 +170,11 @@ export default {
   computed: {
     scopesLookup(): { [key: string]: AssignmentScope[] } {
       return this.projectScopes.reduce((ret: { [key: string]: AssignmentScope[] }, scope: AssignmentScope) => {
-        if (!(scope.task_id in ret)) {
+        if (!(scope.annotation_scheme_id in ret)) {
           // eslint-disable-next-line no-param-reassign
-          ret[scope.task_id] = [];
+          ret[scope.annotation_scheme_id] = [];
         }
-        ret[scope.task_id].push(scope);
+        ret[scope.annotation_scheme_id].push(scope);
         return ret;
       }, {});
     },

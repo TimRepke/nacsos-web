@@ -1,7 +1,7 @@
 import { Endpoint, EndpointFunction, ResponseReason } from '@/plugins/api/types.d';
 import { callEndpointFactory } from '@/plugins/api/index';
 import {
-  AnnotationTask,
+  AnnotationScheme,
   Assignment,
   AssignmentConfigType,
   AssignmentScope,
@@ -11,14 +11,14 @@ import {
 } from '@/types/annotation.d';
 import { AnyItem } from '@/types/items/index.d';
 
-export const AnnotationTaskLabelKinds = ['bool', 'str', 'int', 'float', 'single', 'multi'] as const;
-export type AnnotationTaskLabelKindsType = typeof AnnotationTaskLabelKinds[number];
+export const AnnotationSchemeLabelKinds = ['bool', 'str', 'int', 'float', 'single', 'multi'] as const;
+export type AnnotationSchemeLabelKindsType = typeof AnnotationSchemeLabelKinds[number];
 
-export interface TaskDefinitionRequestPayload {
-  taskId: string;
+export interface SchemeDefinitionRequestPayload {
+  annotationSchemeId: string;
 }
 
-export interface ProjectTasksRequestPayload {
+export interface ProjectSchemesRequestPayload {
   projectId: string;
 }
 
@@ -32,12 +32,12 @@ export interface NextAnnotationItemRequestPayload {
 }
 
 export interface AnnotatedItemRequestPayload {
-  task: AnnotationTask;
+  scheme: AnnotationScheme;
   assignment: Assignment;
 }
 
 export interface AnnotationItemResponse {
-  task: AnnotationTask;
+  scheme: AnnotationScheme;
   assignment: Assignment;
   scope: AssignmentScope;
   item: AnyItem;
@@ -48,27 +48,27 @@ export interface AssignmentScopeRequestPayload {
 }
 
 export interface MakeAssignmentsRequestPayload {
-  task_id: string;
+  annotation_scheme_id: string;
   scope_id: string;
   config: AssignmentConfigType;
   save: boolean;
 }
 
-const TaskDefinitionEndpoint: Endpoint<ResponseReason, AnnotationTask> = {
+const SchemeDefinitionEndpoint: Endpoint<ResponseReason, AnnotationScheme> = {
   method: 'GET',
-  path: '/annotations/tasks/definition/{taskId}',
+  path: '/annotations/schemes/definition/{annotationSchemeId}',
   paramsEncoding: 'PATH',
 };
 
-const SaveAnnotationTaskEndpoint: Endpoint<ResponseReason, string> = {
+const SaveAnnotationSchemeEndpoint: Endpoint<ResponseReason, string> = {
   method: 'PUT',
-  path: '/annotations/tasks/definition/',
+  path: '/annotations/schemes/definition/',
   paramsEncoding: 'BODY',
 };
 
-const RemoveAnnotationTaskEndpoint: Endpoint<ResponseReason, null> = {
+const RemoveAnnotationSchemeEndpoint: Endpoint<ResponseReason, null> = {
   method: 'DELETE',
-  path: '/annotations/tasks/definition/{taskId}',
+  path: '/annotations/schemes/definition/{annotationSchemeId}',
   paramsEncoding: 'PATH',
   transformResponse: (response) => {
     if (response.data) {
@@ -102,9 +102,9 @@ const ScopeCountsEndpoint: Endpoint<ResponseReason, AssignmentScopeCounts> = {
   paramsEncoding: 'PATH',
 };
 
-const ProjectTasksEndpoint: Endpoint<ResponseReason, AnnotationTask[]> = {
+const ProjectSchemesEndpoint: Endpoint<ResponseReason, AnnotationScheme[]> = {
   method: 'GET',
-  path: '/annotations/tasks/list/{projectId}',
+  path: '/annotations/schemes/list/{projectId}',
   paramsEncoding: 'PATH',
 };
 
@@ -175,7 +175,7 @@ export const callSaveAnnotationEndpoint:
   EndpointFunction<AnnotatedItemRequestPayload, ResponseReason, AssignmentStatus> = callEndpointFactory(SaveAnnotationEndpoint);
 
 export const callProjectUserScopesEndpoint:
-  EndpointFunction<ProjectTasksRequestPayload, ResponseReason,
+  EndpointFunction<ProjectSchemesRequestPayload, ResponseReason,
     UserProjectAssignmentScope[]> = callEndpointFactory(ProjectUserScopesEndpoint);
 
 export const callProjectScopesEndpoint:
@@ -193,17 +193,17 @@ export const callRemoveAssignmentScopeEndpoint:
 export const callScopeCountsEndpoint:
   EndpointFunction<AssignmentScopeRequestPayload, ResponseReason, AssignmentScopeCounts> = callEndpointFactory(ScopeCountsEndpoint);
 
-export const callTaskDefinitionEndpoint:
-  EndpointFunction<TaskDefinitionRequestPayload, ResponseReason, AnnotationTask> = callEndpointFactory(TaskDefinitionEndpoint);
+export const callSchemeDefinitionEndpoint:
+  EndpointFunction<SchemeDefinitionRequestPayload, ResponseReason, AnnotationScheme> = callEndpointFactory(SchemeDefinitionEndpoint);
 
-export const callSaveAnnotationTaskEndpoint:
-  EndpointFunction<AnnotationTask, ResponseReason, string> = callEndpointFactory(SaveAnnotationTaskEndpoint);
+export const callSaveAnnotationSchemeEndpoint:
+  EndpointFunction<AnnotationScheme, ResponseReason, string> = callEndpointFactory(SaveAnnotationSchemeEndpoint);
 
-export const callRemoveAnnotationTaskEndpoint:
-  EndpointFunction<TaskDefinitionRequestPayload, ResponseReason, null> = callEndpointFactory(RemoveAnnotationTaskEndpoint);
+export const callRemoveAnnotationSchemeEndpoint:
+  EndpointFunction<SchemeDefinitionRequestPayload, ResponseReason, null> = callEndpointFactory(RemoveAnnotationSchemeEndpoint);
 
-export const callProjectTasksEndpoint:
-  EndpointFunction<ProjectTasksRequestPayload, ResponseReason, AnnotationTask[]> = callEndpointFactory(ProjectTasksEndpoint);
+export const callProjectSchemesEndpoint:
+  EndpointFunction<ProjectSchemesRequestPayload, ResponseReason, AnnotationScheme[]> = callEndpointFactory(ProjectSchemesEndpoint);
 
 export const callScopeAssignmentsEndpoint:
   EndpointFunction<AssignmentScopeRequestPayload, ResponseReason, Assignment[]> = callEndpointFactory(ScopeAssignmentsEndpoint);

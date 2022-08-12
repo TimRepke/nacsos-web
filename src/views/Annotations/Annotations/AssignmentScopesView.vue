@@ -3,7 +3,7 @@
     <h2>List of Assignments</h2>
     <ul v-if="annotationScopes.length > 0">
       <li v-for="scope in annotationScopes" :key="scope.scope.assignment_scope_id">
-        {{ scope.task_name }}
+        {{ scope.scheme_name }}
         <em>({{ scope.scope.name }})</em>&nbsp;
         <router-link :to="{ name:'project-annotate-item', params: { scope_id: scope.scope.assignment_scope_id } }"
                      class="link-secondary">

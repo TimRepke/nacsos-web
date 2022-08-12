@@ -1,35 +1,35 @@
 /* eslint no-use-before-define: ["off"] */
 
-export interface AnnotationTaskLabelChoice {
+export interface AnnotationSchemeLabelChoice {
   tmpKey?: string; // only used in GUI as :key reference
   name: string;
   hint?: string;
   value: number;
-  children?: AnnotationTaskLabel[];
+  children?: AnnotationSchemeLabel[];
 }
 
-// export const AnnotationTaskLabelKinds = ['bool', 'str', 'int', 'float', 'single', 'multi'] as const;
-// export type AnnotationTaskLabelKind = typeof AnnotationTaskLabelKinds[string];
-export type AnnotationTaskLabelKind = 'bool' | 'str' | 'int' | 'float' | 'single' | 'multi';
+// export const AnnotationSchemeLabelKinds = ['bool', 'str', 'int', 'float', 'single', 'multi'] as const;
+// export type AnnotationSchemeLabelKind = typeof AnnotationSchemeLabelKinds[string];
+export type AnnotationSchemeLabelKind = 'bool' | 'str' | 'int' | 'float' | 'single' | 'multi';
 
-export interface AnnotationTaskLabel {
+export interface AnnotationSchemeLabel {
   tmpKey?: string; // only used in GUI as :key reference
   name: string;
   key: string;
   hint?: string;
   max_repeat: number;
   required: boolean;
-  kind: AnnotationTaskLabelKind;
-  choices?: AnnotationTaskLabelChoice[]; // to be used in single or multi, which are dropdown menus
+  kind: AnnotationSchemeLabelKind;
+  choices?: AnnotationSchemeLabelChoice[]; // to be used in single or multi, which are dropdown menus
   annotation?: Annotation;
 }
 
-export interface AnnotationTask {
-  annotation_task_id?: string;
+export interface AnnotationScheme {
+  annotation_scheme_id?: string;
   project_id?: string;
   name: string;
   description?: string;
-  labels: AnnotationTaskLabel[];
+  labels: AnnotationSchemeLabel[];
 }
 
 export type AssignmentScopeConfigType = 'random';
@@ -48,7 +48,7 @@ export type AssignmentConfigType = RandomAssignmentConfig;
 
 export interface AssignmentScope {
   assignment_scope_id?: string;
-  task_id: string;
+  annotation_scheme_id: string;
   time_created?: string; // TODO datetime
   name: string;
   description?: string;
@@ -64,8 +64,8 @@ export interface AssignmentScopeCounts {
 
 export interface UserProjectAssignmentScope {
   scope: AssignmentScope;
-  task_name: string;
-  task_description: string;
+  scheme_name: string;
+  scheme_description: string;
   num_assignments: number;
   num_open: number;
   num_partial: number;
@@ -79,7 +79,7 @@ export interface Assignment {
   assignment_scope_id: string;
   user_id: string;
   item_id: string;
-  task_id: string;
+  annotation_scheme_id: string;
   status: AssignmentStatus;
   order: int;
 }
@@ -91,7 +91,7 @@ export interface Annotation {
   assignment_id?: string;
   user_id: string;
   item_id: string;
-  task_id: string;
+  annotation_scheme_id: string;
   key: string;
   repeat: number;
   parent?: string;

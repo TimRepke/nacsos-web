@@ -113,23 +113,23 @@ const routes: Array<RouteRecordRaw> = [
   },
   {
     path: '/project/config/annotations',
-    name: 'config-annotation-tasks',
+    name: 'config-annotation-schemes',
     component: () => import(/* webpackChunkName: "AnnotationConfigsContainer" */ '../views/Annotations/AnnotationConfigs/AnnotationConfigsContainer.vue'),
     children: [
       {
         path: '',
         alias: ['', 'list'],
-        name: 'config-annotation-task-list',
+        name: 'config-annotation-scheme-list',
         component: () => import(/* webpackChunkName: "AnnotationConfigListView" */ '../views/Annotations/AnnotationConfigs/AnnotationConfigListView.vue'),
       },
       {
         path: 'scope/:scope_id?',
-        name: 'config-annotation-task-scope',
+        name: 'config-annotation-scheme-scope',
         component: () => import(/* webpackChunkName: "AssignmentScopeConfigView" */ '../views/Annotations/AnnotationConfigs/AssignmentScopeConfigView.vue'),
       },
       {
-        path: 'task/:task_id?',
-        name: 'config-annotation-task-edit',
+        path: 'scheme/:annotation_scheme_id?',
+        name: 'config-annotation-scheme-edit',
         component: () => import(/* webpackChunkName: "AnnotationConfigEditView" */ '../views/Annotations/AnnotationConfigs/AnnotationConfigEditView.vue'),
       },
     ],

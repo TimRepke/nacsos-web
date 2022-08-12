@@ -6,11 +6,11 @@
     <!--      <font-awesome-icon :icon="['fas', 'triangle-exclamation']"/>-->
     <!--    </span>-->
 
-    <!-- Annotation Task Name -->
+    <!-- Annotation Scheme Name -->
     <template v-if="nameEditMode">
       <div class="input-group mb-3 w-lg-50">
-        <input type="text" class="form-control" placeholder="Annotation Task Name" aria-label="Annotation Task Name"
-               aria-describedby="button-addon2" v-model="task.name">
+        <input type="text" class="form-control" placeholder="Annotation Scheme Name" aria-label="Annotation Scheme Name"
+               aria-describedby="button-addon2" v-model="scheme.name">
         <button class="btn btn-outline-secondary" type="button" id="button-addon2" @click="nameEditMode=false">
           <font-awesome-icon :icon="['fas', 'circle-check']"/>
         </button>
@@ -18,19 +18,19 @@
     </template>
     <template v-else>
       <h1>
-        {{ task.name }}
+        {{ scheme.name }}
         <sup style="top:-0.8em; left: 0.2em" role="button" tabindex="0" @click="nameEditMode=true">
           <font-awesome-icon class="fs-6" :icon="['fas', 'pen']"/>
         </sup>
       </h1>
     </template>
 
-    <!-- Annotation Task Description -->
+    <!-- Annotation Scheme Description -->
     <template v-if="descriptionEditMode">
       <div class="hstack  align-items-start">
         <div class="form-floating w-lg-50">
         <textarea class="form-control" placeholder="Leave a comment here" id="floatingTextarea2"
-                  style="height: 100px" v-model="task.description"></textarea>
+                  style="height: 100px" v-model="scheme.description"></textarea>
           <label for="floatingTextarea2">Comments</label>
         </div>
         <button class="btn btn-outline-secondary" type="button" id="button-addon2" @click="descriptionEditMode=false">
@@ -47,51 +47,51 @@
       </div>
     </template>
 
-    <!-- Annotation Task Labels (root level) -->
-    <AnnotationTaskLabelsEditor :labels="task.labels"/>
+    <!-- Annotation Scheme Labels (root level) -->
+    <AnnotationSchemeLabelsEditor :labels="scheme.labels"/>
     <button class="btn btn-success position-fixed" style="top: 4rem; right: 1rem;" @click="save()">Save</button>
   </div>
 </template>
 
 <script lang="ts">
 import {
-  callSaveAnnotationTaskEndpoint,
-  callTaskDefinitionEndpoint,
+  callSaveAnnotationSchemeEndpoint,
+  callSchemeDefinitionEndpoint,
 } from '@/plugins/api/annotations';
 import { marked } from 'marked';
-import { AnnotationTask } from '@/types/annotation.d';
-import AnnotationTaskLabelsEditor from '@/components/annotations/AnnotationTaskLabelsEditor.vue';
+import { AnnotationScheme } from '@/types/annotation.d';
 import { EventBus } from '@/plugins/events';
 import { ToastEvent } from '@/plugins/events/events/toast';
 import { ConfirmationRequestEvent } from '@/plugins/events/events/confirmation';
 import { currentProjectStore } from '@/stores';
 import { ref } from 'vue';
+import AnnotationSchemeLabelsEditor from '@/components/annotations/AnnotationSchemeLabelsEditor.vue';
 
 export default {
   name: 'AnnotationConfigEditView',
-  components: { AnnotationTaskLabelsEditor },
+  components: { AnnotationSchemeLabelsEditor },
   data() {
     const { projectId } = currentProjectStore;
-    const taskId = this.$route.params.task_id;
+    const annotationSchemeId = this.$route.params.annotation_scheme_id;
 
     return {
-      taskId,
-      isNewTask: !taskId,
+      annotationSchemeId,
+      isNewScheme: !annotationSchemeId,
       nameEditMode: false,
       descriptionEditMode: false,
-      task: ref({
+      scheme: ref({
         project_id: projectId,
-        name: 'New annotation task',
-        description: 'Description for new task.',
+        name: 'New annotation scheme',
+        description: 'Description for new scheme.',
         labels: [],
-      } as AnnotationTask),
+      } as AnnotationScheme),
     };
   },
   async mounted() {
-    if (!this.isNewTask) {
-      const result = await callTaskDefinitionEndpoint({ taskId: this.taskId });
+    if (!this.isNewScheme) {
+      const result = await callSchemeDefinitionEndpoint({ annotationSchemeId: this.annotationSchemeId });
       if (result.status === 'SUCCESS' && result.payload) {
-        this.task = ref(result.payload);
+        this.scheme = ref(result.payload);
       } else {
         EventBus.emit(new ToastEvent('ERROR', 'Failed to load assignment scope info. Please try reloading.'));
         throw Error('Something went wrong. Please tell the admin how you got here.');
@@ -101,32 +101,32 @@ export default {
   methods: {
     save() {
       EventBus.emit(new ConfirmationRequestEvent(
-        'Editing the annotation task after assignment scopes, assignments, or annotations already exist for it '
+        'Editing the annotation scheme after assignment scopes, assignments, or annotations already exist for it '
         + 'can lead to very unexpected behaviour. Are you sure you want to proceed?',
         (response) => {
           if (response === 'ACCEPT') {
-            callSaveAnnotationTaskEndpoint(this.task)
+            callSaveAnnotationSchemeEndpoint(this.scheme)
               .then((res) => {
                 EventBus.emit(new ToastEvent(
                   'SUCCESS',
-                  `Saved annotation task.  \n**ID:** ${res.payload}`,
+                  `Saved annotation scheme.  \n**ID:** ${res.payload}`,
                 ));
-                if (this.isNewTask) {
-                  this.isNewTask = false;
-                  this.$router.replace({ name: 'config-annotation-task-edit', params: { task_id: res.payload } });
+                if (this.isNewScheme) {
+                  this.isNewScheme = false;
+                  this.$router.replace({ name: 'config-annotation-scheme-edit', params: { annotation_scheme_id: res.payload } });
                 }
               })
               .catch((res) => {
                 EventBus.emit(new ToastEvent(
                   'ERROR',
-                  `Failed to save the annotation task. (${res.reason})`,
+                  `Failed to save the annotation scheme. (${res.reason})`,
                 ));
               });
           } else {
-            EventBus.emit(new ToastEvent('WARN', 'Did not save the annotation task.'));
+            EventBus.emit(new ToastEvent('WARN', 'Did not save the annotation scheme.'));
           }
         },
-        'Save annotation task',
+        'Save annotation scheme',
         'Yes, save!',
         'Nope!',
       ));
@@ -134,7 +134,7 @@ export default {
   },
   computed: {
     htmlDescription() {
-      return marked(this.task.description);
+      return marked(this.scheme.description);
     },
   },
 };
