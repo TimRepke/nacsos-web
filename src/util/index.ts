@@ -1,5 +1,5 @@
 import { App } from 'vue';
-import { isFunctionInfo, isArtefactOrSerializedArtefact } from '@/util/typeChecks';
+import { isFunctionInfo, isArtefactOrSerializedArtefact, type2str } from '@/util/typeChecks';
 // inspired by https://github.com/jashkenas/underscore/blob/master/modules/_shallowProperty.js
 // Internal helper to generate a function to obtain property `key` from `obj`.
 export function shallowProperty<T>(key: string) {
@@ -71,6 +71,14 @@ export function* range(start: number, end: number) {
 export default {
   install(app: App) {
     // eslint-disable-next-line no-param-reassign
-    app.config.globalProperties.$util = { isEmpty, range, isObject, isArray, isFunctionInfo, isArtefactOrSerializedArtefact };
+    app.config.globalProperties.$util = {
+      isEmpty,
+      range,
+      isObject,
+      isArray,
+      isFunctionInfo,
+      isArtefactOrSerializedArtefact,
+      type2str,
+    };
   },
 };

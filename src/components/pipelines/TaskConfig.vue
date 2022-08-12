@@ -13,31 +13,34 @@
     <div class="card-body" v-if="expanded">
       <div class="row g-2 row-cols-auto">
         <div class="col" v-for="(dtype, key) in config.info.kwargs" :key="key">
+
           <template v-if="isPrimitiveType(dtype)">
             <label :for="`tk-${key}`">
-              <code><strong>{{ key }}:</strong> {{ (Array.isArray(dtype)) ? `${dtype[0]}=${dtype[1]}` : dtype }}</code>
+              <code><strong>{{ key }}:</strong><span v-if="!dtype.optional">*</span> {{ $util.type2str(dtype) }}</code>
             </label>
             <input :type="dtype2input(dtype)" :id="`tk-${key}`" class="form-control" :aria-label="key"
                    :class="(dtype2input(dtype) ==='checkbox') ? 'form-check-input' : 'form-control'"
                    v-model="taskParams[key]">
-            <span v-if="dtype2input(dtype)==='checkbox'">
+            <span v-if="dtype2input(dtype) === 'checkbox'">
               {{ (taskParams[key] === undefined) ? 'None' : taskParams[key] }}
             </span>
           </template>
-          <template v-else-if="$util.isArtefactOrSerializedArtefact(dtype)">
-            <code><strong>{{ key }}:</strong> Artefact[{{ dtype.serializer }}, {{ dtype.dtype }}]</code>
+
+          <template v-else-if="dtype.artefact">
+            <code><strong>{{ key }}:</strong><span v-if="!dtype.optional">*</span> {{ $util.type2str(dtype) }}</code>
             <div class="d-flex flex-row align-items-center" style="gap: 1em">
               <font-awesome-icon role="button" class="btn btn-outline-secondary m-1 btn-sm" :icon="['fas','crosshairs']"
-                                 @click="pickReference(key, dtype)"/>
+                                 @click="pickReference(key, dtype.artefact)"/>
               <ul class="list-unstyled small text-muted m-0">
                 <li><strong>Task:</strong> {{ taskParams[key]?.task_id || '[REF?]' }}</li>
                 <li><strong>Artefact:</strong> {{ taskParams[key]?.artefact || '[REF?]' }}</li>
               </ul>
             </div>
           </template>
+
           <template v-else-if="isList(dtype)">
             <label :for="`tk-${key}`">
-              <code><strong>{{ key }}:</strong> {{ (Array.isArray(dtype)) ? `${dtype[0]}=${dtype[1]}` : dtype }}</code>
+              <code><strong>{{ key }}:</strong><span v-if="!dtype.optional">*</span> {{ $util.type2str(dtype) }}</code>
             </label>
             <ul v-if="!$util.isEmpty(taskParams[key])">
               <li v-for="(val, it) in taskParams[key]" :key="`${it}-${val}`">{{ val }}</li>
@@ -45,22 +48,26 @@
             <div class="d-flex flex-row align-items-center">
               <input :type="getListInputType(dtype)" :id="`tk-${key}`" :aria-label="key"
                      :class="(getListInputType(dtype) ==='checkbox') ? 'form-check-input' : 'form-control'"
-                     v-model="taskParams[`__${key}-value`]">
+                     v-model="taskParams[`__${key}-value`]"/>
               <font-awesome-icon role="button" class="btn btn-sm m-1 text-muted" :icon="['far','square-plus']"
                                  @click="addListEntry(key)"
                                  :class="{ disabled: taskParams[`__${key}-value`] === undefined }"/>
             </div>
           </template>
+
           <template v-else-if="isLiteral(dtype)">
             <label :for="`tk-${key}`">
-              <code><strong>{{ key }}:</strong> {{ (Array.isArray(dtype)) ? `${dtype[0]}=${dtype[1]}` : dtype }}</code>
+              <code><strong>{{ key }}:</strong><span v-if="!dtype.optional">*</span> {{ $util.type2str(dtype) }}</code>
             </label>
             <select :id="`tk-${key}`" class="form-select" v-model="taskParams[key]">
               <option v-for="opt in getLiteralOptions(dtype)" :key="opt" :value="opt">{{ opt }}</option>
             </select>
           </template>
-          <template v-else-if="isComplex(dtype)">
-            <code><strong>{{ key }}:</strong> {{ dtype.dtype }}<br/>{{ dtype.params }}</code>&nbsp;<br/>
+
+          <template v-else> <!-- v-else-if="isComplex(dtype)" -->
+            <code><strong>{{ key }}:</strong><span v-if="!dtype.optional">*</span> {{
+                $util.type2str(dtype)
+              }}</code><br/>
             <span class="text-warning">Complex parameters not implemented yet.</span>
           </template>
         </div>
@@ -75,7 +82,7 @@ import {
   ArtefactCallback,
   ArtefactReference,
   FunctionInfo,
-  KWArgEntry,
+  KWARG,
   SerializedArtefact,
   TaskConfig as TaskConfigInterface,
 } from '@/types/pipelines.d';
@@ -86,6 +93,7 @@ export default {
   emits: {
     showInfo: (info: FunctionInfo) => isFunctionInfo(info),
     pickArtefactReference: (artefact: SerializedArtefact, cb: ArtefactCallback) => isArtefactOrSerializedArtefact(artefact) && !!cb,
+    // TODO remove config from list again
   },
   props: {
     config: {
@@ -96,21 +104,15 @@ export default {
     return {
       expanded: true,
       taskParams: Object.fromEntries(Object.entries(this.config.info.kwargs).map((entry) => {
-        const [key, dtype] = entry;
-        const dt = this.getType(dtype);
-        let defaultValue;
-        if (Array.isArray(dtype)) {
-          // eslint-disable-next-line prefer-destructuring
-          defaultValue = dtype[1];
-        }
+        const [key, dtype] = entry as [string, KWARG];
         if (this.isPrimitiveType(dtype)) {
-          return [[key, this.getTypedPrimitive(dt, defaultValue)]];
+          return [[key, this.getTypedPrimitive(dtype.dtype[0], dtype.default)]];
         }
         if (this.isLiteral(dtype)) {
-          return [[key, this.getTypedPrimitive('str', defaultValue)]];
+          return [[key, this.getTypedPrimitive('str', dtype.default)]];
         }
         if (this.isList(dtype)) {
-          return [[key, undefined], [`__${key}-value`, this.getTypedPrimitive(this.getListType(dtype), defaultValue)]];
+          return [[key, undefined], [`__${key}-value`, this.getTypedPrimitive(this.getListType(dtype), dtype.default)]];
         }
         return [];
       }).flat(1)),
@@ -127,60 +129,40 @@ export default {
     },
     getTypedPrimitive(dt: string, defaultValue: unknown): string | boolean | number {
       if (dt === 'int' || dt === 'float') return defaultValue as number;
-      if (dt === 'bool') return defaultValue as boolean;
+      if (dt === 'bool') return !!defaultValue as boolean;
       // if (dt === 'str')
       return defaultValue as string;
     },
-    isPrimitiveType(dtype: KWArgEntry): boolean {
-      const dt = this.getType(dtype);
-      return dt === 'int' || dt === 'float' || dt === 'str' || dt === 'bool';
+    isPrimitiveType(dtype: KWARG): boolean {
+      return dtype.dtype.length === 1
+        && (
+          dtype.dtype[0] === 'int'
+          || dtype.dtype[0] === 'float'
+          || dtype.dtype[0] === 'str'
+          || dtype.dtype[0] === 'bool'
+        );
     },
-    dtype2input(dtype: KWArgEntry): string {
-      const dt = this.getType(dtype);
-      if (dt === 'int' || dt === 'float') return 'number';
-      if (dt === 'bool') return 'checkbox';
+    dtype2input(dtype: KWARG): string {
+      if (dtype.dtype[0] === 'int' || dtype.dtype[0] === 'float') return 'number';
+      if (dtype.dtype[0] === 'bool') return 'checkbox';
       return 'text';
     },
-    getType(dtype: KWArgEntry): string {
-      return ((Array.isArray(dtype)) ? dtype[0] : dtype) as string;
+    isLiteral(dtype: KWARG): boolean {
+      return !!dtype.options;
     },
-    isComplex(dtype: KWArgEntry): boolean {
-      return this.$util.isObject(dtype) && 'dtype' in (dtype as object) && 'params' in (dtype as object);
+    isList(dtype: KWARG): boolean {
+      return dtype.dtype[0] === 'list';
     },
-    isLiteral(dtype: KWArgEntry): boolean {
-      if (typeof this.getType(dtype) === 'string') {
-        return this.getType(dtype).startsWith('Literal');
-      }
-      return false;
+    getListType(dtype: KWARG): string {
+      if (!dtype.generics) return 'str';
+      return dtype.generics[0];
     },
-    isList(dtype: KWArgEntry): boolean {
-      const dt = this.getType(dtype);
-      if (typeof dt === 'string') {
-        return dt.startsWith('list') || dt.startsWith('List');
-      }
-      return false;
+    getListInputType(dtype: KWARG): string {
+      return this.dtype2input({ dtype: [this.getListType(dtype)] });
     },
-    getListType(dtype: KWArgEntry): string {
-      let dt = this.getType(dtype);
-      if (dt.startsWith('list[')) dt = dt.replace('list[', '');
-      if (dt.startsWith('List[')) dt = dt.replace('List[', '');
-      dt = dt.replace(']', '');
-      return dt;
-    },
-    getListInputType(dtype: KWArgEntry): string {
-      return this.dtype2input(this.getListType(dtype));
-    },
-    getLiteralOptions(dtype: KWArgEntry): string[] | number[] {
-      const dt = this.getType(dtype);
-      if (dt.startsWith('Literal')) {
-        const literals = dt.replace('Literal[', '').replace(']', '').split(',');
-        return literals.map((literal: string) => {
-          const trimmedLiteral = literal.trim();
-          if (trimmedLiteral.startsWith('\'') && trimmedLiteral.endsWith('\'')) {
-            return trimmedLiteral.replaceAll('\'', '');
-          }
-          return parseInt(trimmedLiteral, 10);
-        });
+    getLiteralOptions(dtype: KWARG): string[] {
+      if (dtype.options) {
+        return dtype.options;
       }
       return [];
     },
@@ -193,7 +175,6 @@ export default {
       this.$emit('pickArtefactReference', [
         artefact,
         (artefactRef: ArtefactReference) => {
-          console.log(artefactRef);
           this.taskParams[key] = artefactRef;
         },
       ]);

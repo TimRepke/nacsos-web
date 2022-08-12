@@ -58,7 +58,7 @@
                   <li><strong>Parameters:</strong>
                     <ul class="list-unstyled ms-2">
                       <li v-for="(tp, arg) in highlight.kwargs" :key="arg">
-                        <code><strong>{{ arg }}:</strong> {{ tp2string(tp) }}</code>
+                        <code><strong>{{ arg }}:</strong><span v-if="tp.optional !== true">*</span> {{ $util.type2str(tp) }}</code>
                       </li>
                     </ul>
                   </li>
@@ -153,8 +153,8 @@
 
 <script lang="ts">
 import {
-  ArtefactCallback, ArtefactReference,
-  ComplexKWARG,
+  ArtefactCallback,
+  ArtefactReference,
   FunctionInfo,
   NestedLibrary,
   SerializedArtefact,
@@ -202,25 +202,6 @@ export default {
     md2html(s: string): string {
       return marked(s.trim());
     },
-    tp2string(tp: string | SerializedArtefact | [string, object] | ComplexKWARG): string {
-      if (typeof tp === 'string') {
-        return tp;
-      }
-      if (Array.isArray(tp)) {
-        const [key, val] = tp;
-        return `${key} = ${val}`;
-      }
-      if ('dtype' in tp && 'params' in tp) {
-        const { dtype, params } = tp;
-        const parsedParams = Object.entries(params).map(([key_, dtype_]) => `${key_}: ${dtype_}`);
-        return `${dtype}[${parsedParams.join(', ')}]`;
-      }
-      if ('serializer' in tp && 'dtype' in tp) {
-        const { serializer, dtype } = tp;
-        return `Artefact[${serializer}, ${dtype}]`;
-      }
-      return JSON.stringify(tp);
-    },
     async loadQueuedTasks() {
       // TODO: Add type matching -> Only show tasks where an output artefact matches the type of the param artefact type
       // FIXME: Add some filters? Ideally configurable in the interface (only this project, only current user).
@@ -266,6 +247,8 @@ export default {
       });
     },
     submitTasks() {
+      // TODO check that all non-optional parameters are filled
+      // TODO hide submit button otherwise (and if this.configs.length === 0)
       EventBus.emit(new ConfirmationRequestEvent(
         'This will submit all the tasks configured in this view to the compute pipeline. '
         + 'Please only proceed if you know exactly what you are doing!\n\n'
@@ -308,7 +291,7 @@ export default {
       //      -> has matching artefact in queue (non-failed tasks)
       return this.library;
     },
-    nestedLibrary() {
+    nestedLibrary() : NestedLibrary {
       const ret: NestedLibrary = {};
 
       function setInfo(path: string[], info: FunctionInfo) {
@@ -326,7 +309,7 @@ export default {
         const path = info.module.split('.');
         setInfo(path, info);
       });
-      if ('nacsos_lib' in ret) return ret.nacsos_lib;
+      if ('nacsos_lib' in ret) return ret.nacsos_lib as NestedLibrary;
       return ret;
     },
   },

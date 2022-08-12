@@ -40,6 +40,7 @@ export default {
   props: {
     tree: {
       type: Object as PropType<NestedLibrary>,
+      optional: false,
     },
   },
   data() {

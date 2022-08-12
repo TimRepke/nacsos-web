@@ -18,9 +18,14 @@ export interface ArtefactReference {
 
 export type ArtefactCallback = (artefactRef: ArtefactReference) => void;
 
-export interface ComplexKWARG {
-  dtype: string;
-  params: { [index: string]: string | [string, object] };
+export interface KWARG {
+  dtype: string[];
+  optional?: boolean;
+  default?: number | boolean | string;
+  artefact?: SerializedArtefact;
+  params?: { [key: string]: KWARG };
+  options?: string[];
+  generics?: string[];
 }
 
 export interface DeletionRequest {
@@ -29,17 +34,8 @@ export interface DeletionRequest {
 }
 
 export type ArtefactFile = [string, number];
-
-// FIXME what about Literals and things like that?
-export type PythonPrimitives = 'str' | 'bool' | 'int' | 'float';
-export type ExtendedPythonPrimitives = PythonPrimitives | 'list[str]' | 'list[int]' | 'list[float]'
-export type ParamsType = { [index: string]: string | number | string[] | number[] | ArtefactReference };
-export type KWArgEntry =
-  ExtendedPythonPrimitives
-  | [PythonPrimitives, string | number | boolean]
-  | SerializedArtefact
-  | ComplexKWARG;
-export type KWArgsType = { [index: string]: KWArgEntry };
+export type ParamsType = { [key: string]: string | number | string[] | number[] | ArtefactReference };
+export type KWArgsType = { [key: string]: KWARG };
 export type CPULoadClassification = 'VHIGH' | 'HIGH' | 'MEDIUM' | 'LOW' | 'MINIMAL';
 export type ExecutionLocation = 'LOCAL' | 'PIK';
 
