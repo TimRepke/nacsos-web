@@ -13,10 +13,19 @@
     <div class="card-body" v-if="expanded">
       <div class="row g-2 row-cols-auto">
         <div class="col" v-for="(dtype, key) in config.info.kwargs" :key="key">
-
           <template v-if="isPrimitiveType(dtype)">
-            <label :for="`tk-${key}`">
-              <code><strong>{{ key }}:</strong><span v-if="!dtype.optional">*</span> {{ $util.type2str(dtype) }}</code>
+            <label :for="`tk-${key}`" class="border ps-1 w-100 border-bottom-0">
+              <code><strong>{{ key }}:</strong><span v-if="!dtype.optional">*</span><br/>{{
+                  $util.type2str(dtype)
+                }}</code>
+              <InlineToolTip v-if="dtype.dtype[0] === 'str'" info="Paste project ID">
+                <font-awesome-icon class="text-muted ms-2 text-warning" role="button"
+                                   :icon="['fas','hands-holding-circle']" @click="taskParams[key] = currentProjectId"/>
+              </InlineToolTip>
+              <InlineToolTip v-if="dtype.dtype[0] === 'str'" info="Paste user ID">
+                <font-awesome-icon class="text-muted ms-2 text-warning" role="button"
+                                   :icon="['fas','hands-holding-child']" @click="taskParams[key] = currentUserId"/>
+              </InlineToolTip>
             </label>
             <input :type="dtype2input(dtype)" :id="`tk-${key}`" class="form-control" :aria-label="key"
                    :class="(dtype2input(dtype) ==='checkbox') ? 'form-check-input' : 'form-control'"
@@ -27,8 +36,12 @@
           </template>
 
           <template v-else-if="dtype.artefact">
-            <code><strong>{{ key }}:</strong><span v-if="!dtype.optional">*</span> {{ $util.type2str(dtype) }}</code>
-            <div class="d-flex flex-row align-items-center" style="gap: 1em">
+            <div class="border ps-1 w-100 border-bottom-0">
+              <code>
+                <strong>{{ key }}:</strong><span v-if="!dtype.optional">*</span><br/>{{ $util.type2str(dtype) }}
+              </code>
+            </div>
+            <div class="d-flex flex-row align-items-center border ps-1 border-top-0" style="gap: 1em">
               <font-awesome-icon role="button" class="btn btn-outline-secondary m-1 btn-sm" :icon="['fas','crosshairs']"
                                  @click="pickReference(key, dtype.artefact)"/>
               <ul class="list-unstyled small text-muted m-0">
@@ -39,8 +52,10 @@
           </template>
 
           <template v-else-if="isList(dtype)">
-            <label :for="`tk-${key}`">
-              <code><strong>{{ key }}:</strong><span v-if="!dtype.optional">*</span> {{ $util.type2str(dtype) }}</code>
+            <label :for="`tk-${key}`" class="border ps-1 w-100 border-bottom-0">
+              <code><strong>{{ key }}:</strong><span v-if="!dtype.optional">*</span><br/>{{
+                  $util.type2str(dtype)
+                }}</code>
             </label>
             <ul v-if="!$util.isEmpty(taskParams[key])">
               <li v-for="(val, it) in taskParams[key]" :key="`${it}-${val}`">{{ val }}</li>
@@ -56,8 +71,10 @@
           </template>
 
           <template v-else-if="isLiteral(dtype)">
-            <label :for="`tk-${key}`">
-              <code><strong>{{ key }}:</strong><span v-if="!dtype.optional">*</span> {{ $util.type2str(dtype) }}</code>
+            <label :for="`tk-${key}`" class="border ps-1 w-100 border-bottom-0">
+              <code><strong>{{ key }}:</strong><span v-if="!dtype.optional">*</span><br/>{{
+                  $util.type2str(dtype)
+                }}</code>
             </label>
             <select :id="`tk-${key}`" class="form-select" v-model="taskParams[key]">
               <option v-for="opt in getLiteralOptions(dtype)" :key="opt" :value="opt">{{ opt }}</option>
@@ -65,9 +82,11 @@
           </template>
 
           <template v-else> <!-- v-else-if="isComplex(dtype)" -->
-            <code><strong>{{ key }}:</strong><span v-if="!dtype.optional">*</span> {{
-                $util.type2str(dtype)
-              }}</code><br/>
+            <div class="border ps-1 w-100 border-bottom-0">
+              <code>
+                <strong>{{ key }}:</strong><span v-if="!dtype.optional">*</span><br/>{{ $util.type2str(dtype) }}
+              </code>
+            </div>
             <span class="text-warning">Complex parameters not implemented yet.</span>
           </template>
         </div>
@@ -87,9 +106,12 @@ import {
   TaskConfig as TaskConfigInterface,
 } from '@/types/pipelines.d';
 import { isArtefactOrSerializedArtefact, isFunctionInfo } from '@/util/typeChecks';
+import { currentProjectStore, currentUserStore } from '@/stores';
+import InlineToolTip from '@/components/InlineToolTip.vue';
 
 export default {
   name: 'TaskConfig',
+  components: { InlineToolTip },
   emits: {
     showInfo: (info: FunctionInfo) => isFunctionInfo(info),
     pickArtefactReference: (artefact: SerializedArtefact, cb: ArtefactCallback) => isArtefactOrSerializedArtefact(artefact) && !!cb,
@@ -102,6 +124,8 @@ export default {
   },
   data() {
     return {
+      currentProjectId: currentProjectStore.projectId,
+      currentUserId: currentUserStore.user.user_id,
       expanded: true,
       taskParams: Object.fromEntries(Object.entries(this.config.info.kwargs).map((entry) => {
         const [key, dtype] = entry as [string, KWARG];
