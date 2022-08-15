@@ -10,9 +10,21 @@ export interface ImportConfigRIS {
   tmp: string;
 }
 
+export const JSONLTypes = [
+  // twitter-related line encodings
+  'twitter-item', 'twitter-api-page',
+  // basic (generic) items per line
+  'basic-item',
+  // academic-related line encodings
+  'academic-item',
+  // patent-related line encodings
+  'patent-item',
+] as const;
+export type JSONLTypeLiteral = typeof JSONLTypes[number];
+
 export interface ImportConfigJSONL {
-  // TODO
-  tmp: string;
+  filenames: string;
+  line_type: JSONLTypeLiteral;
 }
 
 export const twitterSortOrder = ['recency', 'relevancy'] as const;

@@ -32,7 +32,11 @@ function transformPayload<REQUEST, REASON, RESPONSE>(params: REQUEST, endpoint: 
   if (encoding === 'FORM') {
     const payload = new FormData();
     Object.entries(params).forEach(([key, value]) => {
-      payload.append(key, value);
+      if (value instanceof Array) {
+        value.forEach((val) => payload.append(key, val));
+      } else {
+        payload.append(key, value);
+      }
     });
     return { params: payload, path: endpoint.path };
   }
@@ -48,7 +52,11 @@ function transformPayload<REQUEST, REASON, RESPONSE>(params: REQUEST, endpoint: 
   if (encoding === 'MULTI') {
     const payload = new FormData();
     Object.entries(params).forEach(([key, value]) => {
-      payload.append(key, value);
+      if (value instanceof Array) {
+        value.forEach((val: string | Blob) => payload.append(key, val));
+      } else {
+        payload.append(key, value);
+      }
     });
     return { params: payload, path: endpoint.path, headers: { 'Content-Type': 'multipart/form-data' } };
   }
