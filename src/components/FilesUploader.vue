@@ -47,16 +47,17 @@
 
 <script lang='ts'>
 /* eslint no-param-reassign: "off" */
-import { callUploadImportFileEndpoint } from '@/plugins/api/imports';
 import { ToastEvent } from '@/plugins/events/events/toast';
 import { EventBus } from '@/plugins/events';
 import InlineToolTip from '@/components/InlineToolTip.vue';
+import { callUploadUserArtefactEndpoint } from '@/plugins/api/pipelines';
 
 type UploadStatus = 'PENDING' | 'UPLOADING' | 'SUCCESS' | 'FAILED';
 
-interface UploadFile {
+export interface UploadFile {
   id: string;
   file: File;
+  serverPath?: string;
   percentage: number;
   status: UploadStatus;
 }
@@ -64,6 +65,7 @@ interface UploadFile {
 export default {
   name: 'FilesUploader',
   components: { InlineToolTip },
+  emits: ['filesUpdated'],
   props: {
     uploadEnabled: {
       type: Boolean,
@@ -81,30 +83,46 @@ export default {
       this.selectedFiles = Array.from(event.target.files)
         .map((file: File) => ({ id: crypto.randomUUID(), file, percentage: 0, status: 'PENDING' } as UploadFile));
     },
-    upload(uploadFile: UploadFile) {
+    upload(uploadFile: UploadFile, folder?: string) {
       this.isUploading = true;
       uploadFile.status = 'UPLOADING';
+      if (!folder) {
+        folder = crypto.randomUUID();
+      }
 
-      callUploadImportFileEndpoint(uploadFile.file, {
-        onUploadProgress: (event: { loaded: number; total: number; }) => {
-          uploadFile.percentage = Math.round(100 * (event.loaded / event.total));
-        },
-      })
-        .then(() => {
-          uploadFile.status = 'SUCCESS';
+      return new Promise((resolve, reject) => {
+        callUploadUserArtefactEndpoint({ file: uploadFile.file, folder }, {
+          onUploadProgress: (event: { loaded: number; total: number; }) => {
+            uploadFile.percentage = Math.round(100 * (event.loaded / event.total));
+          },
         })
-        .catch(() => {
-          uploadFile.status = 'FAILED';
-          EventBus.emit(new ToastEvent('ERROR', `Failed to upload file "${uploadFile.file.name}"`));
-        });
+          .then((response) => {
+            uploadFile.status = 'SUCCESS';
+            uploadFile.serverPath = response.payload;
+            resolve(response.payload);
+          })
+          .catch(() => {
+            uploadFile.status = 'FAILED';
+            EventBus.emit(new ToastEvent('ERROR', `Failed to upload file "${uploadFile.file.name}"`));
+            reject();
+          });
+      });
     },
     uploadFiles() {
-      this.isUploading = true;
       if (this.selectedFiles && this.selectedFiles.length > 0) {
+        const folder = crypto.randomUUID();
         this.selectedFiles.forEach((file: UploadFile) => {
-          this.upload(file);
+          this.upload(file, folder);
         });
       }
+    },
+  },
+  watch: {
+    selectedFiles: {
+      handler(newValue: UploadFile[]) {
+        this.$emit('filesUpdated', newValue);
+      },
+      deep: true,
     },
   },
 };

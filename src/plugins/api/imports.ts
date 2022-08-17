@@ -39,6 +39,17 @@ const SaveImportEndpoint: Endpoint<ResponseReason, string> = {
   path: '/imports/import',
   paramsEncoding: 'BODY',
 };
+const TriggerImportEndpoint: Endpoint<ResponseReason, null> = {
+  method: 'POST',
+  path: '/imports/import/{importId}',
+  paramsEncoding: 'PATH',
+  transformResponse: (response) => {
+    if (response.status === 200) {
+      return ['SUCCESS', 'SUCCESS', null];
+    }
+    return ['FAILED', 'REQUEST_FAILED'];
+  },
+};
 
 const UploadImportFileEndpoint: Endpoint<ResponseReason, string> = { // FIXME type properly
   method: 'POST',
@@ -57,6 +68,8 @@ export const callImportDetailsEndpoint:
 
 export const callSaveImportEndpoint:
   EndpointFunction<ImportModel, ResponseReason, string> = callEndpointFactory(SaveImportEndpoint);
+export const callTriggerImportEndpoint:
+  EndpointFunction<ImportDefinitionRequestPayload, ResponseReason, null> = callEndpointFactory(TriggerImportEndpoint);
 
 export const callUploadImportFileEndpoint:
   EndpointFunction<File, ResponseReason, string> = callEndpointFactory(UploadImportFileEndpoint);

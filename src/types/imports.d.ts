@@ -12,13 +12,13 @@ export interface ImportConfigRIS {
 
 export const JSONLTypes = [
   // twitter-related line encodings
-  'twitter-item', 'twitter-api-page',
+  'db-twitter-item', 'twitter-api-page',
   // basic (generic) items per line
-  'basic-item',
+  'db-basic-item',
   // academic-related line encodings
-  'academic-item',
+  'db-academic-item',
   // patent-related line encodings
-  'patent-item',
+  'db-patent-item',
 ] as const;
 export type JSONLTypeLiteral = typeof JSONLTypes[number];
 
@@ -54,4 +54,5 @@ export interface ImportModel {
   time_started?: string; // TODO make datetime
   time_finished?: string; // TODO make datetime
   config?: ImportConfig;
+  pipeline_task_id?: string;
 }

@@ -44,16 +44,35 @@
                    :existing-config="importDetails.config"
                    :editable="!importStarted"
                    @config-changed="updateConfig($event)"></component>
-        <button class="btn btn-primary mt-3" @click="triggerImport">Initiate import</button>
+        <button v-if="!importDetails.time_finished && !importDetails.time_started"
+                class="btn btn-primary mt-3" @click="triggerImport">Initiate import
+        </button>
       </div>
     </div>
     <div class="row pb-2 mb-2 border-bottom g-0">
       <h4>Import progress</h4>
-      TODO
+      <ul>
+        <li><strong>Import created:</strong> {{ importDetails.time_created || '[not yet]' }}</li>
+        <li><strong>Import started:</strong> {{ importDetails.time_started || '[not yet]' }}</li>
+        <li><strong>Import finished:</strong> {{ importDetails.time_finished || '[not yet]' }}</li>
+        <li v-if="importDetails.pipeline_task_id">
+          <router-link :to="{
+            name: 'project-artefacts-details',
+            params: { taskId: importDetails.pipeline_task_id },
+          }">
+            &rrarr; Pipeline Task
+          </router-link>
+        </li>
+      </ul>
     </div>
     <div class="row pb-2 mb-2 border-bottom g-0">
       <h4>Import stats</h4>
-      TODO
+      <div class="col">
+        <button class="btn btn-outline-secondary" @click="loadImportStats">load</button>
+        <ul>
+          <li><strong>Number of items:</strong> {{ importStats.numItems || '[not loaded]' }}</li>
+        </ul>
+      </div>
     </div>
     <button class="btn btn-success position-fixed" style="top: 4rem; right: 1rem;" @click="save()">
       Save
@@ -63,7 +82,12 @@
 
 <script lang="ts">
 import { Component } from 'vue';
-import { callImportDetailsEndpoint, callImportItemCountEndpoint, callSaveImportEndpoint } from '@/plugins/api/imports';
+import {
+  callImportDetailsEndpoint,
+  callImportItemCountEndpoint,
+  callSaveImportEndpoint,
+  callTriggerImportEndpoint,
+} from '@/plugins/api/imports';
 import { ToastEvent } from '@/plugins/events/events/toast';
 import { EventBus } from '@/plugins/events';
 import { ImportConfig, ImportModel, ImportTypeLiteral } from '@/types/imports.d';
@@ -106,7 +130,6 @@ export default {
       importStarted: false,
       currentProject: project as Project,
       projectPermissions: currentProjectStore.projectPermissions as ProjectPermissions,
-      numItems: 0 as number,
       importDetails: {
         project_id: project.project_id,
         user_id: userId,
@@ -115,6 +138,9 @@ export default {
         description: '',
         config: undefined,
       } as ImportModel,
+      importStats: {
+        numItems: undefined as number | undefined,
+      },
     };
   },
   async mounted() {
@@ -122,7 +148,6 @@ export default {
       const requestResult = await callImportDetailsEndpoint({ importId: this.importId });
       if (requestResult.status === 'SUCCESS' && requestResult.payload) {
         this.importDetails = requestResult.payload;
-        this.numItems = (await callImportItemCountEndpoint({ importId: this.importId })).payload as number;
       } else {
         EventBus.emit(new ToastEvent('ERROR', 'Failed to load import details. Please try reloading.'));
       }
@@ -169,7 +194,14 @@ export default {
         + 'Make sure to **click save before importing**!',
         (response) => {
           if (response === 'ACCEPT') {
-            EventBus.emit(new ToastEvent('WARN', 'Lol, not implemented yet.'));
+            callTriggerImportEndpoint({ importId: this.importId })
+              .then(() => {
+                EventBus.emit(new ToastEvent('SUCCESS', 'Probably submitted an import job, may now take a while.'));
+              })
+              .catch((reason) => {
+                console.error(reason);
+                EventBus.emit(new ToastEvent('ERROR', 'Did not start importing data.'));
+              });
           } else {
             EventBus.emit(new ToastEvent('WARN', 'Did not start importing data.'));
           }
@@ -178,6 +210,9 @@ export default {
         'Yes, proceed!',
         'Cancel',
       ));
+    },
+    async loadImportStats() {
+      this.importStats.numItems = (await callImportItemCountEndpoint({ importId: this.importId })).payload;
     },
   },
   computed: {
