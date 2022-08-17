@@ -42,6 +42,11 @@ const routes: Array<RouteRecordRaw> = [
         name: 'project-artefacts-list',
         component: () => import(/* webpackChunkName: "ArtefactsListView" */ '../views/Artefacts/ArtefactsListView.vue'),
       },
+      {
+        path: 'details/:taskId',
+        name: 'project-artefacts-details',
+        component: () => import(/* webpackChunkName: "ArtefactsListView" */ '../views/Artefacts/ArtefactsListView.vue'),
+      },
     ],
   },
   {

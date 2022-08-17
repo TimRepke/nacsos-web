@@ -18,6 +18,11 @@ export interface FunctionsRequestPayload {
   func_name: string[];
 }
 
+export interface ArtefactUploadPayload {
+  file: File | File[];
+  folder?: string;
+}
+
 export interface SearchRequestPayload {
   function_name?: string;
   fingerprint?: string;
@@ -87,6 +92,16 @@ const PipelineTaskArtefactsEndpoint: Endpoint<ResponseReason, ArtefactFile[]> = 
   path: '/artefacts/list/{taskId}',
   paramsEncoding: 'PATH',
 };
+const UploadUserArtefactEndpoint: Endpoint<ResponseReason, string> = {
+  method: 'POST',
+  path: '/artefacts/files/upload',
+  paramsEncoding: 'MULTI',
+};
+const UploadUserArtefactsEndpoint: Endpoint<ResponseReason, string[]> = {
+  method: 'POST',
+  path: '/artefacts/files/upload-many',
+  paramsEncoding: 'MULTI',
+};
 
 // PIPELINE_API/api/library/*
 export const callPipelineLibraryEndpoint:
@@ -107,3 +122,7 @@ export const callPipelineTasksSubmitEndpoint:
 // PIPELINE_API/api/artefacts/*
 export const callPipelineTaskArtefactsEndpoint:
   EndpointFunction<TaskRequestPayload, ResponseReason, ArtefactFile[]> = callPipelineEndpointFactory(PipelineTaskArtefactsEndpoint);
+export const callUploadUserArtefactEndpoint:
+  EndpointFunction<ArtefactUploadPayload, ResponseReason, string> = callPipelineEndpointFactory(UploadUserArtefactEndpoint);
+export const callUploadUserArtefactsEndpoint:
+  EndpointFunction<ArtefactUploadPayload, ResponseReason, string[]> = callPipelineEndpointFactory(UploadUserArtefactsEndpoint);

@@ -130,7 +130,7 @@
 import { PropType } from 'vue';
 import useVuelidate, { BaseValidation, ValidationRule } from '@vuelidate/core';
 import { required, between, alphaNum, integer } from '@vuelidate/validators';
-import { ImportConfigTwitter } from '@/types/imports.d';
+import { ImportConfigTwitter, TwitterSortOrderLiteral } from '@/types/imports.d';
 
 const isValidISO8601: ValidationRule = {
   $validator(value: string): boolean {
@@ -157,8 +157,8 @@ const isValidISO8601: ValidationRule = {
 };
 
 const isValidSortOrder: ValidationRule = {
-  $validator(value: string) {
-    return value === 'recency' || value === 'relevancy';
+  $validator(value?: TwitterSortOrderLiteral) {
+    return value !== undefined;
   },
   $message: 'Not a valid sort order',
 };

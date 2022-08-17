@@ -7,7 +7,6 @@
       <NacsosLogo class="mt-0"/>
     </router-link>
     <div class="list-group rounded-0" v-if="projectPermissions">
-      <!-- TODO: hide items based on permissions -->
       <router-link to="/project/overview" class="list-group-item list-group-item-action border-end-0"
                    active-class="active">Overview
       </router-link>

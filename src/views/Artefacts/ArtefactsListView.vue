@@ -22,10 +22,9 @@
                                        :icon="['fas',(entry.showArtefacts) ? 'chevron-down' : 'chevron-right']"/>
                   </div>
                   <div>
-                    {{ entry.info.name }}<br>
-                    <span class="text-muted small"> {{ entry.info.module }}.<strong>{{
-                        entry.info.function
-                      }}(&sdot;)</strong></span>
+                    {{ entry.info?.name || 'DEPRECATED' }}<br/>
+                    <code class="small">{{ entry.task.function_name }}(&sdot;)</code><br/>
+                    <span class="text-muted small">{{ entry.task.comment }}</span>
                   </div>
                 </div>
               </td>

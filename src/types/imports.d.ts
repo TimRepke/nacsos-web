@@ -10,9 +10,21 @@ export interface ImportConfigRIS {
   tmp: string;
 }
 
+export const JSONLTypes = [
+  // twitter-related line encodings
+  'db-twitter-item', 'twitter-api-page',
+  // basic (generic) items per line
+  'db-basic-item',
+  // academic-related line encodings
+  'db-academic-item',
+  // patent-related line encodings
+  'db-patent-item',
+] as const;
+export type JSONLTypeLiteral = typeof JSONLTypes[number];
+
 export interface ImportConfigJSONL {
-  // TODO
-  tmp: string;
+  filenames: string;
+  line_type: JSONLTypeLiteral;
 }
 
 export const twitterSortOrder = ['recency', 'relevancy'] as const;
@@ -42,4 +54,5 @@ export interface ImportModel {
   time_started?: string; // TODO make datetime
   time_finished?: string; // TODO make datetime
   config?: ImportConfig;
+  pipeline_task_id?: string;
 }
