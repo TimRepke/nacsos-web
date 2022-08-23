@@ -3,7 +3,7 @@
 export type ReferencedTweetType = 'retweeted' | 'quoted' | 'replied_to';
 
 export interface ReferencedTweet {
-  id: number;
+  id: string;
   type: ReferencedTweetType;
 }
 
@@ -23,7 +23,7 @@ export interface Mention {
   start: number;
   end: number;
   username: string;
-  user_id: number;
+  user_id: string;
 }
 
 export interface URL {
@@ -35,12 +35,12 @@ export interface URL {
 
 export interface TwitterItem {
   item_id?: string;
-  twitter_id?: number;
-  twitter_author_id?: number;
+  twitter_id?: string;
+  twitter_author_id?: string;
   status: string;
   created_at: string; // datetime
   language?: string;
-  conversation_id?: number;
+  conversation_id?: string;
   referenced_tweets?: ReferencedTweet[];
   latitude?: number;
   longitude?: number;
