@@ -1,11 +1,17 @@
 {
   "name": "nacsos-web",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
+  "config": {
+    "nacsos_core": "http://127.0.0.1:8081",
+    "nacsos_pipe": "http://127.0.0.1:8000"
+  },
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint",
+    "api-core": "openapi --input $npm_package_config_nacsos_core/openapi.json --client axios --output src/plugins/client-core --indent 2 --useOptions --exportSchemas true --name CoreClient",
+    "api-pipe": "openapi --input $npm_package_config_nacsos_pipe/openapi.json --client axios --output src/plugins/client-pipe --indent 2 --useOptions --exportSchemas true --name PipelinesClient",
     "build-dev": "vue-cli-service build --mode=development"
   },
   "dependencies": {
@@ -14,34 +20,35 @@
     "@fortawesome/free-regular-svg-icons": "^6.1.2",
     "@fortawesome/free-solid-svg-icons": "^6.1.2",
     "@fortawesome/vue-fontawesome": "^3.0.1",
-    "@vuelidate/core": "^2.0.0-alpha.43",
+    "@vuelidate/core": "^2.0.0-alpha.44",
     "@vuelidate/validators": "^2.0.0-alpha.31",
-    "@vueuse/core": "^9.0.2",
+    "@vueuse/core": "^9.1.1",
     "axios": "^0.27.2",
     "bootstrap": "^5.2.0",
-    "core-js": "^3.24.1",
-    "marked": "^4.0.18",
-    "pinia": "^2.0.17",
+    "core-js": "^3.25.0",
+    "marked": "^4.0.19",
+    "pinia": "^2.0.20",
     "vue": "^3.2.37",
-    "vue-router": "^4.1.3"
+    "vue-router": "^4.1.4"
   },
   "devDependencies": {
-    "@types/marked": "^4.0.3",
-    "@typescript-eslint/eslint-plugin": "^5.32.0",
-    "@typescript-eslint/parser": "^5.32.0",
+    "@rushstack/eslint-patch": "^1.1.4",
+    "@types/marked": "^4.0.6",
+    "@typescript-eslint/eslint-plugin": "^5.35.1",
+    "@typescript-eslint/parser": "^5.35.1",
     "@vue/cli-plugin-babel": "^5.0.8",
     "@vue/cli-plugin-eslint": "^5.0.8",
     "@vue/cli-plugin-router": "^5.0.8",
     "@vue/cli-plugin-typescript": "^5.0.4",
     "@vue/cli-plugin-vuex": "^5.0.8",
     "@vue/cli-service": "^5.0.8",
-    "@vue/eslint-config-airbnb": "^6.0.0",
-    "@vue/eslint-config-typescript": "^11.0.0",
-    "eslint": "^8.21.0",
+    "@vue/eslint-config-airbnb-with-typescript": "^7.0.0",
+    "eslint": "^8.22.0",
     "eslint-plugin-import": "^2.26.0",
-    "eslint-plugin-vue": "^9.3.0",
+    "eslint-plugin-vue": "^9.4.0",
     "eslint-plugin-vuejs-accessibility": "^1.2.0",
-    "sass": "^1.54.0",
+    "openapi-typescript-codegen": "^0.23.0",
+    "sass": "^1.54.5",
     "sass-loader": "^13.0.2",
     "typescript": "^4.7.4"
   }

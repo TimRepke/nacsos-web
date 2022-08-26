@@ -1,9 +1,9 @@
 <template>
   <span class="badge align-middle" :class="[background, (rounded) ? 'rounded-pill' : '']">
     <span class="pill-text me-1">
-      <slot/>
+      <slot />
     </span>
-    <button type="button" class="btn-close btn-close-white" aria-label="Close" @click="$emit('clicked-x')"></button>
+    <button type="button" class="btn-close btn-close-white" aria-label="Close" @click="$emit('clicked-x')" />
   </span>
 </template>
 

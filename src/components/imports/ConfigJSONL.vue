@@ -6,7 +6,7 @@
         <p class="text-muted">
           Import method for JSONL encoded files (each line contains one JSON encoded object).
           The JSON object has to exactly reflect the database format unless there is a dedicated
-          format translator available.<br/>
+          format translator available.<br />
           See documentation on which line type to choose.
         </p>
       </div>
@@ -14,11 +14,12 @@
     <div class="row">
       <div class="col">
         <template v-if="uploadsEnabled">
-          <FilesUploader @filesUpdated="onFilesChange($event)"
-                         :class="{
-                            'is-valid': !v$.files.$error,
-                            'is-invalid': v$.files.$error,
-                          }"/>
+          <FilesUploader
+            :class="{
+              'is-valid': !v$.files.$error,
+              'is-invalid': v$.files.$error,
+            }"
+            @filesUpdated="onFilesChange($event)" />
           <div class="invalid-feedback" v-if="v$.files.$error">
             {{ errorsToString(v$.files) }}
           </div>
@@ -49,18 +50,18 @@
 <script lang="ts">
 import FilesUploader, { UploadFile } from '@/components/FilesUploader.vue';
 import { PropType } from 'vue';
-import { ImportConfigJSONL, JSONLTypeLiteral } from '@/types/imports.d';
-import { ProjectTypeLiteral } from '@/types/project.d';
+import { ImportConfigJSONL, ProjectType } from '@/plugins/client-core';
 import { currentProjectStore } from '@/stores';
 import useVuelidate, { BaseValidation, ValidationRule } from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
+import types = ImportConfigJSONL.line_type;
 
-type CompatibilityMapping = { [key in ProjectTypeLiteral]: JSONLTypeLiteral[] };
+type CompatibilityMapping = { [key in ProjectType]: types[] };
 const jsonlTypeCompatibility: CompatibilityMapping = {
-  basic: ['db-basic-item'],
-  academic: ['db-academic-item'],
-  patents: ['db-patent-item'],
-  twitter: ['db-twitter-item', 'twitter-api-page'],
+  basic: [types.DB_BASIC_ITEM],
+  academic: [types.DB_ACADEMIC_ITEM],
+  patents: [types.DB_PATENT_ITEM],
+  twitter: [types.DB_TWITTER_ITEM, types.TWITTER_API_PAGE],
 };
 
 const areFilesUploaded: ValidationRule = {
@@ -72,7 +73,7 @@ const areFilesUploaded: ValidationRule = {
   $message: 'Files not uploaded yet.',
 };
 const isValidLineType: ValidationRule = {
-  $validator(value?: JSONLTypeLiteral) {
+  $validator(value?: ImportConfigJSONL.line_type) {
     return value !== undefined; // FIXME check for actual types (JSONLType.indexOf(value)>=0)
   },
   $message: 'Not a line encoding type.',
@@ -85,6 +86,8 @@ export default {
   props: {
     existingConfig: {
       type: Object as PropType<ImportConfigJSONL>,
+      required: true,
+      default: null,
     },
     editable: {
       type: Boolean,
@@ -99,7 +102,7 @@ export default {
   data() {
     const config: ImportConfigJSONL = (this.existingConfig) ? this.existingConfig : {
       filenames: [] as string[],
-      line_type: undefined as JSONLTypeLiteral | undefined,
+      line_type: undefined as ImportConfigJSONL.line_type | undefined,
     };
     if (!this.existingConfig) {
       this.$emit('configChanged', config);

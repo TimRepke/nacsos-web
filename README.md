@@ -8,6 +8,15 @@ Steps to set up your local development environment are described below.
 npm install
 ```
 
+### Update API clients  
+When changes were made to the API(s), the respective client(s) need to be adapted via
+```
+# update code in src/plugins/client-core for NACSOS Core FastAPI endpoint
+npm run api-core
+# update code in src/plugins/client-core for NACSOS Pipes FastAPI endpoint
+npm run api-pipe
+```
+
 ### Compiles and hot-reloads for development
 ```
 npm run serve

@@ -1,15 +1,26 @@
 <template>
   <!--  <div aria-live="polite" aria-atomic="true" class="position-absolute top-0 end-0 p-3 pt-5 mh-100 overflow-auto">-->
-  <div class="toast-container position-absolute top-0 end-0 p-3 pt-5 mh-100 overflow-auto"
-       role="alert" aria-live="assertive" aria-atomic="true">
+  <div
+    role="alert"
+    class="toast-container position-absolute top-0 end-0 p-3 pt-5 mh-100 overflow-auto"
+    aria-live="assertive"
+    aria-atomic="true">
     <template v-for="toast in toasts" :key="toast.key">
-      <div class="toast align-items-center border-0 show mb-2"
-           :class="[toast.bg, toast.col]"
-           role="alert" aria-live="assertive" aria-atomic="true">
+      <div
+        role="alert"
+        class="toast align-items-center border-0 show mb-2"
+        :class="[toast.bg, toast.col]"
+        aria-live="assertive"
+        aria-atomic="true">
         <div class="d-flex">
-          <div class="toast-body text-start" v-html="toast.htmlMessage"></div>
-          <button @click="remove(toast.key)" type="button" class="btn-close btn-close-white me-2 m-auto"
-                  aria-label="Close"></button>
+          <div
+            class="toast-body text-start"
+            v-html="toast.htmlMessage" />
+          <button
+            type="button"
+            class="btn-close btn-close-white me-2 m-auto"
+            aria-label="Close"
+            @click="remove(toast.key)" />
         </div>
       </div>
     </template>

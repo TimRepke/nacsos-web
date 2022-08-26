@@ -3,25 +3,29 @@
     <div class="card-body">
       <p>
         <small class="text-muted">
-          <i class="bi-calendar4-event"></i> &nbsp; {{ item.created_at.slice(0, 19).replace('T', ' ') }}
+          <i class="bi-calendar4-event" /> &nbsp; {{ item.created_at.slice(0, 19).replace('T', ' ') }}
         </small>
-        <a class="float-end" :href="`https://twitter.com/s/status/${item.twitter_id}`" target="_blank"
-           aria-label="Tweet on Twitter">
+        <a
+          class="float-end"
+          :href="`https://twitter.com/s/status/${item.twitter_id}`"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Tweet on Twitter">
           <!-- FIXME links to twitter ids stopped working, but they used to... -->
-          <font-awesome-icon :icon="['fa-brands', 'twitter']"/>
+          <font-awesome-icon :icon="['fa-brands', 'twitter']" />
         </a>
       </p>
-      <p class="card-text" v-html="renderedStatus"></p>
+      <p class="card-text" v-html="renderedStatus" />
     </div>
     <div class="card-footer d-flex justify-content-between">
       <small class="text-muted">
-        <font-awesome-icon :icon="['fas', 'retweet']"/>
+        <font-awesome-icon :icon="['fas', 'retweet']" />
         {{ item.retweet_count }} &nbsp;
-        <font-awesome-icon :icon="['far', 'heart']"/>
+        <font-awesome-icon :icon="['far', 'heart']" />
         {{ item.like_count }} &nbsp;
-        <font-awesome-icon :icon="['fas', 'reply']"/>
+        <font-awesome-icon :icon="['fas', 'reply']" />
         {{ item.reply_count }} &nbsp;
-        <font-awesome-icon :icon="['fas', 'quote-left']"/>
+        <font-awesome-icon :icon="['fas', 'quote-left']" />
         {{ item.quote_count }}
       </small>
       <small class="text-muted">
@@ -33,7 +37,7 @@
 
 <script lang="ts">
 import { PropType } from 'vue';
-import { Hashtag, Mention, URL, TwitterItem as TwitterItemModel } from '@/types/items/twitter.d';
+import { TwitterItemModel, Hashtag, Mention, URL } from '@/plugins/client-core';
 
 interface Replacement {
   start: number;
@@ -46,6 +50,8 @@ export default {
   props: {
     item: {
       type: Object as PropType<TwitterItemModel>,
+      required: true,
+      default: null,
     },
   },
   computed: {

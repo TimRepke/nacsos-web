@@ -9,23 +9,23 @@
 </template>
 
 <script lang="ts">
-import { callProjectsListEndpoint } from '@/plugins/api/projects';
-import { Project } from '@/types/project.d';
 import { EventBus } from '@/plugins/events';
 import { CurrentProjectSelectedEvent, CurrentProjectSetEvent } from '@/plugins/events/events/projects';
+import { ProjectModel } from '@/plugins/client-core';
+import { coreAPI } from '@/plugins/api';
 
 export default {
   name: 'ProjectListView',
   data() {
     return {
-      projectList: [] as Project[],
+      projectList: [] as ProjectModel[],
     };
   },
   async mounted() {
     // clear the currentProjectStore to prevent side effects
     // currentProjectStore.clear();
     // get all projects from the server (that we have permission to access)
-    const projects = (await callProjectsListEndpoint()).payload;
+    const projects = await coreAPI.projects.getAllProjectsApiProjectsListGet();
     if (projects) this.projectList = projects;
   },
   methods: {

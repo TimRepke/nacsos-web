@@ -1,19 +1,22 @@
 import { defineStore } from 'pinia';
 import { useStorage, RemovableRef } from '@vueuse/core';
-import type { User } from '@/types/user.d';
 import Serializer from '@/types/serializer';
+import { OpenAPI, UserModel } from '@/plugins/client-core';
+import { coreAPI } from '@/plugins/api';
+import { EventBus } from '@/plugins/events';
+import { AuthFailedEvent, LoginSuccessEvent } from '@/plugins/events/events/auth';
 
-const UserSerializer = Serializer<User>();
+const UserSerializer = Serializer<UserModel>();
 
 export type CurrentUserStoreType = {
-  user: RemovableRef<User>,
+  user: RemovableRef<UserModel>,
   accessToken: RemovableRef<string>,
-}
+};
 
 export const useCurrentUserStore = defineStore('CurrentUserStore', {
   state(): CurrentUserStoreType {
     return {
-      user: useStorage<User>(
+      user: useStorage<UserModel>(
         'currentUser',
         null,
         undefined,
@@ -27,14 +30,36 @@ export const useCurrentUserStore = defineStore('CurrentUserStore', {
     };
   },
   actions: {
+    async login(username: string, password: string) {
+      coreAPI.oauth.loginForAccessTokenApiLoginTokenPost({
+        formData: { username, password },
+      }).then(async (response) => {
+        this.setAccessToken(response.access_token);
+        const currentUserResponse = await coreAPI.oauth.readUsersMeApiLoginMeGet();
+        if (!currentUserResponse) {
+          EventBus.emit(new AuthFailedEvent());
+        } else {
+          const user = currentUserResponse;
+          this.setUser(user);
+          EventBus.emit(new LoginSuccessEvent(user));
+        }
+      }).catch((reason) => {
+        console.error(reason);
+      });
+    },
+    logout() {
+      this.clear();
+    },
     clear() {
       this.accessToken = undefined;
       this.user = undefined;
+      OpenAPI.TOKEN = undefined;
     },
     setAccessToken(accessToken: string) {
       this.accessToken = accessToken;
+      OpenAPI.TOKEN = accessToken;
     },
-    setUser(user: User) {
+    setUser(user: UserModel) {
       this.user = user;
     },
   },

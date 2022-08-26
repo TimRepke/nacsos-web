@@ -1,13 +1,13 @@
 <template>
   <div class="nacsos-tooltip ms-2">
-    <font-awesome-icon :icon="['fas', 'circle-question']" class="text-muted"/>
+    <font-awesome-icon :icon="['fas', 'circle-question']" class="text-muted" />
     <span class="nacsos-tooltiptext medium">
-      <slot/>
+      <slot />
     </span>
   </div>
 </template>
 
-<script>
+<script lang="ts">
 /*
 TODO: make size small, medium, large as prop
 TODO: make position (top, left, right, bottom) as prop

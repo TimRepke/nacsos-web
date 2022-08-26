@@ -2,7 +2,7 @@ import { App } from 'vue';
 import { BaseEvent } from '@/plugins/events/baseEvent';
 
 // eslint-disable-next-line  @typescript-eslint/no-explicit-any
-type CallbackHandler = (payload: any) => void
+type CallbackHandler = (payload: any) => void;
 // eslint-disable-next-line  @typescript-eslint/no-explicit-any
 type CallbackInfo = { fn: CallbackHandler, ctx?: any, selfDestruct?: boolean };
 

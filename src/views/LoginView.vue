@@ -1,24 +1,29 @@
 <template>
   <div class="wrapper">
     <div class="row justify-content-center mt-2 mt-sm-5">
-      <NacsosLogo style="height: 200px; width:200px;" class="p-0"/>
+      <NacsosLogo style="height: 200px; width:200px;" class="p-0" />
     </div>
     <div class="row justify-content-center">
       <div class="bg-body bg-opacity-75 rounded p-5 col-lg-4 col-md-6 col-sm-8 col-12 mt-2 mt-sm-5">
         <form @submit.prevent>
           <div class="form-floating mb-3">
-            <input type="text" class="form-control" id="usernameInput" placeholder="Username" v-model="username"/>
+            <input type="text" class="form-control" id="usernameInput" placeholder="Username" v-model="username" />
             <label for="usernameInput">Username</label>
           </div>
           <div class="form-floating mb-3">
-            <input type="password" class="form-control" id="passwordInput" placeholder="Password" v-model="password"/>
+            <input type="password" class="form-control" id="passwordInput" placeholder="Password" v-model="password" />
             <label for="passwordInput">Password</label>
           </div>
-          <div class="alert alert-danger d-flex align-items-center" :class="{'d-none': !error}" role="alert">
-            <font-awesome-icon :icon="['fas', 'triangle-exclamation']"
-                               class="flex-shrink-0 me-2" style="font-size: 1.5em; vertical-align: middle;"/>
+          <div
+            class="alert alert-danger d-flex align-items-center"
+            :class="{ 'd-none': !error }"
+            role="alert">
+            <font-awesome-icon
+              :icon="['fas', 'triangle-exclamation']"
+              class="flex-shrink-0 me-2"
+              style="font-size: 1.5em; vertical-align: middle;" />
             <div class="text-start ms-3">
-              Computer says no. <br/>Please double-check username and password.
+              Computer says no. <br />Please double-check username and password.
             </div>
           </div>
           <button type="submit" class="btn btn-outline-dark w-100" @click="login">LOGIN</button>
@@ -27,13 +32,17 @@
     </div>
     <div class="license">
       Picture:
-      <a href="https://creativecommons.org/licenses/by/3.0" target="_blank">CC BY 3.0</a>
-      (<a href="https://commons.wikimedia.org/wiki/File:Portara_Naxos_26.jpg" target="_blank">Olaf Tausch</a>)
+      <a href="https://creativecommons.org/licenses/by/3.0" target="_blank" rel="noopener noreferrer">CC BY 3.0</a>
+      (
+      <a
+        href="https://commons.wikimedia.org/wiki/File:Portara_Naxos_26.jpg"
+        target="_blank"
+        rel="noopener noreferrer">Olaf Tausch</a>)
     </div>
   </div>
 </template>
 
-<script>
+<script lang="ts">
 import NacsosLogo from '@/components/NacsosLogo.vue';
 import { EventBus } from '@/plugins/events';
 import { AuthFailedEvent, UserLoginEvent, LoginSuccessEvent } from '@/plugins/events/events/auth';

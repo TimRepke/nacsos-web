@@ -1,9 +1,9 @@
 <template>
   <div>
-    <TopBar v-if="userStore.isLoggedIn"/>
+    <TopBar v-if="userStore.isLoggedIn" />
     <div class="row g-0">
       <template v-if="projectStore.projectSelected && userStore.isLoggedIn">
-        <SideBar/>
+        <SideBar />
       </template>
 
       <RouterView v-slot="{ Component }" class="col router-wrapper">
@@ -12,11 +12,11 @@
             <KeepAlive>
               <Suspense>
                 <!-- main content -->
-                <component :is="Component"></component>
+                <component :is="Component" />
 
                 <!-- loading state -->
                 <template #fallback>
-                  Loading...<br/>
+                  Loading...<br />
                   If this takes longer than expected, something might be wrong.
                 </template>
               </Suspense>
@@ -27,12 +27,12 @@
 
       <!--router-view class="col router-wrapper"/-->
     </div>
-    <ToastsViewer/>
-    <ConfirmationModal/>
+    <ToastsViewer />
+    <ConfirmationModal />
   </div>
 </template>
 
-<script>
+<script lang="ts">
 import TopBar from '@/components/TopBar.vue';
 import SideBar from '@/components/SideBar.vue';
 import ToastsViewer from '@/components/ToastsViewer.vue';

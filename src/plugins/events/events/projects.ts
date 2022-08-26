@@ -1,6 +1,6 @@
 /* eslint-disable max-classes-per-file, no-useless-constructor */
 
-import type { Project, ProjectPermissions } from '@/types/project.d';
+import type { ProjectModel, ProjectPermissionsModel } from '@/plugins/client-core';
 import { BaseEvent } from '@/plugins/events/baseEvent';
 
 export class CurrentProjectSelectedEvent extends BaseEvent {
@@ -8,5 +8,5 @@ export class CurrentProjectSelectedEvent extends BaseEvent {
 }
 
 export class CurrentProjectSetEvent extends BaseEvent {
-  constructor(public project: Project, public permissions: ProjectPermissions) { super(); }
+  constructor(public project: ProjectModel, public permissions: ProjectPermissionsModel) { super(); }
 }

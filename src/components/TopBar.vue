@@ -6,9 +6,15 @@
       <!--      </router-link>-->
       <!-- burger menu button, which will appear on narrow screens -->
       <!-- TODO make the burger menu actually work-->
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown"
-              aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
+      <button
+        type="button"
+        class="navbar-toggler"
+        data-bs-toggle="collapse"
+        data-bs-target="#navbarNavDropdown"
+        aria-controls="navbarNavDropdown"
+        aria-expanded="false"
+        aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon" />
       </button>
       <div class="collapse navbar-collapse justify-content-end bg-light" id="navbarNavDropdown">
         <ul class="navbar-nav">
@@ -25,10 +31,17 @@
             <router-link to="/projects" class="nav-link">Projects</router-link>
           </li-->
           <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button"
-               data-bs-toggle="dropdown" aria-expanded="false">
-              <font-awesome-icon :icon="['fas', 'circle-user']"
-                                 class="me-1 mb-1" style="font-size: 1.5em; vertical-align: middle;"/>
+            <a
+              role="button"
+              id="navbarDropdownMenuLink"
+              class="nav-link dropdown-toggle"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+              href="#">
+              <font-awesome-icon
+                class="me-1 mb-1"
+                style="font-size: 1.5em; vertical-align: middle;"
+                :icon="['fas', 'circle-user']" />
               {{ user?.username || 'Username' }}
             </a>
             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdownMenuLink">
@@ -45,7 +58,7 @@
 
 <script lang="ts">
 
-import { User } from '@/types/user.d';
+import { UserModel } from '@/plugins/client-core';
 import { currentUserStore } from '@/stores';
 import { EventBus } from '@/plugins/events';
 import { LoggedOutEvent } from '@/plugins/events/events/auth';
@@ -53,7 +66,7 @@ import { LoggedOutEvent } from '@/plugins/events/events/auth';
 export default {
   name: 'TopBar',
   computed: {
-    user(): User {
+    user(): UserModel {
       return currentUserStore.user;
     },
   },

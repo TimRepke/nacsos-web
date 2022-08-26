@@ -2,42 +2,63 @@
   <!-- FIXME Fix duplicate element ids (keep in mind this is all looped) -->
   <div>
     <ul class="ps-0 list-unstyled">
-      <li class="border m-2 p-2 position-relative" v-for="(schemeLabel, schemeLabelIndex) in schemeLabelsWithKey"
-          :key="schemeLabel.tmpKey">
-        <div role="button" class="position-absolute top-0 end-0 m-2" @click="removeLabel(schemeLabelIndex)"
-             tabindex="0">
-          <font-awesome-icon :icon="['fas', 'trash-can']"/>
+      <li
+        v-for="(schemeLabel, schemeLabelIndex) in schemeLabelsWithKey"
+        :key="schemeLabel.tmpKey"
+        class="border m-2 p-2 position-relative">
+        <div
+          role="button"
+          class="position-absolute top-0 end-0 m-2"
+          tabindex="0"
+          @click="removeLabel(schemeLabelIndex)">
+          <font-awesome-icon :icon="['fas', 'trash-can']" />
         </div>
         <div>
           <div class="hstack gap-2 mb-2">
             <div class="hstack gap-1">
               <span role="button" class="align-middle" tabindex="0" @click="moveLabelDown(schemeLabelIndex)">
-                <font-awesome-icon :icon="['fas', 'down-long']"/>
+                <font-awesome-icon :icon="['fas', 'down-long']" />
               </span>
               <span role="button" tabindex="0" @click="moveLabelUp(schemeLabelIndex)">
-                <font-awesome-icon :icon="['fas', 'up-long']"/>
+                <font-awesome-icon :icon="['fas', 'up-long']" />
               </span>
             </div>
             <div>
-        <span class="input-group">
-          <span class="input-group-text" id="basic-addon1"><font-awesome-icon :icon="['fas', 'eye']"/></span>
-          <input type="text" class="form-control" placeholder="Visible name" aria-label="Visible name"
-                 aria-describedby="basic-addon1" v-model="schemeLabel.name">
-        </span>
+              <span class="input-group">
+                <span class="input-group-text" id="basic-addon1"><font-awesome-icon :icon="['fas', 'eye']" /></span>
+                <input
+                  type="text"
+                  class="form-control"
+                  aria-label="Visible name"
+                  aria-describedby="basic-addon1"
+                  placeholder="Visible name"
+                  v-model="schemeLabel.name">
+              </span>
             </div>
             <div>
-        <span class="input-group">
-          <span class="input-group-text" id="basic-addon1"><font-awesome-icon :icon="['fas', 'tag']"/></span>
-          <input type="text" class="form-control" placeholder="Unique key" aria-label="Unique key"
-                 aria-describedby="basic-addon1" v-model="schemeLabel.key">
-        </span>
+              <span class="input-group">
+                <span class="input-group-text" id="basic-addon1"><font-awesome-icon :icon="['fas', 'tag']" /></span>
+                <input
+                  type="text"
+                  class="form-control"
+                  aria-label="Unique key"
+                  aria-describedby="basic-addon1"
+                  placeholder="Unique key"
+                  v-model="schemeLabel.key">
+              </span>
             </div>
             <div>
               <div class="input-group">
-                  <span class="input-group-text" id="basic-addon1"><font-awesome-icon
-                    :icon="['fas', 'circle-info']"/></span>
-                <input type="text" class="form-control" placeholder="Hint message" aria-label="Hint message"
-                       aria-describedby="basic-addon1" v-model="schemeLabel.hint">
+                <span
+                  id="basic-addon1"
+                  class="input-group-text"><font-awesome-icon :icon="['fas', 'circle-info']" /></span>
+                <input
+                  type="text"
+                  class="form-control"
+                  aria-label="Hint message"
+                  aria-describedby="basic-addon1"
+                  placeholder="Hint message"
+                  v-model="schemeLabel.hint" />
               </div>
             </div>
           </div>
@@ -58,12 +79,17 @@
             </div>
             <div class="col-auto">
               <label for="autoSizingSelect">Max. Repeat</label>
-              <input type="number" class="form-control" v-model="schemeLabel.max_repeat"/>
+              <input type="number" class="form-control" v-model="schemeLabel.max_repeat" />
             </div>
             <div class="col-auto">
               <div class="form-check form-switch">
-                <input class="form-check-input" v-model="schemeLabel.required" type="checkbox" role="switch"
-                       id="flexSwitchCheckDefault" aria-checked="false">
+                <input
+                  type="checkbox"
+                  role="switch"
+                  id="flexSwitchCheckDefault"
+                  class="form-check-input"
+                  aria-checked="false"
+                  v-model="schemeLabel.required" />
                 <label class="form-check-label" for="flexSwitchCheckDefault">Required</label>
               </div>
             </div>
@@ -75,43 +101,64 @@
               <li v-for="(choice, choiceIndex) in schemeLabel.choices" :key="choice.tmpKey">
                 <div class="row mb-2">
                   <div class="col-auto">
-              <span class="input-group">
-                <span class="input-group-text" id="basic-addon1"><font-awesome-icon :icon="['fas', 'eye']"/></span>
-                <input type="text" class="form-control" placeholder="Visible name" aria-label="Visible name"
-                       aria-describedby="basic-addon1" v-model="choice.name">
-              </span>
+                    <span class="input-group">
+                      <span class="input-group-text" id="basic-addon1"><font-awesome-icon :icon="['fas', 'eye']" /></span>
+                      <input
+                        type="text"
+                        class="form-control"
+                        aria-label="Visible name"
+                        aria-describedby="basic-addon1"
+                        placeholder="Visible name"
+                        v-model="choice.name">
+                    </span>
                   </div>
                   <div class="col-3 col-lg-2">
-              <span class="input-group">
-                <span class="input-group-text" id="basic-addon1"><font-awesome-icon :icon="['fas', 'key']"/></span>
-                <input type="number" class="form-control" placeholder="Value" aria-label="Value"
-                       aria-describedby="basic-addon1" v-model="choice.value">
-              </span>
+                    <span class="input-group">
+                      <span class="input-group-text" id="basic-addon1"><font-awesome-icon :icon="['fas', 'key']" /></span>
+                      <input
+                        type="number"
+                        class="form-control"
+                        aria-label="Value"
+                        aria-describedby="basic-addon1"
+                        placeholder="Value"
+                        v-model="choice.value">
+                    </span>
                   </div>
                   <div class="col-auto">
-              <span class="input-group">
-                <span class="input-group-text" id="basic-addon1">
-                  <font-awesome-icon :icon="['fas', 'circle-info']"/>
-                </span>
-                <input type="text" class="form-control" placeholder="Hint message" aria-label="Hint message"
-                       aria-describedby="basic-addon1" v-model="choice.hint">
-              </span>
+                    <span class="input-group">
+                      <span class="input-group-text" id="basic-addon1">
+                        <font-awesome-icon :icon="['fas', 'circle-info']" />
+                      </span>
+                      <input
+                        type="text"
+                        class="form-control"
+                        aria-label="Hint message"
+                        aria-describedby="basic-addon1"
+                        placeholder="Hint message"
+                        v-model="choice.hint" />
+                    </span>
                   </div>
                   <div class="col-auto align-middle">
-                    <span role="button" class="align-middle" tabindex="0"
-                          @click="moveChoiceDown(schemeLabelIndex, choiceIndex)">
-                      <font-awesome-icon :icon="['fas', 'down-long']"/>
+                    <span
+                      role="button"
+                      class="align-middle"
+                      tabindex="0"
+                      @click="moveChoiceDown(schemeLabelIndex, choiceIndex)">
+                      <font-awesome-icon :icon="['fas', 'down-long']" />
                     </span>&nbsp;
                     <span role="button" tabindex="0" @click="moveChoiceUp(schemeLabelIndex, choiceIndex)">
-                      <font-awesome-icon :icon="['fas', 'up-long']"/>
+                      <font-awesome-icon :icon="['fas', 'up-long']" />
                     </span>&nbsp;
                     <span role="button" tabindex="0" @click="removeChoice(schemeLabelIndex, choiceIndex)">
-                      <font-awesome-icon :icon="['fas', 'trash-can']"/>
+                      <font-awesome-icon :icon="['fas', 'trash-can']" />
                     </span>&nbsp;
-                    <span role="button" class="nacsos-tooltip" tabindex="0"
-                          v-if="choice.children === null || choice.children.length === 0"
-                          @click="addChild(schemeLabelIndex, choiceIndex)">
-                      <font-awesome-icon :icon="['fas', 'diagram-predecessor']"/>
+                    <span
+                      v-if="choice.children === null || choice.children.length === 0"
+                      role="button"
+                      class="nacsos-tooltip"
+                      tabindex="0"
+                      @click="addChild(schemeLabelIndex, choiceIndex)">
+                      <font-awesome-icon :icon="['fas', 'diagram-predecessor']" />
                       <span class="nacsos-tooltiptext small">
                         Add sub-labels
                       </span>
@@ -120,12 +167,13 @@
                 </div>
                 <div class="row ms-2" v-if="choice.children !== null && choice.children.length > 0">
                   <strong>Sub-annotations:</strong>
-                  <AnnotationSchemeLabelsEditor :labels="choice.children"/>
+                  <AnnotationSchemeLabelsEditor :labels="choice.children" />
                 </div>
               </li>
             </ul>
             <div>
-              <button class="btn btn-outline-secondary" @click="addChoice(schemeLabelIndex)">Add choice</button>
+              <button type="button" class="btn btn-outline-secondary" @click="addChoice(schemeLabelIndex)">Add choice
+              </button>
             </div>
           </div>
           <!-- /END List label choices for pre-defined choices -->
@@ -133,16 +181,17 @@
       </li>
     </ul>
     <div>
-      <button class="btn btn-outline-primary mb-2" @click="addLabel()">Add Label</button>
+      <button type="button" class="btn btn-outline-primary mb-2" @click="addLabel()">Add Label</button>
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import { AnnotationSchemeLabel } from '@/types/annotation.d';
 import { PropType } from 'vue';
 import ToolTip from '@/components/ToolTip.vue';
-import { AnnotationSchemeLabelKinds } from '@/plugins/api/annotations';
+import { AnnotationSchemeLabel } from '@/plugins/client-core';
+
+type KeyedAnnotationSchemeLabel = AnnotationSchemeLabel & { tmpKey?: string };
 
 // TODO flatten list of all keys and make sure they are all unique (probably in AnnotationConfigEditView)
 // TODO general input validation
@@ -153,11 +202,13 @@ export default {
   props: {
     labels: {
       type: Object as PropType<AnnotationSchemeLabel[]>,
+      required: true,
+      default: null,
     },
   },
   data() {
     return {
-      annotationSchemeLabelKinds: AnnotationSchemeLabelKinds,
+      annotationSchemeLabelKinds: AnnotationSchemeLabel.kind,
       schemeLabels: this.labels,
     };
   },
@@ -237,7 +288,7 @@ export default {
   },
   computed: {
     schemeLabelsWithKey() {
-      return this.schemeLabels.map((schemeLabel: AnnotationSchemeLabel) => {
+      return this.schemeLabels.map((schemeLabel: KeyedAnnotationSchemeLabel) => {
         // eslint-disable-next-line no-param-reassign
         schemeLabel.tmpKey = crypto.randomUUID();
         return schemeLabel;

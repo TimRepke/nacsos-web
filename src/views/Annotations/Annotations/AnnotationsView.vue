@@ -7,28 +7,31 @@
       <div class="col-12 col-md overflow-auto h-md-100">
         <div class="row g-0">
           <ul class="d-flex list-unstyled">
-            <li v-for="assignmentLI in assignments" :key="assignmentLI.assignment_id"
-                class="me-0 assignments-step flex-fill"
-                :class="[assignmentLI.status, (assignmentLI.assignment_id === assignment.assignment_id) ? 'current' : '']"
-                type="button"
-                @click="saveAndGoto(assignmentLI.assignment_id)">
-            </li>
+            <li
+              v-for="assignmentLI in assignments"
+              :key="assignmentLI.assignment_id"
+              class="me-0 assignments-step flex-fill"
+              :class="[assignmentLI.status, (assignmentLI.assignment_id === assignment.assignment_id) ? 'current' : '']"
+              type="button"
+              @click="saveAndGoto(assignmentLI.assignment_id)" />
           </ul>
         </div>
         <div class="row g-0">
-          <GenericItemComponent :item="item"/>
+          <GenericItemComponent :item="item" />
         </div>
       </div>
       <div class="col border-start p-2 overflow-auto h-md-100 position-relative" :class="sidebarWidthClass">
-        <div class="position-fixed bottom-0 border border-end-0 rounded-start text-muted text-center"
-             style="margin-left: -1.325rem; width: 0.75rem; font-size: 0.75rem;"
-             @click="(sidebarWidth<12) && sidebarWidth++">
-          <font-awesome-icon :icon="['fas', 'caret-left']"/>
+        <div
+          class="position-fixed bottom-0 border border-end-0 rounded-start text-muted text-center"
+          style="margin-left: -1.325rem; width: 0.75rem; font-size: 0.75rem;"
+          @click="(sidebarWidth < 12) && sidebarWidth++">
+          <font-awesome-icon :icon="['fas', 'caret-left']" />
         </div>
-        <div class="position-fixed bottom-0 border border-start-0 rounded-end text-muted text-center"
-             style="margin-left: -.5rem; width: 0.75rem; font-size: 0.75rem;"
-             @click="(sidebarWidth>0) && sidebarWidth--">
-          <font-awesome-icon :icon="['fas', 'caret-right']"/>
+        <div
+          class="position-fixed bottom-0 border border-start-0 rounded-end text-muted text-center"
+          style="margin-left: -.5rem; width: 0.75rem; font-size: 0.75rem;"
+          @click="(sidebarWidth > 0) && sidebarWidth--">
+          <font-awesome-icon :icon="['fas', 'caret-right']" />
         </div>
 
         <div class="row g-0">
@@ -39,22 +42,22 @@
             <div class="collapsible-content">
               <div class="content-inner">
                 <strong>Annotation scheme:</strong> {{ scheme.name }}
-                <p v-html="markdown(scheme.description)"></p>
+                <p v-html="markdown(scheme.description)" />
                 <strong>Assignment scope:</strong> {{ scope.name }}
-                <p v-html="markdown(scope.description)"></p>
+                <p v-html="markdown(scope.description)" />
               </div>
             </div>
           </div>
         </div>
         <div class="row g-0">
-          <AnnotationLabels :labels="labels" :assignment="assignment"/>
+          <AnnotationLabels :labels="labels" :assignment="assignment" />
         </div>
         <div class="row g-0 border-top pt-2">
           <div class="col text-start">
-            <button class="btn btn-outline-secondary" @click="saveAndPrevious()" disabled>Save & Previous</button>
+            <button type="button" class="btn btn-outline-secondary" @click="saveAndPrevious()" disabled>Save & Previous</button>
           </div>
           <div class="col text-end">
-            <button class="btn btn-primary" @click="saveAndNext()">Save & Next</button>
+            <button type="button" class="btn btn-primary" @click="saveAndNext()">Save & Next</button>
           </div>
         </div>
       </div>
@@ -64,19 +67,20 @@
 
 <script lang="ts">
 import { marked } from 'marked';
-import {
-  callNextOpenAnnotationItemEndpoint,
-  callNextAnnotationItemEndpoint,
-  callSaveAnnotationEndpoint,
-  callAnnotationItemEndpoint,
-  callScopeUserAssignmentsEndpoint,
-  AnnotationItemResponse,
-} from '@/plugins/api/annotations';
 import GenericItemComponent from '@/components/items/GenericItem.vue';
 import AnnotationLabels from '@/components/annotations/AnnotationLabels.vue';
-import { AnnotationSchemeLabel, AssignmentStatus } from '@/types/annotation.d';
 import { EventBus } from '@/plugins/events';
 import { ToastEvent } from '@/plugins/events/events/toast';
+import {
+  AnnotationItem,
+  AnnotationSchemeLabel,
+  AnnotationSchemeModel,
+  AssignmentModel,
+  AssignmentScopeModel,
+} from '@/plugins/client-core';
+import { AnyItem } from '@/types/items.d';
+import { coreAPI } from '@/plugins/api';
+import { currentProjectStore } from '@/stores';
 
 const motivationalQuotes = [
   // https://www.howmuchisthefish.de/
@@ -106,10 +110,20 @@ const motivationalQuotes = [
   // https://pypi.org/project/quotes-generator/
 ];
 
+type AnnotationsViewData = {
+  item?: AnyItem;
+  assignment?: AssignmentModel;
+  assignments?: AssignmentModel[];
+  scheme?: AnnotationSchemeModel;
+  scope?: AssignmentScopeModel;
+  sidebarWidth: number;
+  labels?: AnnotationSchemeLabel[];
+};
+
 export default {
   name: 'AnnotationsView',
   components: { AnnotationLabels, GenericItemComponent },
-  data() {
+  data(): AnnotationsViewData {
     return {
       item: undefined,
       assignment: undefined,
@@ -124,12 +138,21 @@ export default {
     const assignmentScopeId = this.$route.params.scope_id as string;
     const currentAssignmentId = this.$route.params.assignment_id as string;
 
-    const response = (currentAssignmentId)
-      ? await callAnnotationItemEndpoint({ assignmentId: currentAssignmentId })
-      : await callNextOpenAnnotationItemEndpoint({ assignmentScopeId });
+    let response: AnnotationItem;
+    if (currentAssignmentId) {
+      response = await coreAPI.annotations.getAssignmentApiAnnotationsAnnotateAssignmentAssignmentIdGet({
+        xProjectId: currentProjectStore.projectId,
+        assignmentId: currentAssignmentId,
+      });
+    } else {
+      response = await coreAPI.annotations.getNextOpenAssignmentForScopeForUserApiAnnotationsAnnotateNextAssignmentScopeIdGet({
+        xProjectId: currentProjectStore.projectId,
+        assignmentScopeId,
+      });
+    }
 
-    if (response.payload) {
-      await this.setCurrentAssignment(response.payload);
+    if (response) {
+      await this.setCurrentAssignment(response);
     }
   },
   methods: {
@@ -188,14 +211,15 @@ export default {
       scheme.labels = removeEmptyAnnotations(labels);
 
       // Send data to the server
-      const payload = {
-        scheme,
-        assignment: this.assignment,
-      };
-      // TODO: set up proper response reasons for this endpoint
-      callSaveAnnotationEndpoint(payload)
+      coreAPI.annotations.saveAnnotationApiAnnotationsAnnotateSavePost({
+        xProjectId: currentProjectStore.projectId,
+        requestBody: {
+          scheme,
+          assignment: this.assignment,
+        },
+      })
         .then((reason) => {
-          if ((reason.payload as AssignmentStatus) === 'PARTIAL') {
+          if (reason === 'PARTIAL') {
             EventBus.emit(new ToastEvent(
               'WARN',
               'This annotation wasn\'t quite done yet...',
@@ -223,7 +247,7 @@ export default {
           }
         });
     },
-    async setCurrentAssignment(annotationItem: AnnotationItemResponse) {
+    async setCurrentAssignment(annotationItem: AnnotationItem) {
       // update all the data
       this.assignment = annotationItem.assignment;
       this.scheme = annotationItem.scheme;
@@ -232,9 +256,10 @@ export default {
       this.labels = this.populateEmptyAnnotations(this.scheme.labels);
 
       // update the assignments progress bar
-      this.assignments = (await callScopeUserAssignmentsEndpoint({
+      this.assignments = await coreAPI.annotations.getAssignmentsForScopeApiAnnotationsAnnotateAssignmentsScopeAssignmentScopeIdGet({
+        xProjectId: currentProjectStore.projectId,
         assignmentScopeId: annotationItem.scope.assignment_scope_id as string,
-      })).payload;
+      });
 
       // update the URL
       await this.$router.push({
@@ -248,9 +273,13 @@ export default {
     async saveAndGoto(targetAssignmentId: string) {
       await this.save();
 
-      const response = await callAnnotationItemEndpoint({ assignmentId: targetAssignmentId });
-      if (response.payload) {
-        await this.setCurrentAssignment(response.payload);
+      const response = await coreAPI.annotations
+        .getAssignmentApiAnnotationsAnnotateAssignmentAssignmentIdGet({
+          xProjectId: currentProjectStore.projectId,
+          assignmentId: targetAssignmentId,
+        });
+      if (response) {
+        await this.setCurrentAssignment(response);
       }
     },
     async saveAndPrevious() {
@@ -259,13 +288,15 @@ export default {
     async saveAndNext() {
       await this.save();
 
-      const response = await callNextAnnotationItemEndpoint({
-        assignmentScopeId: this.assignment.assignment_scope_id,
-        currentAssignmentId: this.assignment.assignment_id,
-      });
+      const response = await coreAPI.annotations
+        .getNextAssignmentForScopeForUserApiAnnotationsAnnotateNextAssignmentScopeIdCurrentAssignmentIdGet({
+          xProjectId: currentProjectStore.projectId,
+          assignmentScopeId: this.assignment.assignment_scope_id,
+          currentAssignmentId: this.assignment.assignment_id,
+        });
 
-      if (response.payload) {
-        await this.setCurrentAssignment(response.payload);
+      if (response) {
+        await this.setCurrentAssignment(response);
       }
     },
   },

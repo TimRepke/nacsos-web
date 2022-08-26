@@ -17,10 +17,15 @@
         </div>
         <div class="row m-2 mt-0">
           <div class="input-group p-0">
-            <input id="search" class="form-control" aria-label="Fulltext search" placeholder="Search..." type="text"
-                   style="padding-right: 3rem !important;">
+            <input
+              id="search"
+              class="form-control"
+              aria-label="Fulltext search"
+              placeholder="Search..."
+              type="text"
+              style="padding-right: 3rem !important;">
             <i class="btn btn-outline-secondary">
-              <font-awesome-icon icon="magnifying-glass-plus"/>
+              <font-awesome-icon icon="magnifying-glass-plus" />
             </i>
           </div>
         </div>
@@ -59,7 +64,7 @@
                 <GenericItemComponent
                   v-for="(item) in itemList"
                   :key="item.item_id"
-                  :item="item"/>
+                  :item="item" />
               </template>
               <template v-else>
                 This type of data can not be rendered. Sorry.
@@ -73,15 +78,19 @@
           <!-- Pagination footer -->
           <nav aria-label="Page navigation" class="d-flex flex-row justify-content-center m-2 p-0">
             <ul class="pagination p-0 m-0">
-              <li class="page-item" :class="{disabled: pagination.isFirstPage}">
-                <div @click="pagination.currentPage = 1" role="button" tabindex="0" class="page-link fw-normal"
-                     aria-label="First page">
-                  <font-awesome-icon :icon="['fas', 'angles-left']" style="font-size: 0.7em"/>
+              <li class="page-item" :class="{ disabled: pagination.isFirstPage }">
+                <div
+                  role="button"
+                  class="page-link fw-normal"
+                  aria-label="First page"
+                  tabindex="0"
+                  @click="pagination.currentPage = 1">
+                  <font-awesome-icon :icon="['fas', 'angles-left']" style="font-size: 0.7em" />
                 </div>
               </li>
-              <li class="page-item" :class="{disabled: pagination.isFirstPage}">
+              <li class="page-item" :class="{ disabled: pagination.isFirstPage }">
                 <div @click="pagination.prev" role="button" class="page-link fw-normal" aria-label="Previous page">
-                  <font-awesome-icon :icon="['fas', 'angle-left']" style="font-size: 0.7em"/>
+                  <font-awesome-icon :icon="['fas', 'angle-left']" style="font-size: 0.7em" />
                 </div>
               </li>
               <li class="page-item disabled" v-show="pagination.currentPage > navPagesWindowSize">
@@ -89,31 +98,40 @@
                   &hellip;
                 </div>
               </li>
-              <li class="page-item"
-                  v-for="pageIt in navPages"
-                  :key="pageIt"
-                  :class="{active: pagination.currentPage === pageIt}">
-                <div @click="pagination.currentPage = pageIt" role="button"
-                     class="page-link fw-normal" tabindex="0" :aria-label="`Page ${pageIt}`">
+              <li
+                class="page-item"
+                v-for="pageIt in navPages"
+                :key="pageIt"
+                :class="{ active: pagination.currentPage === pageIt }">
+                <div
+                  @click="pagination.currentPage = pageIt"
+                  role="button"
+                  class="page-link fw-normal"
+                  tabindex="0"
+                  :aria-label="`Page ${pageIt}`">
                   {{ pageIt }}
                 </div>
               </li>
-              <li class="page-item disabled"
-                  v-show="(pagination.pageCount - pagination.currentPage) > navPagesWindowSize">
+              <li
+                class="page-item disabled"
+                v-show="(pagination.pageCount - pagination.currentPage) > navPagesWindowSize">
                 <div role="button" class="page-link fw-normal">
                   &hellip;
                 </div>
               </li>
-              <li class="page-item" :class="{disabled: pagination.isLastPage}">
+              <li class="page-item" :class="{ disabled: pagination.isLastPage }">
                 <div @click="pagination.next" role="button" class="page-link fw-normal" aria-label="Next page">
-                  <font-awesome-icon :icon="['fas', 'angle-right']" style="font-size: 0.7em"/>
+                  <font-awesome-icon :icon="['fas', 'angle-right']" style="font-size: 0.7em" />
                 </div>
               </li>
-              <li class="page-item" :class="{disabled: pagination.isLastPage}">
-                <div @click="pagination.currentPage = pagination.pageCount" role="button" tabindex="0"
-                     class="page-link fw-normal"
-                     aria-label="Last page">
-                  <font-awesome-icon :icon="['fas', 'angles-right']" style="font-size: 0.7em"/>
+              <li class="page-item" :class="{ disabled: pagination.isLastPage }">
+                <div
+                  role="button"
+                  class="page-link fw-normal"
+                  tabindex="0"
+                  aria-label="Last page"
+                  @click="pagination.currentPage = pagination.pageCount">
+                  <font-awesome-icon :icon="['fas', 'angles-right']" style="font-size: 0.7em" />
                 </div>
               </li>
             </ul>
@@ -121,18 +139,16 @@
         </div>
       </div>
     </div>
-    <button class="btn btn-outline-secondary position-absolute top-0 end-0 m-2 me-3"
-            @click="showSearchBar = !showSearchBar">
-      <font-awesome-icon :icon="['fas', 'filter']"/>
+    <button
+      type="button"
+      class="btn btn-outline-secondary position-absolute top-0 end-0 m-2 me-3"
+      @click="showSearchBar = !showSearchBar">
+      <font-awesome-icon :icon="['fas', 'filter']" />
     </button>
   </div>
 </template>
 
 <script lang="ts">
-import {
-  callProjectItemCountEndpoint,
-  callProjectDataPagedListEndpoint,
-} from '@/plugins/api/items';
 import { currentProjectStore } from '@/stores';
 import GenericItemComponent from '@/components/items/GenericItem.vue';
 import { useOffsetPagination, UseOffsetPaginationReturn } from '@vueuse/core';
@@ -140,7 +156,8 @@ import { ToastEvent } from '@/plugins/events/events/toast';
 import { EventBus } from '@/plugins/events';
 import ClosablePill from '@/components/ClosablePill.vue';
 import { reactive } from 'vue';
-import { AnyItem } from '@/types/items/index.d';
+import { AnyItem } from '@/types/items.d';
+import { coreAPI } from '@/plugins/api';
 
 export default {
   name: 'ProjectDataView',
@@ -156,9 +173,10 @@ export default {
     };
   },
   async mounted() {
-    this.totalNumItems = (await callProjectItemCountEndpoint({
-      projectId: currentProjectStore.project.project_id as string,
-    })).payload;
+    this.totalNumItems = await coreAPI.project.countProjectItemsApiProjectProjectIdItemsCountGet({
+      projectId: currentProjectStore.projectId,
+      xProjectId: currentProjectStore.projectId,
+    });
     this.pagination = useOffsetPagination({
       total: this.totalNumItems,
       page: this.$route.query.page || 1,
@@ -169,15 +187,16 @@ export default {
     this.fetchData(this.pagination);
   },
   methods: {
-    fetchData({ currentPage, currentPageSize }: UseOffsetPaginationReturn): AnyItem[] | void {
-      callProjectDataPagedListEndpoint({
-        projectId: currentProjectStore.project.project_id as string,
+    fetchData({ currentPage, currentPageSize }: UseOffsetPaginationReturn): void {
+      coreAPI.project.listProjectDataPagedApiProjectProjectIdItemsItemTypeListPagePageSizeGet({
+        xProjectId: currentProjectStore.projectId,
+        projectId: currentProjectStore.projectId,
         page: this.pagination.currentPage,
         pageSize: this.pagination.currentPageSize,
         itemType: currentProjectStore.project.type,
       })
         .then((response) => {
-          this.itemList = response.payload;
+          this.itemList = response;
           this.$router.push({ query: { page: currentPage, pageSize: currentPageSize } });
         })
         .catch(() => {

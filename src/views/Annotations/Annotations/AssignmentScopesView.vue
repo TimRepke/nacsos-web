@@ -5,11 +5,12 @@
       <li v-for="scope in annotationScopes" :key="scope.scope.assignment_scope_id">
         {{ scope.scheme_name }}
         <em>({{ scope.scope.name }})</em>&nbsp;
-        <router-link :to="{ name:'project-annotate-item', params: { scope_id: scope.scope.assignment_scope_id } }"
-                     class="link-secondary">
-          <font-awesome-icon :icon="['fas', 'tags']"/>
+        <router-link
+          :to="{ name: 'project-annotate-item', params: { scope_id: scope.scope.assignment_scope_id } }"
+          class="link-secondary">
+          <font-awesome-icon :icon="['fas', 'tags']" />
         </router-link>
-        <br/>
+        <br />
         Assignments:
         <InlineToolTip info="Completed assignments">{{ scope.num_completed }}</InlineToolTip>
         /
@@ -26,10 +27,10 @@
 </template>
 
 <script lang="ts">
-import { callProjectUserScopesEndpoint } from '@/plugins/api/annotations';
 import { currentProjectStore } from '@/stores';
 import InlineToolTip from '@/components/InlineToolTip.vue';
-import { UserProjectAssignmentScope } from '@/types/annotation.d';
+import { UserProjectAssignmentScope } from '@/plugins/client-core';
+import { coreAPI } from '@/plugins/api';
 
 export default {
   name: 'AssignmentScopesView',
@@ -40,8 +41,10 @@ export default {
     };
   },
   async mounted() {
-    const currentProjectId = currentProjectStore.projectId;
-    this.annotationScopes = (await callProjectUserScopesEndpoint({ projectId: currentProjectId })).payload;
+    this.annotationScopes = coreAPI.annotations.getAssignmentScopesForUserApiAnnotationsAnnotateScopesProjectIdGet({
+      projectId: currentProjectStore.projectId,
+      xProjectId: currentProjectStore.projectId,
+    });
   },
   methods: {
     // none

@@ -1,10 +1,10 @@
 <template>
   <template v-if="!info">
-    <slot/>
+    <slot />
   </template>
   <template v-else>
     <span class="nacsos-tooltip">
-      <slot/>
+      <slot />
       <span class="nacsos-tooltiptext small">
         {{ info }}
       </span>
@@ -12,7 +12,7 @@
   </template>
 </template>
 
-<script>
+<script lang="ts">
 
 export default {
   name: 'InlineToolTip',
