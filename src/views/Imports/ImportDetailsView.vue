@@ -93,7 +93,7 @@
 import { Component } from 'vue';
 import { ToastEvent } from '@/plugins/events/events/toast';
 import { EventBus } from '@/plugins/events';
-import { ComponentMapping, projectTypeImportTypeCompatibility } from '@/types/imports.d';
+import { CompatibilityMapping, ComponentMapping } from '@/types/imports.d';
 import { ImportModel, ImportType, ProjectModel, ProjectPermissionsModel, ProjectType } from '@/plugins/client-core';
 import ConfigTwitter from '@/components/imports/ConfigTwitter.vue';
 import ConfigJSONL from '@/components/imports/ConfigJSONL.vue';
@@ -103,6 +103,16 @@ import { ConfirmationRequestEvent } from '@/plugins/events/events/confirmation';
 import { coreAPI } from '@/plugins/api';
 
 type ImportConfig = ImportModel['config'];
+
+export const projectTypeImportTypeCompatibility: CompatibilityMapping = {
+  basic: [ImportType.CSV, ImportType.JSONL, ImportType.SCRIPT],
+  academic: [
+    ImportType.RIS, ImportType.CSV, ImportType.JSONL, ImportType.SCRIPT, ImportType.WOS, ImportType.SCOPUS,
+    ImportType.EBSCO, ImportType.JSTOR, ImportType.OVID, ImportType.POP,
+  ],
+  patents: [ImportType.CSV, ImportType.JSONL, ImportType.SCRIPT],
+  twitter: [ImportType.CSV, ImportType.JSONL, ImportType.SCRIPT, ImportType.TWITTER],
+};
 
 const type2component: ComponentMapping = {
   ris: ['Upload RIS file(s)', ConfigRIS],
