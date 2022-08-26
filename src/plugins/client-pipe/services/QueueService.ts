@@ -104,7 +104,7 @@ export class QueueService {
     userId,
     location,
     status,
-    requestBody,
+    orderByFields,
   }: {
     functionName?: string,
     fingerprint?: string,
@@ -112,7 +112,7 @@ export class QueueService {
     userId?: string,
     location?: string,
     status?: string,
-    requestBody?: Array<Array<any>>,
+    orderByFields?: Array<string>,
   }): CancelablePromise<any> {
     return this.httpRequest.request({
       method: 'GET',
@@ -124,9 +124,8 @@ export class QueueService {
         'user_id': userId,
         'location': location,
         'status': status,
+        'order_by_fields': orderByFields,
       },
-      body: requestBody,
-      mediaType: 'application/json',
       errors: {
         422: `Validation Error`,
       },

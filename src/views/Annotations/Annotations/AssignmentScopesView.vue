@@ -41,7 +41,7 @@ export default {
     };
   },
   async mounted() {
-    this.annotationScopes = coreAPI.annotations.getAssignmentScopesForUserApiAnnotationsAnnotateScopesProjectIdGet({
+    this.annotationScopes = await coreAPI.annotations.getAssignmentScopesForUserApiAnnotationsAnnotateScopesProjectIdGet({
       projectId: currentProjectStore.projectId,
       xProjectId: currentProjectStore.projectId,
     });
