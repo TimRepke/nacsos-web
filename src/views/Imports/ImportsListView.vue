@@ -54,7 +54,7 @@
 </template>
 
 <script lang="ts">
-import { ImportModel } from '@/plugins/client-core';
+import { ImportModel } from '@/plugins/api/api-core';
 import InlineToolTip from '@/components/InlineToolTip.vue';
 import { EventBus } from '@/plugins/events';
 import { ToastEvent } from '@/plugins/events/events/toast';

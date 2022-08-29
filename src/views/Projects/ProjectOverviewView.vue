@@ -16,7 +16,7 @@
 </template>
 
 <script lang="ts">
-import { ProjectModel, ProjectPermissionsModel } from '@/plugins/client-core';
+import { ProjectModel, ProjectPermissionsModel } from '@/plugins/api/api-core';
 import { currentProjectStore } from '@/stores';
 import { marked } from 'marked';
 

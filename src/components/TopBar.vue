@@ -58,7 +58,7 @@
 
 <script lang="ts">
 
-import { UserModel } from '@/plugins/client-core';
+import { UserModel } from '@/plugins/api/api-core';
 import { currentUserStore } from '@/stores';
 import { EventBus } from '@/plugins/events';
 import { LoggedOutEvent } from '@/plugins/events/events/auth';

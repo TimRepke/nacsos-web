@@ -1,6 +1,7 @@
 import { App } from 'vue';
-import { PipelinesClient } from '@/plugins/client-pipe';
-import { CoreClient } from '@/plugins/client-core';
+import { OpenAPIConfig } from '@/plugins/api/core/OpenAPI';
+import { CoreClient } from './api-core';
+import { PipelinesClient } from './api-pipe';
 
 const pipelinesAPI = new PipelinesClient({
   BASE: 'http://localhost:8000',
@@ -8,7 +9,7 @@ const pipelinesAPI = new PipelinesClient({
 
 const coreAPI = new CoreClient({
   BASE: 'http://localhost:8081',
-});
+} as OpenAPIConfig);
 
 export default {
   install(app: App) {

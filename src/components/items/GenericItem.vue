@@ -8,7 +8,7 @@ import { PropType, Component } from 'vue';
 import TwitterItemComponent from '@/components/items/TwitterItem.vue';
 import BaseItemComponent from '@/components/items/BaseItem.vue';
 import { useCurrentProjectStore } from '@/stores/CurrentProjectStore';
-import { ProjectType } from '@/plugins/client-core';
+import { ProjectType } from '@/plugins/api/api-core';
 
 type TypeMapType = { [key in ProjectType]: Component };
 

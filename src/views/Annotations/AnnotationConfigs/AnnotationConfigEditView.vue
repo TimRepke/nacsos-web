@@ -70,7 +70,7 @@ import { ConfirmationRequestEvent } from '@/plugins/events/events/confirmation';
 import { currentProjectStore } from '@/stores';
 import { ref } from 'vue';
 import AnnotationSchemeLabelsEditor from '@/components/annotations/AnnotationSchemeLabelsEditor.vue';
-import { AnnotationSchemeModel } from '@/plugins/client-core';
+import { AnnotationSchemeModel } from '@/plugins/api/api-core';
 import { coreAPI } from '@/plugins/api';
 
 export default {

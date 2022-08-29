@@ -88,7 +88,7 @@
 <script lang="ts">
 import NacsosLogo from '@/components/NacsosLogo.vue';
 import { currentProjectStore } from '@/stores';
-import { ProjectPermissionsModel } from '@/plugins/client-core';
+import { ProjectPermissionsModel } from '@/plugins/api/api-core';
 import { RouteLocationMatched } from 'vue-router';
 
 export default {

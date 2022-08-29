@@ -1,4 +1,4 @@
-import { ItemModel, TwitterItemModel } from '@/plugins/client-core';
+import { ItemModel, TwitterItemModel } from '@/plugins/api/api-core';
 
 export type BaseItem = ItemModel & { meta: Record<string, unknown> }
 

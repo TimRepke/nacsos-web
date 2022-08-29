@@ -87,7 +87,7 @@ import { EventBus } from '@/plugins/events';
 import { ConfirmationRequestEvent } from '@/plugins/events/events/confirmation';
 import InlineToolTip from '@/components/InlineToolTip.vue';
 import { ToastEvent } from '@/plugins/events/events/toast';
-import { AnnotationSchemeModel, AssignmentScopeModel } from '@/plugins/client-core';
+import { AnnotationSchemeModel, AssignmentScopeModel } from '@/plugins/api/api-core';
 import { coreAPI } from '@/plugins/api';
 
 export default {

@@ -79,7 +79,7 @@
 
 <script lang="ts">
 import { marked } from 'marked';
-import { TaskInDB, FunctionInfo, FileOnDisk, QueueService } from '@/plugins/client-pipe';
+import { TaskInDB, FunctionInfo, FileOnDisk, QueueService } from '@/plugins/api/api-pipe';
 import { EventBus } from '@/plugins/events';
 import { ToastEvent } from '@/plugins/events/events/toast';
 import { pipelinesAPI } from '@/plugins/api';

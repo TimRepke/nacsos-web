@@ -77,7 +77,7 @@ import {
   AnnotationSchemeModel,
   AssignmentModel,
   AssignmentScopeModel,
-} from '@/plugins/client-core';
+} from '@/plugins/api/api-core';
 import { AnyItem } from '@/types/items.d';
 import { coreAPI } from '@/plugins/api';
 import { currentProjectStore } from '@/stores';

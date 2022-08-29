@@ -194,7 +194,7 @@ import TaskConfigComponent from '@/components/pipelines/TaskConfig.vue';
 import { ConfirmationRequestEvent } from '@/plugins/events/events/confirmation';
 import { currentProjectStore, currentUserStore } from '@/stores';
 import { pipelinesAPI } from '@/plugins/api';
-import { FunctionInfo, SerializedArtefact, TaskInDB, ArtefactReference } from '@/plugins/client-pipe';
+import { FunctionInfo, SerializedArtefact, TaskInDB, ArtefactReference } from '@/plugins/api/api-pipe';
 import { ArtefactCallback, TaskConfig, NestedLibrary } from '@/types/pipelines.d';
 
 export default {

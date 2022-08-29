@@ -120,10 +120,10 @@ import {
   ArtefactCallback,
   TaskConfig as TaskConfigInterface,
 } from '@/types/pipelines.d';
-import { FunctionInfo, SerializedArtefact, KWARG, ArtefactReference } from '@/plugins/client-pipe';
 import { isArtefactOrSerializedArtefact, isFunctionInfo } from '@/util/typeChecks';
 import { currentProjectStore, currentUserStore } from '@/stores';
 import InlineToolTip from '@/components/InlineToolTip.vue';
+import { FunctionInfo, SerializedArtefact, KWARG, ArtefactReference } from '@/plugins/api/api-pipe';
 
 export default {
   name: 'TaskConfig',

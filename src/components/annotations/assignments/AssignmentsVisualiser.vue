@@ -23,7 +23,7 @@
 import { PropType } from 'vue';
 import { EventBus } from '@/plugins/events';
 import { ToastEvent } from '@/plugins/events/events/toast';
-import { AssignmentModel, UserModel } from '@/plugins/client-core';
+import { AssignmentModel, UserModel } from '@/plugins/api/api-core';
 import { coreAPI } from '@/plugins/api';
 import { currentProjectStore } from '@/stores';
 

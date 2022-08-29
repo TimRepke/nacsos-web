@@ -11,7 +11,7 @@
 
 <script lang="ts">
 import { currentProjectStore } from '@/stores';
-import { ProjectPermissionsModel } from '@/plugins/client-core';
+import { ProjectPermissionsModel } from '@/plugins/api/api-core';
 
 export default {
   name: 'PipelinesContainer',

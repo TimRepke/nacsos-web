@@ -50,7 +50,7 @@
 <script lang="ts">
 import FilesUploader, { UploadFile } from '@/components/FilesUploader.vue';
 import { PropType } from 'vue';
-import { ImportConfigJSONL, ProjectType } from '@/plugins/client-core';
+import { ImportConfigJSONL, ProjectType } from '@/plugins/api/api-core';
 import { currentProjectStore } from '@/stores';
 import useVuelidate, { BaseValidation, ValidationRule } from '@vuelidate/core';
 import { required } from '@vuelidate/validators';

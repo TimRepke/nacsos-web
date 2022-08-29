@@ -39,7 +39,7 @@
 <script lang="ts">
 import { PropType } from 'vue';
 import { NestedLibrary } from '@/types/pipelines.d';
-import { FunctionInfo } from '@/plugins/client-pipe';
+import { FunctionInfo } from '@/plugins/api/api-pipe';
 
 export default {
   name: 'NestedExpandableComponent',

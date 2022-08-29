@@ -37,7 +37,7 @@
 
 <script lang="ts">
 import { PropType } from 'vue';
-import { TwitterItemModel, Hashtag, Mention, URL } from '@/plugins/client-core';
+import { TwitterItemModel, Hashtag, Mention, URL } from '@/plugins/api/api-core';
 
 interface Replacement {
   start: number;

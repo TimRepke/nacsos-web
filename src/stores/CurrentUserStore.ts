@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia';
 import { useStorage, RemovableRef } from '@vueuse/core';
 import Serializer from '@/types/serializer';
-import { OpenAPI, UserModel } from '@/plugins/client-core';
+import { UserModel } from '@/plugins/api/api-core';
 import { coreAPI } from '@/plugins/api';
 import { EventBus } from '@/plugins/events';
 import { AuthFailedEvent, LoginSuccessEvent } from '@/plugins/events/events/auth';
@@ -53,11 +53,11 @@ export const useCurrentUserStore = defineStore('CurrentUserStore', {
     clear() {
       this.accessToken = undefined;
       this.user = undefined;
-      OpenAPI.TOKEN = undefined;
+      coreAPI.request.config.TOKEN = undefined;
     },
     setAccessToken(accessToken: string) {
       this.accessToken = accessToken;
-      OpenAPI.TOKEN = accessToken;
+      coreAPI.request.config.TOKEN = accessToken;
     },
     setUser(user: UserModel) {
       this.user = user;

@@ -11,7 +11,7 @@
 <script lang="ts">
 import { EventBus } from '@/plugins/events';
 import { CurrentProjectSelectedEvent, CurrentProjectSetEvent } from '@/plugins/events/events/projects';
-import { ProjectModel } from '@/plugins/client-core';
+import { ProjectModel } from '@/plugins/api/api-core';
 import { coreAPI } from '@/plugins/api';
 
 export default {

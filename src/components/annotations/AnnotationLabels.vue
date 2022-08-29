@@ -124,7 +124,7 @@
 
 import { PropType } from 'vue';
 import InlineToolTip from '@/components/InlineToolTip.vue';
-import { AnnotationSchemeLabel, AssignmentModel, AnnotationModel } from '@/plugins/client-core';
+import { AnnotationSchemeLabel, AssignmentModel, AnnotationModel } from '@/plugins/api/api-core';
 
 export default {
   name: 'AnnotationLabels',

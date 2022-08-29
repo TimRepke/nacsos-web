@@ -167,7 +167,7 @@ import {
   AssignmentScopeModel,
   AssignmentScopeRandomConfig,
   UserModel,
-} from '@/plugins/client-core';
+} from '@/plugins/api/api-core';
 import { coreAPI } from '@/plugins/api';
 import { currentProjectStore } from '@/stores';
 

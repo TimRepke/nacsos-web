@@ -29,7 +29,7 @@
 <script lang="ts">
 import { currentProjectStore } from '@/stores';
 import InlineToolTip from '@/components/InlineToolTip.vue';
-import { UserProjectAssignmentScope } from '@/plugins/client-core';
+import { UserProjectAssignmentScope } from '@/plugins/api/api-core';
 import { coreAPI } from '@/plugins/api';
 
 export default {

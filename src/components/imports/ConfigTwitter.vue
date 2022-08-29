@@ -193,7 +193,7 @@
 import { PropType } from 'vue';
 import useVuelidate, { BaseValidation, ValidationRule } from '@vuelidate/core';
 import { required, between, alphaNum, integer } from '@vuelidate/validators';
-import { ImportConfigTwitter } from '@/plugins/client-core';
+import { ImportConfigTwitter } from '@/plugins/api/api-core';
 
 const isValidISO8601: ValidationRule = {
   $validator(value: string): boolean {

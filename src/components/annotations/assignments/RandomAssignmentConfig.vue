@@ -62,7 +62,7 @@
 </template>
 
 <script lang="ts">
-import { AssignmentScopeRandomConfig } from '@/plugins/client-core';
+import { AssignmentScopeRandomConfig } from '@/plugins/api/api-core';
 import { PropType } from 'vue';
 
 export default {
