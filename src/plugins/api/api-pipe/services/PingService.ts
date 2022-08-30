@@ -4,6 +4,8 @@
 import type { CancelablePromise } from '@/plugins/api/core/CancelablePromise';
 import type { BaseHttpRequest } from '@/plugins/api/core/BaseHttpRequest';
 
+import { ApiRequestOptions } from '@/plugins/api/core/ApiRequestOptions';
+
 export class PingService {
 
   constructor(public readonly httpRequest: BaseHttpRequest) {}
@@ -13,10 +15,11 @@ export class PingService {
    * @returns string Successful Response
    * @throws ApiError
    */
-  public pongApiPingGet(): CancelablePromise<string> {
+  public pongApiPingGet(options?: Partial<ApiRequestOptions>): CancelablePromise<string> {
     return this.httpRequest.request({
       method: 'GET',
       url: '/api/ping/',
+      ...options,
     });
   }
 
@@ -25,10 +28,11 @@ export class PingService {
    * @returns string Successful Response
    * @throws ApiError
    */
-  public errApiPingErrorGet(): CancelablePromise<string> {
+  public errApiPingErrorGet(options?: Partial<ApiRequestOptions>): CancelablePromise<string> {
     return this.httpRequest.request({
       method: 'GET',
       url: '/api/ping/error',
+      ...options,
     });
   }
 
@@ -37,10 +41,11 @@ export class PingService {
    * @returns string Successful Response
    * @throws ApiError
    */
-  public warnApiPingWarnGet(): CancelablePromise<string> {
+  public warnApiPingWarnGet(options?: Partial<ApiRequestOptions>): CancelablePromise<string> {
     return this.httpRequest.request({
       method: 'GET',
       url: '/api/ping/warn',
+      ...options,
     });
   }
 
@@ -49,10 +54,11 @@ export class PingService {
    * @returns string Successful Response
    * @throws ApiError
    */
-  public warn2ApiPingWarn2Get(): CancelablePromise<string> {
+  public warn2ApiPingWarn2Get(options?: Partial<ApiRequestOptions>): CancelablePromise<string> {
     return this.httpRequest.request({
       method: 'GET',
       url: '/api/ping/warn2',
+      ...options,
     });
   }
 
@@ -65,7 +71,7 @@ export class PingService {
     name,
   }: {
     name: string,
-  }): CancelablePromise<string> {
+  }, options?: Partial<ApiRequestOptions>): CancelablePromise<string> {
     return this.httpRequest.request({
       method: 'POST',
       url: '/api/ping/{name}',
@@ -75,6 +81,7 @@ export class PingService {
       errors: {
         422: `Validation Error`,
       },
+      ...options,
     });
   }
 

@@ -30,7 +30,7 @@
 import { currentProjectStore } from '@/stores';
 import InlineToolTip from '@/components/InlineToolTip.vue';
 import { UserProjectAssignmentScope } from '@/plugins/api/api-core';
-import { coreAPI } from '@/plugins/api';
+import { API, ignore } from '@/plugins/api';
 
 export default {
   name: 'AssignmentScopesView',
@@ -41,10 +41,12 @@ export default {
     };
   },
   async mounted() {
-    this.annotationScopes = await coreAPI.annotations.getAssignmentScopesForUserApiAnnotationsAnnotateScopesProjectIdGet({
+    API.core.annotations.getAssignmentScopesForUserApiAnnotationsAnnotateScopesProjectIdGet({
       projectId: currentProjectStore.projectId,
       xProjectId: currentProjectStore.projectId,
-    });
+    })
+      .then((response) => { this.annotationScopes = response.data; })
+      .catch(ignore);
   },
   methods: {
     // none

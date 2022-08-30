@@ -54,7 +54,9 @@
         </div>
         <div class="row g-0 border-top pt-2">
           <div class="col text-start">
-            <button type="button" class="btn btn-outline-secondary" @click="saveAndPrevious()" disabled>Save & Previous</button>
+            <button type="button" class="btn btn-outline-secondary" @click="saveAndPrevious()" disabled>Save &
+              Previous
+            </button>
           </div>
           <div class="col text-end">
             <button type="button" class="btn btn-primary" @click="saveAndNext()">Save & Next</button>
@@ -79,7 +81,7 @@ import {
   AssignmentScopeModel,
 } from '@/plugins/api/api-core';
 import { AnyItem } from '@/types/items.d';
-import { coreAPI } from '@/plugins/api';
+import { API, ignore } from '@/plugins/api';
 import { currentProjectStore } from '@/stores';
 
 const motivationalQuotes = [
@@ -138,21 +140,22 @@ export default {
     const assignmentScopeId = this.$route.params.scope_id as string;
     const currentAssignmentId = this.$route.params.assignment_id as string;
 
-    let response: AnnotationItem;
-    if (currentAssignmentId) {
-      response = await coreAPI.annotations.getAssignmentApiAnnotationsAnnotateAssignmentAssignmentIdGet({
-        xProjectId: currentProjectStore.projectId,
-        assignmentId: currentAssignmentId,
-      });
-    } else {
-      response = await coreAPI.annotations.getNextOpenAssignmentForScopeForUserApiAnnotationsAnnotateNextAssignmentScopeIdGet({
-        xProjectId: currentProjectStore.projectId,
-        assignmentScopeId,
-      });
-    }
-
-    if (response) {
+    try {
+      let response: AnnotationItem;
+      if (currentAssignmentId) {
+        response = (await API.core.annotations.getAssignmentApiAnnotationsAnnotateAssignmentAssignmentIdGet({
+          xProjectId: currentProjectStore.projectId,
+          assignmentId: currentAssignmentId,
+        })).data;
+      } else {
+        response = (await API.core.annotations.getNextOpenAssignmentForScopeForUserApiAnnotationsAnnotateNextAssignmentScopeIdGet({
+          xProjectId: currentProjectStore.projectId,
+          assignmentScopeId,
+        })).data;
+      }
       await this.setCurrentAssignment(response);
+    } catch (e) {
+      console.error(e);
     }
   },
   methods: {
@@ -211,14 +214,15 @@ export default {
       scheme.labels = removeEmptyAnnotations(labels);
 
       // Send data to the server
-      coreAPI.annotations.saveAnnotationApiAnnotationsAnnotateSavePost({
+      API.core.annotations.saveAnnotationApiAnnotationsAnnotateSavePost({
         xProjectId: currentProjectStore.projectId,
         requestBody: {
           scheme,
           assignment: this.assignment,
         },
       })
-        .then((reason) => {
+        .then((response) => {
+          const reason = response.data;
           if (reason === 'PARTIAL') {
             EventBus.emit(new ToastEvent(
               'WARN',
@@ -256,31 +260,32 @@ export default {
       this.labels = this.populateEmptyAnnotations(this.scheme.labels);
 
       // update the assignments progress bar
-      this.assignments = await coreAPI.annotations.getAssignmentsForScopeApiAnnotationsAnnotateAssignmentsScopeAssignmentScopeIdGet({
+      API.core.annotations.getAssignmentsForScopeApiAnnotationsAnnotateAssignmentsScopeAssignmentScopeIdGet({
         xProjectId: currentProjectStore.projectId,
         assignmentScopeId: annotationItem.scope.assignment_scope_id as string,
-      });
-
-      // update the URL
-      await this.$router.push({
-        name: 'project-annotate-item',
-        params: {
-          scope_id: this.scope.assignment_scope_id,
-          assignment_id: this.assignment.assignment_id,
-        },
-      });
+      })
+        .then(async (response) => {
+          this.assignments = response.data;
+          // update the URL
+          await this.$router.push({
+            name: 'project-annotate-item',
+            params: {
+              scope_id: this.scope.assignment_scope_id,
+              assignment_id: this.assignment.assignment_id,
+            },
+          });
+        })
+        .catch(ignore);
     },
     async saveAndGoto(targetAssignmentId: string) {
       await this.save();
 
-      const response = await coreAPI.annotations
-        .getAssignmentApiAnnotationsAnnotateAssignmentAssignmentIdGet({
-          xProjectId: currentProjectStore.projectId,
-          assignmentId: targetAssignmentId,
-        });
-      if (response) {
-        await this.setCurrentAssignment(response);
-      }
+      API.core.annotations.getAssignmentApiAnnotationsAnnotateAssignmentAssignmentIdGet({
+        xProjectId: currentProjectStore.projectId,
+        assignmentId: targetAssignmentId,
+      })
+        .then((response) => { this.setCurrentAssignment(response.data); })
+        .catch(ignore);
     },
     async saveAndPrevious() {
       // TODO implement "previous" endpoint and this function
@@ -288,16 +293,14 @@ export default {
     async saveAndNext() {
       await this.save();
 
-      const response = await coreAPI.annotations
+      API.core.annotations
         .getNextAssignmentForScopeForUserApiAnnotationsAnnotateNextAssignmentScopeIdCurrentAssignmentIdGet({
           xProjectId: currentProjectStore.projectId,
           assignmentScopeId: this.assignment.assignment_scope_id,
           currentAssignmentId: this.assignment.assignment_id,
-        });
-
-      if (response) {
-        await this.setCurrentAssignment(response);
-      }
+        })
+        .then((response) => { this.setCurrentAssignment(response.data); })
+        .catch(ignore);
     },
   },
   computed: {

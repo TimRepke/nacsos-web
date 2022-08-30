@@ -1,23 +1,22 @@
 import { App } from 'vue';
-import { OpenAPIConfig } from '@/plugins/api/core/OpenAPI';
 import { CoreClient } from './api-core';
 import { PipelinesClient } from './api-pipe';
 
-const pipelinesAPI = new PipelinesClient({
-  BASE: 'http://localhost:8000',
-});
-
-const coreAPI = new CoreClient({
-  BASE: 'http://localhost:8081',
-} as OpenAPIConfig);
+const API = {
+  pipe: new PipelinesClient({
+    BASE: 'http://localhost:8000',
+  }),
+  core: new CoreClient({
+    BASE: 'http://localhost:8081',
+  }),
+};
 
 export default {
   install(app: App) {
     // eslint-disable-next-line no-param-reassign
-    app.config.globalProperties.$coreAPI = coreAPI;
-    // eslint-disable-next-line no-param-reassign
-    app.config.globalProperties.$pipelineAPI = pipelinesAPI;
+    app.config.globalProperties.$API = API;
   },
 };
-
-export { pipelinesAPI, coreAPI };
+export { API };
+export type { ApiResponse, ApiResponseReject, ErrorDetails, ErrorLevel } from '@/plugins/api/core/CancelablePromise';
+export { ignore, toastReject, logReject } from '@/plugins/api/core/CancelablePromise';

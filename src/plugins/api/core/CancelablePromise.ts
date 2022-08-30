@@ -1,4 +1,8 @@
 /* eslint-disable max-classes-per-file, no-underscore-dangle, lines-between-class-members */
+import { AxiosResponse } from 'axios';
+import { EventBus } from '@/plugins/events';
+import { ToastEvent } from '@/plugins/events/events/toast';
+
 export class CancelError extends Error {
   constructor(message: string) {
     super(message);
@@ -18,7 +22,37 @@ export interface OnCancel {
   (cancelHandler: () => void): void;
 }
 
-export class CancelablePromise<T> implements Promise<T> {
+export enum ErrorLevel {
+  WARNING = 'WARNING',
+  ERROR = 'ERROR',
+}
+
+export type ErrorDetails = {
+  level: ErrorLevel;
+  type: string;
+  message: string;
+  args?: unknown[];
+  error?: Error;
+};
+
+type ApiResponseBase = {
+  readonly ok: boolean;
+  readonly status: number;
+  readonly response?: AxiosResponse;
+};
+
+export type ApiResponse<T> = ApiResponseBase & { data: T };
+export type ApiResponseReject = ApiResponseBase & { error: ErrorDetails };
+
+export function ignore() {}
+
+export function logReject(reason: ApiResponseReject) { console.error(reason); }
+
+export function toastReject(reason: ApiResponseReject) {
+  EventBus.emit(new ToastEvent('WARN', `Request failed ${reason.status} ${reason.error.type}(${reason.error.message})`));
+}
+
+export class CancelablePromise<T> implements Promise<ApiResponse<T>> {
   readonly [Symbol.toStringTag]!: string;
 
   private _isResolved: boolean;
@@ -29,16 +63,16 @@ export class CancelablePromise<T> implements Promise<T> {
 
   private readonly _cancelHandlers: (() => void)[];
 
-  private readonly _promise: Promise<T>;
+  private readonly _promise: Promise<ApiResponse<T>>;
 
-  private _resolve?: (value: T | PromiseLike<T>) => void;
+  private _resolve?: (value: ApiResponse<T> | PromiseLike<ApiResponse<T>>) => void;
 
-  private _reject?: (reason?: any) => void;
+  private _reject?: (reason?: ApiResponseReject) => void;
 
   constructor(
     executor: (
-      resolve: (value: T | PromiseLike<T>) => void,
-      reject: (reason?: any) => void,
+      resolve: (value: ApiResponse<T> | PromiseLike<ApiResponse<T>>) => void,
+      reject: (reason?: ApiResponseReject) => void,
       onCancel: OnCancel
     ) => void,
   ) {
@@ -46,11 +80,11 @@ export class CancelablePromise<T> implements Promise<T> {
     this._isRejected = false;
     this._isCancelled = false;
     this._cancelHandlers = [];
-    this._promise = new Promise<T>((resolve, reject) => {
+    this._promise = new Promise<ApiResponse<T>>((resolve, reject) => {
       this._resolve = resolve;
       this._reject = reject;
 
-      const onResolve = (value: T | PromiseLike<T>): void => {
+      const onResolve = (value: ApiResponse<T> | PromiseLike<ApiResponse<T>>): void => {
         if (this._isResolved || this._isRejected || this._isCancelled) {
           return;
         }
@@ -58,7 +92,7 @@ export class CancelablePromise<T> implements Promise<T> {
         this._resolve?.(value);
       };
 
-      const onReject = (reason?: any): void => {
+      const onReject = (reason?: ApiResponseReject): void => {
         if (this._isResolved || this._isRejected || this._isCancelled) {
           return;
         }
@@ -90,20 +124,20 @@ export class CancelablePromise<T> implements Promise<T> {
     });
   }
 
-  public then<TResult1 = T, TResult2 = never>(
-    onFulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | null,
-    onRejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | null,
+  public then<TResult1 = ApiResponse<T>, TResult2 = ApiResponseReject>(
+    onFulfilled?: ((value: ApiResponse<T>) => TResult1 | PromiseLike<TResult1>) | null,
+    onRejected?: ((reason: ApiResponseReject) => TResult2 | PromiseLike<TResult2>) | null,
   ): Promise<TResult1 | TResult2> {
     return this._promise.then(onFulfilled, onRejected);
   }
 
-  public catch<TResult = never>(
-    onRejected?: ((reason: any) => TResult | PromiseLike<TResult>) | null,
-  ): Promise<T | TResult> {
+  public catch<TResult = ApiResponseReject>(
+    onRejected?: ((reason: ApiResponseReject) => TResult | PromiseLike<TResult>) | null,
+  ): Promise<ApiResponse<T> | TResult> {
     return this._promise.catch(onRejected);
   }
 
-  public finally(onFinally?: (() => void) | null): Promise<T> {
+  public finally(onFinally?: (() => void) | null): Promise<ApiResponse<T>> {
     return this._promise.finally(onFinally);
   }
 
@@ -124,7 +158,16 @@ export class CancelablePromise<T> implements Promise<T> {
       }
     }
     this._cancelHandlers.length = 0;
-    this._reject?.(new CancelError('Request aborted'));
+    this._reject?.({ // new CancelError('Request aborted')
+      ok: false,
+      status: -1,
+      response: undefined,
+      error: {
+        level: ErrorLevel.WARNING,
+        message: 'Request aborted',
+        type: 'CancelError',
+      },
+    });
   }
 
   public get isCancelled(): boolean {

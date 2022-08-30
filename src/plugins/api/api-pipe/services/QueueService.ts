@@ -7,6 +7,8 @@ import type { TaskInDB } from '../models/TaskInDB';
 import type { CancelablePromise } from '@/plugins/api/core/CancelablePromise';
 import type { BaseHttpRequest } from '@/plugins/api/core/BaseHttpRequest';
 
+import { ApiRequestOptions } from '@/plugins/api/core/ApiRequestOptions';
+
 export class QueueService {
 
   constructor(public readonly httpRequest: BaseHttpRequest) {}
@@ -16,10 +18,11 @@ export class QueueService {
    * @returns TaskInDB Successful Response
    * @throws ApiError
    */
-  public getAllApiQueueListGet(): CancelablePromise<Array<TaskInDB>> {
+  public getAllApiQueueListGet(options?: Partial<ApiRequestOptions>): CancelablePromise<Array<TaskInDB>> {
     return this.httpRequest.request({
       method: 'GET',
       url: '/api/queue/list',
+      ...options,
     });
   }
 
@@ -32,7 +35,7 @@ export class QueueService {
     status,
   }: {
     status: 'PENDING' | 'RUNNING' | 'COMPLETED' | 'FAILED' | 'CANCELLED',
-  }): CancelablePromise<Array<TaskInDB>> {
+  }, options?: Partial<ApiRequestOptions>): CancelablePromise<Array<TaskInDB>> {
     return this.httpRequest.request({
       method: 'GET',
       url: '/api/queue/list/{status}',
@@ -42,6 +45,7 @@ export class QueueService {
       errors: {
         422: `Validation Error`,
       },
+      ...options,
     });
   }
 
@@ -54,7 +58,7 @@ export class QueueService {
     projectId,
   }: {
     projectId: string,
-  }): CancelablePromise<Array<TaskInDB>> {
+  }, options?: Partial<ApiRequestOptions>): CancelablePromise<Array<TaskInDB>> {
     return this.httpRequest.request({
       method: 'GET',
       url: '/api/queue/project/{project_id}/list',
@@ -64,6 +68,7 @@ export class QueueService {
       errors: {
         422: `Validation Error`,
       },
+      ...options,
     });
   }
 
@@ -78,7 +83,7 @@ export class QueueService {
   }: {
     projectId: string,
     status: 'PENDING' | 'RUNNING' | 'COMPLETED' | 'FAILED' | 'CANCELLED',
-  }): CancelablePromise<Array<TaskInDB>> {
+  }, options?: Partial<ApiRequestOptions>): CancelablePromise<Array<TaskInDB>> {
     return this.httpRequest.request({
       method: 'GET',
       url: '/api/queue/project/{project_id}/list/{status}',
@@ -89,12 +94,13 @@ export class QueueService {
       errors: {
         422: `Validation Error`,
       },
+      ...options,
     });
   }
 
   /**
    * Search Tasks
-   * @returns any Successful Response
+   * @returns TaskInDB Successful Response
    * @throws ApiError
    */
   public searchTasksApiQueueSearchGet({
@@ -113,7 +119,7 @@ export class QueueService {
     location?: string,
     status?: string,
     orderByFields?: Array<string>,
-  }): CancelablePromise<any> {
+  }, options?: Partial<ApiRequestOptions>): CancelablePromise<Array<TaskInDB>> {
     return this.httpRequest.request({
       method: 'GET',
       url: '/api/queue/search',
@@ -129,6 +135,7 @@ export class QueueService {
       errors: {
         422: `Validation Error`,
       },
+      ...options,
     });
   }
 
@@ -141,7 +148,7 @@ export class QueueService {
     taskId,
   }: {
     taskId: string,
-  }): CancelablePromise<'PENDING' | 'RUNNING' | 'COMPLETED' | 'FAILED' | 'CANCELLED'> {
+  }, options?: Partial<ApiRequestOptions>): CancelablePromise<'PENDING' | 'RUNNING' | 'COMPLETED' | 'FAILED' | 'CANCELLED'> {
     return this.httpRequest.request({
       method: 'GET',
       url: '/api/queue/status/{task_id}',
@@ -151,6 +158,7 @@ export class QueueService {
       errors: {
         422: `Validation Error`,
       },
+      ...options,
     });
   }
 
@@ -163,7 +171,7 @@ export class QueueService {
     taskId,
   }: {
     taskId: string,
-  }): CancelablePromise<any> {
+  }, options?: Partial<ApiRequestOptions>): CancelablePromise<any> {
     return this.httpRequest.request({
       method: 'POST',
       url: '/api/queue/force-run/{task_id}',
@@ -173,19 +181,20 @@ export class QueueService {
       errors: {
         422: `Validation Error`,
       },
+      ...options,
     });
   }
 
   /**
    * Submit Bulk
-   * @returns any Successful Response
+   * @returns string Successful Response
    * @throws ApiError
    */
   public submitBulkApiQueueSubmitTasksPut({
     requestBody,
   }: {
     requestBody: Array<SubmittedTask>,
-  }): CancelablePromise<any> {
+  }, options?: Partial<ApiRequestOptions>): CancelablePromise<Array<string>> {
     return this.httpRequest.request({
       method: 'PUT',
       url: '/api/queue/submit/tasks',
@@ -194,19 +203,20 @@ export class QueueService {
       errors: {
         422: `Validation Error`,
       },
+      ...options,
     });
   }
 
   /**
    * Submit Single
-   * @returns any Successful Response
+   * @returns string Successful Response
    * @throws ApiError
    */
   public submitSingleApiQueueSubmitTaskPut({
     requestBody,
   }: {
     requestBody: SubmittedTask,
-  }): CancelablePromise<any> {
+  }, options?: Partial<ApiRequestOptions>): CancelablePromise<string> {
     return this.httpRequest.request({
       method: 'PUT',
       url: '/api/queue/submit/task',
@@ -215,6 +225,7 @@ export class QueueService {
       errors: {
         422: `Validation Error`,
       },
+      ...options,
     });
   }
 
@@ -227,7 +238,7 @@ export class QueueService {
     taskId,
   }: {
     taskId: string,
-  }): CancelablePromise<any> {
+  }, options?: Partial<ApiRequestOptions>): CancelablePromise<any> {
     return this.httpRequest.request({
       method: 'PUT',
       url: '/api/queue/cancel/{task_id}',
@@ -237,6 +248,7 @@ export class QueueService {
       errors: {
         422: `Validation Error`,
       },
+      ...options,
     });
   }
 
@@ -249,7 +261,7 @@ export class QueueService {
     taskId,
   }: {
     taskId: string,
-  }): CancelablePromise<any> {
+  }, options?: Partial<ApiRequestOptions>): CancelablePromise<any> {
     return this.httpRequest.request({
       method: 'DELETE',
       url: '/api/queue/task/{task_id}',
@@ -259,6 +271,7 @@ export class QueueService {
       errors: {
         422: `Validation Error`,
       },
+      ...options,
     });
   }
 

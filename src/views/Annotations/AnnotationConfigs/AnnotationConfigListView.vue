@@ -88,7 +88,7 @@ import { ConfirmationRequestEvent } from '@/plugins/events/events/confirmation';
 import InlineToolTip from '@/components/InlineToolTip.vue';
 import { ToastEvent } from '@/plugins/events/events/toast';
 import { AnnotationSchemeModel, AssignmentScopeModel } from '@/plugins/api/api-core';
-import { coreAPI } from '@/plugins/api';
+import { API, ApiResponseReject } from '@/plugins/api';
 
 export default {
   name: 'AnnotationConfigListView',
@@ -100,31 +100,39 @@ export default {
     };
   },
   async mounted() {
-    this.projectSchemes = await coreAPI.annotations.getSchemeDefinitionsForProjectApiAnnotationsSchemesListProjectIdGet({
-      projectId: currentProjectStore.projectId,
-    });
-    this.projectScopes = await coreAPI.annotations.getAssignmentScopesForProjectApiAnnotationsAnnotateScopesGet({
-      xProjectId: currentProjectStore.projectId,
-    });
+    try {
+      this.projectSchemes = (await API.core.annotations.getSchemeDefinitionsForProjectApiAnnotationsSchemesListProjectIdGet({
+        projectId: currentProjectStore.projectId,
+      })).data;
+      this.projectScopes = (await API.core.annotations.getAssignmentScopesForProjectApiAnnotationsAnnotateScopesGet({
+        xProjectId: currentProjectStore.projectId,
+      })).data;
+    } catch (e) {
+      console.error(e);
+      const err = e as ApiResponseReject;
+      EventBus.emit(new ToastEvent('ERROR', `Failed to load data (${err.error.type}: ${err.error.message})`));
+    }
   },
   methods: {
-    copyScheme(scheme: AnnotationSchemeModel) {
+    async copyScheme(scheme: AnnotationSchemeModel) {
       const copy: AnnotationSchemeModel = JSON.parse(JSON.stringify(scheme));
       copy.annotation_scheme_id = undefined;
       copy.name = `[COPY] ${scheme.name}`;
-      coreAPI.annotations.putAnnotationSchemeApiAnnotationsSchemesDefinitionPut({
-        xProjectId: currentProjectStore.projectId,
-        requestBody: copy,
-      })
-        .then(() => {
-          EventBus.emit(new ToastEvent('SUCCESS', `Created copy of the annotation scheme "${scheme.name}".`));
-          coreAPI.annotations.getSchemeDefinitionsForProjectApiAnnotationsSchemesListProjectIdGet({
-            projectId: currentProjectStore.projectId,
-          })
-            .then((res) => { this.projectSchemes = res; })
-            .catch(() => { EventBus.emit(new ToastEvent('ERROR', 'Failed to refresh data, try reloading the page.')); });
-        })
-        .catch(() => { EventBus.emit(new ToastEvent('ERROR', `Failed to copy annotation scheme "${scheme.name}".`)); });
+
+      try {
+        const copyId = await API.core.annotations.putAnnotationSchemeApiAnnotationsSchemesDefinitionPut({
+          xProjectId: currentProjectStore.projectId,
+          requestBody: copy,
+        });
+        EventBus.emit(new ToastEvent('SUCCESS', `Created copy of the annotation scheme "${scheme.name}" with ID ${copyId.data}.`));
+
+        const schemes = await API.core.annotations.getSchemeDefinitionsForProjectApiAnnotationsSchemesListProjectIdGet({
+          projectId: currentProjectStore.projectId,
+        });
+        this.projectSchemes = schemes.data;
+      } catch (e) {
+        EventBus.emit(new ToastEvent('ERROR', 'Failed to copy or refresh data, try reloading the page.'));
+      }
     },
     exportData(scheme: AnnotationSchemeModel) {
       // TODO
@@ -137,9 +145,9 @@ export default {
         + `- "${scheme.name}"\n`
         + `- ID: ${scheme.annotation_scheme_id}\n\n`
         + 'This may result in deletion of all associated assignments and annotations or at least make them meaningless!',
-        (response) => {
-          if (response === 'ACCEPT') {
-            coreAPI.annotations.removeAnnotationSchemeApiAnnotationsSchemesDefinitionSchemeIdDelete({
+        (confirmationResponse) => {
+          if (confirmationResponse === 'ACCEPT') {
+            API.core.annotations.removeAnnotationSchemeApiAnnotationsSchemesDefinitionSchemeIdDelete({
               xProjectId: currentProjectStore.projectId,
               annotationSchemeId: scheme.annotation_scheme_id as string,
             })
@@ -168,9 +176,9 @@ export default {
         + `- "${scope.name}"\n`
         + `- ID: ${scope.assignment_scope_id}\n\n`
         + 'This may result in deletion of all associated assignments and annotations or at least make them meaningless!',
-        (response) => {
-          if (response === 'ACCEPT') {
-            coreAPI.annotations.removeAssignmentScopeApiAnnotationsAnnotateScopeAssignmentScopeIdDelete({
+        (confirmationResponse) => {
+          if (confirmationResponse === 'ACCEPT') {
+            API.core.annotations.removeAssignmentScopeApiAnnotationsAnnotateScopeAssignmentScopeIdDelete({
               xProjectId: currentProjectStore.projectId,
               assignmentScopeId: scope.assignment_scope_id as string,
             })
@@ -178,7 +186,6 @@ export default {
                 EventBus.emit(new ToastEvent('SUCCESS', 'Assignment scope deleted!'));
                 const index = this.projectScopes
                   .findIndex((assignmentScope: AssignmentScopeModel) => assignmentScope.assignment_scope_id === scope.assignment_scope_id);
-                console.log(index);
                 if (index >= 0) {
                   this.projectScopes.splice(index, 1);
                 }

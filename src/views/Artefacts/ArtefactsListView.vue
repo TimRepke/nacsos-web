@@ -82,7 +82,7 @@ import { marked } from 'marked';
 import { TaskInDB, FunctionInfo, FileOnDisk, QueueService } from '@/plugins/api/api-pipe';
 import { EventBus } from '@/plugins/events';
 import { ToastEvent } from '@/plugins/events/events/toast';
-import { pipelinesAPI } from '@/plugins/api';
+import { API } from '@/plugins/api';
 import { currentProjectStore, currentUserStore } from '@/stores';
 
 type SearchParams = Parameters<QueueService['searchTasksApiQueueSearchGet']>[0];
@@ -120,34 +120,39 @@ export default {
   },
   methods: {
     async loadEntries() {
-      const tasks = await pipelinesAPI.queue.searchTasksApiQueueSearchGet(this.searchObject);
-      if (!tasks) {
-        EventBus.emit(new ToastEvent('ERROR', 'Failed to load tasks. Please try reloading the page.'));
-        return;
+      try {
+        const tasks = (await API.pipe.queue.searchTasksApiQueueSearchGet(this.searchObject)).data;
+        if (!tasks) {
+          EventBus.emit(new ToastEvent('ERROR', 'Failed to load tasks. Please try reloading the page.'));
+          return;
+        }
+
+        const funcNames: string[] = Array.from(new Set(tasks.map((task: TaskInDB) => task.function_name)));
+        const funcInfos = (await API.pipe.library.getFunctionInfosApiLibraryInfosGet({ funcName: funcNames })).data;
+        if (!funcInfos) {
+          EventBus.emit(new ToastEvent('ERROR', 'Failed to load function infos. Please try reloading the page.'));
+          return;
+        }
+
+        const funcs = Object.fromEntries(funcInfos.map((func: FunctionInfo) => [`${func.module}.${func.function}`, func]));
+
+        this.entries = tasks.map((task: TaskInDB) => ({
+          task,
+          info: funcs[task.function_name],
+          showArtefacts: false,
+          showLog: false,
+          log: false,
+        }));
+      } catch (e) {
+        console.error(e);
+        EventBus.emit(new ToastEvent('ERROR', 'Loading data failed, please try reloading.'));
       }
-
-      const funcNames: string[] = Array.from(new Set(tasks.map((task: TaskInDB) => task.function_name)));
-      const funcInfos = await pipelinesAPI.library.getFunctionInfosApiLibraryInfosGet({ funcName: funcNames });
-      if (!funcInfos) {
-        EventBus.emit(new ToastEvent('ERROR', 'Failed to load function infos. Please try reloading the page.'));
-        return;
-      }
-
-      const funcs = Object.fromEntries(funcInfos.map((func: FunctionInfo) => [`${func.module}.${func.function}`, func]));
-
-      this.entries = tasks.map((task: TaskInDB) => ({
-        task,
-        info: funcs[task.function_name],
-        showArtefacts: false,
-        showLog: false,
-        log: false,
-      }));
     },
     md2html(s: string): string {
       return marked(s);
     },
     async toggleEntry(entry: Entry) {
-      const artefacts = await pipelinesAPI.artefacts.getArtefactsApiArtefactsListTaskIdGet({ taskId: entry.task.task_id as string });
+      const artefacts = (await API.pipe.artefacts.getArtefactsApiArtefactsListTaskIdGet({ taskId: entry.task.task_id as string })).data;
       if (!artefacts) {
         EventBus.emit(new ToastEvent('WARN', `Failed to load additional info for task ${entry.task.task_id}`));
       } else {

@@ -1,12 +1,12 @@
-import axios from 'axios';
 import type { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
+import axios from 'axios';
 import FormData from 'form-data';
 
-import { CancelablePromise } from './CancelablePromise';
+import type { OnCancel } from './CancelablePromise';
+import { CancelablePromise, ErrorLevel } from './CancelablePromise';
 import { ApiError } from './ApiError';
 import type { ApiRequestOptions } from './ApiRequestOptions';
 import type { ApiResult } from './ApiResult';
-import type { OnCancel } from './CancelablePromise';
 import type { OpenAPIConfig } from './OpenAPI';
 
 const isDefined = <T>(value: T | null | undefined): value is Exclude<T, null | undefined> => value !== undefined && value !== null;
@@ -198,6 +198,7 @@ const sendRequest = async <T>(
     method: options.method,
     withCredentials: config.WITH_CREDENTIALS,
     cancelToken: source.token,
+    ...options.customRequestConfig,
   };
 
   onCancel(() => source.cancel('The user aborted a request.'));
@@ -243,7 +244,7 @@ const catchErrorCodes = (options: ApiRequestOptions, result: ApiResult): void =>
   };
 
   const error = errors[result.status];
-  if (error) {
+  if (error || !result.ok) {
     throw new ApiError(options, result, error);
   }
 
@@ -279,14 +280,39 @@ export const request = <T>(config: OpenAPIConfig, options: ApiRequestOptions): C
           status: response.status,
           statusText: response.statusText,
           body: responseHeader ?? responseBody,
+          response,
         };
 
         catchErrorCodes(options, result);
 
-        resolvePromise(result.body);
+        resolvePromise({
+          ok: result.ok,
+          status: result.status,
+          response,
+          data: result.body,
+        });
       }
     } catch (error) {
-      rejectPromise(error);
+      if (error instanceof ApiError) {
+        const reason = {
+          ok: error.ok,
+          status: error.status,
+          response: error.response,
+          error: error.body,
+        };
+        rejectPromise(reason);
+      } else {
+        rejectPromise({
+          ok: false,
+          status: -1,
+          error: {
+            level: ErrorLevel.ERROR,
+            type: 'JSError',
+            message: 'Internal client-side error',
+            error: error as Error,
+          },
+        });
+      }
     }
   })
 );

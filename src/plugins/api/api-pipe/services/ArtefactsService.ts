@@ -9,6 +9,8 @@ import type { FileOnDisk } from '../models/FileOnDisk';
 import type { CancelablePromise } from '@/plugins/api/core/CancelablePromise';
 import type { BaseHttpRequest } from '@/plugins/api/core/BaseHttpRequest';
 
+import { ApiRequestOptions } from '@/plugins/api/core/ApiRequestOptions';
+
 export class ArtefactsService {
 
   constructor(public readonly httpRequest: BaseHttpRequest) {}
@@ -22,7 +24,7 @@ export class ArtefactsService {
     taskId,
   }: {
     taskId: string,
-  }): CancelablePromise<Array<FileOnDisk>> {
+  }, options?: Partial<ApiRequestOptions>): CancelablePromise<Array<FileOnDisk>> {
     return this.httpRequest.request({
       method: 'GET',
       url: '/api/artefacts/list/{task_id}',
@@ -32,6 +34,7 @@ export class ArtefactsService {
       errors: {
         422: `Validation Error`,
       },
+      ...options,
     });
   }
 
@@ -44,7 +47,7 @@ export class ArtefactsService {
     taskId,
   }: {
     taskId: string,
-  }): CancelablePromise<string> {
+  }, options?: Partial<ApiRequestOptions>): CancelablePromise<string> {
     return this.httpRequest.request({
       method: 'GET',
       url: '/api/artefacts/log/{task_id}',
@@ -54,6 +57,7 @@ export class ArtefactsService {
       errors: {
         422: `Validation Error`,
       },
+      ...options,
     });
   }
 
@@ -66,7 +70,7 @@ export class ArtefactsService {
     filename,
   }: {
     filename: string,
-  }): CancelablePromise<any> {
+  }, options?: Partial<ApiRequestOptions>): CancelablePromise<any> {
     return this.httpRequest.request({
       method: 'GET',
       url: '/api/artefacts/file',
@@ -76,6 +80,7 @@ export class ArtefactsService {
       errors: {
         422: `Validation Error`,
       },
+      ...options,
     });
   }
 
@@ -88,7 +93,7 @@ export class ArtefactsService {
     taskId,
   }: {
     taskId: string,
-  }): CancelablePromise<any> {
+  }, options?: Partial<ApiRequestOptions>): CancelablePromise<any> {
     return this.httpRequest.request({
       method: 'GET',
       url: '/api/artefacts/files/{task_id}',
@@ -98,12 +103,13 @@ export class ArtefactsService {
       errors: {
         422: `Validation Error`,
       },
+      ...options,
     });
   }
 
   /**
    * Upload File
-   * @returns any Successful Response
+   * @returns string Successful Response
    * @throws ApiError
    */
   public uploadFileApiArtefactsFilesUploadPost({
@@ -112,7 +118,7 @@ export class ArtefactsService {
   }: {
     formData: Body_upload_file_api_artefacts_files_upload_post,
     folder?: string,
-  }): CancelablePromise<any> {
+  }, options?: Partial<ApiRequestOptions>): CancelablePromise<string> {
     return this.httpRequest.request({
       method: 'POST',
       url: '/api/artefacts/files/upload',
@@ -124,12 +130,13 @@ export class ArtefactsService {
       errors: {
         422: `Validation Error`,
       },
+      ...options,
     });
   }
 
   /**
    * Upload Files
-   * @returns any Successful Response
+   * @returns string Successful Response
    * @throws ApiError
    */
   public uploadFilesApiArtefactsFilesUploadManyPost({
@@ -138,7 +145,7 @@ export class ArtefactsService {
   }: {
     formData: Body_upload_files_api_artefacts_files_upload_many_post,
     folder?: string,
-  }): CancelablePromise<any> {
+  }, options?: Partial<ApiRequestOptions>): CancelablePromise<Array<string>> {
     return this.httpRequest.request({
       method: 'POST',
       url: '/api/artefacts/files/upload-many',
@@ -150,6 +157,7 @@ export class ArtefactsService {
       errors: {
         422: `Validation Error`,
       },
+      ...options,
     });
   }
 
@@ -162,7 +170,7 @@ export class ArtefactsService {
     requestBody,
   }: {
     requestBody: DeletionRequest,
-  }): CancelablePromise<any> {
+  }, options?: Partial<ApiRequestOptions>): CancelablePromise<any> {
     return this.httpRequest.request({
       method: 'DELETE',
       url: '/api/artefacts/files',
@@ -171,6 +179,7 @@ export class ArtefactsService {
       errors: {
         422: `Validation Error`,
       },
+      ...options,
     });
   }
 
@@ -183,7 +192,7 @@ export class ArtefactsService {
     taskId,
   }: {
     taskId: string,
-  }): CancelablePromise<any> {
+  }, options?: Partial<ApiRequestOptions>): CancelablePromise<any> {
     return this.httpRequest.request({
       method: 'DELETE',
       url: '/api/artefacts/task/{task_id}',
@@ -193,6 +202,7 @@ export class ArtefactsService {
       errors: {
         422: `Validation Error`,
       },
+      ...options,
     });
   }
 

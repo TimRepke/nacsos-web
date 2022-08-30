@@ -100,7 +100,7 @@ import ConfigJSONL from '@/components/imports/ConfigJSONL.vue';
 import ConfigRIS from '@/components/imports/ConfigRIS.vue';
 import { currentProjectStore, currentUserStore } from '@/stores';
 import { ConfirmationRequestEvent } from '@/plugins/events/events/confirmation';
-import { coreAPI } from '@/plugins/api';
+import { API, logReject, toastReject } from '@/plugins/api';
 
 type ImportConfig = ImportModel['config'];
 
@@ -162,15 +162,12 @@ export default {
   },
   async mounted() {
     if (this.importId) {
-      const importModel = await coreAPI.imports.getImportDetailsApiImportsImportImportIdGet({
+      API.core.imports.getImportDetailsApiImportsImportImportIdGet({
         importId: this.importId,
         xProjectId: currentProjectStore.projectId,
-      });
-      if (importModel) {
-        this.importDetails = importModel;
-      } else {
-        EventBus.emit(new ToastEvent('ERROR', 'Failed to load import details. Please try reloading.'));
-      }
+      })
+        .then((response) => { this.importDetails = response.data; })
+        .catch(toastReject);
     }
   },
   methods: {
@@ -181,21 +178,21 @@ export default {
       EventBus.emit(new ConfirmationRequestEvent(
         'Saving does not actually import data, so if you are ready, click the import button after saving.  \n'
         + 'In case the import has already started, you can not change the configuration (only the description).',
-        (response) => {
-          if (response === 'ACCEPT') {
-            coreAPI.imports.putImportDetailsApiImportsImportPut({
+        (confirmationResponse) => {
+          if (confirmationResponse === 'ACCEPT') {
+            API.core.imports.putImportDetailsApiImportsImportPut({
               requestBody: this.importDetails,
               xProjectId: currentProjectStore.projectId,
             })
-              .then((res) => {
-                EventBus.emit(new ToastEvent('SUCCESS', `Saved import settings.  \n**ID:** ${res}`));
+              .then((response) => {
+                EventBus.emit(new ToastEvent('SUCCESS', `Saved import settings.  \n**ID:** ${response.data}`));
                 if (this.isNewImport) {
                   this.isNewImport = false;
-                  this.$router.replace({ name: 'project-imports-details', params: { import_id: res } });
+                  this.$router.replace({ name: 'project-imports-details', params: { import_id: response.data } });
                 }
               })
-              .catch((res) => {
-                EventBus.emit(new ToastEvent('ERROR', `Failed to save your import settings. (${res.message})`));
+              .catch((reason) => {
+                EventBus.emit(new ToastEvent('ERROR', `Failed to save your import settings. (${reason.error?.type})`));
               });
           } else {
             EventBus.emit(new ToastEvent('WARN', 'Did not save your import config.'));
@@ -214,7 +211,7 @@ export default {
         + 'Make sure to **click save before importing**!',
         (response) => {
           if (response === 'ACCEPT') {
-            coreAPI.imports.triggerImportApiImportsImportImportIdPost({
+            API.core.imports.triggerImportApiImportsImportImportIdPost({
               importId: this.importId,
               xProjectId: currentProjectStore.projectId,
             })
@@ -235,10 +232,12 @@ export default {
       ));
     },
     async loadImportStats() {
-      this.importStats.numItems = await coreAPI.imports.getImportCountsApiImportsImportImportIdCountGet({
+      API.core.imports.getImportCountsApiImportsImportImportIdCountGet({
         importId: this.importId,
         xProjectId: currentProjectStore.projectId,
-      });
+      })
+        .then((response) => { this.importStats.numItems = response.data; })
+        .catch(logReject);
     },
   },
   computed: {

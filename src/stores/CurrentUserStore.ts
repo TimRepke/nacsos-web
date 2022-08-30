@@ -2,7 +2,7 @@ import { defineStore } from 'pinia';
 import { useStorage, RemovableRef } from '@vueuse/core';
 import Serializer from '@/types/serializer';
 import { UserModel } from '@/plugins/api/api-core';
-import { coreAPI } from '@/plugins/api';
+import { API } from '@/plugins/api';
 import { EventBus } from '@/plugins/events';
 import { AuthFailedEvent, LoginSuccessEvent } from '@/plugins/events/events/auth';
 
@@ -31,21 +31,17 @@ export const useCurrentUserStore = defineStore('CurrentUserStore', {
   },
   actions: {
     async login(username: string, password: string) {
-      coreAPI.oauth.loginForAccessTokenApiLoginTokenPost({
-        formData: { username, password },
-      }).then(async (response) => {
-        this.setAccessToken(response.access_token);
-        const currentUserResponse = await coreAPI.oauth.readUsersMeApiLoginMeGet();
-        if (!currentUserResponse) {
-          EventBus.emit(new AuthFailedEvent());
-        } else {
-          const user = currentUserResponse;
-          this.setUser(user);
-          EventBus.emit(new LoginSuccessEvent(user));
-        }
-      }).catch((reason) => {
+      try {
+        const token = await API.core.oauth.loginForAccessTokenApiLoginTokenPost({ formData: { username, password } });
+        this.setAccessToken(token.data.access_token);
+        const me = await API.core.oauth.readUsersMeApiLoginMeGet();
+        this.setUser(me.data);
+        EventBus.emit(new LoginSuccessEvent(me.data));
+      } catch (reason) {
+        this.clear();
         console.error(reason);
-      });
+        EventBus.emit(new AuthFailedEvent());
+      }
     },
     logout() {
       this.clear();
@@ -53,11 +49,11 @@ export const useCurrentUserStore = defineStore('CurrentUserStore', {
     clear() {
       this.accessToken = undefined;
       this.user = undefined;
-      coreAPI.request.config.TOKEN = undefined;
+      API.core.request.config.TOKEN = undefined;
     },
     setAccessToken(accessToken: string) {
       this.accessToken = accessToken;
-      coreAPI.request.config.TOKEN = accessToken;
+      API.core.request.config.TOKEN = accessToken;
     },
     setUser(user: UserModel) {
       this.user = user;

@@ -193,7 +193,7 @@ import NestedExpandableComponent from '@/components/pipelines/NestedExpandableCo
 import TaskConfigComponent from '@/components/pipelines/TaskConfig.vue';
 import { ConfirmationRequestEvent } from '@/plugins/events/events/confirmation';
 import { currentProjectStore, currentUserStore } from '@/stores';
-import { pipelinesAPI } from '@/plugins/api';
+import { API, toastReject } from '@/plugins/api';
 import { FunctionInfo, SerializedArtefact, TaskInDB, ArtefactReference } from '@/plugins/api/api-pipe';
 import { ArtefactCallback, TaskConfig, NestedLibrary } from '@/types/pipelines.d';
 
@@ -212,14 +212,19 @@ export default {
     };
   },
   async mounted() {
-    this.library = await pipelinesAPI.library.getFullLibraryApiLibraryListGet();
+    API.pipe.library.getFullLibraryApiLibraryListGet()
+      .then((response) => { this.library = response.data; })
+      .catch(toastReject);
   },
   methods: {
     async reloadLibrary() {
-      const numFunctions = await pipelinesAPI.library.reloadLibraryApiLibraryRefreshPatch();
-      this.library = await pipelinesAPI.library.getFullLibraryApiLibraryListGet();
-
-      EventBus.emit(new ToastEvent('INFO', `Reload of library done, found ${numFunctions} functions.`));
+      try {
+        const numFunctions = (await API.pipe.library.reloadLibraryApiLibraryRefreshPatch()).data;
+        this.library = (await API.pipe.library.getFullLibraryApiLibraryListGet()).data;
+        EventBus.emit(new ToastEvent('INFO', `Reload of library done, found ${numFunctions} functions.`));
+      } catch (e) {
+        console.error(e);
+      }
     },
     md2html(s: string): string {
       return marked(s.trim());
@@ -227,9 +232,9 @@ export default {
     async loadQueuedTasks() {
       // TODO: Add type matching -> Only show tasks where an output artefact matches the type of the param artefact type
       // FIXME: Add some filters? Ideally configurable in the interface (only this project, only current user).
-      const response = await pipelinesAPI.queue.searchTasksApiQueueSearchGet({});
-      if (response) this.queuedTasks = response;
-      else EventBus.emit(new ToastEvent('ERROR', 'Failed to load task queue.'));
+      API.pipe.queue.searchTasksApiQueueSearchGet({})
+        .then((response) => { this.queuedTasks = response.data; })
+        .catch(toastReject);
     },
     pickReference(query: [SerializedArtefact, ArtefactReference]) {
       const [artefact, cb] = query;
@@ -275,8 +280,8 @@ export default {
         'This will submit all the tasks configured in this view to the compute pipeline. '
         + 'Please only proceed if you know exactly what you are doing!\n\n'
         + 'Cancellation of tasks is currently not implemented, so proceeding is extra-dangerous.',
-        (response) => {
-          if (response === 'ACCEPT') {
+        (confirmationResponse) => {
+          if (confirmationResponse === 'ACCEPT') {
             // TODO implement
 
             const tasks = JSON.parse(JSON.stringify(Object.fromEntries(
@@ -286,14 +291,13 @@ export default {
             this.$refs.taskConfigs.forEach((config: any) => {
               tasks[config.config.task.task_id].params = JSON.stringify(config.getTaskParams());
             });
-            pipelinesAPI.queue.submitBulkApiQueueSubmitTasksPut({ requestBody: Object.values(tasks) })
-              .then((res) => {
-                console.log(res);
-                EventBus.emit(new ToastEvent('SUCCESS', `Submitted ${res.length} tasks to the queue!`));
+            API.pipe.queue.submitBulkApiQueueSubmitTasksPut({ requestBody: Object.values(tasks) })
+              .then((response) => {
+                EventBus.emit(new ToastEvent('SUCCESS', `Submitted ${response.data?.length} tasks to the queue!`));
               })
               .catch((reason) => {
-                EventBus.emit(new ToastEvent('ERROR', 'Failed to submit tasks!'));
                 console.error(reason);
+                EventBus.emit(new ToastEvent('ERROR', 'Failed to submit tasks!'));
               });
           }
         },

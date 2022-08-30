@@ -24,7 +24,7 @@ import { PropType } from 'vue';
 import { EventBus } from '@/plugins/events';
 import { ToastEvent } from '@/plugins/events/events/toast';
 import { AssignmentModel, UserModel } from '@/plugins/api/api-core';
-import { coreAPI } from '@/plugins/api';
+import { API } from '@/plugins/api';
 import { currentProjectStore } from '@/stores';
 
 export default {
@@ -74,11 +74,11 @@ export default {
   },
   methods: {
     fetchUserInfos() {
-      coreAPI.users.getUsersByIdsApiUsersDetailsGet({
+      API.core.users.getUsersByIdsApiUsersDetailsGet({
         xProjectId: currentProjectStore.projectId,
         userId: this.userIds,
       })
-        .then((result) => { this.users = result; })
+        .then((result) => { this.users = result.data; })
         .catch(() => { EventBus.emit(new ToastEvent('WARN', 'Failed to load usernames')); });
     },
     tryGetAssignment(userId: string, itemId: string): AssignmentModel | undefined {

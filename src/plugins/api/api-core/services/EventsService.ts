@@ -6,6 +6,8 @@ import type { Event } from '../models/Event';
 import type { CancelablePromise } from '@/plugins/api/core/CancelablePromise';
 import type { BaseHttpRequest } from '@/plugins/api/core/BaseHttpRequest';
 
+import { ApiRequestOptions } from '@/plugins/api/core/ApiRequestOptions';
+
 export class EventsService {
 
   constructor(public readonly httpRequest: BaseHttpRequest) {}
@@ -24,7 +26,7 @@ export class EventsService {
     requestBody,
   }: {
     requestBody: Event,
-  }): CancelablePromise<any> {
+  }, options?: Partial<ApiRequestOptions>): CancelablePromise<any> {
     return this.httpRequest.request({
       method: 'POST',
       url: '/api/events/emit',
@@ -33,6 +35,7 @@ export class EventsService {
       errors: {
         422: `Validation Error`,
       },
+      ...options,
     });
   }
 

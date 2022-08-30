@@ -152,12 +152,10 @@
 import { currentProjectStore } from '@/stores';
 import GenericItemComponent from '@/components/items/GenericItem.vue';
 import { useOffsetPagination, UseOffsetPaginationReturn } from '@vueuse/core';
-import { ToastEvent } from '@/plugins/events/events/toast';
-import { EventBus } from '@/plugins/events';
 import ClosablePill from '@/components/ClosablePill.vue';
 import { reactive } from 'vue';
 import { AnyItem } from '@/types/items.d';
-import { coreAPI } from '@/plugins/api';
+import { API, toastReject } from '@/plugins/api';
 
 export default {
   name: 'ProjectDataView',
@@ -173,22 +171,26 @@ export default {
     };
   },
   async mounted() {
-    this.totalNumItems = await coreAPI.project.countProjectItemsApiProjectProjectIdItemsCountGet({
+    API.core.project.countProjectItemsApiProjectProjectIdItemsCountGet({
       projectId: currentProjectStore.projectId,
       xProjectId: currentProjectStore.projectId,
-    });
-    this.pagination = useOffsetPagination({
-      total: this.totalNumItems,
-      page: this.$route.query.page || 1,
-      pageSize: this.$route.query.pageSize || 20,
-      onPageChange: this.fetchData,
-      onPageSizeChange: this.fetchData,
-    });
-    this.fetchData(this.pagination);
+    })
+      .then((response) => {
+        this.totalNumItems = response.data;
+        this.pagination = useOffsetPagination({
+          total: this.totalNumItems,
+          page: this.$route.query.page || 1,
+          pageSize: this.$route.query.pageSize || 20,
+          onPageChange: this.fetchData,
+          onPageSizeChange: this.fetchData,
+        });
+        this.fetchData(this.pagination);
+      })
+      .catch(toastReject);
   },
   methods: {
     fetchData({ currentPage, currentPageSize }: UseOffsetPaginationReturn): void {
-      coreAPI.project.listProjectDataPagedApiProjectProjectIdItemsItemTypeListPagePageSizeGet({
+      API.core.project.listProjectDataPagedApiProjectProjectIdItemsItemTypeListPagePageSizeGet({
         xProjectId: currentProjectStore.projectId,
         projectId: currentProjectStore.projectId,
         page: this.pagination.currentPage,
@@ -196,12 +198,10 @@ export default {
         itemType: currentProjectStore.project.type,
       })
         .then((response) => {
-          this.itemList = response;
+          this.itemList = response.data;
           this.$router.push({ query: { page: currentPage, pageSize: currentPageSize } });
         })
-        .catch(() => {
-          EventBus.emit(new ToastEvent('ERROR', 'Failed to load data.'));
-        });
+        .catch(toastReject);
     },
   },
   computed: {

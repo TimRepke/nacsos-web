@@ -71,7 +71,7 @@ import { currentProjectStore } from '@/stores';
 import { ref } from 'vue';
 import AnnotationSchemeLabelsEditor from '@/components/annotations/AnnotationSchemeLabelsEditor.vue';
 import { AnnotationSchemeModel } from '@/plugins/api/api-core';
-import { coreAPI } from '@/plugins/api';
+import { API } from '@/plugins/api';
 
 export default {
   name: 'AnnotationConfigEditView',
@@ -95,11 +95,11 @@ export default {
   },
   async mounted() {
     if (!this.isNewScheme) {
-      coreAPI.annotations.getSchemeDefinitionApiAnnotationsSchemesDefinitionAnnotationSchemeIdGet({
+      API.core.annotations.getSchemeDefinitionApiAnnotationsSchemesDefinitionAnnotationSchemeIdGet({
         annotationSchemeId: this.annotationSchemeId,
       })
         .then((response) => {
-          this.scheme = ref(response);
+          this.scheme = ref(response.data);
         })
         .catch(() => {
           EventBus.emit(new ToastEvent('ERROR', 'Failed to load assignment scope info. Please try reloading.'));
@@ -114,18 +114,18 @@ export default {
         + 'can lead to very unexpected behaviour. Are you sure you want to proceed?',
         (response) => {
           if (response === 'ACCEPT') {
-            coreAPI.annotations.putAnnotationSchemeApiAnnotationsSchemesDefinitionPut({
+            API.core.annotations.putAnnotationSchemeApiAnnotationsSchemesDefinitionPut({
               xProjectId: currentProjectStore.projectId,
               requestBody: this.scheme,
             })
               .then((res) => {
                 EventBus.emit(new ToastEvent(
                   'SUCCESS',
-                  `Saved annotation scheme.  \n**ID:** ${res}`,
+                  `Saved annotation scheme.  \n**ID:** ${res.data}`,
                 ));
                 if (this.isNewScheme) {
                   this.isNewScheme = false;
-                  this.$router.replace({ name: 'config-annotation-scheme-edit', params: { annotation_scheme_id: res } });
+                  this.$router.replace({ name: 'config-annotation-scheme-edit', params: { annotation_scheme_id: res.data } });
                 }
               })
               .catch((res) => {

@@ -6,6 +6,8 @@ import type { UserModel } from '../models/UserModel';
 import type { CancelablePromise } from '@/plugins/api/core/CancelablePromise';
 import type { BaseHttpRequest } from '@/plugins/api/core/BaseHttpRequest';
 
+import { ApiRequestOptions } from '@/plugins/api/core/ApiRequestOptions';
+
 export class UsersService {
 
   constructor(public readonly httpRequest: BaseHttpRequest) {}
@@ -19,7 +21,7 @@ export class UsersService {
     xProjectId,
   }: {
     xProjectId: string,
-  }): CancelablePromise<Array<UserModel>> {
+  }, options?: Partial<ApiRequestOptions>): CancelablePromise<Array<UserModel>> {
     return this.httpRequest.request({
       method: 'GET',
       url: '/api/users/list/all',
@@ -29,6 +31,7 @@ export class UsersService {
       errors: {
         422: `Validation Error`,
       },
+      ...options,
     });
   }
 
@@ -43,7 +46,7 @@ export class UsersService {
   }: {
     projectId: string,
     xProjectId: string,
-  }): CancelablePromise<Array<UserModel>> {
+  }, options?: Partial<ApiRequestOptions>): CancelablePromise<Array<UserModel>> {
     return this.httpRequest.request({
       method: 'GET',
       url: '/api/users/list/project/{project_id}',
@@ -56,6 +59,7 @@ export class UsersService {
       errors: {
         422: `Validation Error`,
       },
+      ...options,
     });
   }
 
@@ -70,7 +74,7 @@ export class UsersService {
   }: {
     userId: string,
     xProjectId: string,
-  }): CancelablePromise<UserModel> {
+  }, options?: Partial<ApiRequestOptions>): CancelablePromise<UserModel> {
     return this.httpRequest.request({
       method: 'GET',
       url: '/api/users/details/{user_id}',
@@ -83,6 +87,7 @@ export class UsersService {
       errors: {
         422: `Validation Error`,
       },
+      ...options,
     });
   }
 
@@ -97,7 +102,7 @@ export class UsersService {
   }: {
     userId: Array<string>,
     xProjectId: string,
-  }): CancelablePromise<Array<UserModel>> {
+  }, options?: Partial<ApiRequestOptions>): CancelablePromise<Array<UserModel>> {
     return this.httpRequest.request({
       method: 'GET',
       url: '/api/users/details',
@@ -110,6 +115,7 @@ export class UsersService {
       errors: {
         422: `Validation Error`,
       },
+      ...options,
     });
   }
 

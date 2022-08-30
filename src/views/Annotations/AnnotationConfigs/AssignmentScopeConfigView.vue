@@ -151,7 +151,8 @@
         </div>
       </div>
     </div>
-    <button type="button" class="btn btn-success position-fixed" style="top: 4rem; right: 1rem;" @click="save()">Save</button>
+    <button type="button" class="btn btn-success position-fixed" style="top: 4rem; right: 1rem;" @click="save()">Save
+    </button>
   </div>
 </template>
 
@@ -168,7 +169,7 @@ import {
   AssignmentScopeRandomConfig,
   UserModel,
 } from '@/plugins/api/api-core';
-import { coreAPI } from '@/plugins/api';
+import { API, ApiResponseReject } from '@/plugins/api';
 import { currentProjectStore } from '@/stores';
 
 type AssignmentScopeConfigData = {
@@ -181,7 +182,7 @@ type AssignmentScopeConfigData = {
   // users selected to be in the query pool
   selectedUsers: UserModel[];
   // assignment strategy type
-  strategyConfigType?: AssignmentScopeRandomConfig.config_type; // FIXME
+  strategyConfigType?: AssignmentScopeRandomConfig.config_type;
   // indicates whether this is (or will be) a newly created scope
   isNewScope: boolean;
   // holds the assignment counts (or undefined if none exist)
@@ -220,34 +221,38 @@ export default {
   },
   async mounted() {
     if (!this.isNewScope) {
-      const scopeReq = await coreAPI.annotations.getAssignmentScopeApiAnnotationsAnnotateScopeAssignmentScopeIdGet({
-        xProjectId: currentProjectStore.projectId,
-        assignmentScopeId: this.scopeId,
-      });
-      const countsReq = await coreAPI.annotations.getNumAssignmentsForScopeApiAnnotationsAnnotateScopeCountsAssignmentScopeIdGet({
-        xProjectId: currentProjectStore.projectId,
-        assignmentScopeId: this.scopeId,
-      });
-
-      if (scopeReq && countsReq) {
-        this.assignmentScope = scopeReq;
-        this.assignmentCounts = countsReq;
-
-        if (this.assignmentScope.config && this.assignmentScope.config.users && this.assignmentScope.config.users.length > 0) {
-          this.strategyConfigType = this.assignmentScope.config.config_type;
-          const usersReq = await coreAPI.users.getUsersByIdsApiUsersDetailsGet({
-            xProjectId: currentProjectStore.projectId,
-            userId: this.assignmentScope.config.users,
-          });
-          if (usersReq) {
-            this.selectedUsers = usersReq;
+      Promise.allSettled([
+        API.core.annotations.getAssignmentScopeApiAnnotationsAnnotateScopeAssignmentScopeIdGet({
+          xProjectId: currentProjectStore.projectId,
+          assignmentScopeId: this.scopeId,
+        }),
+        API.core.annotations.getNumAssignmentsForScopeApiAnnotationsAnnotateScopeCountsAssignmentScopeIdGet({
+          xProjectId: currentProjectStore.projectId,
+          assignmentScopeId: this.scopeId,
+        }),
+      ])
+        .then(([scopePromise, countsPromise]) => {
+          if (scopePromise.status === 'fulfilled' && countsPromise.status === 'fulfilled') {
+            this.assignmentScope = scopePromise.value.data;
+            this.assignmentCounts = countsPromise.value.data;
           } else {
-            EventBus.emit(new ToastEvent('ERROR', 'Failed to load list of users. Please try reloading.'));
+            EventBus.emit(new ToastEvent('ERROR', 'Failed to load assignment scope info. Please try reloading.'));
           }
-        }
-      } else {
-        EventBus.emit(new ToastEvent('ERROR', 'Failed to load assignment scope info. Please try reloading.'));
-      }
+
+          if (this.assignmentScope.config?.users?.length > 0) {
+            this.strategyConfigType = this.assignmentScope.config.config_type;
+            API.core.users.getUsersByIdsApiUsersDetailsGet({
+              xProjectId: currentProjectStore.projectId,
+              userId: this.assignmentScope.config.users,
+            })
+              .then((response) => {
+                this.selectedUsers = response.data;
+              })
+              .catch(() => {
+                EventBus.emit(new ToastEvent('ERROR', 'Failed to load list of users. Please try reloading.'));
+              });
+          }
+        });
     }
   },
   methods: {
@@ -274,14 +279,14 @@ export default {
               };
               payload.config.users = this.selectedUserIds;
 
-              coreAPI.annotations.makeAssignmentsApiAnnotationsConfigAssignmentsPost({
+              API.core.annotations.makeAssignmentsApiAnnotationsConfigAssignmentsPost({
                 xProjectId: currentProjectStore.projectId,
                 requestBody: payload,
               })
                 .then((res) => {
                   EventBus.emit(new ToastEvent(
                     'SUCCESS',
-                    `Successfully created ${res?.length} assignments.`,
+                    `Successfully created ${res.data.length} assignments.`,
                   ));
                   this.scopeHasAssignments = true;
                   this.loadResults();
@@ -305,24 +310,25 @@ export default {
             if (scope.config) {
               scope.config.users = this.selectedUserIds;
             }
-            coreAPI.annotations.putAssignmentScopeApiAnnotationsAnnotateScopePut({
+            API.core.annotations.putAssignmentScopeApiAnnotationsAnnotateScopePut({
               xProjectId: currentProjectStore.projectId,
               requestBody: scope,
             })
               .then((res) => {
                 EventBus.emit(new ToastEvent(
                   'SUCCESS',
-                  `Save assignment scope details.  \n**ID:** ${res}`,
+                  `Save assignment scope details.  \n**ID:** ${res.data}`,
                 ));
                 if (this.isNewScope) {
                   this.isNewScope = false;
-                  this.$router.replace({ name: 'config-annotation-scheme-scope', params: { scope_id: res } });
+                  this.$router.replace({ name: 'config-annotation-scheme-scope', params: { scope_id: res.data } });
                 }
               })
               .catch((res) => {
+                const err = res as ApiResponseReject;
                 EventBus.emit(new ToastEvent(
                   'ERROR',
-                  `Failed to save assignment scope details. (${res.reason})`,
+                  `Failed to save assignment scope details. (${err.error?.type})`,
                 ));
               });
           } else {
@@ -336,26 +342,29 @@ export default {
     },
     loadResults() {
       if (this.assignmentScope.assignment_scope_id) {
-        coreAPI.annotations.getNumAssignmentsForScopeApiAnnotationsAnnotateScopeCountsAssignmentScopeIdGet({
+        API.core.annotations.getNumAssignmentsForScopeApiAnnotationsAnnotateScopeCountsAssignmentScopeIdGet({
           xProjectId: currentProjectStore.projectId,
           assignmentScopeId: this.assignmentScope.assignment_scope_id,
         })
-          .then((result) => { this.assignmentCounts = result; })
+          .then((result) => { this.assignmentCounts = result.data; })
           .catch(() => { EventBus.emit(new ToastEvent('ERROR', 'Failed to load assignment counts.')); });
-        coreAPI.annotations.getAssignmentsForScopeApiAnnotationsAnnotateAssignmentsScopeAssignmentScopeIdGet({
+
+        API.core.annotations.getAssignmentsForScopeApiAnnotationsAnnotateAssignmentsScopeAssignmentScopeIdGet({
           xProjectId: currentProjectStore.projectId,
           assignmentScopeId: this.assignmentScope.assignment_scope_id,
         })
-          .then((result) => { this.assignments = result; })
+          .then((result) => { this.assignments = result.data; })
           .catch(() => { EventBus.emit(new ToastEvent('ERROR', 'Failed to load assignments.')); });
       }
     },
     async loadListOfUsers() {
       this.users = undefined;
-      this.users = await coreAPI.users.getProjectUsersApiUsersListProjectProjectIdGet({
+      API.core.users.getProjectUsersApiUsersListProjectProjectIdGet({
         xProjectId: currentProjectStore.projectId,
         projectId: currentProjectStore.projectId,
-      });
+      })
+        .then((response) => { this.users = response.data; })
+        .catch(() => { EventBus.emit(new ToastEvent('WARN', 'Failed to load list of users.')); });
     },
     selectUser(user: UserModel) {
       if (!this.isSelected(user)) {

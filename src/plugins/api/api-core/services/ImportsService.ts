@@ -6,6 +6,8 @@ import type { ImportModel } from '../models/ImportModel';
 import type { CancelablePromise } from '@/plugins/api/core/CancelablePromise';
 import type { BaseHttpRequest } from '@/plugins/api/core/BaseHttpRequest';
 
+import { ApiRequestOptions } from '@/plugins/api/core/ApiRequestOptions';
+
 export class ImportsService {
 
   constructor(public readonly httpRequest: BaseHttpRequest) {}
@@ -19,7 +21,7 @@ export class ImportsService {
     xProjectId,
   }: {
     xProjectId: string,
-  }): CancelablePromise<Array<ImportModel>> {
+  }, options?: Partial<ApiRequestOptions>): CancelablePromise<Array<ImportModel>> {
     return this.httpRequest.request({
       method: 'GET',
       url: '/api/imports/list',
@@ -29,6 +31,7 @@ export class ImportsService {
       errors: {
         422: `Validation Error`,
       },
+      ...options,
     });
   }
 
@@ -43,7 +46,7 @@ export class ImportsService {
   }: {
     importId: string,
     xProjectId: string,
-  }): CancelablePromise<ImportModel> {
+  }, options?: Partial<ApiRequestOptions>): CancelablePromise<ImportModel> {
     return this.httpRequest.request({
       method: 'GET',
       url: '/api/imports/import/{import_id}',
@@ -56,6 +59,7 @@ export class ImportsService {
       errors: {
         422: `Validation Error`,
       },
+      ...options,
     });
   }
 
@@ -70,7 +74,7 @@ export class ImportsService {
   }: {
     importId: string,
     xProjectId: string,
-  }): CancelablePromise<string> {
+  }, options?: Partial<ApiRequestOptions>): CancelablePromise<string> {
     return this.httpRequest.request({
       method: 'POST',
       url: '/api/imports/import/{import_id}',
@@ -83,6 +87,7 @@ export class ImportsService {
       errors: {
         422: `Validation Error`,
       },
+      ...options,
     });
   }
 
@@ -97,7 +102,7 @@ export class ImportsService {
   }: {
     importId: string,
     xProjectId: string,
-  }): CancelablePromise<number> {
+  }, options?: Partial<ApiRequestOptions>): CancelablePromise<number> {
     return this.httpRequest.request({
       method: 'GET',
       url: '/api/imports/import/{import_id}/count/',
@@ -110,6 +115,7 @@ export class ImportsService {
       errors: {
         422: `Validation Error`,
       },
+      ...options,
     });
   }
 
@@ -124,7 +130,7 @@ export class ImportsService {
   }: {
     xProjectId: string,
     requestBody: ImportModel,
-  }): CancelablePromise<string> {
+  }, options?: Partial<ApiRequestOptions>): CancelablePromise<string> {
     return this.httpRequest.request({
       method: 'PUT',
       url: '/api/imports/import',
@@ -136,6 +142,7 @@ export class ImportsService {
       errors: {
         422: `Validation Error`,
       },
+      ...options,
     });
   }
 

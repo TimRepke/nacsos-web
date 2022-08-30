@@ -15,6 +15,8 @@ import type { UserProjectAssignmentScope } from '../models/UserProjectAssignment
 import type { CancelablePromise } from '@/plugins/api/core/CancelablePromise';
 import type { BaseHttpRequest } from '@/plugins/api/core/BaseHttpRequest';
 
+import { ApiRequestOptions } from '@/plugins/api/core/ApiRequestOptions';
+
 export class AnnotationsService {
 
   constructor(public readonly httpRequest: BaseHttpRequest) {}
@@ -32,7 +34,7 @@ export class AnnotationsService {
     annotationSchemeId,
   }: {
     annotationSchemeId: string,
-  }): CancelablePromise<AnnotationSchemeModel> {
+  }, options?: Partial<ApiRequestOptions>): CancelablePromise<AnnotationSchemeModel> {
     return this.httpRequest.request({
       method: 'GET',
       url: '/api/annotations/schemes/definition/{annotation_scheme_id}',
@@ -42,6 +44,7 @@ export class AnnotationsService {
       errors: {
         422: `Validation Error`,
       },
+      ...options,
     });
   }
 
@@ -56,7 +59,7 @@ export class AnnotationsService {
   }: {
     xProjectId: string,
     requestBody: AnnotationSchemeModel,
-  }): CancelablePromise<string> {
+  }, options?: Partial<ApiRequestOptions>): CancelablePromise<string> {
     return this.httpRequest.request({
       method: 'PUT',
       url: '/api/annotations/schemes/definition/',
@@ -68,6 +71,7 @@ export class AnnotationsService {
       errors: {
         422: `Validation Error`,
       },
+      ...options,
     });
   }
 
@@ -82,7 +86,7 @@ export class AnnotationsService {
   }: {
     annotationSchemeId: string,
     xProjectId: string,
-  }): CancelablePromise<any> {
+  }, options?: Partial<ApiRequestOptions>): CancelablePromise<any> {
     return this.httpRequest.request({
       method: 'DELETE',
       url: '/api/annotations/schemes/definition/{scheme_id}',
@@ -95,6 +99,7 @@ export class AnnotationsService {
       errors: {
         422: `Validation Error`,
       },
+      ...options,
     });
   }
 
@@ -111,7 +116,7 @@ export class AnnotationsService {
     projectId,
   }: {
     projectId: string,
-  }): CancelablePromise<Array<AnnotationSchemeModel>> {
+  }, options?: Partial<ApiRequestOptions>): CancelablePromise<Array<AnnotationSchemeModel>> {
     return this.httpRequest.request({
       method: 'GET',
       url: '/api/annotations/schemes/list/{project_id}',
@@ -121,6 +126,7 @@ export class AnnotationsService {
       errors: {
         422: `Validation Error`,
       },
+      ...options,
     });
   }
 
@@ -137,7 +143,7 @@ export class AnnotationsService {
     assignmentScopeId: string,
     currentAssignmentId: string,
     xProjectId: string,
-  }): CancelablePromise<AnnotationItem> {
+  }, options?: Partial<ApiRequestOptions>): CancelablePromise<AnnotationItem> {
     return this.httpRequest.request({
       method: 'GET',
       url: '/api/annotations/annotate/next/{assignment_scope_id}/{current_assignment_id}',
@@ -151,6 +157,7 @@ export class AnnotationsService {
       errors: {
         422: `Validation Error`,
       },
+      ...options,
     });
   }
 
@@ -165,7 +172,7 @@ export class AnnotationsService {
   }: {
     assignmentScopeId: string,
     xProjectId: string,
-  }): CancelablePromise<AnnotationItem> {
+  }, options?: Partial<ApiRequestOptions>): CancelablePromise<AnnotationItem> {
     return this.httpRequest.request({
       method: 'GET',
       url: '/api/annotations/annotate/next/{assignment_scope_id}',
@@ -178,6 +185,7 @@ export class AnnotationsService {
       errors: {
         422: `Validation Error`,
       },
+      ...options,
     });
   }
 
@@ -192,7 +200,7 @@ export class AnnotationsService {
   }: {
     assignmentId: string,
     xProjectId: string,
-  }): CancelablePromise<AnnotationItem> {
+  }, options?: Partial<ApiRequestOptions>): CancelablePromise<AnnotationItem> {
     return this.httpRequest.request({
       method: 'GET',
       url: '/api/annotations/annotate/assignment/{assignment_id}',
@@ -205,6 +213,7 @@ export class AnnotationsService {
       errors: {
         422: `Validation Error`,
       },
+      ...options,
     });
   }
 
@@ -219,7 +228,7 @@ export class AnnotationsService {
   }: {
     projectId: string,
     xProjectId: string,
-  }): CancelablePromise<Array<UserProjectAssignmentScope>> {
+  }, options?: Partial<ApiRequestOptions>): CancelablePromise<Array<UserProjectAssignmentScope>> {
     return this.httpRequest.request({
       method: 'GET',
       url: '/api/annotations/annotate/scopes/{project_id}',
@@ -232,6 +241,7 @@ export class AnnotationsService {
       errors: {
         422: `Validation Error`,
       },
+      ...options,
     });
   }
 
@@ -244,7 +254,7 @@ export class AnnotationsService {
     xProjectId,
   }: {
     xProjectId: string,
-  }): CancelablePromise<Array<AssignmentScopeModel>> {
+  }, options?: Partial<ApiRequestOptions>): CancelablePromise<Array<AssignmentScopeModel>> {
     return this.httpRequest.request({
       method: 'GET',
       url: '/api/annotations/annotate/scopes/',
@@ -254,6 +264,7 @@ export class AnnotationsService {
       errors: {
         422: `Validation Error`,
       },
+      ...options,
     });
   }
 
@@ -268,7 +279,7 @@ export class AnnotationsService {
   }: {
     assignmentScopeId: string,
     xProjectId: string,
-  }): CancelablePromise<AssignmentScopeModel> {
+  }, options?: Partial<ApiRequestOptions>): CancelablePromise<AssignmentScopeModel> {
     return this.httpRequest.request({
       method: 'GET',
       url: '/api/annotations/annotate/scope/{assignment_scope_id}',
@@ -281,6 +292,7 @@ export class AnnotationsService {
       errors: {
         422: `Validation Error`,
       },
+      ...options,
     });
   }
 
@@ -295,7 +307,7 @@ export class AnnotationsService {
   }: {
     assignmentScopeId: string,
     xProjectId: string,
-  }): CancelablePromise<any> {
+  }, options?: Partial<ApiRequestOptions>): CancelablePromise<any> {
     return this.httpRequest.request({
       method: 'DELETE',
       url: '/api/annotations/annotate/scope/{assignment_scope_id}',
@@ -308,6 +320,7 @@ export class AnnotationsService {
       errors: {
         422: `Validation Error`,
       },
+      ...options,
     });
   }
 
@@ -322,7 +335,7 @@ export class AnnotationsService {
   }: {
     xProjectId: string,
     requestBody: AssignmentScopeModel,
-  }): CancelablePromise<string> {
+  }, options?: Partial<ApiRequestOptions>): CancelablePromise<string> {
     return this.httpRequest.request({
       method: 'PUT',
       url: '/api/annotations/annotate/scope/',
@@ -334,6 +347,7 @@ export class AnnotationsService {
       errors: {
         422: `Validation Error`,
       },
+      ...options,
     });
   }
 
@@ -348,7 +362,7 @@ export class AnnotationsService {
   }: {
     assignmentScopeId: string,
     xProjectId: string,
-  }): CancelablePromise<AssignmentCounts> {
+  }, options?: Partial<ApiRequestOptions>): CancelablePromise<AssignmentCounts> {
     return this.httpRequest.request({
       method: 'GET',
       url: '/api/annotations/annotate/scope/counts/{assignment_scope_id}',
@@ -361,6 +375,7 @@ export class AnnotationsService {
       errors: {
         422: `Validation Error`,
       },
+      ...options,
     });
   }
 
@@ -375,7 +390,7 @@ export class AnnotationsService {
   }: {
     assignmentScopeId: string,
     xProjectId: string,
-  }): CancelablePromise<Array<AssignmentModel>> {
+  }, options?: Partial<ApiRequestOptions>): CancelablePromise<Array<AssignmentModel>> {
     return this.httpRequest.request({
       method: 'GET',
       url: '/api/annotations/annotate/assignments/{assignment_scope_id}',
@@ -388,6 +403,7 @@ export class AnnotationsService {
       errors: {
         422: `Validation Error`,
       },
+      ...options,
     });
   }
 
@@ -402,7 +418,7 @@ export class AnnotationsService {
   }: {
     assignmentScopeId: string,
     xProjectId: string,
-  }): CancelablePromise<Array<AssignmentModel>> {
+  }, options?: Partial<ApiRequestOptions>): CancelablePromise<Array<AssignmentModel>> {
     return this.httpRequest.request({
       method: 'GET',
       url: '/api/annotations/annotate/assignments/scope/{assignment_scope_id}',
@@ -415,6 +431,7 @@ export class AnnotationsService {
       errors: {
         422: `Validation Error`,
       },
+      ...options,
     });
   }
 
@@ -429,7 +446,7 @@ export class AnnotationsService {
   }: {
     assignmentScopeId: string,
     xProjectId: string,
-  }): CancelablePromise<Array<AssignmentModel>> {
+  }, options?: Partial<ApiRequestOptions>): CancelablePromise<Array<AssignmentModel>> {
     return this.httpRequest.request({
       method: 'GET',
       url: '/api/annotations/annotate/annotations/{assignment_scope_id}',
@@ -442,6 +459,7 @@ export class AnnotationsService {
       errors: {
         422: `Validation Error`,
       },
+      ...options,
     });
   }
 
@@ -456,7 +474,7 @@ export class AnnotationsService {
   }: {
     xProjectId: string,
     requestBody: AnnotatedItem,
-  }): CancelablePromise<AssignmentStatus> {
+  }, options?: Partial<ApiRequestOptions>): CancelablePromise<AssignmentStatus> {
     return this.httpRequest.request({
       method: 'POST',
       url: '/api/annotations/annotate/save',
@@ -468,6 +486,7 @@ export class AnnotationsService {
       errors: {
         422: `Validation Error`,
       },
+      ...options,
     });
   }
 
@@ -480,7 +499,7 @@ export class AnnotationsService {
     xProjectId,
   }: {
     xProjectId: string,
-  }): CancelablePromise<Array<ItemWithCount>> {
+  }, options?: Partial<ApiRequestOptions>): CancelablePromise<Array<ItemWithCount>> {
     return this.httpRequest.request({
       method: 'GET',
       url: '/api/annotations/config/items/',
@@ -490,6 +509,7 @@ export class AnnotationsService {
       errors: {
         422: `Validation Error`,
       },
+      ...options,
     });
   }
 
@@ -504,7 +524,7 @@ export class AnnotationsService {
   }: {
     xProjectId: string,
     requestBody: MakeAssignmentsRequestModel,
-  }): CancelablePromise<Array<AssignmentModel>> {
+  }, options?: Partial<ApiRequestOptions>): CancelablePromise<Array<AssignmentModel>> {
     return this.httpRequest.request({
       method: 'POST',
       url: '/api/annotations/config/assignments/',
@@ -516,6 +536,7 @@ export class AnnotationsService {
       errors: {
         422: `Validation Error`,
       },
+      ...options,
     });
   }
 

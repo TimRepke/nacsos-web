@@ -57,7 +57,7 @@
 import { ToastEvent } from '@/plugins/events/events/toast';
 import { EventBus } from '@/plugins/events';
 import InlineToolTip from '@/components/InlineToolTip.vue';
-import { pipelinesAPI } from '@/plugins/api';
+import { API } from '@/plugins/api';
 
 type UploadStatus = 'PENDING' | 'UPLOADING' | 'SUCCESS' | 'FAILED';
 
@@ -98,18 +98,20 @@ export default {
       }
 
       return new Promise((resolve, reject) => {
-        pipelinesAPI.artefacts.uploadFileApiArtefactsFilesUploadPost({
+        API.pipe.artefacts.uploadFileApiArtefactsFilesUploadPost({
           folder,
           formData: { file: uploadFile.file },
-          // FIXME add back in somehow
-          // onUploadProgress: (event: { loaded: number; total: number; }) => {
-          //   uploadFile.percentage = Math.round(100 * (event.loaded / event.total));
-          // },
+        }, {
+          customRequestConfig: {
+            onUploadProgress: (event: { loaded: number; total: number; }) => {
+              uploadFile.percentage = Math.round(100 * (event.loaded / event.total));
+            },
+          },
         })
           .then((response) => {
             uploadFile.status = 'SUCCESS';
-            uploadFile.serverPath = response.payload;
-            resolve(response.payload);
+            uploadFile.serverPath = response.data;
+            resolve(response.data);
           })
           .catch(() => {
             uploadFile.status = 'FAILED';

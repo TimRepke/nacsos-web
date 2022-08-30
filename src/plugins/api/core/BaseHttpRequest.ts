@@ -14,6 +14,6 @@ export class BaseHttpRequest {
    * @throws ApiError
    */
   public request<T>(options: ApiRequestOptions): CancelablePromise<T> {
-    return __request(this.config, options);
+    return __request<T>(this.config, options);
   }
 }

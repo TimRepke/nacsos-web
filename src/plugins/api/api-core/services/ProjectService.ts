@@ -9,6 +9,8 @@ import type { TwitterItemModel } from '../models/TwitterItemModel';
 import type { CancelablePromise } from '@/plugins/api/core/CancelablePromise';
 import type { BaseHttpRequest } from '@/plugins/api/core/BaseHttpRequest';
 
+import { ApiRequestOptions } from '@/plugins/api/core/ApiRequestOptions';
+
 export class ProjectService {
 
   constructor(public readonly httpRequest: BaseHttpRequest) {}
@@ -24,7 +26,7 @@ export class ProjectService {
   }: {
     projectId: string,
     xProjectId: string,
-  }): CancelablePromise<ProjectModel> {
+  }, options?: Partial<ApiRequestOptions>): CancelablePromise<ProjectModel> {
     return this.httpRequest.request({
       method: 'GET',
       url: '/api/project/{project_id}/info/',
@@ -37,6 +39,7 @@ export class ProjectService {
       errors: {
         422: `Validation Error`,
       },
+      ...options,
     });
   }
 
@@ -49,7 +52,7 @@ export class ProjectService {
     xProjectId,
   }: {
     xProjectId: string,
-  }): CancelablePromise<ProjectPermissionsModel> {
+  }, options?: Partial<ApiRequestOptions>): CancelablePromise<ProjectPermissionsModel> {
     return this.httpRequest.request({
       method: 'GET',
       url: '/api/project/{project_id}/permissions/me',
@@ -59,6 +62,7 @@ export class ProjectService {
       errors: {
         422: `Validation Error`,
       },
+      ...options,
     });
   }
 
@@ -73,7 +77,7 @@ export class ProjectService {
   }: {
     projectId: string,
     xProjectId: string,
-  }): CancelablePromise<Array<ProjectPermissionsModel>> {
+  }, options?: Partial<ApiRequestOptions>): CancelablePromise<Array<ProjectPermissionsModel>> {
     return this.httpRequest.request({
       method: 'GET',
       url: '/api/project/{project_id}/permissions/list',
@@ -86,6 +90,7 @@ export class ProjectService {
       errors: {
         422: `Validation Error`,
       },
+      ...options,
     });
   }
 
@@ -100,7 +105,7 @@ export class ProjectService {
   }: {
     projectPermissionId: string,
     xProjectId: string,
-  }): CancelablePromise<ProjectPermissionsModel> {
+  }, options?: Partial<ApiRequestOptions>): CancelablePromise<ProjectPermissionsModel> {
     return this.httpRequest.request({
       method: 'GET',
       url: '/api/project/{project_id}/permissions/{project_permission_id}',
@@ -113,6 +118,7 @@ export class ProjectService {
       errors: {
         422: `Validation Error`,
       },
+      ...options,
     });
   }
 
@@ -129,7 +135,7 @@ export class ProjectService {
     projectId: string,
     itemType: 'basic' | 'twitter' | 'academic' | 'patents',
     xProjectId: string,
-  }): CancelablePromise<Array<(ItemModel | TwitterItemModel)>> {
+  }, options?: Partial<ApiRequestOptions>): CancelablePromise<Array<(ItemModel | TwitterItemModel)>> {
     return this.httpRequest.request({
       method: 'GET',
       url: '/api/project/{project_id}/items/{item_type}/list',
@@ -143,6 +149,7 @@ export class ProjectService {
       errors: {
         422: `Validation Error`,
       },
+      ...options,
     });
   }
 
@@ -163,7 +170,7 @@ export class ProjectService {
     page: number,
     pageSize: number,
     xProjectId: string,
-  }): CancelablePromise<Array<(ItemModel | TwitterItemModel)>> {
+  }, options?: Partial<ApiRequestOptions>): CancelablePromise<Array<(ItemModel | TwitterItemModel)>> {
     return this.httpRequest.request({
       method: 'GET',
       url: '/api/project/{project_id}/items/{item_type}/list/{page}/{page_size}',
@@ -179,6 +186,7 @@ export class ProjectService {
       errors: {
         422: `Validation Error`,
       },
+      ...options,
     });
   }
 
@@ -195,7 +203,7 @@ export class ProjectService {
     itemId: string,
     itemType: 'basic' | 'twitter' | 'academic' | 'patents',
     xProjectId: string,
-  }): CancelablePromise<(ItemModel | TwitterItemModel)> {
+  }, options?: Partial<ApiRequestOptions>): CancelablePromise<(ItemModel | TwitterItemModel)> {
     return this.httpRequest.request({
       method: 'GET',
       url: '/api/project/{project_id}/items/{item_type}/detail/{item_id}',
@@ -209,6 +217,7 @@ export class ProjectService {
       errors: {
         422: `Validation Error`,
       },
+      ...options,
     });
   }
 
@@ -223,7 +232,7 @@ export class ProjectService {
   }: {
     projectId: string,
     xProjectId: string,
-  }): CancelablePromise<number> {
+  }, options?: Partial<ApiRequestOptions>): CancelablePromise<number> {
     return this.httpRequest.request({
       method: 'GET',
       url: '/api/project/{project_id}/items/count',
@@ -236,6 +245,7 @@ export class ProjectService {
       errors: {
         422: `Validation Error`,
       },
+      ...options,
     });
   }
 
@@ -252,7 +262,7 @@ export class ProjectService {
     projectId: string,
     xProjectId: string,
     requestBody: TwitterItemModel,
-  }): CancelablePromise<any> {
+  }, options?: Partial<ApiRequestOptions>): CancelablePromise<any> {
     return this.httpRequest.request({
       method: 'POST',
       url: '/api/project/{project_id}/items/twitter/add',
@@ -267,6 +277,7 @@ export class ProjectService {
       errors: {
         422: `Validation Error`,
       },
+      ...options,
     });
   }
 

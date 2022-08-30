@@ -8,6 +8,8 @@ import type { UserModel } from '../models/UserModel';
 import type { CancelablePromise } from '@/plugins/api/core/CancelablePromise';
 import type { BaseHttpRequest } from '@/plugins/api/core/BaseHttpRequest';
 
+import { ApiRequestOptions } from '@/plugins/api/core/ApiRequestOptions';
+
 export class OauthService {
 
   constructor(public readonly httpRequest: BaseHttpRequest) {}
@@ -21,7 +23,7 @@ export class OauthService {
     formData,
   }: {
     formData: Body_login_for_access_token_api_login_token_post,
-  }): CancelablePromise<Token> {
+  }, options?: Partial<ApiRequestOptions>): CancelablePromise<Token> {
     return this.httpRequest.request({
       method: 'POST',
       url: '/api/login/token',
@@ -30,6 +32,7 @@ export class OauthService {
       errors: {
         422: `Validation Error`,
       },
+      ...options,
     });
   }
 
@@ -38,10 +41,11 @@ export class OauthService {
    * @returns UserModel Successful Response
    * @throws ApiError
    */
-  public readUsersMeApiLoginMeGet(): CancelablePromise<UserModel> {
+  public readUsersMeApiLoginMeGet(options?: Partial<ApiRequestOptions>): CancelablePromise<UserModel> {
     return this.httpRequest.request({
       method: 'GET',
       url: '/api/login/me',
+      ...options,
     });
   }
 

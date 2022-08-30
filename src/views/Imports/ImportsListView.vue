@@ -59,7 +59,7 @@ import InlineToolTip from '@/components/InlineToolTip.vue';
 import { EventBus } from '@/plugins/events';
 import { ToastEvent } from '@/plugins/events/events/toast';
 import { currentProjectStore } from '@/stores';
-import { coreAPI } from '@/plugins/api';
+import { API, toastReject } from '@/plugins/api';
 
 export default {
   name: 'ProjectListView',
@@ -70,9 +70,11 @@ export default {
     };
   },
   async mounted() {
-    this.imports = await coreAPI.imports.getAllImportsForProjectApiImportsListGet({
+    API.core.imports.getAllImportsForProjectApiImportsListGet({
       xProjectId: currentProjectStore.projectId,
-    });
+    })
+      .then((response) => { this.imports = response.data; })
+      .catch(toastReject);
   },
   methods: {
     copyImport(importDetails: ImportModel) {

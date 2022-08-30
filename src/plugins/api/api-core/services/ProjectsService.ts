@@ -6,6 +6,8 @@ import type { ProjectModel } from '../models/ProjectModel';
 import type { CancelablePromise } from '@/plugins/api/core/CancelablePromise';
 import type { BaseHttpRequest } from '@/plugins/api/core/BaseHttpRequest';
 
+import { ApiRequestOptions } from '@/plugins/api/core/ApiRequestOptions';
+
 export class ProjectsService {
 
   constructor(public readonly httpRequest: BaseHttpRequest) {}
@@ -20,10 +22,11 @@ export class ProjectsService {
    * @returns ProjectModel Successful Response
    * @throws ApiError
    */
-  public getAllProjectsApiProjectsListGet(): CancelablePromise<Array<ProjectModel>> {
+  public getAllProjectsApiProjectsListGet(options?: Partial<ApiRequestOptions>): CancelablePromise<Array<ProjectModel>> {
     return this.httpRequest.request({
       method: 'GET',
       url: '/api/projects/list',
+      ...options,
     });
   }
 

@@ -2,7 +2,7 @@ import { EventBus } from '@/plugins/events';
 import { CurrentProjectSelectedEvent, CurrentProjectSetEvent } from '@/plugins/events/events/projects';
 import { currentProjectStore } from '@/stores';
 import { LoggedOutEvent } from '@/plugins/events/events/auth';
-import { coreAPI } from '@/plugins/api';
+import { API } from '@/plugins/api';
 
 export default () => {
   EventBus.on(CurrentProjectSelectedEvent, (event: CurrentProjectSelectedEvent) => {
@@ -14,8 +14,8 @@ export default () => {
     currentProjectStore.projectId = projectId;
     Promise
       .allSettled([
-        coreAPI.project.getProjectApiProjectProjectIdInfoGet({ xProjectId: projectId, projectId }),
-        coreAPI.project.getProjectPermissionsCurrentUserApiProjectProjectIdPermissionsMeGet({ xProjectId: projectId }),
+        API.core.project.getProjectApiProjectProjectIdInfoGet({ xProjectId: projectId, projectId }),
+        API.core.project.getProjectPermissionsCurrentUserApiProjectProjectIdPermissionsMeGet({ xProjectId: projectId }),
       ])
       .then((values) => {
         const [projectInfo, projectPermissions] = values;
@@ -23,8 +23,8 @@ export default () => {
           projectInfo.status === 'fulfilled' && projectInfo.value
           && projectPermissions.status === 'fulfilled' && projectPermissions.value
         ) {
-          const project = projectInfo.value;
-          const projectPerms = projectPermissions.value;
+          const project = projectInfo.value.data;
+          const projectPerms = projectPermissions.value.data;
           currentProjectStore.project = project;
           currentProjectStore.projectPermissions = projectPerms;
           EventBus.emit(new CurrentProjectSetEvent(project, projectPerms));
