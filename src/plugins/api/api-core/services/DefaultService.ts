@@ -4,7 +4,7 @@
 import type { CancelablePromise } from '@/plugins/api/core/CancelablePromise';
 import type { BaseHttpRequest } from '@/plugins/api/core/BaseHttpRequest';
 
-import { ApiRequestOptions } from '@/plugins/api/core/ApiRequestOptions';
+import type { ApiRequestOptions } from '@/plugins/api/core/ApiRequestOptions';
 
 export class DefaultService {
 
@@ -81,6 +81,19 @@ export class DefaultService {
       errors: {
         422: `Validation Error`,
       },
+      ...options,
+    });
+  }
+
+  /**
+   * Test
+   * @returns any Successful Response
+   * @throws ApiError
+   */
+  public testApiPingTestGet(options?: Partial<ApiRequestOptions>): CancelablePromise<any> {
+    return this.httpRequest.request({
+      method: 'GET',
+      url: '/api/ping/test',
       ...options,
     });
   }
