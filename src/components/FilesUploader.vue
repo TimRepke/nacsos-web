@@ -103,8 +103,8 @@ export default {
           formData: { file: uploadFile.file },
         }, {
           customRequestConfig: {
-            onUploadProgress: (event: { loaded: number; total: number; }) => {
-              uploadFile.percentage = Math.round(100 * (event.loaded / event.total));
+            onUploadProgress: (event: { loaded: number; total?: number; }) => {
+              uploadFile.percentage = Math.round(100 * (event.loaded / (event.total || 1)));
             },
           },
         })
