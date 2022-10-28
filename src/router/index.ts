@@ -137,6 +137,11 @@ const routes: Array<RouteRecordRaw> = [
         name: 'config-annotation-scheme-edit',
         component: () => import(/* webpackChunkName: "AnnotationConfigEditView" */ '../views/Annotations/AnnotationConfigs/AnnotationConfigEditView.vue'),
       },
+      {
+        path: 'resolve/:bot_annotation_meta_id?',
+        name: 'config-annotation-resolve',
+        component: () => import(/* webpackChunkName: "AnnotationConfigResolveView" */ '../views/Annotations/AnnotationConfigs/AnnotationConfigResolveView.vue'),
+      },
     ],
   },
 ];

@@ -3,7 +3,9 @@
 /* eslint-disable */
 import type { AnnotatedItem } from '../models/AnnotatedItem';
 import type { AnnotationItem } from '../models/AnnotationItem';
+import type { AnnotationMatrix } from '../models/AnnotationMatrix';
 import type { AnnotationSchemeModel } from '../models/AnnotationSchemeModel';
+import type { AnnotationSchemeModelFlat } from '../models/AnnotationSchemeModelFlat';
 import type { AssignmentCounts } from '../models/AssignmentCounts';
 import type { AssignmentModel } from '../models/AssignmentModel';
 import type { AssignmentScopeModel } from '../models/AssignmentScopeModel';
@@ -26,20 +28,26 @@ export class AnnotationsService {
    * This endpoint returns the detailed definition of an annotation scheme.
    *
    * :param annotation_scheme_id: database id of the annotation scheme.
+   * :param flat: True to get the flattened scheme
    * :return: a single annotation scheme
-   * @returns AnnotationSchemeModel Successful Response
+   * @returns any Successful Response
    * @throws ApiError
    */
   public getSchemeDefinitionApiAnnotationsSchemesDefinitionAnnotationSchemeIdGet({
     annotationSchemeId,
+    flat = false,
   }: {
     annotationSchemeId: string,
-  }, options?: Partial<ApiRequestOptions>): CancelablePromise<AnnotationSchemeModel> {
+    flat?: boolean,
+  }, options?: Partial<ApiRequestOptions>): CancelablePromise<(AnnotationSchemeModel | AnnotationSchemeModelFlat)> {
     return this.httpRequest.request({
       method: 'GET',
       url: '/api/annotations/schemes/definition/{annotation_scheme_id}',
       path: {
         'annotation_scheme_id': annotationSchemeId,
+      },
+      query: {
+        'flat': flat,
       },
       errors: {
         422: `Validation Error`,
@@ -533,6 +541,77 @@ export class AnnotationsService {
       },
       body: requestBody,
       mediaType: 'application/json',
+      errors: {
+        422: `Validation Error`,
+      },
+      ...options,
+    });
+  }
+
+  /**
+   * Send Item Annotation Matrix
+   * @returns AnnotationMatrix Successful Response
+   * @throws ApiError
+   */
+  public sendItemAnnotationMatrixApiAnnotationsConfigResolveGet({
+    xProjectId,
+    schemeId,
+    scopeId,
+    userId,
+    key,
+    repeat,
+    excludeKey,
+  }: {
+    xProjectId: string,
+    schemeId?: string,
+    scopeId?: string,
+    userId?: string,
+    key?: Array<string>,
+    repeat?: number,
+    excludeKey?: Array<string>,
+  }, options?: Partial<ApiRequestOptions>): CancelablePromise<AnnotationMatrix> {
+    return this.httpRequest.request({
+      method: 'GET',
+      url: '/api/annotations/config/resolve/',
+      headers: {
+        'x-project-id': xProjectId,
+      },
+      query: {
+        'scheme_id': schemeId,
+        'scope_id': scopeId,
+        'user_id': userId,
+        'key': key,
+        'repeat': repeat,
+        'exclude_key': excludeKey,
+      },
+      errors: {
+        422: `Validation Error`,
+      },
+      ...options,
+    });
+  }
+
+  /**
+   * Send Resolved Annotations
+   * @returns AnnotationMatrix Successful Response
+   * @throws ApiError
+   */
+  public sendResolvedAnnotationsApiAnnotationsConfigResolvedBotAnnotationMetaIdGet({
+    botAnnotationMetaId,
+    xProjectId,
+  }: {
+    botAnnotationMetaId: string,
+    xProjectId: string,
+  }, options?: Partial<ApiRequestOptions>): CancelablePromise<AnnotationMatrix> {
+    return this.httpRequest.request({
+      method: 'GET',
+      url: '/api/annotations/config/resolved/:bot_annotation_meta_id',
+      headers: {
+        'x-project-id': xProjectId,
+      },
+      query: {
+        'bot_annotation_meta_id': botAnnotationMetaId,
+      },
       errors: {
         422: `Validation Error`,
       },

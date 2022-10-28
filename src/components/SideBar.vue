@@ -49,13 +49,13 @@
         v-if="projectPermissions.annotations_read && isActive('project-pipelines')"
         to="/project/pipelines/setup"
         class="list-group-item list-group-item-action list-group-item-info border-end-0 sub-link"
-        active-class="active"> Task Configuration
+        exact-active-class="active"> Task Configuration
       </router-link>
       <router-link
         v-if="projectPermissions.annotations_read && isActive('project-pipelines')"
         to="/project/pipelines/presets"
         class="list-group-item list-group-item-action list-group-item-info border-end-0 sub-link"
-        active-class="active"> Presets
+        exact-active-class="active"> Presets
       </router-link>
       <router-link
         v-if="projectPermissions.annotations_edit"
