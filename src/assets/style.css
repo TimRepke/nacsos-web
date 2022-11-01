@@ -19,6 +19,11 @@
 .nacsos-tooltip {
     position: relative;
     display: inline-block;
+
+    --tooltip-margin-x: 1rem;
+    --tooltip-margin-y: -1rem;
+    --tooltip-padding-x: 1rem;
+    --tooltip-padding-y: 0.5rem;
 }
 
 /* Tooltip text */
@@ -27,29 +32,45 @@
     visibility: hidden;
     background-color: rgba(0, 0, 0, 0.9);
     color: #fff;
-    padding: 0.5rem 1rem;
-    margin: -1rem 1rem;
+    padding: var(--tooltip-padding-y) var(--tooltip-padding-x);
+    margin: var(--tooltip-margin-y) var(--tooltip-margin-x);
     border-radius: 6px;
 
     /* Position the tooltip text - see examples below! */
     position: absolute;
     z-index: 1;
+    inline-size: max-content;
+}
+
+.nacsos-tooltip > .right {
+    transform: translate(0%, 0%);
+    --tooltip-margin-x: 0.2rem;
+}
+
+.nacsos-tooltip > .top {
+    transform: translate(-50%, -100%);
+}
+
+.nacsos-tooltip > .bottom {
+    transform: translate(-50%, 33%);
+}
+
+.nacsos-tooltip > .left {
+    transform: translate(calc(-100% - 2 * var(--tooltip-padding-x)), -33%);
 }
 
 .nacsos-tooltip > .small {
     margin: 0;
-    transform: translate(-50%,-100%);
     max-width: 10rem;
     text-align: center;
-    inline-size: max-content;
 }
 
 .nacsos-tooltip > .medium {
-    width: 25rem;
+    max-width: 25rem;
 }
 
 .nacsos-tooltip > .wide {
-    width: 50rem;
+    max-width: 50rem;
 }
 
 /* Show the tooltip text when you mouse over the tooltip container */
