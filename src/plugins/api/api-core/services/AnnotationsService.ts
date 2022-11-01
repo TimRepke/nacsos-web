@@ -3,7 +3,6 @@
 /* eslint-disable */
 import type { AnnotatedItem } from '../models/AnnotatedItem';
 import type { AnnotationItem } from '../models/AnnotationItem';
-import type { AnnotationMatrix } from '../models/AnnotationMatrix';
 import type { AnnotationSchemeModel } from '../models/AnnotationSchemeModel';
 import type { AnnotationSchemeModelFlat } from '../models/AnnotationSchemeModelFlat';
 import type { AssignmentCounts } from '../models/AssignmentCounts';
@@ -12,6 +11,8 @@ import type { AssignmentScopeModel } from '../models/AssignmentScopeModel';
 import type { AssignmentStatus } from '../models/AssignmentStatus';
 import type { ItemWithCount } from '../models/ItemWithCount';
 import type { MakeAssignmentsRequestModel } from '../models/MakeAssignmentsRequestModel';
+import type { ResolutionProposalResponse } from '../models/ResolutionProposalResponse';
+import type { SavedResolutionResponse } from '../models/SavedResolutionResponse';
 import type { UserProjectAssignmentScope } from '../models/UserProjectAssignmentScope';
 
 import type { CancelablePromise } from '@/plugins/api/core/CancelablePromise';
@@ -556,6 +557,7 @@ export class AnnotationsService {
    * columns (list index of dict entry): Label (key in scheme + repeat); index map in matrix.keys
    * cells: list of annotations by each user for item/Label combination
    *
+   * :param strategy
    * :param scheme_id:
    * :param scope_id:
    * :param user_id:
@@ -563,10 +565,11 @@ export class AnnotationsService {
    * :param repeat:
    * :param permissions:
    * :return:
-   * @returns AnnotationMatrix Successful Response
+   * @returns ResolutionProposalResponse Successful Response
    * @throws ApiError
    */
   public getItemAnnotationMatrixApiAnnotationsConfigResolveGet({
+    strategy,
     xProjectId,
     schemeId,
     scopeId,
@@ -574,13 +577,14 @@ export class AnnotationsService {
     key,
     repeat,
   }: {
+    strategy: 'majority' | 'first' | 'last' | 'trust',
     xProjectId: string,
     schemeId?: string,
-    scopeId?: string,
-    userId?: string,
+    scopeId?: Array<string>,
+    userId?: Array<string>,
     key?: Array<string>,
-    repeat?: number,
-  }, options?: Partial<ApiRequestOptions>): CancelablePromise<AnnotationMatrix> {
+    repeat?: Array<number>,
+  }, options?: Partial<ApiRequestOptions>): CancelablePromise<ResolutionProposalResponse> {
     return this.httpRequest.request({
       method: 'GET',
       url: '/api/annotations/config/resolve/',
@@ -588,6 +592,7 @@ export class AnnotationsService {
         'x-project-id': xProjectId,
       },
       query: {
+        'strategy': strategy,
         'scheme_id': schemeId,
         'scope_id': scopeId,
         'user_id': userId,
@@ -602,17 +607,17 @@ export class AnnotationsService {
   }
 
   /**
-   * Get Resolved Annotations
-   * @returns AnnotationMatrix Successful Response
+   * Get Saved Resolved Annotations
+   * @returns SavedResolutionResponse Successful Response
    * @throws ApiError
    */
-  public getResolvedAnnotationsApiAnnotationsConfigResolvedBotAnnotationMetaIdGet({
+  public getSavedResolvedAnnotationsApiAnnotationsConfigResolvedBotAnnotationMetaIdGet({
     botAnnotationMetaId,
     xProjectId,
   }: {
     botAnnotationMetaId: string,
     xProjectId: string,
-  }, options?: Partial<ApiRequestOptions>): CancelablePromise<AnnotationMatrix> {
+  }, options?: Partial<ApiRequestOptions>): CancelablePromise<SavedResolutionResponse> {
     return this.httpRequest.request({
       method: 'GET',
       url: '/api/annotations/config/resolved/:bot_annotation_meta_id',

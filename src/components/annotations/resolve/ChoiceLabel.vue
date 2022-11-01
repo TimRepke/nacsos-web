@@ -1,6 +1,6 @@
 <template>
-  <div v-if="annotation !== null">
-    <span v-for="(value, user_i) in annotation" :key="user_i">
+  <div v-if="userAnnotations !== undefined">
+    <span v-for="(value, user_i) in userAnnotations" :key="user_i">
       <InlineToolTip :info="val2str(value)">
         <span
           class="border text-light p-1"
@@ -14,6 +14,9 @@
         </span>
       </InlineToolTip>
     </span>
+    <span v-if="botAnnotation !== undefined">
+      {{ botAnnotation.value_int }}
+    </span>
   </div>
   <div v-else>
     --
@@ -23,7 +26,11 @@
 <script lang="ts">
 
 import { Value, AnnotationValueTuple } from '@/types/annotations';
-import { AnnotationSchemeLabelChoiceFlat, FlattenedAnnotationSchemeLabel } from '@/plugins/api/api-core';
+import {
+  AnnotationSchemeLabelChoiceFlat,
+  BotAnnotationModel,
+  FlattenedAnnotationSchemeLabel,
+} from '@/plugins/api/api-core';
 import InlineToolTip from '@/components/InlineToolTip.vue';
 import { PropType } from 'vue';
 import { cmap10, cmap20 } from '@/types/colours';
@@ -45,14 +52,23 @@ export default {
       type: Object as PropType<FlattenedAnnotationSchemeLabel>,
       required: true,
     },
+    choiceLookup: {
+      type: Object as PropType<Record<number, AnnotationSchemeLabelChoiceFlat>>,
+      required: true,
+    },
     users: {
       type: Array as PropType<string[]>,
       required: true,
     },
-    annotation: {
+    userAnnotations: {
       type: Array as PropType<AnnotationValueTuple[]>,
       required: false,
-      default: () => null,
+      default: () => undefined,
+    },
+    botAnnotation: {
+      type: Object as PropType<BotAnnotationModel>,
+      required: false,
+      default: () => undefined,
     },
   },
   methods: {
@@ -67,9 +83,6 @@ export default {
     },
   },
   computed: {
-    choiceLookup(): Record<number, AnnotationSchemeLabelChoiceFlat> {
-      return Object.fromEntries(this.info.choices.map((choice: AnnotationSchemeLabelChoiceFlat) => [choice.value, choice]));
-    },
     cmap(): string[] {
       return (this.info.choices.length > 10) ? cmap20 : cmap10;
     },
