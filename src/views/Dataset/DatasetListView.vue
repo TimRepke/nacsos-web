@@ -171,8 +171,7 @@ export default {
     };
   },
   async mounted() {
-    API.core.project.countProjectItemsApiProjectProjectIdItemsCountGet({
-      projectId: currentProjectStore.projectId,
+    API.core.project.countProjectItemsApiProjectItemsCountGet({
       xProjectId: currentProjectStore.projectId,
     })
       .then((response) => {
@@ -190,9 +189,8 @@ export default {
   },
   methods: {
     fetchData({ currentPage, currentPageSize }: UseOffsetPaginationReturn): void {
-      API.core.project.listProjectDataPagedApiProjectProjectIdItemsItemTypeListPagePageSizeGet({
+      API.core.project.listProjectDataPagedApiProjectItemsItemTypeListPagePageSizeGet({
         xProjectId: currentProjectStore.projectId,
-        projectId: currentProjectStore.projectId,
         page: this.pagination.currentPage,
         pageSize: this.pagination.currentPageSize,
         itemType: currentProjectStore.project.type,
