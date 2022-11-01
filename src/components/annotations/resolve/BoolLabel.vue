@@ -1,14 +1,23 @@
 <template>
   <span v-for="(value, user_i) in annotation" :key="user_i">
-    <InlineToolTip :info="`key: ${info.key} Value: ${!!value}`">
+    <InlineToolTip :info="val2str(value)">
       <template v-if="value === null">
-        <font-awesome-icon :icon="['fas', 'question']" class="border p-1 bg-light" style="height: 1rem; width: 1rem;" />
+        <font-awesome-icon
+          :icon="['fas', 'question']"
+          class="border p-1 bg-light"
+          style="height: 1rem; width: 1rem;" />
       </template>
-      <template v-else-if="!!value">
-        <font-awesome-icon :icon="['fas', 'check']" class="border text-light p-1 bg-success" style="height: 1rem; width: 1rem;" />
+      <template v-else-if="value[TupleInd.V_BOOL]">
+        <font-awesome-icon
+          :icon="['fas', 'check']"
+          class="border text-light p-1 bg-success"
+          style="height: 1rem; width: 1rem;" />
       </template>
       <template v-else>
-        <font-awesome-icon :icon="['fas', 'xmark']" class="border text-light p-1 bg-danger" style="height: 1rem; width: 1rem;" />
+        <font-awesome-icon
+          :icon="['fas', 'xmark']"
+          class="border text-light p-1 bg-danger"
+          style="height: 1rem; width: 1rem;" />
       </template>
     </InlineToolTip>
   </span>
@@ -16,21 +25,41 @@
 
 <script lang="ts">
 
+import { Value, AnnotationValueTuple } from '@/types/annotations';
 import { FlattenedAnnotationSchemeLabel } from '@/plugins/api/api-core';
 import InlineToolTip from '@/components/InlineToolTip.vue';
+import { PropType } from 'vue';
+
+interface BoolLabelData {
+  TupleInd: typeof Value,
+}
 
 export default {
   name: 'BoolLabel',
   components: { InlineToolTip },
+  data(): BoolLabelData {
+    return {
+      TupleInd: Value,
+    };
+  },
   props: {
-    users: {
-      type: Array < String >,
-      default: [],
+    info: {
+      type: Object as PropType<FlattenedAnnotationSchemeLabel>,
+      required: true,
     },
-    info: FlattenedAnnotationSchemeLabel,
+    users: {
+      type: Array as PropType<string[]>,
+      required: true,
+    },
     annotation: {
-      type: Array < Boolean >,
-      default: [],
+      type: Array as PropType<AnnotationValueTuple[]>,
+      required: true,
+    },
+  },
+  methods: {
+    val2str: (val: AnnotationValueTuple | null) => {
+      if (val === null) return '[MISSING]';
+      return (val[Value.V_BOOL]) ? 'Yes' : 'No';
     },
   },
 };
