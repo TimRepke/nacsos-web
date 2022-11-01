@@ -1,7 +1,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-export const $Key = {
+export const $Label = {
   properties: {
     key: {
       type: 'string',

@@ -549,18 +549,30 @@ export class AnnotationsService {
   }
 
   /**
-   * Send Item Annotation Matrix
+   * Get Item Annotation Matrix
+   * Get all annotations that match the filters (e.g. all annotations made by users in scope with :scope_id).
+   * Annotations are returned in a 3D matrix:
+   * rows (dict entries): items (key: item_id)
+   * columns (list index of dict entry): Label (key in scheme + repeat); index map in matrix.keys
+   * cells: list of annotations by each user for item/Label combination
+   *
+   * :param scheme_id:
+   * :param scope_id:
+   * :param user_id:
+   * :param key:
+   * :param repeat:
+   * :param permissions:
+   * :return:
    * @returns AnnotationMatrix Successful Response
    * @throws ApiError
    */
-  public sendItemAnnotationMatrixApiAnnotationsConfigResolveGet({
+  public getItemAnnotationMatrixApiAnnotationsConfigResolveGet({
     xProjectId,
     schemeId,
     scopeId,
     userId,
     key,
     repeat,
-    excludeKey,
   }: {
     xProjectId: string,
     schemeId?: string,
@@ -568,7 +580,6 @@ export class AnnotationsService {
     userId?: string,
     key?: Array<string>,
     repeat?: number,
-    excludeKey?: Array<string>,
   }, options?: Partial<ApiRequestOptions>): CancelablePromise<AnnotationMatrix> {
     return this.httpRequest.request({
       method: 'GET',
@@ -582,7 +593,6 @@ export class AnnotationsService {
         'user_id': userId,
         'key': key,
         'repeat': repeat,
-        'exclude_key': excludeKey,
       },
       errors: {
         422: `Validation Error`,
@@ -592,11 +602,11 @@ export class AnnotationsService {
   }
 
   /**
-   * Send Resolved Annotations
+   * Get Resolved Annotations
    * @returns AnnotationMatrix Successful Response
    * @throws ApiError
    */
-  public sendResolvedAnnotationsApiAnnotationsConfigResolvedBotAnnotationMetaIdGet({
+  public getResolvedAnnotationsApiAnnotationsConfigResolvedBotAnnotationMetaIdGet({
     botAnnotationMetaId,
     xProjectId,
   }: {

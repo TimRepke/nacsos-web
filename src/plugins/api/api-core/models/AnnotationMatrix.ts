@@ -4,8 +4,8 @@
 
 export type AnnotationMatrix = {
   scheme_id: string;
-  keys: Array<Array<Array<any>>>;
+  labels: Array<Array<Array<any>>>;
   users: Array<string>;
-  matrix: Record<string, Array<Array<(number | boolean | string)>>>;
+  matrix: Record<string, Array<Array<Array<any>>>>;
 };
 

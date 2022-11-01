@@ -3,6 +3,13 @@
 /* eslint-disable */
 export const $FlattenedAnnotationSchemeLabel = {
   properties: {
+    name: {
+      type: 'string',
+      isRequired: true,
+    },
+    hint: {
+      type: 'string',
+    },
     key: {
       type: 'string',
       isRequired: true,
@@ -26,11 +33,14 @@ export const $FlattenedAnnotationSchemeLabel = {
     choices: {
       type: 'array',
       contains: {
-        type: 'number',
+        type: 'AnnotationSchemeLabelChoiceFlat',
       },
     },
     parent_label: {
       type: 'string',
+    },
+    parent_choice: {
+      type: 'number',
     },
   },
 } as const;

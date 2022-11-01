@@ -2,7 +2,7 @@
 /* tslint:disable */
 /* eslint-disable */
 
-export type Key = {
+export type Label = {
   key: string;
   repeat: number;
 };

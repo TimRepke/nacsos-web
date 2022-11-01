@@ -7,7 +7,7 @@ export const $AnnotationMatrix = {
       type: 'string',
       isRequired: true,
     },
-    keys: {
+    labels: {
       type: 'array',
       contains: {
         type: 'array',
@@ -35,16 +35,11 @@ export const $AnnotationMatrix = {
         contains: {
           type: 'array',
           contains: {
-            type: 'any-of',
-            contains: [{
-              type: 'number',
-            }, {
-              type: 'number',
-            }, {
-              type: 'boolean',
-            }, {
-              type: 'string',
-            }],
+            type: 'array',
+            contains: {
+              properties: {
+              },
+            },
           },
         },
       },
