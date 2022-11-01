@@ -144,6 +144,19 @@ const routes: Array<RouteRecordRaw> = [
       },
     ],
   },
+  {
+    path: '/project/settings',
+    name: 'project-settings',
+    component: () => import(/* webpackChunkName: "ProjectSettingsContainer" */ '../views/Projects/ProjectSettingsContainer.vue'),
+    children: [
+      {
+        path: '',
+        alias: ['', 'settings'],
+        name: 'project-settings-settings',
+        component: () => import(/* webpackChunkName: "ProjectSettingsView" */ '../views/Projects/ProjectSettingsView.vue'),
+      },
+    ],
+  },
 ];
 
 const router = createRouter({
@@ -152,7 +165,7 @@ const router = createRouter({
 });
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-router.beforeEach(async (to, from) => {
+router.beforeEach(async (to) => {
   // if user is not authenticated -> redirect to login page
   // prevent infinite redirects if user isn't logged in
   if (!currentUserStore.isLoggedIn && to.name !== 'login') {

@@ -66,8 +66,20 @@
         Annotations
       </router-link>
       <router-link
+        v-if="projectPermissions.annotations_edit && isActive('config-annotation-schemes')"
+        to="/project/config/annotations/list"
+        class="list-group-item list-group-item-action list-group-item-info border-end-0 sub-link"
+        exact-active-class="active"> Schemes & Scopes
+      </router-link>
+      <router-link
+        v-if="projectPermissions.annotations_edit && isActive('config-annotation-schemes')"
+        to="/project/config/annotations/resolve"
+        class="list-group-item list-group-item-action list-group-item-info border-end-0 sub-link"
+        exact-active-class="active"> Label Centre
+      </router-link>
+      <router-link
         v-if="projectPermissions.owner"
-        to="/project/config/project"
+        to="/project/settings"
         class="list-group-item list-group-item-action border-end-0"
         active-class="active">
         <font-awesome-icon icon="gear" />
@@ -123,9 +135,9 @@ export default {
     toggleVisibility(): void {
       this.visible = (this.visible === undefined) ? false : !this.visible;
     },
-    setVisibility(newState: boolean): void {
-      this.visible = newState;
-    },
+    // setVisibility(newState: boolean): void {
+    //   this.visible = newState;
+    // },
   },
   mounted() {
     window.onresize = () => {
