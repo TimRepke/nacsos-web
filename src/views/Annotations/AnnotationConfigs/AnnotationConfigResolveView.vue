@@ -2,6 +2,11 @@
   <div class="text-start">
     <h1>Consolidate/Resolve Annotations</h1>
     <div v-if="dataIsLoaded" class="table-responsive">
+      <button
+        @click="save"
+        type="button"
+        class="btn btn-success">Save
+      </button>
       <table class="table" style="width: calc(100% - 1rem)">
         <thead>
           <tr>
@@ -35,7 +40,8 @@
                   :user-annotations="annotation"
                   :bot-annotation="botAnnotationMap[itemId][key_i]"
                   :info="columnLabelInfos[key_i]"
-                  :users="matrix.users" />
+                  :users="matrix.users"
+                  @bot-annotation-changed="handleChangedBotAnnotation" />
               </template>
               <template v-else-if="columnLabelInfos[key_i].kind === 'single'">
                 <ChoiceLabel
@@ -73,6 +79,8 @@ import BoolLabel from '@/components/annotations/resolve/BoolLabel.vue';
 import ItemModal from '@/components/items/ItemModal.vue';
 import InlineToolTip from '@/components/InlineToolTip.vue';
 import ChoiceLabel from '@/components/annotations/resolve/ChoiceLabel.vue';
+import { ToastEvent } from '@/plugins/events/events/toast';
+import { EventBus } from '@/plugins/events';
 
 type ResolveData = {
   botAnnotationMetaId: string | undefined,
@@ -163,6 +171,21 @@ export default {
         this.matrix = data.matrix;
         this.annotations = data.proposal;
       });
+    },
+    handleChangedBotAnnotation(annotation: BotAnnotationModel) {
+      console.log(annotation);
+      const key = `${annotation.key}-${annotation.repeat}`;
+      if (this.botAnnotationMap[annotation.item_id][key] !== undefined) {
+        this.botAnnotationMap[annotation.item_id][key].value_bool = annotation.value_bool;
+        this.botAnnotationMap[annotation.item_id][key].value_str = annotation.value_str;
+        this.botAnnotationMap[annotation.item_id][key].value_float = annotation.value_float;
+        this.botAnnotationMap[annotation.item_id][key].value_int = annotation.value_int;
+      } else {
+        // this.annotations.push(annotation);
+      }
+    },
+    save() {
+      EventBus.emit(new ToastEvent('WARN', 'No.'));
     },
   },
   computed: {
