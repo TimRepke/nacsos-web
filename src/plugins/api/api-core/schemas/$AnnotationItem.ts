@@ -18,9 +18,11 @@ export const $AnnotationItem = {
     item: {
       type: 'any-of',
       contains: [{
-        type: 'ItemModel',
+        type: 'GenericItemModel',
       }, {
         type: 'TwitterItemModel',
+      }, {
+        type: 'AcademicItemModel',
       }],
       isRequired: true,
     },

@@ -16,7 +16,7 @@
  * :param repeat: if not None: annotation has to be primary/secondary/...
  */
 export type AnnotationFilters = {
-  scheme_id?: (string | Array<string>);
+  scheme_id: string;
   scope_id?: (string | Array<string>);
   user_id?: (string | Array<string>);
   key?: (string | Array<string>);

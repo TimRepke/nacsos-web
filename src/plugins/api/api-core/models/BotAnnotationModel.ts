@@ -8,12 +8,14 @@ export type BotAnnotationModel = {
   time_created?: string;
   time_updated?: string;
   item_id: string;
+  parent?: string;
   key?: string;
   repeat?: number;
   value_bool?: boolean;
   value_int?: number;
   value_float?: number;
   value_str?: string;
+  multi_int?: Array<number>;
   confidence?: number;
 };
 

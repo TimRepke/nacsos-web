@@ -15,15 +15,8 @@ export const $AnnotationFilters = {
   :param repeat: if not None: annotation has to be primary/secondary/...`,
   properties: {
     scheme_id: {
-      type: 'any-of',
-      contains: [{
-        type: 'string',
-      }, {
-        type: 'array',
-        contains: {
-          type: 'string',
-        },
-      }],
+      type: 'string',
+      isRequired: true,
     },
     scope_id: {
       type: 'any-of',

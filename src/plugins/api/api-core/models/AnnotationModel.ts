@@ -38,6 +38,7 @@ export type AnnotationModel = {
   value_int?: number;
   value_float?: number;
   value_str?: string;
+  multi_int?: Array<number>;
   text_offset_start?: number;
   text_offset_stop?: number;
 };

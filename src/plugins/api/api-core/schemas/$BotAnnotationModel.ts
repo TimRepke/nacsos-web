@@ -39,6 +39,15 @@ export const $BotAnnotationModel = {
       }],
       isRequired: true,
     },
+    parent: {
+      type: 'any-of',
+      contains: [{
+        type: 'string',
+      }, {
+        type: 'string',
+        format: 'uuid',
+      }],
+    },
     key: {
       type: 'string',
     },
@@ -56,6 +65,12 @@ export const $BotAnnotationModel = {
     },
     value_str: {
       type: 'string',
+    },
+    multi_int: {
+      type: 'array',
+      contains: {
+        type: 'number',
+      },
     },
     confidence: {
       type: 'number',

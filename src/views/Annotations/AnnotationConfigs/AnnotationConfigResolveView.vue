@@ -216,7 +216,7 @@ export default {
       const ret: Record<string, Array<BotAnnotationModel | undefined>> = {};
       this.annotations.forEach((botAnnotation: BotAnnotationModel) => {
         if (!(botAnnotation.item_id in ret)) ret[botAnnotation.item_id] = [];
-        ret[botAnnotation.item_id][this.lab2col[`${botAnnotation.key}-${botAnnotation.repeat}`]] = botAnnotation;
+        ret[botAnnotation.item_id][this.lab2col[`${botAnnotation.parent}-${botAnnotation.key}-${botAnnotation.repeat}`]] = botAnnotation;
       });
       return ret;
     },

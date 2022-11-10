@@ -1,6 +1,6 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-export const $ProjectType = {
+export const $ItemType = {
   type: 'Enum',
 } as const;

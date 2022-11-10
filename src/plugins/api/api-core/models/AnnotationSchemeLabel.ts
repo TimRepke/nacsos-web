@@ -21,8 +21,8 @@ export namespace AnnotationSchemeLabel {
   export enum kind {
     BOOL = 'bool',
     STR = 'str',
-    INT = 'int',
     FLOAT = 'float',
+    INT = 'int',
     SINGLE = 'single',
     MULTI = 'multi',
     INTEXT = 'intext',

@@ -11,8 +11,12 @@ export const $BotMetaResolve = {
       type: 'AnnotationFilters',
       isRequired: true,
     },
-    matrix: {
-      type: 'AnnotationMatrix',
+    ignore_hierarchy: {
+      type: 'boolean',
+      isRequired: true,
+    },
+    ignore_repeat: {
+      type: 'boolean',
       isRequired: true,
     },
     trust: {
@@ -20,6 +24,10 @@ export const $BotMetaResolve = {
       contains: {
         type: 'number',
       },
+    },
+    collection: {
+      type: 'AnnotationCollectionDB',
+      isRequired: true,
     },
   },
 } as const;

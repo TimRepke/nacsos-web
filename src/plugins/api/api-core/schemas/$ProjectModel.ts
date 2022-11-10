@@ -30,7 +30,7 @@ export const $ProjectModel = {
       contains: [{
         type: 'Enum',
       }, {
-        type: 'ProjectType',
+        type: 'ItemType',
       }],
       isRequired: true,
     },

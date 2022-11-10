@@ -1,7 +1,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-export const $AnnotationMatrix = {
+export const $AnnotationCollectionDB = {
   properties: {
     scheme_id: {
       type: 'string',
@@ -12,36 +12,25 @@ export const $AnnotationMatrix = {
       contains: {
         type: 'array',
         contains: {
-          type: 'array',
-          contains: {
-            properties: {
-            },
-          },
+          type: 'Label',
         },
       },
       isRequired: true,
     },
-    users: {
-      type: 'array',
-      contains: {
-        type: 'string',
-      },
-      isRequired: true,
-    },
-    matrix: {
+    annotations: {
       type: 'dictionary',
       contains: {
         type: 'array',
         contains: {
-          type: 'array',
-          contains: {
-            type: 'array',
-            contains: {
-              properties: {
-              },
-            },
-          },
+          type: 'items',
         },
+      },
+      isRequired: true,
+    },
+    annotators: {
+      type: 'array',
+      contains: {
+        type: 'string',
       },
       isRequired: true,
     },

@@ -1,7 +1,8 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { ItemModel } from '../models/ItemModel';
+import type { AcademicItemModel } from '../models/AcademicItemModel';
+import type { GenericItemModel } from '../models/GenericItemModel';
 import type { ProjectModel } from '../models/ProjectModel';
 import type { ProjectPermissionsModel } from '../models/ProjectPermissionsModel';
 import type { TwitterItemModel } from '../models/TwitterItemModel';
@@ -126,9 +127,9 @@ export class ProjectService {
     itemType,
     xProjectId,
   }: {
-    itemType: 'basic' | 'twitter' | 'academic' | 'patents',
+    itemType: 'generic' | 'twitter' | 'academic' | 'patents',
     xProjectId: string,
-  }, options?: Partial<ApiRequestOptions>): CancelablePromise<Array<(ItemModel | TwitterItemModel)>> {
+  }, options?: Partial<ApiRequestOptions>): CancelablePromise<Array<(GenericItemModel | TwitterItemModel | AcademicItemModel)>> {
     return this.httpRequest.request({
       method: 'GET',
       url: '/api/project/items/{item_type}/list',
@@ -156,11 +157,11 @@ export class ProjectService {
     pageSize,
     xProjectId,
   }: {
-    itemType: 'basic' | 'twitter' | 'academic' | 'patents',
+    itemType: 'generic' | 'twitter' | 'academic' | 'patents',
     page: number,
     pageSize: number,
     xProjectId: string,
-  }, options?: Partial<ApiRequestOptions>): CancelablePromise<Array<(ItemModel | TwitterItemModel)>> {
+  }, options?: Partial<ApiRequestOptions>): CancelablePromise<Array<(GenericItemModel | TwitterItemModel | AcademicItemModel)>> {
     return this.httpRequest.request({
       method: 'GET',
       url: '/api/project/items/{item_type}/list/{page}/{page_size}',
@@ -191,8 +192,8 @@ export class ProjectService {
   }: {
     itemId: string,
     xProjectId: string,
-    itemType?: 'basic' | 'twitter' | 'academic' | 'patents',
-  }, options?: Partial<ApiRequestOptions>): CancelablePromise<(ItemModel | TwitterItemModel)> {
+    itemType?: 'generic' | 'twitter' | 'academic' | 'patents',
+  }, options?: Partial<ApiRequestOptions>): CancelablePromise<(GenericItemModel | TwitterItemModel | AcademicItemModel)> {
     return this.httpRequest.request({
       method: 'GET',
       url: '/api/project/items/detail/{item_id}',
@@ -243,15 +244,20 @@ export class ProjectService {
   public addTweetApiProjectItemsTwitterAddPost({
     xProjectId,
     requestBody,
+    importId,
   }: {
     xProjectId: string,
     requestBody: TwitterItemModel,
+    importId?: string,
   }, options?: Partial<ApiRequestOptions>): CancelablePromise<any> {
     return this.httpRequest.request({
       method: 'POST',
       url: '/api/project/items/twitter/add',
       headers: {
         'x-project-id': xProjectId,
+      },
+      query: {
+        'import_id': importId,
       },
       body: requestBody,
       mediaType: 'application/json',

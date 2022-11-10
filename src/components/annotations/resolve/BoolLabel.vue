@@ -1,18 +1,18 @@
 <template>
   <div>
     <span v-for="(value, user_i) in userAnnotations" :key="user_i">
-      <InlineToolTip :info="val2str(value)">
+      <InlineToolTip :info="annotation2string(value)">
         <font-awesome-icon
-          :icon="['fas', val2icon(value)]"
-          :class="[val2bg(value)]"
+          :icon="['fas', annotation2icon(value)]"
+          :class="[annotation2classes(value)]"
           class="border text-light p-1"
           style="height: 1rem; width: 1rem;" />
       </InlineToolTip>
     </span>
     <div class="dropdown ps-2 d-inline">
       <font-awesome-icon
-        :icon="['fas', botValueIcon]"
-        :class="botValueBgColor"
+        :icon="['fas', annotation2icon(botAnnotation)]"
+        :class="annotation2classes(botAnnotation)"
         class="border border-dark border-2 rounded-3 text-light p-1 dropdown-toggle"
         role="button"
         style="height: 1rem; width: 1rem;"
@@ -31,8 +31,7 @@
 </template>
 
 <script lang="ts">
-import { Value, AnnotationValueTuple } from '@/types/annotations';
-import { BotAnnotationModel, FlattenedAnnotationSchemeLabel } from '@/plugins/api/api-core';
+import { AnnotationValue, BotAnnotationModel, FlattenedAnnotationSchemeLabel } from '@/plugins/api/api-core';
 import InlineToolTip from '@/components/InlineToolTip.vue';
 import { PropType } from 'vue';
 import { EventBus } from '@/plugins/events';
@@ -64,7 +63,7 @@ export default {
       required: true,
     },
     userAnnotations: {
-      type: Array as PropType<AnnotationValueTuple[]>,
+      type: Array as PropType<AnnotationValue[]>,
       required: true,
     },
     botAnnotation: {
@@ -74,23 +73,17 @@ export default {
     },
   },
   methods: {
-    val2icon(val: AnnotationValueTuple | null | undefined) {
-      if (val === null || val === undefined) return 'question';
-      const vBool = val[Value.V_BOOL];
-      if (vBool === null || vBool === undefined) return 'question';
-      if (vBool) return 'check';
-      return 'xmark';
+    annotation2icon(val: AnnotationValue | BotAnnotationModel | undefined): string {
+      if (val === undefined || val.value_bool === undefined) return 'question';
+      return (val.value_bool) ? 'check' : 'xmark';
     },
-    val2bg(val: AnnotationValueTuple | null | undefined) {
-      if (val === null || val === undefined) return ['bg-light', 'text-dark'];
-      const vBool = val[Value.V_BOOL];
-      if (vBool === null || vBool === undefined) return ['bg-light', 'text-dark'];
-      if (vBool) return ['bg-success', 'text-light'];
-      return ['bg-danger', 'text-light'];
+    annotation2classes(val: AnnotationValue | BotAnnotationModel | undefined): string[] {
+      if (val === undefined || val.value_bool === undefined) return ['bg-light', 'text-dark'];
+      return (val.value_bool) ? ['bg-success', 'text-light'] : ['bg-danger', 'text-light'];
     },
-    val2str(val: AnnotationValueTuple | null | undefined) {
-      if (val === null || val === undefined) return '[MISSING]';
-      return (val[Value.V_BOOL]) ? 'Yes' : 'No';
+    annotation2string(val: AnnotationValue | BotAnnotationModel | undefined) {
+      if (val === undefined || val.value_bool === undefined) return '[MISSING]';
+      return (val.value_bool) ? 'Yes' : 'No';
     },
     setBotAnnotation(value: boolean | undefined) {
       if (this.botAnnotation !== undefined) {
@@ -106,16 +99,7 @@ export default {
     },
   },
   computed: {
-    botValueIcon() {
-      if (this.botAnnotation === undefined) return 'question';
-      if (this.botAnnotation.value_bool === undefined) return 'question';
-      return (this.botAnnotation.value_bool) ? 'check' : 'xmark';
-    },
-    botValueBgColor() {
-      if (this.botAnnotation === undefined) return ['bg-light', 'text-dark'];
-      if (this.botAnnotation.value_bool === undefined) return ['bg-light', 'text-dark'];
-      return [(this.botAnnotation.value_bool) ? 'bg-success' : 'bg-danger', 'text-light'];
-    },
+    // pass
   },
 };
 </script>

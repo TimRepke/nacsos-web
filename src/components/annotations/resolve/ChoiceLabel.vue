@@ -46,7 +46,6 @@
 
 <script lang="ts">
 
-import { Value, AnnotationValueTuple } from '@/types/annotations';
 import {
   AnnotationSchemeLabelChoiceFlat,
   BotAnnotationModel,

@@ -2,11 +2,11 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { AnnotationMatrix } from './AnnotationMatrix';
+import type { AnnotationCollection } from './AnnotationCollection';
 import type { BotAnnotationModel } from './BotAnnotationModel';
 
 export type ResolutionProposalResponse = {
-  matrix: AnnotationMatrix;
+  collection: AnnotationCollection;
   proposal: Array<BotAnnotationModel>;
 };
 

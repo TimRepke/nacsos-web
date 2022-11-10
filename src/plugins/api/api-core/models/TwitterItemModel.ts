@@ -5,6 +5,7 @@
 import type { Cashtag } from './Cashtag';
 import type { ContextAnnotation } from './ContextAnnotation';
 import type { Hashtag } from './Hashtag';
+import type { ItemType } from './ItemType';
 import type { Mention } from './Mention';
 import type { ReferencedTweet } from './ReferencedTweet';
 import type { TwitterUserModel } from './TwitterUserModel';
@@ -18,9 +19,11 @@ import type { URL } from './URL';
  */
 export type TwitterItemModel = {
   item_id?: string;
+  project_id?: string;
+  type?: ItemType;
+  text: string;
   twitter_id?: string;
   twitter_author_id?: string;
-  status: string;
   created_at: string;
   language?: string;
   conversation_id?: string;

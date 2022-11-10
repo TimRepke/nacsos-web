@@ -3,8 +3,8 @@
 /* eslint-disable */
 export const $ResolutionProposalResponse = {
   properties: {
-    matrix: {
-      type: 'AnnotationMatrix',
+    collection: {
+      type: 'AnnotationCollection',
       isRequired: true,
     },
     proposal: {

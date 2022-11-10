@@ -564,26 +564,32 @@ export class AnnotationsService {
    * :param key:
    * :param repeat:
    * :param permissions:
+   * :param ignore_order:
+   * :param ignore_hierarchy:
    * :return:
    * @returns ResolutionProposalResponse Successful Response
    * @throws ApiError
    */
   public getItemAnnotationMatrixApiAnnotationsConfigResolveGet({
     strategy,
-    xProjectId,
     schemeId,
+    xProjectId,
     scopeId,
     userId,
     key,
     repeat,
+    ignoreOrder = false,
+    ignoreHierarchy = false,
   }: {
     strategy: 'majority' | 'first' | 'last' | 'trust',
+    schemeId: string,
     xProjectId: string,
-    schemeId?: string,
     scopeId?: Array<string>,
     userId?: Array<string>,
     key?: Array<string>,
     repeat?: Array<number>,
+    ignoreOrder?: boolean,
+    ignoreHierarchy?: boolean,
   }, options?: Partial<ApiRequestOptions>): CancelablePromise<ResolutionProposalResponse> {
     return this.httpRequest.request({
       method: 'GET',
@@ -598,6 +604,8 @@ export class AnnotationsService {
         'user_id': userId,
         'key': key,
         'repeat': repeat,
+        'ignore_order': ignoreOrder,
+        'ignore_hierarchy': ignoreHierarchy,
       },
       errors: {
         422: `Validation Error`,

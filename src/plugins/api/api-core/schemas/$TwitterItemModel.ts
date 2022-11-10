@@ -16,15 +16,27 @@ export const $TwitterItemModel = {
         format: 'uuid',
       }],
     },
+    project_id: {
+      type: 'any-of',
+      contains: [{
+        type: 'string',
+      }, {
+        type: 'string',
+        format: 'uuid',
+      }],
+    },
+    type: {
+      type: 'ItemType',
+    },
+    text: {
+      type: 'string',
+      isRequired: true,
+    },
     twitter_id: {
       type: 'string',
     },
     twitter_author_id: {
       type: 'string',
-    },
-    status: {
-      type: 'string',
-      isRequired: true,
     },
     created_at: {
       type: 'string',
