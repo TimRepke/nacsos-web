@@ -7,6 +7,6 @@ import type { BotMetaResolve } from './BotMetaResolve';
 
 export type SavedResolutionResponse = {
   meta: BotMetaResolve;
-  saved: Array<BotAnnotationModel>;
+  saved: Record<string, Array<BotAnnotationModel>>;
 };
 

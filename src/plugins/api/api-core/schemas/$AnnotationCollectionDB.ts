@@ -22,7 +22,11 @@ export const $AnnotationCollectionDB = {
       contains: {
         type: 'array',
         contains: {
-          type: 'items',
+          type: 'array',
+          contains: {
+            properties: {
+            },
+          },
         },
       },
       isRequired: true,

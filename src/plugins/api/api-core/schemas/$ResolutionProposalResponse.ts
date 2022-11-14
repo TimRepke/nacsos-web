@@ -8,9 +8,23 @@ export const $ResolutionProposalResponse = {
       isRequired: true,
     },
     proposal: {
+      type: 'dictionary',
+      contains: {
+        type: 'array',
+        contains: {
+          type: 'array',
+          contains: {
+            properties: {
+            },
+          },
+        },
+      },
+      isRequired: true,
+    },
+    scheme_flat: {
       type: 'array',
       contains: {
-        type: 'BotAnnotationModel',
+        type: 'FlattenedAnnotationSchemeLabel',
       },
       isRequired: true,
     },

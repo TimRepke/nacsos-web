@@ -17,7 +17,7 @@
           </ul>
         </div>
         <div class="row g-0">
-          <GenericItemComponent :item="item" />
+          <AnyItemComponent :item="item" />
         </div>
       </div>
       <div class="col border-start p-2 overflow-auto h-md-100 position-relative" :class="sidebarWidthClass">
@@ -69,7 +69,7 @@
 
 <script lang="ts">
 import { marked } from 'marked';
-import GenericItemComponent from '@/components/items/GenericItem.vue';
+import AnyItemComponent from '@/components/items/AnyItem.vue';
 import AnnotationLabels from '@/components/annotations/AnnotationLabels.vue';
 import { EventBus } from '@/plugins/events';
 import { ToastEvent } from '@/plugins/events/events/toast';
@@ -124,7 +124,7 @@ type AnnotationsViewData = {
 
 export default {
   name: 'AnnotationsView',
-  components: { AnnotationLabels, GenericItemComponent },
+  components: { AnnotationLabels, AnyItemComponent },
   data(): AnnotationsViewData {
     return {
       item: undefined,

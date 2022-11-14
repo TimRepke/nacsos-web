@@ -61,7 +61,7 @@
           <div class="d-flex flex-row flex-wrap p-2 overflow-auto">
             <template v-if="this.itemList && this.itemList.length > 0">
               <template v-if="projectType === 'twitter'">
-                <GenericItemComponent
+                <AnyItemComponent
                   v-for="(item) in itemList"
                   :key="item.item_id"
                   :item="item" />
@@ -150,7 +150,7 @@
 
 <script lang="ts">
 import { currentProjectStore } from '@/stores';
-import GenericItemComponent from '@/components/items/GenericItem.vue';
+import AnyItemComponent from '@/components/items/AnyItem.vue';
 import { useOffsetPagination, UseOffsetPaginationReturn } from '@vueuse/core';
 import ClosablePill from '@/components/ClosablePill.vue';
 import { reactive } from 'vue';
@@ -159,7 +159,7 @@ import { API, toastReject } from '@/plugins/api';
 
 export default {
   name: 'ProjectDataView',
-  components: { ClosablePill, GenericItemComponent },
+  components: { ClosablePill, AnyItemComponent },
   data() {
     return {
       projectType: currentProjectStore.project.type,

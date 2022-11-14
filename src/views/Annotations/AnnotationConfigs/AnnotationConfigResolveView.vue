@@ -1,30 +1,48 @@
 <template>
   <div class="text-start">
     <h1>Consolidate/Resolve Annotations</h1>
-    <div v-if="dataIsLoaded" class="table-responsive">
-      <button
-        @click="save"
-        type="button"
-        class="btn btn-success">Save
-      </button>
+    <button
+      @click="save"
+      type="button"
+      class="btn btn-success">Save
+    </button>
+    <div v-if="!!collection && !!collection.annotations" class="table-responsive">
       <table class="table" style="width: calc(100% - 1rem)">
         <thead>
           <tr>
-            <th />
-            <th :colspan="matrix.labels.length">Label</th>
-          </tr>
-          <tr>
             <th>Item</th>
-            <th v-for="key in matrix.labels" :key="key">
-              <span v-for="skey in key" :key="skey[0]" class="label-pill me-1">
-                <span>{{ skey[0] }}</span>
-                <span>{{ skey[1] }}</span>
+            <th v-for="label in collection.labels" :key="label">
+              <span v-for="skey in label" :key="skey.key" class="nacsos-tooltip ms-2 label-pill me-1">
+                <span>{{ skey.key }}</span>
+                <span>{{ skey.repeat }}</span>
+                <div
+                  class="nacsos-tooltiptext popover bs-popover-auto fade show bg-light p-0"
+                  role="tooltip"
+                  data-popper-placement="bottom"
+                  style="position: absolute; inset: 0 auto auto 0; margin: 0; transform: translateY(2rem);">
+                  <div
+                    class="popover-arrow"
+                    style="position: absolute; left: 0; transform: translateX(30px);" />
+                  <h3 class="popover-header text-dark">{{ schemeLookup[skey.key].name }}</h3>
+                  <div class="popover-body">
+                    <template v-if="schemeLookup[skey.key].choices">
+                      <ul class="list-unstyled">
+                        <li v-for="choice in schemeLookup[skey.key].choices" :key="choice.value">
+                          <strong>{{ choice.value }}:</strong> {{ choice.name }}
+                        </li>
+                      </ul>
+                    </template>
+                    <template v-else>
+                      {{ schemeLookup[skey.key].kind }}
+                    </template>
+                  </div>
+                </div>
               </span>
             </th>
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(annotations, itemId) in matrix.matrix" :key="itemId">
+          <tr v-for="itemId in Object.keys(collection.annotations)" :key="itemId">
             <td>
               <InlineToolTip :info="`ID: ${itemId}`" placement="right" size="medium">
                 <font-awesome-icon
@@ -34,25 +52,25 @@
                   @click="this.focusItem = itemId" />
               </InlineToolTip>
             </td>
-            <td v-for="(annotation, key_i) in annotations" :key="key_i">
-              <template v-if="columnLabelInfos[key_i].kind === 'bool'">
+            <td v-for="[label, strLabel] in labels" :key="strLabel">
+              <template v-if="schemeLookup[label[0].key]?.kind === 'bool'">
                 <BoolLabel
-                  :user-annotations="annotation"
-                  :bot-annotation="botAnnotationMap[itemId][key_i]"
-                  :info="columnLabelInfos[key_i]"
-                  :users="matrix.users"
+                  :user-annotations="matrix[itemId][strLabel]?.users"
+                  :bot-annotation="matrix[itemId][strLabel]?.bot"
+                  :info="schemeLookup[label[0].key]"
+                  :users="userLookup"
                   @bot-annotation-changed="handleChangedBotAnnotation" />
               </template>
-              <template v-else-if="columnLabelInfos[key_i].kind === 'single'">
+              <template v-else-if="schemeLookup[label[0].key]?.kind === 'single'">
                 <ChoiceLabel
-                  :user-annotations="annotation"
-                  :bot-annotation="botAnnotationMap[itemId][key_i]"
-                  :info="columnLabelInfos[key_i]"
-                  :users="matrix.users"
-                  :choice-lookup="choiceLookups[columnLabelInfos[key_i].key]" />
+                  :user-annotations="matrix[itemId][strLabel]?.users"
+                  :bot-annotation="matrix[itemId][strLabel]?.bot"
+                  :info="schemeLookup[label[0].key]"
+                  :users="userLookup"
+                  @bot-annotation-changed="handleChangedBotAnnotation" />
               </template>
               <template v-else>
-                {{ annotation }}
+                Unhandled "{{ schemeLookup[label[0].key]?.kind }}"
               </template>
             </td>
           </tr>
@@ -66,13 +84,12 @@
 <script lang="ts">
 import { currentProjectStore } from '@/stores';
 import {
-  AnnotationMatrix,
-  AnnotationSchemeLabelChoiceFlat,
-  AnnotationSchemeModelFlat,
+  AnnotationCollection,
   FlattenedAnnotationSchemeLabel,
-  BotMetaResolve,
   BotAnnotationModel,
   AnnotationFilters,
+  BotMetaResolve,
+  AnnotationSchemeModel, UserModel, Label, AnnotationModel,
 } from '@/plugins/api/api-core';
 import { API } from '@/plugins/api';
 import BoolLabel from '@/components/annotations/resolve/BoolLabel.vue';
@@ -82,18 +99,21 @@ import ChoiceLabel from '@/components/annotations/resolve/ChoiceLabel.vue';
 import { ToastEvent } from '@/plugins/events/events/toast';
 import { EventBus } from '@/plugins/events';
 
+type LookupMatrix = Record<string, Record<string, Partial<{ users: AnnotationModel[], bot: BotAnnotationModel }>>>;
+
 type ResolveData = {
   botAnnotationMetaId: string | undefined,
-  algorithm: BotMetaResolve.algorithm | undefined,
+  algorithm: BotMetaResolve.algorithm,
+  ignoreHierarchy: boolean;
+  ignoreOrder: boolean;
   filters: AnnotationFilters,
-  matrix: AnnotationMatrix | undefined,
-  // currently relevant annotation_scheme_id (e.g. if part of matrix or selected during setup)
-  schemeId: string | undefined,
-  // flattened labels for schemeId (lazy-loaded via watch)
-  scheme: AnnotationSchemeModelFlat | undefined,
+  schemeFlat: FlattenedAnnotationSchemeLabel[],
+  collection: AnnotationCollection | undefined,
+  botAnnotations: Record<string, BotAnnotationModel[]>,
   // id of item in focus (to be opened in modal)
   focusItem: string | undefined,
-  annotations: BotAnnotationModel[] | undefined,
+  // only used for setup (empty when botAnnotationMetaId not None)
+  projectAnnotationSchemes: AnnotationSchemeModel[],
 };
 
 export default {
@@ -103,15 +123,17 @@ export default {
     return {
       botAnnotationMetaId: this.$route.params.bot_annotation_meta_id,
       filters: {
+        scheme_id: '98545fb3-3ed3-48b2-9748-a24015244be0', // FIXME remove after testing
         scope_id: 'b3731e6a-c651-4d15-b957-828508dee5ac', // FIXME remove after testing
       } as AnnotationFilters,
-      algorithm: BotMetaResolve.algorithm.MAJORITY, // FIXME remove after testing
-      // algorithm: undefined,
-      schemeId: undefined,
-      matrix: undefined,
-      scheme: undefined,
-      focusItem: undefined,
-      annotations: undefined,
+      algorithm: BotMetaResolve.algorithm.MAJORITY,
+      ignoreHierarchy: false,
+      ignoreOrder: false,
+      schemeFlat: [],
+      collection: undefined as AnnotationCollection | undefined,
+      botAnnotations: {},
+      focusItem: undefined as string | undefined,
+      projectAnnotationSchemes: [],
     };
   },
 
@@ -121,43 +143,21 @@ export default {
         botAnnotationMetaId: this.botAnnotationMetaId,
         xProjectId: currentProjectStore.projectId,
       }).then((response) => {
+        // TODO
         const { data } = response;
-        this.filters = data.meta.filters;
-        this.algorithm = data.meta.algorithm;
-        this.schemeId = data.annotation_scheme_id;
-        this.matrix = data.meta.matrix;
-        this.annotations = data.saved;
+        console.log(data);
+        // this.filters = data.meta.filters;
+        // this.algorithm = data.meta.algorithm;
+        // this.annotations = data.saved;
       });
     } else {
-      // FIXME: remove after testing!
-      this.fetchProposal();
+      this.fetchProjectSchemas();
+      this.fetchProposal(); // FIXME: remove after testing!
     }
-  },
-  watch: {
-    schemeId(newSchemeId: string | undefined | null) {
-      if (newSchemeId !== undefined && newSchemeId !== null) {
-        API.core.annotations.getSchemeDefinitionApiAnnotationsSchemesDefinitionAnnotationSchemeIdGet({
-          annotationSchemeId: newSchemeId,
-          flat: true,
-        }).then((response) => {
-          this.scheme = response.data;
-        });
-        this.fetchProposal();
-      }
-    },
-    filters: {
-      handler() {
-        this.fetchProposal();
-      },
-      deep: true,
-    },
-    algorithm() {
-      this.fetchProposal();
-    },
   },
   methods: {
     fetchProposal() {
-      API.core.annotations.getItemAnnotationMatrixApiAnnotationsConfigResolveGet({
+      API.core.annotations.getResolvedAnnotationsApiAnnotationsConfigResolveGet({
         strategy: this.algorithm,
         xProjectId: currentProjectStore.projectId,
         schemeId: this.filters.scheme_id,
@@ -165,60 +165,76 @@ export default {
         userId: (!this.filters.user_id) ? undefined : [this.filters.user_id],
         key: (!this.filters.key) ? undefined : [this.filters.key],
         repeat: (!this.filters.repeat) ? undefined : [this.filters.repeat],
+        ignoreHierarchy: this.ignoreHierarchy,
+        ignoreOrder: this.ignoreOrder,
       }).then((response) => {
         const { data } = response;
-        this.schemeId = data.matrix.scheme_id;
-        this.matrix = data.matrix;
-        this.annotations = data.proposal;
+        this.collection = data.collection;
+        this.schemeFlat = data.scheme_flat;
+        this.botAnnotations = data.proposal;
       });
     },
-    handleChangedBotAnnotation(annotation: BotAnnotationModel) {
-      console.log(annotation);
-      const key = `${annotation.key}-${annotation.repeat}`;
-      if (this.botAnnotationMap[annotation.item_id][key] !== undefined) {
-        this.botAnnotationMap[annotation.item_id][key].value_bool = annotation.value_bool;
-        this.botAnnotationMap[annotation.item_id][key].value_str = annotation.value_str;
-        this.botAnnotationMap[annotation.item_id][key].value_float = annotation.value_float;
-        this.botAnnotationMap[annotation.item_id][key].value_int = annotation.value_int;
-      } else {
-        // this.annotations.push(annotation);
-      }
+    fetchProjectSchemas() {
+      API.core.annotations.getSchemeDefinitionsForProjectApiAnnotationsSchemesListProjectIdGet({
+        projectId: currentProjectStore.projectId,
+        xProjectId: currentProjectStore.projectId,
+      }).then((response) => {
+        const { data } = response;
+        this.projectAnnotationSchemes = data;
+      });
+    },
+    handleChangedBotAnnotation(updatedBotAnnotation: BotAnnotationModel) {
+      console.log(updatedBotAnnotation);
+      console.log('asd');
     },
     save() {
-      EventBus.emit(new ToastEvent('WARN', 'No.'));
+      EventBus.emit(new ToastEvent('WARN', 'Computer says no.'));
+    },
+    label2string(label: Label[]) {
+      return label.map((label_: Label) => `${label_.key}:${label_.repeat}`).join('-');
     },
   },
   computed: {
-    dataIsLoaded() {
-      return this.matrix !== undefined && this.scheme !== undefined;
+    userLookup(): Record<string, UserModel> {
+      if (!this.collection || !this.collection.annotators) {
+        return {};
+      }
+      return Object.fromEntries(this.collection.annotators.map((user: UserModel) => [user.user_id, user]));
     },
-    labelInfoMap(): Record<string, FlattenedAnnotationSchemeLabel> {
-      if (!this.dataIsLoaded) return {};
-      return Object.fromEntries(this.scheme.labels.map((label: FlattenedAnnotationSchemeLabel) => [label.key, label]));
+    labels() {
+      if (!this.collection || !this.collection.labels) {
+        return [];
+      }
+      return this.collection.labels.map((label: Label[]) => [label, this.label2string(label)]);
     },
-    columnLabelInfos(): FlattenedAnnotationSchemeLabel[] {
-      if (!this.dataIsLoaded) return [];
-      return this.matrix.labels.map((key: string[][]) => this.labelInfoMap[key[key.length - 1][0]]);
+    schemeLookup(): Record<string, FlattenedAnnotationSchemeLabel> {
+      if (!this.schemeFlat) return {};
+      return Object.fromEntries(this.schemeFlat.map((label: FlattenedAnnotationSchemeLabel) => [label.key, label]));
     },
-    choiceLookups(): Record<string, Record<number, AnnotationSchemeLabelChoiceFlat>> {
-      if (!this.dataIsLoaded) return {};
-      return Object.fromEntries(this.scheme.labels.map((label: FlattenedAnnotationSchemeLabel) => {
-        if (!label.choices) return [label.key, undefined];
-        return [label.key, Object.fromEntries(label.choices.map((choice: AnnotationSchemeLabelChoiceFlat) => [choice.value, choice]))];
-      }));
-    },
-    lab2col(): Record<string, number> {
-      if (!this.dataIsLoaded) return {};
-      return Object.fromEntries(this.matrix.labels.map((key: Array<[string, number]>, ind: number) => [key[key.length - 1].join('-'), ind]));
-    },
-    botAnnotationMap(): Record<string, Array<BotAnnotationModel | undefined>> {
-      if (!this.dataIsLoaded || !this.annotations) return {};
-      const ret: Record<string, Array<BotAnnotationModel | undefined>> = {};
-      this.annotations.forEach((botAnnotation: BotAnnotationModel) => {
-        if (!(botAnnotation.item_id in ret)) ret[botAnnotation.item_id] = [];
-        ret[botAnnotation.item_id][this.lab2col[`${botAnnotation.parent}-${botAnnotation.key}-${botAnnotation.repeat}`]] = botAnnotation;
+    matrix(): LookupMatrix {
+      if (!this.collection || !this.collection.annotations) {
+        return {};
+      }
+      const matrix: LookupMatrix = {};
+      Object.entries(this.collection.annotations).forEach((entry) => {
+        const [itemId, groupedAnnotations] = entry as [string, Array<[Label[], AnnotationModel[]]>];
+        if (!matrix[itemId]) matrix[itemId] = {};
+        groupedAnnotations.forEach(([path, annotations]) => {
+          matrix[itemId][this.label2string(path)] = { users: annotations };
+        });
       });
-      return ret;
+      if (this.botAnnotations) {
+        Object.entries(this.botAnnotations).forEach((entry) => {
+          const [itemId, botAnnotationEntry] = entry as [string, Array<[Label[], BotAnnotationModel]>];
+          botAnnotationEntry.forEach(([path, botAnnotation]) => {
+            const strPath = this.label2string(path);
+            if (!matrix[itemId]) matrix[itemId] = {};
+            if (!matrix[itemId][strPath]) matrix[itemId][strPath] = { bot: botAnnotation };
+            else matrix[itemId][strPath].bot = botAnnotation;
+          });
+        });
+      }
+      return matrix;
     },
   },
 };
@@ -241,7 +257,7 @@ export default {
   border-bottom-right-radius: 0;
 }
 
-.label-pill span:last-child {
+.label-pill span:last-of-type {
   border-top-left-radius: 0;
   border-bottom-left-radius: 0;
   border-left: 0;

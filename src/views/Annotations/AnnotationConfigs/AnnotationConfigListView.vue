@@ -103,6 +103,7 @@ export default {
     try {
       this.projectSchemes = (await API.core.annotations.getSchemeDefinitionsForProjectApiAnnotationsSchemesListProjectIdGet({
         projectId: currentProjectStore.projectId,
+        xProjectId: currentProjectStore.projectId,
       })).data;
       this.projectScopes = (await API.core.annotations.getAssignmentScopesForProjectApiAnnotationsAnnotateScopesGet({
         xProjectId: currentProjectStore.projectId,
@@ -128,6 +129,7 @@ export default {
 
         const schemes = await API.core.annotations.getSchemeDefinitionsForProjectApiAnnotationsSchemesListProjectIdGet({
           projectId: currentProjectStore.projectId,
+          xProjectId: currentProjectStore.projectId,
         });
         this.projectSchemes = schemes.data;
       } catch (e) {

@@ -31,7 +31,7 @@
 </template>
 
 <script lang="ts">
-import { AnnotationValue, BotAnnotationModel, FlattenedAnnotationSchemeLabel } from '@/plugins/api/api-core';
+import { AnnotationModel, BotAnnotationModel, FlattenedAnnotationSchemeLabel, UserModel } from '@/plugins/api/api-core';
 import InlineToolTip from '@/components/InlineToolTip.vue';
 import { PropType } from 'vue';
 import { EventBus } from '@/plugins/events';
@@ -59,11 +59,11 @@ export default {
       required: true,
     },
     users: {
-      type: Array as PropType<string[]>,
+      type: Object as PropType<Record<string, UserModel>>,
       required: true,
     },
     userAnnotations: {
-      type: Array as PropType<AnnotationValue[]>,
+      type: Array as PropType<AnnotationModel[]>,
       required: true,
     },
     botAnnotation: {
@@ -73,17 +73,21 @@ export default {
     },
   },
   methods: {
-    annotation2icon(val: AnnotationValue | BotAnnotationModel | undefined): string {
+    annotation2icon(val: AnnotationModel | BotAnnotationModel | undefined): string {
       if (val === undefined || val.value_bool === undefined) return 'question';
       return (val.value_bool) ? 'check' : 'xmark';
     },
-    annotation2classes(val: AnnotationValue | BotAnnotationModel | undefined): string[] {
+    annotation2classes(val: AnnotationModel | BotAnnotationModel | undefined): string[] {
       if (val === undefined || val.value_bool === undefined) return ['bg-light', 'text-dark'];
       return (val.value_bool) ? ['bg-success', 'text-light'] : ['bg-danger', 'text-light'];
     },
-    annotation2string(val: AnnotationValue | BotAnnotationModel | undefined) {
+    annotation2string(val: AnnotationModel | BotAnnotationModel | undefined) {
       if (val === undefined || val.value_bool === undefined) return '[MISSING]';
-      return (val.value_bool) ? 'Yes' : 'No';
+      let user = '';
+      if ('user_id' in val) {
+        user = `${this.users[val.user_id].username}: `;
+      }
+      return `${user}${(val.value_bool) ? 'Yes' : 'No'}`;
     },
     setBotAnnotation(value: boolean | undefined) {
       if (this.botAnnotation !== undefined) {

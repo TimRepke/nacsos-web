@@ -8,9 +8,12 @@ export const $SavedResolutionResponse = {
       isRequired: true,
     },
     saved: {
-      type: 'array',
+      type: 'dictionary',
       contains: {
-        type: 'BotAnnotationModel',
+        type: 'array',
+        contains: {
+          type: 'BotAnnotationModel',
+        },
       },
       isRequired: true,
     },

@@ -1,27 +1,32 @@
 <template>
   <div v-if="userAnnotations !== undefined">
-    <span v-for="(value, user_i) in userAnnotations" :key="user_i">
-      <InlineToolTip :info="val2str(value)">
+
+    <!-- User Annotations -->
+    <span v-for="annotation in userAnnotations" :key="annotation.annotation_id">
+      <InlineToolTip :info="annotation2string(annotation)">
         <span
-          class="border text-light p-1"
-          :style="{ backgroundColor: val2col(value) }">
-          <template v-if="value === null || value === undefined">
+          class="border text-light p-1 ps-2 pe-2"
+          :style="{ backgroundColor: annotation2bgColor(annotation) }">
+          <template v-if="annotation.value_int === undefined">
             <font-awesome-icon :icon="['fas', 'question']" class="text-dark" />
           </template>
           <template v-else>
-            {{ value[TupleInd.V_INT] }}
+            {{ annotation.value_int }}
           </template>
         </span>
       </InlineToolTip>
     </span>
+    <!-- / User Annotations -->
+
+    <!-- BotAnnotation -->
     <div class="dropdown ps-2 d-inline">
       <span
         class="border text-light p-1 border-dark border-2 rounded-3 dropdown-toggle"
-        :style="{ backgroundColor: botValueBgColor }"
+        :style="{ backgroundColor: annotation2bgColor(botAnnotation) }"
         role="button"
         tabindex="-1"
         @click="editMode = !editMode">
-        <template v-if="botAnnotation === undefined || botAnnotation.value_int === null || botAnnotation.value_int === undefined">
+        <template v-if="botAnnotation === undefined || botAnnotation.value_int === undefined">
           <font-awesome-icon :icon="['fas', 'question']" class="text-dark" />
         </template>
         <template v-else>
@@ -41,15 +46,18 @@
           @click="setBotAnnotation(undefined)">[NONE]</span></li>
       </ul>
     </div>
+    <!-- / BotAnnotation -->
+
   </div>
 </template>
 
 <script lang="ts">
 
 import {
+  AnnotationModel,
   AnnotationSchemeLabelChoiceFlat,
   BotAnnotationModel,
-  FlattenedAnnotationSchemeLabel,
+  FlattenedAnnotationSchemeLabel, UserModel,
 } from '@/plugins/api/api-core';
 import InlineToolTip from '@/components/InlineToolTip.vue';
 import { PropType } from 'vue';
@@ -58,7 +66,7 @@ import { EventBus } from '@/plugins/events';
 import { ToastEvent } from '@/plugins/events/events/toast';
 
 interface ChoiceLabelData {
-  TupleInd: typeof Value,
+  changed: boolean,
   editMode: boolean,
 }
 
@@ -67,7 +75,7 @@ export default {
   components: { InlineToolTip },
   data(): ChoiceLabelData {
     return {
-      TupleInd: Value,
+      changed: false,
       editMode: false,
     };
   },
@@ -77,16 +85,12 @@ export default {
       type: Object as PropType<FlattenedAnnotationSchemeLabel>,
       required: true,
     },
-    choiceLookup: {
-      type: Object as PropType<Record<number, AnnotationSchemeLabelChoiceFlat>>,
-      required: true,
-    },
     users: {
-      type: Array as PropType<string[]>,
+      type: Object as PropType<Record<string, UserModel>>,
       required: true,
     },
     userAnnotations: {
-      type: Array as PropType<AnnotationValueTuple[]>,
+      type: Array as PropType<AnnotationModel[]>,
       required: false,
       default: () => undefined,
     },
@@ -97,34 +101,28 @@ export default {
     },
   },
   methods: {
-    safeValue(val: AnnotationValueTuple | number | null | undefined): number | undefined {
-      if (val === null || val === undefined) return undefined;
-      // is AnnotationValueTuple
-      if (Array.isArray(val)) {
-        const vInt = val[Value.V_INT];
-        if (vInt === null || vInt === undefined) return undefined;
-        return vInt;
+    annotation2string(val: AnnotationModel | BotAnnotationModel | undefined) {
+      if (!val || val.value_int === undefined) return '[MISSING]';
+      let user = '';
+      if ('user_id' in val) {
+        user = `${this.users[val.user_id].username}: `;
       }
-      // is number
-      return val;
+      const { name, value } = this.choiceLookup[val.value_int];
+      return `${user}${name} (${value})`;
     },
-    val2str(val: AnnotationValueTuple | number | null | undefined) {
-      const vInt = this.safeValue(val);
-      if (vInt === undefined) return '[MISSING]';
-      const { name, value } = this.choiceLookup[vInt];
-      return `${name} (${value})`;
-    },
-    val2col(val: AnnotationValueTuple | number | null | undefined) {
-      const vInt = this.safeValue(val);
-      if (vInt === undefined) return 'transparent';
-      return this.cmap[vInt % this.cmap.length];
+    annotation2bgColor(val: AnnotationModel | BotAnnotationModel | undefined) {
+      if (!val || val.value_int === undefined) return 'transparent';
+      return this.cmap[val.value_int % this.cmap.length];
     },
     setBotAnnotation(value: number | undefined) {
       if (this.botAnnotation !== undefined) {
-        const anno = this.botAnnotation;
-        anno.value_int = value;
-        this.$emit('botAnnotationChanged', anno);
-        this.editMode = false;
+        if (this.botAnnotation.value_int !== value) {
+          this.changed = true;
+          const anno = this.botAnnotation;
+          anno.value_int = value;
+          this.$emit('botAnnotationChanged', anno);
+          this.editMode = false;
+        }
       } else {
         // FIXME: not implemented (handle adding new BotAnnotation, i.e. handle the case where item has no annotation here)
         // const anno: BotAnnotationModel = {};
@@ -136,10 +134,8 @@ export default {
     cmap(): string[] {
       return (this.info.choices.length > 10) ? cmap20 : cmap10;
     },
-    botValueBgColor() {
-      if (this.botAnnotation === undefined) return 'transparent';
-      if (this.botAnnotation.value_int === undefined) return 'transparent';
-      return this.cmap[this.botAnnotation.value_int % this.cmap.length];
+    choiceLookup(): Record<number, AnnotationSchemeLabelChoiceFlat> {
+      return Object.fromEntries(this.info.choices.map((choice: AnnotationSchemeLabelChoiceFlat) => [choice.value, choice]));
     },
   },
 };

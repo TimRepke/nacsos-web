@@ -117,20 +117,26 @@ export class AnnotationsService {
    * This endpoint returns the detailed definitions of all annotation schemes associated with a project.
    *
    * :param project_id: database id of the project
+   * :param permissions:
    * :return: list of annotation schemes
    * @returns AnnotationSchemeModel Successful Response
    * @throws ApiError
    */
   public getSchemeDefinitionsForProjectApiAnnotationsSchemesListProjectIdGet({
     projectId,
+    xProjectId,
   }: {
     projectId: string,
+    xProjectId: string,
   }, options?: Partial<ApiRequestOptions>): CancelablePromise<Array<AnnotationSchemeModel>> {
     return this.httpRequest.request({
       method: 'GET',
       url: '/api/annotations/schemes/list/{project_id}',
       path: {
         'project_id': projectId,
+      },
+      headers: {
+        'x-project-id': xProjectId,
       },
       errors: {
         422: `Validation Error`,
@@ -550,7 +556,7 @@ export class AnnotationsService {
   }
 
   /**
-   * Get Item Annotation Matrix
+   * Get Resolved Annotations
    * Get all annotations that match the filters (e.g. all annotations made by users in scope with :scope_id).
    * Annotations are returned in a 3D matrix:
    * rows (dict entries): items (key: item_id)
@@ -570,7 +576,7 @@ export class AnnotationsService {
    * @returns ResolutionProposalResponse Successful Response
    * @throws ApiError
    */
-  public getItemAnnotationMatrixApiAnnotationsConfigResolveGet({
+  public getResolvedAnnotationsApiAnnotationsConfigResolveGet({
     strategy,
     schemeId,
     xProjectId,

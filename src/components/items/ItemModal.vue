@@ -25,7 +25,7 @@
               </p>
             </template>
             <template v-else>
-              <GenericItem :item="itemInfo" />
+              <AnyItemComponent :item="itemInfo" />
             </template>
           </div>
           <!--          <div class="modal-footer">-->
@@ -45,7 +45,7 @@ import { AnyItem } from '@/types/items';
 import { API } from '@/plugins/api';
 import { currentProjectStore } from '@/stores';
 import { CancelablePromise } from '@/plugins/api/core/CancelablePromise';
-import GenericItem from '@/components/items/GenericItem.vue';
+import AnyItemComponent from '@/components/items/AnyItem.vue';
 
 type ItemModalData = {
   itemInfo: AnyItem | undefined,
@@ -53,7 +53,7 @@ type ItemModalData = {
 };
 
 export default {
-  components: { GenericItem },
+  components: { AnyItemComponent },
   props: ['itemId'],
   emits: ['dismissed'],
   data(): ItemModalData {
