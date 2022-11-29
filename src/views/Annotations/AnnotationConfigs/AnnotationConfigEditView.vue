@@ -97,6 +97,8 @@ export default {
     if (!this.isNewScheme) {
       API.core.annotations.getSchemeDefinitionApiAnnotationsSchemesDefinitionAnnotationSchemeIdGet({
         annotationSchemeId: this.annotationSchemeId,
+        xProjectId: currentProjectStore.projectId,
+        flat: false,
       })
         .then((response) => {
           this.scheme = ref(response.data);

@@ -3,7 +3,7 @@
 
     <!-- User Annotations -->
     <span v-for="annotation in userAnnotations" :key="annotation.annotation_id">
-      <InlineToolTip :info="annotation2string(annotation)">
+      <InlineToolTip :info="getPrettyUsername(annotation.user_id)">
         <span
           class="border text-light p-1 ps-2 pe-2"
           :style="{ backgroundColor: annotation2bgColor(annotation) }">
@@ -19,21 +19,21 @@
     <!-- / User Annotations -->
 
     <!-- BotAnnotation -->
-    <div class="dropdown ps-2 d-inline">
+    <div class="dropdown ps-2 d-inline-block">
       <span
         class="border text-light p-1 border-dark border-2 rounded-3 dropdown-toggle"
         :style="{ backgroundColor: annotation2bgColor(botAnnotation) }"
         role="button"
         tabindex="-1"
         @click="editMode = !editMode">
-        <template v-if="botAnnotation === undefined || botAnnotation.value_int === undefined">
+        <template v-if="!hasValue(botAnnotation)">
           <font-awesome-icon :icon="['fas', 'question']" class="text-dark" />
         </template>
         <template v-else>
           {{ botAnnotation.value_int }}
         </template>
       </span>
-      <ul class="dropdown-menu" :class="{ show: editMode }">
+      <ul class="dropdown-menu end-0" :class="{ show: editMode }">
         <li v-for="choice in info.choices" :key="choice.value">
           <span class="dropdown-item" role="button" tabindex="-1" @click="setBotAnnotation(choice.value)">
             {{ choice.name }} ({{ choice.value }})
@@ -64,6 +64,12 @@ import { PropType } from 'vue';
 import { cmap10, cmap20 } from '@/types/colours';
 import { EventBus } from '@/plugins/events';
 import { ToastEvent } from '@/plugins/events/events/toast';
+
+function hasValue(model: AnnotationModel | BotAnnotationModel | undefined | null):
+  model is (AnnotationModel | BotAnnotationModel) & { value_int: number } {
+  if (model === null || model === undefined) return false;
+  return (model.value_int !== undefined && model.value_int !== null);
+}
 
 interface ChoiceLabelData {
   changed: boolean,
@@ -101,18 +107,15 @@ export default {
     },
   },
   methods: {
-    annotation2string(val: AnnotationModel | BotAnnotationModel | undefined) {
-      if (!val || val.value_int === undefined) return '[MISSING]';
-      let user = '';
-      if ('user_id' in val) {
-        user = `${this.users[val.user_id].username}: `;
-      }
-      const { name, value } = this.choiceLookup[val.value_int];
-      return `${user}${name} (${value})`;
+    hasValue(model: AnnotationModel | BotAnnotationModel | undefined | null):
+      model is (AnnotationModel | BotAnnotationModel) & { value_int: number } {
+      return hasValue(model);
     },
     annotation2bgColor(val: AnnotationModel | BotAnnotationModel | undefined) {
-      if (!val || val.value_int === undefined) return 'transparent';
-      return this.cmap[val.value_int % this.cmap.length];
+      if (hasValue(val)) {
+        return this.cmap[val.value_int % this.cmap.length];
+      }
+      return 'transparent';
     },
     setBotAnnotation(value: number | undefined) {
       if (this.botAnnotation !== undefined) {
@@ -128,6 +131,11 @@ export default {
         // const anno: BotAnnotationModel = {};
         EventBus.emit(new ToastEvent('WARN', 'Not implemented yet.'));
       }
+    },
+    getPrettyUsername(userId: string): string {
+      const user: UserModel | undefined = this.users[userId];
+      if (!user) return '??';
+      return `${user.username} (${user.full_name})`;
     },
   },
   computed: {

@@ -2,11 +2,11 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { BotAnnotationModel } from './BotAnnotationModel';
 import type { BotMetaResolve } from './BotMetaResolve';
 
 export type SavedResolutionResponse = {
+  name: string;
   meta: BotMetaResolve;
-  saved: Record<string, Array<BotAnnotationModel>>;
+  saved: Record<string, Array<Array<any>>>;
 };
 

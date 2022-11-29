@@ -3,6 +3,10 @@
 /* eslint-disable */
 export const $SavedResolutionResponse = {
   properties: {
+    name: {
+      type: 'string',
+      isRequired: true,
+    },
     meta: {
       type: 'BotMetaResolve',
       isRequired: true,
@@ -12,7 +16,11 @@ export const $SavedResolutionResponse = {
       contains: {
         type: 'array',
         contains: {
-          type: 'BotAnnotationModel',
+          type: 'array',
+          contains: {
+            properties: {
+            },
+          },
         },
       },
       isRequired: true,

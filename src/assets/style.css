@@ -117,3 +117,29 @@
 .collapsible > .toggle:checked + .lbl-toggle + .collapsible-content {
     max-height: 350px;
 }
+
+/*
+Analogous to LaTeX
+\tiny         .fs-tiny (0.5rem)
+\scriptsize   .fs-script (0.6125rem)
+\footnotesize .fs-fn (0.75rem)
+\small        .small (0.875rem)  # already in bootstrap
+\normalsize   .fs-6 (1.00rem)
+\large        .fs-5 (1.25rem)
+\Large        .fs-4 (1.50rem)
+\LARGE        .fs-3 (1.75rem)
+\huge         .fs-2 (2.00rem)
+\Huge         .fs-1 (2.50rem)
+*/
+
+.fs-tiny {
+    font-size: 0.5rem !important;
+}
+
+.fs-script {
+    font-size: 0.6125rem !important;
+}
+
+.fs-fn {
+    font-size: 0.75rem !important;
+}

@@ -1,23 +1,24 @@
 <template>
   <div>
-    <span v-for="(value, user_i) in userAnnotations" :key="user_i">
-      <InlineToolTip :info="annotation2string(value)">
+    <span v-for="annotation in userAnnotations" :key="annotation.annotation_id">
+      <InlineToolTip :info="getPrettyUsername(annotation.user_id)">
         <font-awesome-icon
-          :icon="['fas', annotation2icon(value)]"
-          :class="[annotation2classes(value)]"
+          :icon="['fas', annotation2icon(annotation.value_bool)]"
+          :class="[annotation2classes(annotation.value_bool)]"
           class="border text-light p-1"
           style="height: 1rem; width: 1rem;" />
       </InlineToolTip>
     </span>
-    <div class="dropdown ps-2 d-inline">
+
+    <div class="dropdown ps-2 d-inline-block">
       <font-awesome-icon
-        :icon="['fas', annotation2icon(botAnnotation)]"
-        :class="annotation2classes(botAnnotation)"
+        :icon="['fas', annotation2icon(botAnnotation.value_bool)]"
+        :class="annotation2classes(botAnnotation.value_bool)"
         class="border border-dark border-2 rounded-3 text-light p-1 dropdown-toggle"
         role="button"
         style="height: 1rem; width: 1rem;"
         @click="editMode = !editMode" />
-      <ul class="dropdown-menu" :class="{ show: editMode }">
+      <ul class="dropdown-menu end-0" :class="{ show: editMode }">
         <li><span class="dropdown-item" role="button" tabindex="-1" @click="setBotAnnotation(true)">True</span></li>
         <li><span class="dropdown-item" role="button" tabindex="-1" @click="setBotAnnotation(false)">False</span></li>
         <li><span
@@ -68,26 +69,17 @@ export default {
     },
     botAnnotation: {
       type: Object as PropType<BotAnnotationModel>,
-      required: false,
-      default: () => undefined,
+      required: true,
     },
   },
   methods: {
-    annotation2icon(val: AnnotationModel | BotAnnotationModel | undefined): string {
-      if (val === undefined || val.value_bool === undefined) return 'question';
-      return (val.value_bool) ? 'check' : 'xmark';
+    annotation2icon(val: boolean | undefined): string {
+      if (val === undefined) return 'question';
+      return (val) ? 'check' : 'xmark';
     },
-    annotation2classes(val: AnnotationModel | BotAnnotationModel | undefined): string[] {
-      if (val === undefined || val.value_bool === undefined) return ['bg-light', 'text-dark'];
-      return (val.value_bool) ? ['bg-success', 'text-light'] : ['bg-danger', 'text-light'];
-    },
-    annotation2string(val: AnnotationModel | BotAnnotationModel | undefined) {
-      if (val === undefined || val.value_bool === undefined) return '[MISSING]';
-      let user = '';
-      if ('user_id' in val) {
-        user = `${this.users[val.user_id].username}: `;
-      }
-      return `${user}${(val.value_bool) ? 'Yes' : 'No'}`;
+    annotation2classes(val: boolean | undefined): string[] {
+      if (val === undefined) return ['bg-light', 'text-dark'];
+      return (val) ? ['bg-success', 'text-light'] : ['bg-danger', 'text-light'];
     },
     setBotAnnotation(value: boolean | undefined) {
       if (this.botAnnotation !== undefined) {
@@ -100,6 +92,11 @@ export default {
         // const anno: BotAnnotationModel = {};
         EventBus.emit(new ToastEvent('WARN', 'Not implemented yet.'));
       }
+    },
+    getPrettyUsername(userId: string): string {
+      const user: UserModel | undefined = this.users[userId];
+      if (!user) return '??';
+      return `${user.username} (${user.full_name})`;
     },
   },
   computed: {

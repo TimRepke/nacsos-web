@@ -69,13 +69,18 @@
         v-if="projectPermissions.annotations_edit && isActive('config-annotation-schemes')"
         to="/project/config/annotations/list"
         class="list-group-item list-group-item-action list-group-item-info border-end-0 sub-link"
-        exact-active-class="active"> Schemes & Scopes
+        :class="{
+          active: anyOf(['config-annotation-scheme-edit',
+                         'config-annotation-scheme-scope',
+                         'config-annotation-scheme-list']),
+        }"> Schemes & Scopes
       </router-link>
       <router-link
         v-if="projectPermissions.annotations_edit && isActive('config-annotation-schemes')"
-        to="/project/config/annotations/resolve"
+        to="/project/config/annotations/resolved"
         class="list-group-item list-group-item-action list-group-item-info border-end-0 sub-link"
-        exact-active-class="active"> Label Centre
+        :class="{ active: anyOf(['config-annotation-resolve', 'config-resolved-annotations-list']) }">
+        Label Centre
       </router-link>
       <router-link
         v-if="projectPermissions.owner"
@@ -131,6 +136,9 @@ export default {
   methods: {
     isActive(parentName: string): boolean {
       return this.$router.currentRoute.value.matched.some((route: RouteLocationMatched) => route.name === parentName);
+    },
+    anyOf(routeNames: string[]): boolean {
+      return routeNames.indexOf(this.$router.currentRoute.value.name) >= 0;
     },
     toggleVisibility(): void {
       this.visible = (this.visible === undefined) ? false : !this.visible;
