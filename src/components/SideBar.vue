@@ -49,13 +49,13 @@
         v-if="projectPermissions.annotations_read && isActive('project-pipelines')"
         to="/project/pipelines/setup"
         class="list-group-item list-group-item-action list-group-item-info border-end-0 sub-link"
-        active-class="active"> Task Configuration
+        exact-active-class="active"> Task Configuration
       </router-link>
       <router-link
         v-if="projectPermissions.annotations_read && isActive('project-pipelines')"
         to="/project/pipelines/presets"
         class="list-group-item list-group-item-action list-group-item-info border-end-0 sub-link"
-        active-class="active"> Presets
+        exact-active-class="active"> Presets
       </router-link>
       <router-link
         v-if="projectPermissions.annotations_edit"
@@ -66,8 +66,25 @@
         Annotations
       </router-link>
       <router-link
+        v-if="projectPermissions.annotations_edit && isActive('config-annotation-schemes')"
+        to="/project/config/annotations/list"
+        class="list-group-item list-group-item-action list-group-item-info border-end-0 sub-link"
+        :class="{
+          active: anyOf(['config-annotation-scheme-edit',
+                         'config-annotation-scheme-scope',
+                         'config-annotation-scheme-list']),
+        }"> Schemes & Scopes
+      </router-link>
+      <router-link
+        v-if="projectPermissions.annotations_edit && isActive('config-annotation-schemes')"
+        to="/project/config/annotations/resolved"
+        class="list-group-item list-group-item-action list-group-item-info border-end-0 sub-link"
+        :class="{ active: anyOf(['config-annotation-resolve', 'config-resolved-annotations-list']) }">
+        Label Centre
+      </router-link>
+      <router-link
         v-if="projectPermissions.owner"
-        to="/project/config/project"
+        to="/project/settings"
         class="list-group-item list-group-item-action border-end-0"
         active-class="active">
         <font-awesome-icon icon="gear" />
@@ -120,12 +137,15 @@ export default {
     isActive(parentName: string): boolean {
       return this.$router.currentRoute.value.matched.some((route: RouteLocationMatched) => route.name === parentName);
     },
+    anyOf(routeNames: string[]): boolean {
+      return routeNames.indexOf(this.$router.currentRoute.value.name) >= 0;
+    },
     toggleVisibility(): void {
       this.visible = (this.visible === undefined) ? false : !this.visible;
     },
-    setVisibility(newState: boolean): void {
-      this.visible = newState;
-    },
+    // setVisibility(newState: boolean): void {
+    //   this.visible = newState;
+    // },
   },
   mounted() {
     window.onresize = () => {

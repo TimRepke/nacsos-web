@@ -50,15 +50,15 @@
 <script lang="ts">
 import FilesUploader, { UploadFile } from '@/components/FilesUploader.vue';
 import { PropType } from 'vue';
-import { ImportConfigJSONL, ProjectType } from '@/plugins/api/api-core';
+import { ImportConfigJSONL, ItemType } from '@/plugins/api/api-core';
 import { currentProjectStore } from '@/stores';
 import useVuelidate, { BaseValidation, ValidationRule } from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
 import types = ImportConfigJSONL.line_type;
 
-type CompatibilityMapping = { [key in ProjectType]: types[] };
+type CompatibilityMapping = { [key in ItemType]: types[] };
 const jsonlTypeCompatibility: CompatibilityMapping = {
-  basic: [types.DB_BASIC_ITEM],
+  generic: [types.DB_GENERIC_ITEM],
   academic: [types.DB_ACADEMIC_ITEM],
   patents: [types.DB_PATENT_ITEM],
   twitter: [types.DB_TWITTER_ITEM, types.TWITTER_API_PAGE],

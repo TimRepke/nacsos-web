@@ -85,17 +85,4 @@ export class DefaultService {
     });
   }
 
-  /**
-   * Test
-   * @returns any Successful Response
-   * @throws ApiError
-   */
-  public testApiPingTestGet(options?: Partial<ApiRequestOptions>): CancelablePromise<any> {
-    return this.httpRequest.request({
-      method: 'GET',
-      url: '/api/ping/test',
-      ...options,
-    });
-  }
-
 }

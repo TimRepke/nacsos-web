@@ -1,7 +1,8 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { ItemModel } from '../models/ItemModel';
+import type { AcademicItemModel } from '../models/AcademicItemModel';
+import type { GenericItemModel } from '../models/GenericItemModel';
 import type { ProjectModel } from '../models/ProjectModel';
 import type { ProjectPermissionsModel } from '../models/ProjectPermissionsModel';
 import type { TwitterItemModel } from '../models/TwitterItemModel';
@@ -20,19 +21,14 @@ export class ProjectService {
    * @returns ProjectModel Successful Response
    * @throws ApiError
    */
-  public getProjectApiProjectProjectIdInfoGet({
-    projectId,
+  public getProjectApiProjectInfoGet({
     xProjectId,
   }: {
-    projectId: string,
     xProjectId: string,
   }, options?: Partial<ApiRequestOptions>): CancelablePromise<ProjectModel> {
     return this.httpRequest.request({
       method: 'GET',
-      url: '/api/project/{project_id}/info/',
-      path: {
-        'project_id': projectId,
-      },
+      url: '/api/project/info',
       headers: {
         'x-project-id': xProjectId,
       },
@@ -48,14 +44,14 @@ export class ProjectService {
    * @returns ProjectPermissionsModel Successful Response
    * @throws ApiError
    */
-  public getProjectPermissionsCurrentUserApiProjectProjectIdPermissionsMeGet({
+  public getProjectPermissionsCurrentUserApiProjectPermissionsMeGet({
     xProjectId,
   }: {
     xProjectId: string,
   }, options?: Partial<ApiRequestOptions>): CancelablePromise<ProjectPermissionsModel> {
     return this.httpRequest.request({
       method: 'GET',
-      url: '/api/project/{project_id}/permissions/me',
+      url: '/api/project/permissions/me',
       headers: {
         'x-project-id': xProjectId,
       },
@@ -71,7 +67,7 @@ export class ProjectService {
    * @returns ProjectPermissionsModel Successful Response
    * @throws ApiError
    */
-  public getAllProjectPermissionsApiProjectProjectIdPermissionsListGet({
+  public getAllProjectPermissionsApiProjectPermissionsListProjectIdGet({
     projectId,
     xProjectId,
   }: {
@@ -80,7 +76,7 @@ export class ProjectService {
   }, options?: Partial<ApiRequestOptions>): CancelablePromise<Array<ProjectPermissionsModel>> {
     return this.httpRequest.request({
       method: 'GET',
-      url: '/api/project/{project_id}/permissions/list',
+      url: '/api/project/permissions/list/{project_id}',
       path: {
         'project_id': projectId,
       },
@@ -99,7 +95,7 @@ export class ProjectService {
    * @returns ProjectPermissionsModel Successful Response
    * @throws ApiError
    */
-  public getProjectPermissionsByIdApiProjectProjectIdPermissionsProjectPermissionIdGet({
+  public getProjectPermissionsByIdApiProjectPermissionsProjectPermissionIdGet({
     projectPermissionId,
     xProjectId,
   }: {
@@ -108,7 +104,7 @@ export class ProjectService {
   }, options?: Partial<ApiRequestOptions>): CancelablePromise<ProjectPermissionsModel> {
     return this.httpRequest.request({
       method: 'GET',
-      url: '/api/project/{project_id}/permissions/{project_permission_id}',
+      url: '/api/project/permissions/{project_permission_id}',
       path: {
         'project_permission_id': projectPermissionId,
       },
@@ -127,20 +123,17 @@ export class ProjectService {
    * @returns any Successful Response
    * @throws ApiError
    */
-  public listProjectDataApiProjectProjectIdItemsItemTypeListGet({
-    projectId,
+  public listProjectDataApiProjectItemsItemTypeListGet({
     itemType,
     xProjectId,
   }: {
-    projectId: string,
-    itemType: 'basic' | 'twitter' | 'academic' | 'patents',
+    itemType: 'generic' | 'twitter' | 'academic' | 'patents',
     xProjectId: string,
-  }, options?: Partial<ApiRequestOptions>): CancelablePromise<Array<(ItemModel | TwitterItemModel)>> {
+  }, options?: Partial<ApiRequestOptions>): CancelablePromise<Array<(GenericItemModel | TwitterItemModel | AcademicItemModel)>> {
     return this.httpRequest.request({
       method: 'GET',
-      url: '/api/project/{project_id}/items/{item_type}/list',
+      url: '/api/project/items/{item_type}/list',
       path: {
-        'project_id': projectId,
         'item_type': itemType,
       },
       headers: {
@@ -158,24 +151,21 @@ export class ProjectService {
    * @returns any Successful Response
    * @throws ApiError
    */
-  public listProjectDataPagedApiProjectProjectIdItemsItemTypeListPagePageSizeGet({
-    projectId,
+  public listProjectDataPagedApiProjectItemsItemTypeListPagePageSizeGet({
     itemType,
     page,
     pageSize,
     xProjectId,
   }: {
-    projectId: string,
-    itemType: 'basic' | 'twitter' | 'academic' | 'patents',
+    itemType: 'generic' | 'twitter' | 'academic' | 'patents',
     page: number,
     pageSize: number,
     xProjectId: string,
-  }, options?: Partial<ApiRequestOptions>): CancelablePromise<Array<(ItemModel | TwitterItemModel)>> {
+  }, options?: Partial<ApiRequestOptions>): CancelablePromise<Array<(GenericItemModel | TwitterItemModel | AcademicItemModel)>> {
     return this.httpRequest.request({
       method: 'GET',
-      url: '/api/project/{project_id}/items/{item_type}/list/{page}/{page_size}',
+      url: '/api/project/items/{item_type}/list/{page}/{page_size}',
       path: {
-        'project_id': projectId,
         'item_type': itemType,
         'page': page,
         'page_size': pageSize,
@@ -195,24 +185,26 @@ export class ProjectService {
    * @returns any Successful Response
    * @throws ApiError
    */
-  public getDetailForItemApiProjectProjectIdItemsItemTypeDetailItemIdGet({
+  public getDetailForItemApiProjectItemsDetailItemIdGet({
     itemId,
-    itemType,
     xProjectId,
+    itemType,
   }: {
     itemId: string,
-    itemType: 'basic' | 'twitter' | 'academic' | 'patents',
     xProjectId: string,
-  }, options?: Partial<ApiRequestOptions>): CancelablePromise<(ItemModel | TwitterItemModel)> {
+    itemType?: 'generic' | 'twitter' | 'academic' | 'patents',
+  }, options?: Partial<ApiRequestOptions>): CancelablePromise<(GenericItemModel | TwitterItemModel | AcademicItemModel)> {
     return this.httpRequest.request({
       method: 'GET',
-      url: '/api/project/{project_id}/items/{item_type}/detail/{item_id}',
+      url: '/api/project/items/detail/{item_id}',
       path: {
         'item_id': itemId,
-        'item_type': itemType,
       },
       headers: {
         'x-project-id': xProjectId,
+      },
+      query: {
+        'item_type': itemType,
       },
       errors: {
         422: `Validation Error`,
@@ -226,19 +218,14 @@ export class ProjectService {
    * @returns number Successful Response
    * @throws ApiError
    */
-  public countProjectItemsApiProjectProjectIdItemsCountGet({
-    projectId,
+  public countProjectItemsApiProjectItemsCountGet({
     xProjectId,
   }: {
-    projectId: string,
     xProjectId: string,
   }, options?: Partial<ApiRequestOptions>): CancelablePromise<number> {
     return this.httpRequest.request({
       method: 'GET',
-      url: '/api/project/{project_id}/items/count',
-      path: {
-        'project_id': projectId,
-      },
+      url: '/api/project/items/count',
       headers: {
         'x-project-id': xProjectId,
       },
@@ -254,23 +241,23 @@ export class ProjectService {
    * @returns any Successful Response
    * @throws ApiError
    */
-  public addTweetApiProjectProjectIdItemsTwitterAddPost({
-    projectId,
+  public addTweetApiProjectItemsTwitterAddPost({
     xProjectId,
     requestBody,
+    importId,
   }: {
-    projectId: string,
     xProjectId: string,
     requestBody: TwitterItemModel,
+    importId?: string,
   }, options?: Partial<ApiRequestOptions>): CancelablePromise<any> {
     return this.httpRequest.request({
       method: 'POST',
-      url: '/api/project/{project_id}/items/twitter/add',
-      path: {
-        'project_id': projectId,
-      },
+      url: '/api/project/items/twitter/add',
       headers: {
         'x-project-id': xProjectId,
+      },
+      query: {
+        'import_id': importId,
       },
       body: requestBody,
       mediaType: 'application/json',

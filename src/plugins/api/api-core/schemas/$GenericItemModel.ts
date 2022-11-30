@@ -1,8 +1,8 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-export const $ItemModel = {
-  description: `Corresponds to db.models.items.Item`,
+export const $GenericItemModel = {
+  description: `Corresponds to db.models.items.generic.GenericItem`,
   properties: {
     item_id: {
       type: 'any-of',
@@ -12,6 +12,18 @@ export const $ItemModel = {
         type: 'string',
         format: 'uuid',
       }],
+    },
+    project_id: {
+      type: 'any-of',
+      contains: [{
+        type: 'string',
+      }, {
+        type: 'string',
+        format: 'uuid',
+      }],
+    },
+    type: {
+      type: 'ItemType',
     },
     text: {
       type: 'string',

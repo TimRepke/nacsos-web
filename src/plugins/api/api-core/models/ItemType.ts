@@ -5,8 +5,8 @@
 /**
  * An enumeration.
  */
-export enum ProjectType {
-  BASIC = 'basic',
+export enum ItemType {
+  GENERIC = 'generic',
   TWITTER = 'twitter',
   ACADEMIC = 'academic',
   PATENTS = 'patents',

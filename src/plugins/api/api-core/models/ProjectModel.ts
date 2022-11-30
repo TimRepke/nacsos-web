@@ -2,7 +2,7 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { ProjectType } from './ProjectType';
+import type { ItemType } from './ItemType';
 
 /**
  * Project is the basic structural and conceptual place around which all functionality evolves.
@@ -16,6 +16,6 @@ export type ProjectModel = {
   project_id?: string;
   name: string;
   description?: string;
-  type: ('basic' | 'twitter' | 'academic' | 'patents' | ProjectType);
+  type: ('generic' | 'twitter' | 'academic' | 'patents' | ItemType);
 };
 

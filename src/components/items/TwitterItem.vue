@@ -90,11 +90,11 @@ export default {
         .sort((a, b) => a.start - b.start)
         .forEach((replacement) => {
           // FIXME: something has to be done with the slicing offsets... sometimes they are off
-          ret += this.item.status.slice(prevEnd, replacement.start);
+          ret += this.item.text.slice(prevEnd, replacement.start);
           ret += replacement.html;
           prevEnd = replacement.end;
         });
-      ret += this.item.status.slice(prevEnd, this.item.status.length);
+      ret += this.item.text.slice(prevEnd, this.item.text.length);
       return ret;
     },
   },

@@ -94,7 +94,7 @@ import { Component } from 'vue';
 import { ToastEvent } from '@/plugins/events/events/toast';
 import { EventBus } from '@/plugins/events';
 import { CompatibilityMapping, ComponentMapping } from '@/types/imports.d';
-import { ImportModel, ImportType, ProjectModel, ProjectPermissionsModel, ProjectType } from '@/plugins/api/api-core';
+import { ImportModel, ImportType, ItemType, ProjectModel, ProjectPermissionsModel } from '@/plugins/api/api-core';
 import ConfigTwitter from '@/components/imports/ConfigTwitter.vue';
 import ConfigJSONL from '@/components/imports/ConfigJSONL.vue';
 import ConfigRIS from '@/components/imports/ConfigRIS.vue';
@@ -248,7 +248,7 @@ export default {
       return undefined;
     },
     compatibleImportTypes() {
-      const projectType: ProjectType = this.currentProject.type;
+      const projectType: ItemType = this.currentProject.type;
       const compatibleTypes = projectTypeImportTypeCompatibility[projectType];
 
       return Object.fromEntries(

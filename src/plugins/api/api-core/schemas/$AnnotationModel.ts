@@ -107,6 +107,12 @@ export const $AnnotationModel = {
     value_str: {
       type: 'string',
     },
+    multi_int: {
+      type: 'array',
+      contains: {
+        type: 'number',
+      },
+    },
     text_offset_start: {
       type: 'number',
     },
