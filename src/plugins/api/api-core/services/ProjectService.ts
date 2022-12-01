@@ -6,6 +6,7 @@ import type { GenericItemModel } from '../models/GenericItemModel';
 import type { ProjectModel } from '../models/ProjectModel';
 import type { ProjectPermissionsModel } from '../models/ProjectPermissionsModel';
 import type { TwitterItemModel } from '../models/TwitterItemModel';
+import type { UserPermission } from '../models/UserPermission';
 
 import type { CancelablePromise } from '@/plugins/api/core/CancelablePromise';
 import type { BaseHttpRequest } from '@/plugins/api/core/BaseHttpRequest';
@@ -32,6 +33,33 @@ export class ProjectService {
       headers: {
         'x-project-id': xProjectId,
       },
+      errors: {
+        422: `Validation Error`,
+      },
+      ...options,
+    });
+  }
+
+  /**
+   * Save Project
+   * @returns any Successful Response
+   * @throws ApiError
+   */
+  public saveProjectApiProjectInfoPut({
+    xProjectId,
+    requestBody,
+  }: {
+    xProjectId: string,
+    requestBody: ProjectModel,
+  }, options?: Partial<ApiRequestOptions>): CancelablePromise<any> {
+    return this.httpRequest.request({
+      method: 'PUT',
+      url: '/api/project/info',
+      headers: {
+        'x-project-id': xProjectId,
+      },
+      body: requestBody,
+      mediaType: 'application/json',
       errors: {
         422: `Validation Error`,
       },
@@ -82,6 +110,84 @@ export class ProjectService {
       },
       headers: {
         'x-project-id': xProjectId,
+      },
+      errors: {
+        422: `Validation Error`,
+      },
+      ...options,
+    });
+  }
+
+  /**
+   * Get All User Permissions
+   * @returns UserPermission Successful Response
+   * @throws ApiError
+   */
+  public getAllUserPermissionsApiProjectPermissionsListUsersGet({
+    xProjectId,
+  }: {
+    xProjectId: string,
+  }, options?: Partial<ApiRequestOptions>): CancelablePromise<Array<UserPermission>> {
+    return this.httpRequest.request({
+      method: 'GET',
+      url: '/api/project/permissions/list-users',
+      headers: {
+        'x-project-id': xProjectId,
+      },
+      errors: {
+        422: `Validation Error`,
+      },
+      ...options,
+    });
+  }
+
+  /**
+   * Save Project Permission
+   * @returns any Successful Response
+   * @throws ApiError
+   */
+  public saveProjectPermissionApiProjectPermissionsPermissionPut({
+    xProjectId,
+    requestBody,
+  }: {
+    xProjectId: string,
+    requestBody: ProjectPermissionsModel,
+  }, options?: Partial<ApiRequestOptions>): CancelablePromise<any> {
+    return this.httpRequest.request({
+      method: 'PUT',
+      url: '/api/project/permissions/permission',
+      headers: {
+        'x-project-id': xProjectId,
+      },
+      body: requestBody,
+      mediaType: 'application/json',
+      errors: {
+        422: `Validation Error`,
+      },
+      ...options,
+    });
+  }
+
+  /**
+   * Remove Project Permission
+   * @returns any Successful Response
+   * @throws ApiError
+   */
+  public removeProjectPermissionApiProjectPermissionsPermissionDelete({
+    projectPermissionId,
+    xProjectId,
+  }: {
+    projectPermissionId: string,
+    xProjectId: string,
+  }, options?: Partial<ApiRequestOptions>): CancelablePromise<any> {
+    return this.httpRequest.request({
+      method: 'DELETE',
+      url: '/api/project/permissions/permission',
+      headers: {
+        'x-project-id': xProjectId,
+      },
+      query: {
+        'project_permission_id': projectPermissionId,
       },
       errors: {
         422: `Validation Error`,

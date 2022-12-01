@@ -59,7 +59,9 @@ export type { Token } from './models/Token';
 export type { TwitterItemModel } from './models/TwitterItemModel';
 export type { TwitterUserModel } from './models/TwitterUserModel';
 export type { URL } from './models/URL';
+export type { UserBaseModel } from './models/UserBaseModel';
 export type { UserModel } from './models/UserModel';
+export type { UserPermission } from './models/UserPermission';
 export type { UserProjectAssignmentScope } from './models/UserProjectAssignmentScope';
 export type { ValidationError } from './models/ValidationError';
 
@@ -118,7 +120,9 @@ export { $Token } from './schemas/$Token';
 export { $TwitterItemModel } from './schemas/$TwitterItemModel';
 export { $TwitterUserModel } from './schemas/$TwitterUserModel';
 export { $URL } from './schemas/$URL';
+export { $UserBaseModel } from './schemas/$UserBaseModel';
 export { $UserModel } from './schemas/$UserModel';
+export { $UserPermission } from './schemas/$UserPermission';
 export { $UserProjectAssignmentScope } from './schemas/$UserProjectAssignmentScope';
 export { $ValidationError } from './schemas/$ValidationError';
 
