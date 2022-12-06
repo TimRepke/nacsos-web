@@ -1,5 +1,5 @@
 <template>
-  <div class="text-start p-3 position-relative">
+  <div>
     <!--    <span class="text-warning">-->
     <!--      <font-awesome-icon :icon="['fas', 'triangle-exclamation']"/>-->
     <!--      Please note that editing the scheme may break the database if assignments and/or annotations were already made.-->

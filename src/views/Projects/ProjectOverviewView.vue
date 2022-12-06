@@ -1,5 +1,5 @@
 <template>
-  <div class="text-start p-3">
+  <div>
     <div v-if="project && permissions">
       <h1>{{ project.name }}</h1>
       <div class="row mb-3">

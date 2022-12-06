@@ -1,5 +1,5 @@
 <template>
-  <div class="text-start m-2">
+  <div>
     <h2>About NACSOS</h2>
     <p>
       This platform was developed in the

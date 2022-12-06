@@ -1,5 +1,5 @@
 <template>
-  <div class="text-start">
+  <div>
     <h1>Resolve and Export Annotations</h1>
     <ul>
       <li v-for="meta in exports" :key="meta.b">

@@ -1,5 +1,5 @@
 <template>
-  <div class="text-start p-2">
+  <div>
     <h2>List of Assignments</h2>
     <ul v-if="annotationScopes.length > 0">
       <li v-for="scope in annotationScopes" :key="scope.scope.assignment_scope_id">

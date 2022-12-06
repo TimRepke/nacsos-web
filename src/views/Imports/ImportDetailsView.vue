@@ -1,5 +1,5 @@
 <template>
-  <div class="text-start p-2 container-fluid">
+  <div class="container-fluid">
     <div class="row pb-2 mb-2 border-bottom g-0">
       <div class="col-md-8">
         <h1 v-if="isNewImport">Create new data import</h1>

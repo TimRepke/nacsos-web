@@ -1,5 +1,5 @@
 <template>
-  <div class="text-start p-3">
+  <div>
     bla
   </div>
 </template>

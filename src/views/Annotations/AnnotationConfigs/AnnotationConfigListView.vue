@@ -1,5 +1,5 @@
 <template>
-  <div class="text-start">
+  <div>
     <h1>Annotation Schemes and Assignment Scopes</h1>
     <!-- TODO make pretty -->
     <ul>

@@ -1,5 +1,5 @@
 <template>
-  <div class="text-start p-2">
+  <div>
     <div class="row pb-2 mb-2 border-bottom g-0">
       <div class="col-md-8">
         <h1>Project settings</h1>

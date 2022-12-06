@@ -1,5 +1,5 @@
 <template>
-  <div class="text-start">
+  <div>
     <div class="row">
       <h1>Resolve Annotations</h1>
     </div>

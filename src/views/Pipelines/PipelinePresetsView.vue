@@ -1,13 +1,15 @@
 <template>
-  <div class="text-start p-2 row">
+  <div>
     <div class="row">
       <h2>Pipeline setup</h2>
     </div>
-    <span class="text-warning">
-      <strong>TODO:</strong> have useful presets of entire (configured) pipelines of sub-tasks.
-      For example, instead of scraping WoS, deduplicating, cleaning, .... import tasks, have a preset
-      that sensibly combines all these steps with good preset parameters.
-    </span>
+    <div class="row">
+      <span class="text-warning">
+        <strong>TODO:</strong> have useful presets of entire (configured) pipelines of sub-tasks.
+        For example, instead of scraping WoS, deduplicating, cleaning, .... import tasks, have a preset
+        that sensibly combines all these steps with good preset parameters.
+      </span>
+    </div>
   </div>
 </template>
 

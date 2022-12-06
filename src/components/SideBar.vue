@@ -1,126 +1,115 @@
 <template>
-  <!--  <div v-if="viewNeedsSidebar">-->
-  <div
-    class="col-8 col-md-2 sidebar"
-    :class="{ 'd-none': !isOpen }"
-    :style="logoSize">
-    <router-link
-      to="/"
-      class="text-decoration-none text-nowrap position-absolute d-inline-block mt-1 top-0"
-      style="z-index: 2000; left:1rem;">
-      <NacsosLogo class="mt-0" />
-    </router-link>
-    <div class="list-group rounded-0" v-if="projectPermissions">
-      <router-link
-        to="/project/overview"
-        class="list-group-item list-group-item-action border-end-0"
-        active-class="active">Overview
-      </router-link>
-      <router-link
-        v-if="projectPermissions.imports_read"
-        to="/project/imports"
-        class="list-group-item list-group-item-action border-end-0"
-        active-class="active"> Imports
-      </router-link>
-      <router-link
-        v-if="projectPermissions.dataset_read"
-        to="/project/dataset"
-        class="list-group-item list-group-item-action border-end-0"
-        active-class="active"> Dataset
-      </router-link>
-      <router-link
-        v-if="projectPermissions.annotations_read"
-        to="/project/annotate"
-        class="list-group-item list-group-item-action border-end-0"
-        active-class="active"> Annotation
-      </router-link>
-      <router-link
-        v-if="projectPermissions.artefacts_read"
-        to="/project/artefacts"
-        class="list-group-item list-group-item-action border-end-0"
-        active-class="active"> Artefacts
-      </router-link>
-      <router-link
-        v-if="projectPermissions.pipelines_read"
-        to="/project/pipelines"
-        class="list-group-item list-group-item-action border-end-0"
-        active-class="active"> Pipelines
-      </router-link>
-      <router-link
-        v-if="projectPermissions.annotations_read && isActive('project-pipelines')"
-        to="/project/pipelines/setup"
-        class="list-group-item list-group-item-action list-group-item-info border-end-0 sub-link"
-        exact-active-class="active"> Task Configuration
-      </router-link>
-      <router-link
-        v-if="projectPermissions.annotations_read && isActive('project-pipelines')"
-        to="/project/pipelines/presets"
-        class="list-group-item list-group-item-action list-group-item-info border-end-0 sub-link"
-        exact-active-class="active"> Presets
-      </router-link>
-      <router-link
-        v-if="projectPermissions.annotations_edit"
-        to="/project/config/annotations"
-        class="list-group-item list-group-item-action border-end-0"
-        active-class="active">
-        <font-awesome-icon icon="gear" />
-        Annotations
-      </router-link>
-      <router-link
-        v-if="projectPermissions.annotations_edit && isActive('config-annotation-schemes')"
-        to="/project/config/annotations/list"
-        class="list-group-item list-group-item-action list-group-item-info border-end-0 sub-link"
-        :class="{
-          active: anyOf(['config-annotation-scheme-edit',
-                         'config-annotation-scheme-scope',
-                         'config-annotation-scheme-list']),
-        }"> Schemes & Scopes
-      </router-link>
-      <router-link
-        v-if="projectPermissions.annotations_edit && isActive('config-annotation-schemes')"
-        to="/project/config/annotations/resolved"
-        class="list-group-item list-group-item-action list-group-item-info border-end-0 sub-link"
-        :class="{ active: anyOf(['config-annotation-resolve', 'config-resolved-annotations-list']) }">
-        Label Centre
-      </router-link>
-      <router-link
-        v-if="projectPermissions.owner"
-        to="/project/settings"
-        class="list-group-item list-group-item-action border-end-0"
-        active-class="active">
-        <font-awesome-icon icon="gear" />
-        Project
-      </router-link>
+  <div class="col-8 col-md-2" :class="{ 'sidebar-hidden': !isOpen }">
+    <div class="d-flex" style="height: calc(100vh - var(--topnav-height));">
+      <div class="flex-grow-1 border-end overflow-auto" v-if="isOpen">
+        <div v-if="projectPermissions" class="list-group rounded-0" style="margin-top: calc(var(--logo-size) / 2)">
+          <router-link
+            to="/project/overview"
+            class="list-group-item list-group-item-action border-end-0"
+            active-class="active">Overview
+          </router-link>
+          <router-link
+            v-if="projectPermissions.imports_read"
+            to="/project/imports"
+            class="list-group-item list-group-item-action border-end-0"
+            active-class="active"> Imports
+          </router-link>
+          <router-link
+            v-if="projectPermissions.dataset_read"
+            to="/project/dataset"
+            class="list-group-item list-group-item-action border-end-0"
+            active-class="active"> Dataset
+          </router-link>
+          <router-link
+            v-if="projectPermissions.annotations_read"
+            to="/project/annotate"
+            class="list-group-item list-group-item-action border-end-0"
+            active-class="active"> Annotation
+          </router-link>
+          <router-link
+            v-if="projectPermissions.artefacts_read"
+            to="/project/artefacts"
+            class="list-group-item list-group-item-action border-end-0"
+            active-class="active"> Artefacts
+          </router-link>
+          <router-link
+            v-if="projectPermissions.pipelines_read"
+            to="/project/pipelines"
+            class="list-group-item list-group-item-action border-end-0"
+            active-class="active"> Pipelines
+          </router-link>
+          <router-link
+            v-if="projectPermissions.annotations_read && isActive('project-pipelines')"
+            to="/project/pipelines/setup"
+            class="list-group-item list-group-item-action list-group-item-info border-end-0 sub-link"
+            exact-active-class="active"> Task Configuration
+          </router-link>
+          <router-link
+            v-if="projectPermissions.annotations_read && isActive('project-pipelines')"
+            to="/project/pipelines/presets"
+            class="list-group-item list-group-item-action list-group-item-info border-end-0 sub-link"
+            exact-active-class="active"> Presets
+          </router-link>
+          <router-link
+            v-if="projectPermissions.annotations_edit"
+            to="/project/config/annotations"
+            class="list-group-item list-group-item-action border-end-0"
+            active-class="active">
+            <font-awesome-icon icon="gear" />
+            Annotations
+          </router-link>
+          <router-link
+            v-if="projectPermissions.annotations_edit && isActive('config-annotation-schemes')"
+            to="/project/config/annotations/list"
+            class="list-group-item list-group-item-action list-group-item-info border-end-0 sub-link"
+            :class="{
+              active: anyOf(['config-annotation-scheme-edit',
+                             'config-annotation-scheme-scope',
+                             'config-annotation-scheme-list']),
+            }"> Schemes & Scopes
+          </router-link>
+          <router-link
+            v-if="projectPermissions.annotations_edit && isActive('config-annotation-schemes')"
+            to="/project/config/annotations/resolved"
+            class="list-group-item list-group-item-action list-group-item-info border-end-0 sub-link"
+            :class="{ active: anyOf(['config-annotation-resolve', 'config-resolved-annotations-list']) }">
+            Label Centre
+          </router-link>
+          <router-link
+            v-if="projectPermissions.owner"
+            to="/project/settings"
+            class="list-group-item list-group-item-action border-end-0"
+            active-class="active">
+            <font-awesome-icon icon="gear" />
+            Project
+          </router-link>
+        </div>
+      </div>
+      <div
+        id="sidebar-toggle"
+        class="border border-start-0 rounded-end mt-5">
+        <a
+          aria-label="test"
+          @click="toggleVisibility()"
+          @keypress="toggleVisibility()">
+          <font-awesome-icon :icon="iconButton" />
+        </a>
+      </div>
     </div>
   </div>
-  <a
-    id="sidebar-toggle"
-    class="border border-start-0 rounded-end col-auto mt-4"
-    aria-label="test"
-    @click="toggleVisibility()"
-    @keypress="toggleVisibility()">
-    <font-awesome-icon :icon="iconButton" />
-  </a>
-  <!--  </div> -->
 </template>
 
 <script lang="ts">
-import NacsosLogo from '@/components/NacsosLogo.vue';
 import { currentProjectStore, currentUserStore } from '@/stores';
 import { ProjectPermissionsModel, UserModel } from '@/plugins/api/api-core';
 import { RouteLocationMatched } from 'vue-router';
-import { isOnRoute } from '@/util';
 
 export default {
   name: 'SideBar',
-  components: { NacsosLogo },
   data(): object {
     return {
       visible: undefined,
       windowWidth: window.innerWidth,
-      logoSize: {
-        '--logo-size': '4rem',
-      },
     };
   },
   computed: {
@@ -140,13 +129,6 @@ export default {
     currentUser(): UserModel {
       return currentUserStore.user;
     },
-    viewNeedsSidebar(): boolean {
-      return currentProjectStore.projectSelected && currentUserStore.isLoggedIn
-        && !(isOnRoute(this.$route, 'admin')
-          || isOnRoute(this.$route, 'user')
-          || this.$route.name === 'project-list'
-          || this.$route.name === 'about');
-    },
   },
   methods: {
     isActive(parentName: string): boolean {
@@ -158,9 +140,6 @@ export default {
     toggleVisibility(): void {
       this.visible = (this.visible === undefined) ? false : !this.visible;
     },
-    // setVisibility(newState: boolean): void {
-    //   this.visible = newState;
-    // },
   },
   mounted() {
     window.onresize = () => {
@@ -171,23 +150,8 @@ export default {
 </script>
 
 <style scoped>
-:root {
-  --logo-size: 4rem;
-}
-
-#nacsos-logo {
-  width: var(--logo-size);
-  height: var(--logo-size);
-}
-
-.sidebar {
-  border-right: 1px solid gray;
-  height: 100vh;
-  margin-top: -3rem;
-  padding-top: calc(var(--logo-size) + 1rem);
-  margin-right: 0 !important;
-  overflow-x: hidden;
-  overflow-y: auto;
+.sidebar-hidden {
+  width: 0.75rem !important;
 }
 
 #sidebar-toggle {

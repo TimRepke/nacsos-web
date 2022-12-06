@@ -1,5 +1,5 @@
 <template>
-  <div class="text-start p-2">
+  <div>
     <h2>Artefacts and task queue</h2>
     <div class="table-responsive card">
       <div class="card-body">

@@ -1,5 +1,5 @@
 <template>
-  <div class="text-start p-2 row">
+  <div>
     <div class="row">
       <h2>Pipeline setup</h2>
     </div>

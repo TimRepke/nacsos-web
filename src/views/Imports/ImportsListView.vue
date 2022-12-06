@@ -1,5 +1,5 @@
 <template>
-  <div class="text-start m-2">
+  <div>
     <h2>Data import and query manager</h2>
     <ul>
       <li v-for="importDetails in imports" :key="importDetails.import_id">
