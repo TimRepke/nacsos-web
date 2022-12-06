@@ -59,14 +59,16 @@ export default {
   name: 'ProjectOverviewView',
   data(): ProjectOverview {
     return {
-      project: undefined,
-      permissions: undefined,
       hints: ProjectPermissionHints,
     };
   },
-  mounted() {
-    this.project = currentProjectStore.project;
-    this.permissions = currentProjectStore.projectPermissions;
+  computed: {
+    project(): ProjectModel | undefined {
+      return currentProjectStore.project;
+    },
+    permissions(): ProjectPermissionsModel | undefined {
+      return currentProjectStore.projectPermissions;
+    },
   },
   methods: {
     markdownToHtml(txt: string) {

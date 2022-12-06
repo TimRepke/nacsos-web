@@ -2,9 +2,7 @@
   <div>
     <TopBar v-if="userStore.isLoggedIn" />
     <div class="row g-0">
-      <template v-if="projectStore.projectSelected && userStore.isLoggedIn">
-        <SideBar />
-      </template>
+      <SideBar />
 
       <RouterView v-slot="{ Component }" class="col router-wrapper">
         <template v-if="Component">

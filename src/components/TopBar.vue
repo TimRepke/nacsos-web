@@ -24,12 +24,6 @@
           <li class="nav-item">
             <router-link to="/about" class="nav-link">About</router-link>
           </li>
-          <!--li class="nav-item">
-            <router-link to="/login" class="nav-link">Login</router-link>
-          </li-->
-          <!--li class="nav-item">
-            <router-link to="/projects" class="nav-link">Projects</router-link>
-          </li-->
           <li class="nav-item dropdown">
             <a
               role="button"
@@ -45,9 +39,43 @@
               {{ user?.username || 'Username' }}
             </a>
             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdownMenuLink">
-              <li><a class="dropdown-item" href="#">Edit Profile</a></li>
-              <li><a class="dropdown-item" href="#">Another action</a></li>
-              <li class="dropdown-item" type="button" @click="logout">Log out</li>
+              <template v-if="user.is_superuser">
+                <li>
+                  <h6 class="dropdown-header">
+                    <font-awesome-icon :icon="['fas', 'toolbox']" class="me-2" />
+                    Admin Area
+                  </h6>
+                </li>
+                <li>
+                  <router-link
+                    to="/admin/projects"
+                    class="dropdown-item">
+                    Manage projects
+                  </router-link>
+                </li>
+                <li>
+                  <router-link
+                    to="/admin/users"
+                    class="dropdown-item">
+                    Manage users
+                  </router-link>
+                </li>
+                <li>
+                  <hr class="dropdown-divider">
+                </li>
+              </template>
+              <li>
+                <router-link
+                  to="/user/profile"
+                  class="dropdown-item">
+                  <font-awesome-icon :icon="['fas', 'user-pen']" class="me-2" />
+                  Edit Profile
+                </router-link>
+              </li>
+              <li class="dropdown-item" type="button" @click="logout">
+                <font-awesome-icon :icon="['fas', 'arrow-right-from-bracket']" class="me-2" />
+                Log out
+              </li>
             </ul>
           </li>
         </ul>
@@ -72,7 +100,7 @@ export default {
   },
   methods: {
     logout() {
-      this.$router.push({ name: 'login' });
+      this.$router.push({ name: 'user-login' });
       EventBus.emit(new LoggedOutEvent());
     },
   },

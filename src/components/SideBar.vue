@@ -1,4 +1,5 @@
 <template>
+  <!--  <div v-if="viewNeedsSidebar">-->
   <div
     class="col-8 col-md-2 sidebar"
     :class="{ 'd-none': !isOpen }"
@@ -100,20 +101,21 @@
     @keypress="toggleVisibility()">
     <font-awesome-icon :icon="iconButton" />
   </a>
+  <!--  </div> -->
 </template>
 
 <script lang="ts">
 import NacsosLogo from '@/components/NacsosLogo.vue';
-import { currentProjectStore } from '@/stores';
-import { ProjectPermissionsModel } from '@/plugins/api/api-core';
+import { currentProjectStore, currentUserStore } from '@/stores';
+import { ProjectPermissionsModel, UserModel } from '@/plugins/api/api-core';
 import { RouteLocationMatched } from 'vue-router';
+import { isOnRoute } from '@/util';
 
 export default {
   name: 'SideBar',
   components: { NacsosLogo },
   data(): object {
     return {
-      projectPermissions: currentProjectStore.projectPermissions as ProjectPermissionsModel,
       visible: undefined,
       windowWidth: window.innerWidth,
       logoSize: {
@@ -131,6 +133,19 @@ export default {
     },
     iconButton(): string[] {
       return ['fas', this.isOpen ? 'caret-left' : 'caret-right'];
+    },
+    projectPermissions(): ProjectPermissionsModel | {} {
+      return currentProjectStore.projectPermissions || {};
+    },
+    currentUser(): UserModel {
+      return currentUserStore.user;
+    },
+    viewNeedsSidebar(): boolean {
+      return currentProjectStore.projectSelected && currentUserStore.isLoggedIn
+        && !(isOnRoute(this.$route, 'admin')
+          || isOnRoute(this.$route, 'user')
+          || this.$route.name === 'project-list'
+          || this.$route.name === 'about');
     },
   },
   methods: {

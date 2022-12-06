@@ -1,5 +1,6 @@
 import { App } from 'vue';
 import { isFunctionInfo, isArtefactOrSerializedArtefact, type2str } from '@/util/typeChecks';
+import { RouteLocationNormalized, RouteRecordNormalized } from 'vue-router';
 // inspired by https://github.com/jashkenas/underscore/blob/master/modules/_shallowProperty.js
 // Internal helper to generate a function to obtain property `key` from `obj`.
 export function shallowProperty<T>(key: string) {
@@ -68,6 +69,10 @@ export function* range(start: number, end: number) {
   }
 }
 
+export function isOnRoute(loc: RouteLocationNormalized, name: string): boolean {
+  return loc.matched.findIndex((match: RouteRecordNormalized) => match.name === name) >= 0;
+}
+
 export default {
   install(app: App) {
     // eslint-disable-next-line no-param-reassign
@@ -79,6 +84,7 @@ export default {
       isFunctionInfo,
       isArtefactOrSerializedArtefact,
       type2str,
+      isOnRoute,
     };
   },
 };
