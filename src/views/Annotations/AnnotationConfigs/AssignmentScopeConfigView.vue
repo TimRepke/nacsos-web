@@ -1,5 +1,5 @@
 <template>
-  <div class="text-start p-2 container-fluid">
+  <div>
     <div class="row pb-2 mb-2 border-bottom g-0">
       <div class="col-md-8">
         <h1 v-if="isNewScope">Create new assignment scope</h1>
@@ -15,45 +15,66 @@
         <h4>General settings</h4>
         <div class="mb-3">
           <label for="scopeName" class="form-label">Scope Name</label>
-          <input type="text" class="form-control" id="scopeName" placeholder="Name for this scope"
-                 v-model="assignmentScope.name"/>
+          <input
+            type="text"
+            class="form-control"
+            id="scopeName"
+            placeholder="Name for this scope"
+            v-model="assignmentScope.name" />
         </div>
         <div>
           <label for="scopeDescription" class="form-label">Scope description</label>
-          <textarea class="form-control" id="scopeDescription" rows="3"
-                    v-model="assignmentScope.description"></textarea>
+          <textarea
+            class="form-control"
+            id="scopeDescription"
+            rows="3"
+            v-model="assignmentScope.description" />
         </div>
       </div>
     </div>
     <div class="row pb-2 mb-2 border-bottom g-0" v-if="!scopeHasAssignments">
       <h4>User pool</h4>
       <div class="col-lg-5 col-md-7">
-        <button v-if="!users || users.length === 0"
-                class="btn btn-outline-secondary btn-sm" @click="loadListOfUsers">
-          <font-awesome-icon v-if="users === undefined" :icon="['fas', 'spinner']" class="fa-pulse"/>
-          <font-awesome-icon v-else :icon="['fas', 'arrows-down-to-people']"/>
+        <button
+          v-if="!users || users.length === 0"
+          type="button"
+          class="btn btn-outline-secondary btn-sm"
+          @click="loadListOfUsers">
+          <font-awesome-icon v-if="users === undefined" :icon="['fas', 'spinner']" class="fa-pulse" />
+          <font-awesome-icon v-else :icon="['fas', 'arrows-down-to-people']" />
           Load list of users
         </button>
         <div v-else>
           <div class="m-0">
-            <input type="text" class="form-control mb-1" placeholder="Search..." v-model="userSearch"
-                   aria-label="Search for users"/>
+            <input
+              type="text"
+              class="form-control mb-1"
+              placeholder="Search..."
+              v-model="userSearch"
+              aria-label="Search for users" />
           </div>
           <ul style="max-height: 15rem" class="list-group overflow-auto">
-            <li v-for="user in searchFilteredUsers" :key="user.user_id"
-                class="list-group-item d-flex justify-content-between align-items-start"
-                :class="{'list-group-item-info': isSelected(user) }">
+            <li
+              v-for="user in searchFilteredUsers"
+              :key="user.user_id"
+              class="list-group-item d-flex justify-content-between align-items-start"
+              :class="{ 'list-group-item-info': isSelected(user) }">
               <div class="me-auto">
                 {{ user.full_name }}
-                <span class="text-muted ms-2"
-                      style="font-size: calc(0.876*var(--bs-body-font-size))">
-                    {{ user.affiliation }} | {{ user.email }} | {{ user.username }}
-                  </span>
-              </div>
-              <span role="button" class="link-secondary" tabindex="0"
-                    @click="selectUser(user)" v-show="!isSelected(user)">
-                  <font-awesome-icon :icon="['fas', 'user-plus']"/>
+                <span
+                  class="text-muted ms-2"
+                  style="font-size: calc(0.876*var(--bs-body-font-size))">
+                  {{ user.affiliation }} | {{ user.email }} | {{ user.username }}
                 </span>
+              </div>
+              <span
+                v-show="!isSelected(user)"
+                role="button"
+                class="link-secondary"
+                tabindex="0"
+                @click="selectUser(user)">
+                <font-awesome-icon :icon="['fas', 'user-plus']" />
+              </span>
             </li>
           </ul>
         </div>
@@ -69,7 +90,7 @@
               <li v-for="user in selectedUsers" :key="user.user_id" class="ms-2">
                 {{ user.username }}
                 <span role="button" class="link-secondary" tabindex="0" @click="unselectUser(user)">
-                  <font-awesome-icon :icon="['fas', 'user-minus']"/>
+                  <font-awesome-icon :icon="['fas', 'user-minus']" />
                 </span>
               </li>
             </ul>
@@ -87,15 +108,18 @@
           </select>
         </div>
         <div class="mb-2">
-          <RandomAssignmentConfig v-if="strategyConfigType === 'random'"
-                                  :existing-config="assignmentScope.config"
-                                  :editable="!scopeHasAssignments"
-                                  @config-changed="updateConfig($event)"/>
+          <RandomAssignmentConfig
+            v-if="strategyConfigType === 'random'"
+            :existing-config="assignmentScope.config"
+            :editable="!scopeHasAssignments"
+            @config-changed="updateConfig($event)" />
         </div>
-        <button class="btn btn-outline-secondary"
-                v-if="strategyConfigType !== undefined"
-                :disabled="scopeHasAssignments"
-                @click="createAssignments">
+        <button
+          v-if="strategyConfigType !== undefined"
+          type="button"
+          class="btn btn-outline-secondary"
+          :disabled="scopeHasAssignments"
+          @click="createAssignments">
           Make assignments
         </button>
       </div>
@@ -103,8 +127,11 @@
     <div class="row pb-2 mb-2 border-bottom g-0" v-if="scopeHasAssignments">
       <div class="col">
         <h4>Results</h4>
-        <button class="btn btn-sm btn-outline-secondary" @click="loadResults">
-          <font-awesome-icon :icon="['fas', 'rotate']"/>
+        <button
+          type="button"
+          class="btn btn-sm btn-outline-secondary"
+          @click="loadResults">
+          <font-awesome-icon :icon="['fas', 'rotate']" />
           (Re)load stats
         </button>
         <div class="mt-2 mb-2" v-if="assignmentCounts">
@@ -115,16 +142,17 @@
           done: <span class="bg-success bg-opacity-50 p-1">{{ assignmentCounts.num_full }}</span>)
         </div>
         <template v-if="statsLoaded">
-          <AssignmentsVisualiser :assignments="assignments"/>
+          <AssignmentsVisualiser :assignments="assignments" />
         </template>
         <div class="mt-2 ms-2 text-warning">
-          TODO: for each user, show num assignments and progress<br/>
-          TODO: some basic stats<br/>
-          TODO: a few export buttons<br/>
+          TODO: for each user, show num assignments and progress<br />
+          TODO: some basic stats<br />
+          TODO: a few export buttons<br />
         </div>
       </div>
     </div>
-    <button class="btn btn-success position-fixed" style="top: 4rem; right: 1rem;" @click="save()">Save</button>
+    <button type="button" class="btn btn-success position-fixed" style="top: 4rem; right: 1rem;" @click="save()">Save
+    </button>
   </div>
 </template>
 
@@ -132,81 +160,99 @@
 import RandomAssignmentConfig from '@/components/annotations/assignments/RandomAssignmentConfig.vue';
 import { EventBus } from '@/plugins/events';
 import { ConfirmationRequestEvent } from '@/plugins/events/events/confirmation';
-import {
-  Assignment,
-  AssignmentScope,
-  AssignmentScopeConfigType,
-  AssignmentConfigType,
-  AssignmentScopeCounts,
-} from '@/types/annotation.d';
-import { User } from '@/types/user.d';
-import {
-  callAllProjectUsersListEndpoint,
-  callUsersDetailsEndpoint,
-} from '@/plugins/api/users';
-import {
-  callMakeAssignmentsEndpoint,
-  callScopeEndpoint,
-  callScopeCountsEndpoint,
-  callSaveAssignmentScopeEndpoint, callScopeAssignmentsEndpoint,
-} from '@/plugins/api/annotations';
 import AssignmentsVisualiser from '@/components/annotations/assignments/AssignmentsVisualiser.vue';
-import { useCurrentProjectStore } from '@/stores/CurrentProjectStore';
 import { ToastEvent } from '@/plugins/events/events/toast';
+import {
+  AssignmentCounts,
+  AssignmentModel,
+  AssignmentScopeModel,
+  AssignmentScopeRandomConfig,
+  UserModel,
+} from '@/plugins/api/api-core';
+import { API, ApiResponseReject } from '@/plugins/api';
+import { currentProjectStore } from '@/stores';
+
+type AssignmentScopeConfigData = {
+  scopeId: string;
+  annotationSchemeId: string;
+  // list of all users in the system
+  users: UserModel[];
+  // search query for filtering list of users
+  userSearch: string;
+  // users selected to be in the query pool
+  selectedUsers: UserModel[];
+  // assignment strategy type
+  strategyConfigType?: AssignmentScopeRandomConfig.config_type;
+  // indicates whether this is (or will be) a newly created scope
+  isNewScope: boolean;
+  // holds the assignment counts (or undefined if none exist)
+  assignmentCounts?: AssignmentCounts;
+  assignments: AssignmentModel[];
+  assignmentScope: AssignmentScopeModel;
+};
 
 export default {
   name: 'AssignmentScopeConfigView',
   components: { AssignmentsVisualiser, RandomAssignmentConfig },
-  data() {
+  data(): AssignmentScopeConfigData {
     const scopeId = this.$route.params.scope_id;
     const annotationSchemeId = this.$route.query.annotation_scheme_id;
 
     return {
       scopeId,
       annotationSchemeId,
-      // list of all users in the system
-      users: [] as User[],
-      // search query for filtering list of users
+      users: [],
       userSearch: '',
-      // users selected to be in the query pool
-      selectedUsers: [] as User[],
-      // assignment strategy type
-      strategyConfigType: undefined as AssignmentScopeConfigType | undefined,
+      selectedUsers: [],
+      strategyConfigType: undefined,
       // indicates whether this is (or will be) a newly created scope
       isNewScope: !scopeId && annotationSchemeId,
       // holds the assignment counts (or undefined if none exist)
-      assignmentCounts: undefined as AssignmentScopeCounts | undefined,
-      assignments: [] as Assignment[],
+      assignmentCounts: undefined,
+      assignments: [],
       assignmentScope: {
         assignment_scope_id: undefined,
         annotation_scheme_id: annotationSchemeId,
         time_created: undefined,
         name: '',
         description: '',
-      } as AssignmentScope,
+      },
     };
   },
   async mounted() {
     if (!this.isNewScope) {
-      const scopeReq = await callScopeEndpoint({ assignmentScopeId: this.scopeId });
-      const countsReq = await callScopeCountsEndpoint({ assignmentScopeId: this.scopeId });
-
-      if (scopeReq.status === 'SUCCESS' && scopeReq.payload && countsReq.status === 'SUCCESS' && countsReq.payload) {
-        this.assignmentScope = scopeReq.payload;
-        this.assignmentCounts = countsReq.payload;
-
-        if (this.assignmentScope.config && this.assignmentScope.config.users && this.assignmentScope.config.users.length > 0) {
-          this.strategyConfigType = this.assignmentScope.config.config_type;
-          const usersReq = await callUsersDetailsEndpoint({ user_id: this.assignmentScope.config.users });
-          if (usersReq.status === 'SUCCESS' && usersReq.payload) {
-            this.selectedUsers = usersReq.payload;
+      Promise.allSettled([
+        API.core.annotations.getAssignmentScopeApiAnnotationsAnnotateScopeAssignmentScopeIdGet({
+          xProjectId: currentProjectStore.projectId,
+          assignmentScopeId: this.scopeId,
+        }),
+        API.core.annotations.getNumAssignmentsForScopeApiAnnotationsAnnotateScopeCountsAssignmentScopeIdGet({
+          xProjectId: currentProjectStore.projectId,
+          assignmentScopeId: this.scopeId,
+        }),
+      ])
+        .then(([scopePromise, countsPromise]) => {
+          if (scopePromise.status === 'fulfilled' && countsPromise.status === 'fulfilled') {
+            this.assignmentScope = scopePromise.value.data;
+            this.assignmentCounts = countsPromise.value.data;
           } else {
-            EventBus.emit(new ToastEvent('ERROR', 'Failed to load list of users. Please try reloading.'));
+            EventBus.emit(new ToastEvent('ERROR', 'Failed to load assignment scope info. Please try reloading.'));
           }
-        }
-      } else {
-        EventBus.emit(new ToastEvent('ERROR', 'Failed to load assignment scope info. Please try reloading.'));
-      }
+
+          if (this.assignmentScope.config?.users?.length > 0) {
+            this.strategyConfigType = this.assignmentScope.config.config_type;
+            API.core.users.getUsersByIdsApiUsersDetailsGet({
+              xProjectId: currentProjectStore.projectId,
+              userId: this.assignmentScope.config.users,
+            })
+              .then((response) => {
+                this.selectedUsers = response.data;
+              })
+              .catch(() => {
+                EventBus.emit(new ToastEvent('ERROR', 'Failed to load list of users. Please try reloading.'));
+              });
+          }
+        });
     }
   },
   methods: {
@@ -232,11 +278,15 @@ export default {
                 config: JSON.parse(JSON.stringify(this.assignmentScope.config)),
               };
               payload.config.users = this.selectedUserIds;
-              callMakeAssignmentsEndpoint(payload)
+
+              API.core.annotations.makeAssignmentsApiAnnotationsConfigAssignmentsPost({
+                xProjectId: currentProjectStore.projectId,
+                requestBody: payload,
+              })
                 .then((res) => {
                   EventBus.emit(new ToastEvent(
                     'SUCCESS',
-                    `Successfully created ${res.payload?.length} assignments.`,
+                    `Successfully created ${res.data.length} assignments.`,
                   ));
                   this.scopeHasAssignments = true;
                   this.loadResults();
@@ -260,21 +310,25 @@ export default {
             if (scope.config) {
               scope.config.users = this.selectedUserIds;
             }
-            callSaveAssignmentScopeEndpoint(scope)
+            API.core.annotations.putAssignmentScopeApiAnnotationsAnnotateScopePut({
+              xProjectId: currentProjectStore.projectId,
+              requestBody: scope,
+            })
               .then((res) => {
                 EventBus.emit(new ToastEvent(
                   'SUCCESS',
-                  `Save assignment scope details.  \n**ID:** ${res.payload}`,
+                  `Save assignment scope details.  \n**ID:** ${res.data}`,
                 ));
                 if (this.isNewScope) {
                   this.isNewScope = false;
-                  this.$router.replace({ name: 'config-annotation-scheme-scope', params: { scope_id: res.payload } });
+                  this.$router.replace({ name: 'config-annotation-scheme-scope', params: { scope_id: res.data } });
                 }
               })
               .catch((res) => {
+                const err = res as ApiResponseReject;
                 EventBus.emit(new ToastEvent(
                   'ERROR',
-                  `Failed to save assignment scope details. (${res.reason})`,
+                  `Failed to save assignment scope details. (${err.error?.type})`,
                 ));
               });
           } else {
@@ -288,46 +342,58 @@ export default {
     },
     loadResults() {
       if (this.assignmentScope.assignment_scope_id) {
-        callScopeCountsEndpoint({ assignmentScopeId: this.assignmentScope.assignment_scope_id })
-          .then((result) => { this.assignmentCounts = result.payload; })
+        API.core.annotations.getNumAssignmentsForScopeApiAnnotationsAnnotateScopeCountsAssignmentScopeIdGet({
+          xProjectId: currentProjectStore.projectId,
+          assignmentScopeId: this.assignmentScope.assignment_scope_id,
+        })
+          .then((result) => { this.assignmentCounts = result.data; })
           .catch(() => { EventBus.emit(new ToastEvent('ERROR', 'Failed to load assignment counts.')); });
-        callScopeAssignmentsEndpoint({ assignmentScopeId: this.assignmentScope.assignment_scope_id })
-          .then((result) => { this.assignments = result.payload; })
+
+        API.core.annotations.getAssignmentsForScopeApiAnnotationsAnnotateAssignmentsScopeAssignmentScopeIdGet({
+          xProjectId: currentProjectStore.projectId,
+          assignmentScopeId: this.assignmentScope.assignment_scope_id,
+        })
+          .then((result) => { this.assignments = result.data; })
           .catch(() => { EventBus.emit(new ToastEvent('ERROR', 'Failed to load assignments.')); });
       }
     },
     async loadListOfUsers() {
       this.users = undefined;
-      this.users = (await callAllProjectUsersListEndpoint({ projectId: useCurrentProjectStore().projectId })).payload;
+      API.core.users.getProjectUsersApiUsersListProjectProjectIdGet({
+        xProjectId: currentProjectStore.projectId,
+        projectId: currentProjectStore.projectId,
+      })
+        .then((response) => { this.users = response.data; })
+        .catch(() => { EventBus.emit(new ToastEvent('WARN', 'Failed to load list of users.')); });
     },
-    selectUser(user: User) {
+    selectUser(user: UserModel) {
       if (!this.isSelected(user)) {
         this.selectedUsers.push(user);
       }
     },
-    unselectUser(user: User) {
+    unselectUser(user: UserModel) {
       const userIndex = this.selectedUserIds.indexOf(user.user_id);
       this.selectedUsers.splice(userIndex, 1);
     },
-    updateConfig(eventPayload: AssignmentConfigType | undefined) {
+    updateConfig(eventPayload: AssignmentScopeRandomConfig.config_type | undefined) { // FIXME
       this.assignmentScope.config = eventPayload;
     },
-    isSelected(user: User) {
+    isSelected(user: UserModel) {
       return this.selectedUserIds.indexOf(user.user_id) >= 0;
     },
   },
   computed: {
-    searchFilteredUsers(): User[] {
+    searchFilteredUsers(): UserModel[] {
       if (this.users) {
         // TODO make the search more sophisticated
         //      e.g. by including institution, email, username, substring matches
-        return this.users.filter((user: User) => user.full_name.toLowerCase().startsWith(this.userSearch.toLowerCase()));
+        return this.users.filter((user: UserModel) => user.full_name?.toLowerCase().startsWith(this.userSearch.toLowerCase()));
       }
       return this.users;
     },
     selectedUserIds(): string[] {
       if (this.selectedUsers && this.selectedUsers.length > 0) {
-        return this.selectedUsers.map((user: User) => user.user_id);
+        return this.selectedUsers.map((user: UserModel) => user.user_id);
       }
       return [];
     },

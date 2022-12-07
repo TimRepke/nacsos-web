@@ -1,4 +1,4 @@
-import { KWARG } from '@/types/pipelines.d';
+import { KWARG } from '@/plugins/api/api-pipe';
 
 export function isFunctionInfo(obj: unknown) {
   if (typeof obj !== 'object' || !obj) return false;

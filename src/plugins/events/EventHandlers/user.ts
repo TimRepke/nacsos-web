@@ -1,35 +1,11 @@
 import { EventBus } from '@/plugins/events';
-import { AuthFailedEvent, LoggedOutEvent, LoginSuccessEvent, UserLoginEvent } from '@/plugins/events/events/auth';
-import { callCurrentUserEndpoint, callLoginEndpoint } from '@/plugins/api/login';
+import { AuthFailedEvent, LoggedOutEvent, UserLoginEvent } from '@/plugins/events/events/auth';
 import { currentUserStore } from '@/stores';
 
 export default () => {
-  EventBus.on(UserLoginEvent, (event: UserLoginEvent) => {
+  EventBus.on(UserLoginEvent, async (event: UserLoginEvent) => {
     const { username, password } = event;
-    callLoginEndpoint({
-      username,
-      password,
-    })
-      .then(async (response) => {
-        if (!response.payload || !response.payload.accessToken) {
-          EventBus.emit(new AuthFailedEvent());
-        } else {
-          currentUserStore.setAccessToken(response.payload.accessToken);
-
-          const currentUserResponse = await callCurrentUserEndpoint();
-          if (!currentUserResponse || !currentUserResponse.payload) {
-            EventBus.emit(new AuthFailedEvent());
-          } else {
-            const user = currentUserResponse.payload;
-            currentUserStore.setUser(user);
-            EventBus.emit(new LoginSuccessEvent(user));
-          }
-        }
-      })
-      .catch((reason) => {
-        EventBus.emit(new AuthFailedEvent());
-        console.error(reason);
-      });
+    await currentUserStore.login(username, password);
   });
 
   EventBus.on(AuthFailedEvent, () => {

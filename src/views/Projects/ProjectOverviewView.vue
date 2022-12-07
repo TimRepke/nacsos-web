@@ -1,35 +1,74 @@
 <template>
   <div>
-    <div class="text-start ps-5" v-if="project && permissions">
-      <h1>Project Dashboard</h1>
-      <h3>{{ project.name }}</h3>
-      <div v-html="markdownToHtml(project.description)"></div>
-      <pre>
-      {{ permissions }}
-    </pre>
+    <div v-if="project && permissions">
+      <h1>{{ project.name }}</h1>
+      <div class="row mb-3">
+        <div class="col" v-html="markdownToHtml(project.description)" />
+      </div>
+      <div class="row mb-3">
+        <div class="col">
+          <h5>Your permissions</h5>
+          <h6>In this project, you have the following permissions</h6>
+          <div class="card p-3">
+            <div class="row gy-3 gx-4">
+              <div
+                v-for="(hint, setting) in hints"
+                :key="setting"
+                class="col-lg-3">
+                <div>
+                  <code>{{ setting }}</code>
+                  <font-awesome-icon
+                    :icon="[(permissions[setting]) ? 'fas' : 'far', (permissions[setting]) ? 'circle-check' : 'circle-xmark']"
+                    class="ms-2" />
+                </div>
+                <div class="text-muted small">
+                  {{ hint }}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
     <div v-else>
-      Something failed, please try reloading the page (or go back to project seletion page and choose the project again).
+      Sorry, something failed. Please try one of the following things to resolve the issue:
+      <ul>
+        <li>Reload the page.</li>
+        <li>Wait a little bit.</li>
+        <li>Go to project selection page select a project.</li>
+        <li>Log out and log back in again.</li>
+      </ul>
+      If that didn't work, please contact technical support.
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import { Project, ProjectPermissions } from '@/types/project.d';
+import { ProjectModel, ProjectPermissionsModel } from '@/plugins/api/api-core';
 import { currentProjectStore } from '@/stores';
 import { marked } from 'marked';
+import { PermissionKeys, ProjectPermissionHints } from '@/types/permissions';
+
+type ProjectOverview = {
+  project?: ProjectModel;
+  permissions?: ProjectPermissionsModel;
+  hints: Record<PermissionKeys, string>;
+};
 
 export default {
   name: 'ProjectOverviewView',
-  data() {
+  data(): ProjectOverview {
     return {
-      project: undefined as Project | undefined,
-      permissions: undefined as ProjectPermissions | undefined,
+      hints: ProjectPermissionHints,
     };
   },
-  mounted() {
-    this.project = currentProjectStore.project;
-    this.permissions = currentProjectStore.projectPermissions;
+  computed: {
+    project(): ProjectModel | undefined {
+      return currentProjectStore.project;
+    },
+    permissions(): ProjectPermissionsModel | undefined {
+      return currentProjectStore.projectPermissions;
+    },
   },
   methods: {
     markdownToHtml(txt: string) {

@@ -1,19 +1,22 @@
 import { defineStore } from 'pinia';
 import { useStorage, RemovableRef } from '@vueuse/core';
-import type { User } from '@/types/user.d';
 import Serializer from '@/types/serializer';
+import { UserModel } from '@/plugins/api/api-core';
+import { API } from '@/plugins/api';
+import { EventBus } from '@/plugins/events';
+import { AuthFailedEvent, LoginSuccessEvent } from '@/plugins/events/events/auth';
 
-const UserSerializer = Serializer<User>();
+const UserSerializer = Serializer<UserModel>();
 
 export type CurrentUserStoreType = {
-  user: RemovableRef<User>,
+  user: RemovableRef<UserModel>,
   accessToken: RemovableRef<string>,
-}
+};
 
 export const useCurrentUserStore = defineStore('CurrentUserStore', {
   state(): CurrentUserStoreType {
     return {
-      user: useStorage<User>(
+      user: useStorage<UserModel>(
         'currentUser',
         null,
         undefined,
@@ -27,14 +30,32 @@ export const useCurrentUserStore = defineStore('CurrentUserStore', {
     };
   },
   actions: {
+    async login(username: string, password: string) {
+      try {
+        const token = await API.core.oauth.loginForAccessTokenApiLoginTokenPost({ formData: { username, password } });
+        this.setAccessToken(token.data.access_token);
+        const me = await API.core.oauth.readUsersMeApiLoginMeGet();
+        this.setUser(me.data);
+        EventBus.emit(new LoginSuccessEvent(me.data));
+      } catch (reason) {
+        this.clear();
+        console.error(reason);
+        EventBus.emit(new AuthFailedEvent());
+      }
+    },
+    logout() {
+      this.clear();
+    },
     clear() {
       this.accessToken = undefined;
       this.user = undefined;
+      API.core.request.config.TOKEN = undefined;
     },
     setAccessToken(accessToken: string) {
       this.accessToken = accessToken;
+      API.core.request.config.TOKEN = accessToken;
     },
-    setUser(user: User) {
+    setUser(user: UserModel) {
       this.user = user;
     },
   },

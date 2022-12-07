@@ -3,12 +3,14 @@
     <div class="row mb-2">
       <div class="col">
         <label class="btn btn-default">
-          <input type="file" multiple @change="selectFile"/>
+          <input type="file" multiple @change="selectFile" />
         </label>
 
-        <button class="btn btn-outline-primary"
-                :disabled="isUploading || !uploadEnabled"
-                @click="uploadFiles">
+        <button
+          type="button"
+          class="btn btn-outline-primary"
+          :disabled="isUploading || !uploadEnabled"
+          @click="uploadFiles">
           Upload
         </button>
       </div>
@@ -19,21 +21,26 @@
           <li v-for="file in selectedFiles" :key="file.id">
             {{ file.file.name }}
             <span class="text-muted fst-italic">
-          ({{ (file.file.size / 1024).toLocaleString(undefined, { maximumFractionDigits: 0 }) }} KB)
-        </span>
+              ({{ (file.file.size / 1024).toLocaleString(undefined, { maximumFractionDigits: 0 }) }} KB)
+            </span>
             <div v-if="isUploading">
-          <span class="text-muted">
-            <InlineToolTip :info="file.status">
-              <font-awesome-icon :icon="['fas', 'file-circle-exclamation']" v-if="file.status==='FAILED'"/>
-              <font-awesome-icon :icon="['fas', 'file-circle-check']" v-else-if="file.status==='SUCCESS'"/>
-              <font-awesome-icon :icon="['fas', 'file-arrow-up']" v-else-if="file.status==='UPLOADING'"/>
-              <font-awesome-icon :icon="['far', 'paper-plane']" v-else/> <!--"file.status==='PENDING'"-->
-            </InlineToolTip>
-          </span>
+              <span class="text-muted">
+                <InlineToolTip :info="file.status">
+                  <font-awesome-icon v-if="file.status === 'FAILED'" :icon="['fas', 'file-circle-exclamation']" />
+                  <font-awesome-icon v-else-if="file.status === 'SUCCESS'" :icon="['fas', 'file-circle-check']" />
+                  <font-awesome-icon v-else-if="file.status === 'UPLOADING'" :icon="['fas', 'file-arrow-up']" />
+                  <font-awesome-icon v-else :icon="['far', 'paper-plane']" /> <!--"file.status==='PENDING'"-->
+                </InlineToolTip>
+              </span>
               <div class="progress">
-                <div class="progress-bar" role="progressbar" aria-label="File upload progress"
-                     :style="{width: `${file.percentage}%` }"
-                     :aria-valuenow="file.percentage" aria-valuemin="0" aria-valuemax="100">
+                <div
+                  role="progressbar"
+                  :style="{ width: `${file.percentage}%` }"
+                  class="progress-bar"
+                  aria-label="File upload progress"
+                  :aria-valuenow="file.percentage"
+                  aria-valuemin="0"
+                  aria-valuemax="100">
                   {{ file.percentage }}%
                 </div>
               </div>
@@ -50,7 +57,7 @@
 import { ToastEvent } from '@/plugins/events/events/toast';
 import { EventBus } from '@/plugins/events';
 import InlineToolTip from '@/components/InlineToolTip.vue';
-import { callUploadUserArtefactEndpoint } from '@/plugins/api/pipelines';
+import { API } from '@/plugins/api';
 
 type UploadStatus = 'PENDING' | 'UPLOADING' | 'SUCCESS' | 'FAILED';
 
@@ -91,15 +98,20 @@ export default {
       }
 
       return new Promise((resolve, reject) => {
-        callUploadUserArtefactEndpoint({ file: uploadFile.file, folder }, {
-          onUploadProgress: (event: { loaded: number; total: number; }) => {
-            uploadFile.percentage = Math.round(100 * (event.loaded / event.total));
+        API.pipe.artefacts.uploadFileApiArtefactsFilesUploadPost({
+          folder,
+          formData: { file: uploadFile.file },
+        }, {
+          customRequestConfig: {
+            onUploadProgress: (event: { loaded: number; total?: number; }) => {
+              uploadFile.percentage = Math.round(100 * (event.loaded / (event.total || 1)));
+            },
           },
         })
           .then((response) => {
             uploadFile.status = 'SUCCESS';
-            uploadFile.serverPath = response.payload;
-            resolve(response.payload);
+            uploadFile.serverPath = response.data;
+            resolve(response.data);
           })
           .catch(() => {
             uploadFile.status = 'FAILED';

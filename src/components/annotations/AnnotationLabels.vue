@@ -7,21 +7,27 @@
           <span v-if="label.max_repeat > 1" style="font-size: .875rem">
             ({{ label.annotation.repeat }} / {{ label.max_repeat }})
             <span>
-              <font-awesome-icon :icon="['far', 'clone']" class="text-muted ms-2"
-                                 v-if="keyCounts[label.key] < label.max_repeat"
-                                 role="button"
-                                 @click="duplicateLabel(label, labelIndex)"/>
-              <font-awesome-icon :icon="['far', 'trash-can']" class="text-muted ms-2"
-                                 v-if="keyCounts[label.key] > 1"
-                                 role="button"
-                                 @click="deleteLabel(label, labelIndex)"/>
+              <font-awesome-icon
+                v-if="keyCounts[label.key] < label.max_repeat"
+                role="button"
+                class="text-muted ms-2"
+                :icon="['far', 'clone']"
+                @click="duplicateLabel(label, labelIndex)" />
+              <font-awesome-icon
+                v-if="keyCounts[label.key] > 1"
+                role="button"
+                class="text-muted ms-2"
+                :icon="['far', 'trash-can']"
+                @click="deleteLabel(label, labelIndex)" />
             </span>
           </span>
           <sup v-if="hasAnnotation(label.annotation)" class="ms-1">
             <InlineToolTip info="Reset">
-              <font-awesome-icon :icon="['fas', 'delete-left']" class="text-muted"
-                                 role="button"
-                                 @click="clearAnnotation(label.annotation)"/>
+              <font-awesome-icon
+                role="button"
+                class="text-muted"
+                :icon="['fas', 'delete-left']"
+                @click="clearAnnotation(label.annotation)" />
             </InlineToolTip>
           </sup>
         </div>
@@ -32,46 +38,64 @@
       <div>
         <template v-if="label.kind === 'bool'">
           <div style="width: 100px">
-            <div :class="{
-            'theme-toggle': true,
-            'bg-false': label.annotation.value_bool === false,
-            'bg-true': label.annotation.value_bool === true,
-          }">
+            <div
+              :class="{
+                'theme-toggle': true,
+                'bg-false': label.annotation.value_bool === false,
+                'bg-true': label.annotation.value_bool === true,
+              }">
               <label class="tristate-checkbox false">
-                <input name="toggle-state" type="radio"
-                       v-bind:value="false" v-model="label.annotation.value_bool"/>
-                <span class="checkmark"></span>
+                <input
+                  type="radio"
+                  name="toggle-state"
+                  v-bind:value="false"
+                  v-model="label.annotation.value_bool" />
+                <span class="checkmark" />
               </label>
               <label class="tristate-checkbox undetermined">
-                <input name="toggle-state" type="radio" disabled
-                       v-bind:value="undefined" v-model="label.annotation.value_bool"/>
-                <span class="checkmark"></span>
+                <input
+                  type="radio"
+                  name="toggle-state"
+                  v-bind:value="undefined"
+                  v-model="label.annotation.value_bool"
+                  disabled />
+                <span class="checkmark" />
               </label>
               <label class="tristate-checkbox true">
-                <input name="toggle-state" type="radio"
-                       v-bind:value="true" v-model="label.annotation.value_bool"/>
-                <span class="checkmark"></span>
+                <input
+                  type="radio"
+                  name="toggle-state"
+                  v-bind:value="true"
+                  v-model="label.annotation.value_bool" />
+                <span class="checkmark" />
               </label>
             </div>
           </div>
         </template>
-        <template v-else-if="label.kind==='single'">
+        <template v-else-if="label.kind === 'single'">
           <div class="list-group">
-            <label v-for="(choice, index) in label.choices" :key="index"
-                   class="list-group-item list-group-item-action"
-                   :class="{ 'list-group-item-dark': label.annotation.value_int === choice.value }">
-              <input class="form-check-input me-1" type="radio"
-                     v-bind:value="choice.value"
-                     v-model="label.annotation.value_int"/>
+            <label
+              v-for="(choice, index) in label.choices"
+              :key="index"
+              class="list-group-item list-group-item-action"
+              :class="{ 'list-group-item-dark': label.annotation.value_int === choice.value }">
+              <input
+                type="radio"
+                class="form-check-input me-1"
+                v-bind:value="choice.value"
+                v-model="label.annotation.value_int" />
               <InlineToolTip :info="choice.hint">
                 <span class="ms-2">{{ choice.name }}</span>
               </InlineToolTip>
             </label>
           </div>
-          <div v-if="label.annotation.value_int !== undefined && label.choices[label.annotation.value_int].children"
-               class="ms-3 mt-2">
-            <AnnotationLabels :labels="label.choices[label.annotation.value_int].children"
-                              :assignment="assignment" :key="label.annotation.value_int"/>
+          <div
+            v-if="label.annotation.value_int !== undefined && label.choices[label.annotation.value_int].children"
+            class="ms-3 mt-2">
+            <AnnotationLabels
+              :labels="label.choices[label.annotation.value_int].children"
+              :assignment="assignment"
+              :key="label.annotation.value_int" />
           </div>
         </template>
         <template v-else-if="label.kind === 'multi'">
@@ -98,9 +122,9 @@
 <script lang="ts">
 /* eslint no-param-reassign: "off" */
 
-import { Annotation, AnnotationSchemeLabel, Assignment } from '@/types/annotation.d';
 import { PropType } from 'vue';
 import InlineToolTip from '@/components/InlineToolTip.vue';
+import { AnnotationSchemeLabel, AssignmentModel, AnnotationModel } from '@/plugins/api/api-core';
 
 export default {
   name: 'AnnotationLabels',
@@ -108,26 +132,30 @@ export default {
   props: {
     labels: {
       type: Object as PropType<AnnotationSchemeLabel[]>,
+      required: true,
+      default: null,
     },
     assignment: {
-      type: Object as PropType<Assignment>,
+      type: Object as PropType<AssignmentModel>,
+      required: true,
+      default: null,
     },
   },
   methods: {
-    clearAnnotation(annotation: Annotation) {
+    clearAnnotation(annotation: AnnotationModel) {
       annotation.value_int = undefined;
       annotation.value_bool = undefined;
       annotation.value_str = undefined;
       annotation.value_float = undefined;
     },
-    hasAnnotation(annotation: Annotation) {
+    hasAnnotation(annotation: AnnotationModel) {
       return annotation.value_int !== undefined
         || annotation.value_str !== undefined
         || annotation.value_bool !== undefined
         || annotation.value_float !== undefined;
     },
     duplicateLabel(label: AnnotationSchemeLabel, labelIndex: number) {
-      if (this.keyCounts[label.key] < label.max_repeat) {
+      if (this.keyCounts[label.key] < (label.max_repeat ?? 1)) {
         // copy the current label and remove irrelevant things
         const labelCopy = JSON.parse(JSON.stringify(label)) as AnnotationSchemeLabel;
         if (labelCopy.annotation) this.clearAnnotation(labelCopy.annotation);

@@ -1,7 +1,7 @@
 /* eslint-disable max-classes-per-file, no-useless-constructor */
 
-import type { User } from '@/types/user.d';
 import { BaseEvent } from '@/plugins/events/baseEvent';
+import { UserModel } from '@/plugins/api/api-core';
 
 // FIXME this event seems wrong here...
 export class RequestSubmittedEvent extends BaseEvent {
@@ -17,7 +17,7 @@ export class AuthTokenReceivedEvent extends BaseEvent {
 }
 
 export class LoginSuccessEvent extends BaseEvent {
-  constructor(public user: User) { super(); }
+  constructor(public user: UserModel) { super(); }
 }
 
 export class AuthFailedEvent extends BaseEvent {}

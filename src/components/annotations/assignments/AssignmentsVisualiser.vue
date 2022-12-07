@@ -3,13 +3,15 @@
     <div class="table-responsive ">
       <table class="table table-bordered">
         <tbody>
-        <tr v-for="userId in userIds" :key="userId">
-          <th>{{ userLookup[userId]?.username }}</th>
-          <td v-for="itemId in itemIds" :key="itemId"
+          <tr v-for="userId in userIds" :key="userId">
+            <th>{{ userLookup[userId]?.username }}</th>
+            <td
+              v-for="itemId in itemIds"
+              :key="itemId"
               :class="getBackgroundColourClass(userId, itemId)">
-            <!--{{ this.tryGetAssignment(userId, itemId)?.status }}-->
-          </td>
-        </tr>
+              <!--{{ this.tryGetAssignment(userId, itemId)?.status }}-->
+            </td>
+          </tr>
         </tbody>
       </table>
     </div>
@@ -18,19 +20,19 @@
 
 <script lang="ts">
 
-import { Assignment } from '@/types/annotation.d';
 import { PropType } from 'vue';
-import { callUsersDetailsEndpoint } from '@/plugins/api/users';
-import { User } from '@/types/user.d';
 import { EventBus } from '@/plugins/events';
 import { ToastEvent } from '@/plugins/events/events/toast';
+import { AssignmentModel, UserModel } from '@/plugins/api/api-core';
+import { API } from '@/plugins/api';
+import { currentProjectStore } from '@/stores';
 
 export default {
   name: 'AssignmentsVisualiser',
   props: {
     assignments: {
-      type: Object as PropType<Assignment[]>,
-      default: (): Assignment[] => [] as Assignment[],
+      type: Object as PropType<AssignmentModel[]>,
+      default: (): AssignmentModel[] => [] as AssignmentModel[],
     },
   },
   async mounted() {
@@ -38,28 +40,28 @@ export default {
   },
   data() {
     return {
-      users: [] as User[],
+      users: [] as UserModel[],
     };
   },
   computed: {
     lookup() {
-      const ret = this.itemIds.reduce((acc: { [key: string]: Assignment[] }, itemId: string) => {
+      const ret = this.itemIds.reduce((acc: { [key: string]: AssignmentModel[] }, itemId: string) => {
         acc[itemId] = [];
         return acc;
       }, {});
-      this.assignments.forEach((assignment: Assignment) => {
+      this.assignments.forEach((assignment: AssignmentModel) => {
         ret[assignment.item_id].push(assignment);
       });
       return ret;
     },
     userIds() {
-      return [...new Set(this.assignments.map((assignment: Assignment) => assignment.user_id))];
+      return [...new Set(this.assignments.map((assignment: AssignmentModel) => assignment.user_id))];
     },
     itemIds() {
-      return [...new Set(this.assignments.map((assignment: Assignment) => assignment.item_id))];
+      return [...new Set(this.assignments.map((assignment: AssignmentModel) => assignment.item_id))];
     },
     userLookup() {
-      return this.users.reduce((acc: { [key: string]: User }, user: User) => {
+      return this.users.reduce((acc: { [key: string]: UserModel }, user: UserModel) => {
         acc[user.user_id as string] = user;
         return acc;
       }, {});
@@ -72,12 +74,15 @@ export default {
   },
   methods: {
     fetchUserInfos() {
-      callUsersDetailsEndpoint({ user_id: this.userIds })
-        .then((result) => { this.users = result.payload; })
+      API.core.users.getUsersByIdsApiUsersDetailsGet({
+        xProjectId: currentProjectStore.projectId,
+        userId: this.userIds,
+      })
+        .then((result) => { this.users = result.data; })
         .catch(() => { EventBus.emit(new ToastEvent('WARN', 'Failed to load usernames')); });
     },
-    tryGetAssignment(userId: string, itemId: string): Assignment | undefined {
-      return this.lookup[itemId]?.find((assignment: Assignment) => assignment.user_id === userId);
+    tryGetAssignment(userId: string, itemId: string): AssignmentModel | undefined {
+      return this.lookup[itemId]?.find((assignment: AssignmentModel) => assignment.user_id === userId);
     },
     getBackgroundColourClass(userId: string, itemId: string): string[] {
       const assignment = this.tryGetAssignment(userId, itemId);

@@ -1,13 +1,16 @@
 <template>
   <div class="card">
-    <div class="card-header small d-flex" tabindex="0" role="button" @click="expanded=!expanded">
+    <div class="card-header small d-flex" tabindex="0" role="button" @click="expanded = !expanded">
       <strong class="small">{{ config.task.task_id.slice(0, 6) }}..</strong>&nbsp;
       <code>{{ config.info.module }}.<strong>{{ config.info.function }}(&sdot;)</strong></code>
-      <font-awesome-icon role="button" class="ms-1 text-muted" :icon="['fas','circle-info']"
-                         @click.stop="$emit('showInfo', config.info)"/>
+      <font-awesome-icon
+        role="button"
+        class="ms-1 text-muted"
+        :icon="['fas', 'circle-info']"
+        @click.stop="$emit('showInfo', config.info)" />
       <!-- TODO set force_run -->
-      <font-awesome-icon class="text-muted ms-2 text-warning" :icon="['fas','toggle-off']"/>
-      <font-awesome-icon class="text-muted ms-auto" :icon="['fas',(expanded) ? 'minus' : 'plus']"/>
+      <font-awesome-icon class="text-muted ms-2 text-warning" :icon="['fas', 'toggle-off']" />
+      <font-awesome-icon class="text-muted ms-auto" :icon="['fas', (expanded) ? 'minus' : 'plus']" />
     </div>
 
     <div class="card-body" v-if="expanded">
@@ -15,21 +18,30 @@
         <div class="col" v-for="(dtype, key) in config.info.kwargs" :key="key">
           <template v-if="isPrimitiveType(dtype)">
             <label :for="`tk-${key}`" class="border ps-1 w-100 border-bottom-0">
-              <code><strong>{{ key }}:</strong><span v-if="!dtype.optional">*</span><br/>{{
-                  $util.type2str(dtype)
-                }}</code>
+              <code><strong>{{ key }}:</strong><span v-if="!dtype.optional">*</span><br />
+                {{ $util.type2str(dtype) }}</code>
               <InlineToolTip v-if="dtype.dtype[0] === 'str'" info="Paste project ID">
-                <font-awesome-icon class="text-muted ms-2 text-warning" role="button"
-                                   :icon="['fas','hands-holding-circle']" @click="taskParams[key] = currentProjectId"/>
+                <font-awesome-icon
+                  role="button"
+                  class="text-muted ms-2 text-warning"
+                  :icon="['fas', 'hands-holding-circle']"
+                  @click="taskParams[key] = currentProjectId" />
               </InlineToolTip>
               <InlineToolTip v-if="dtype.dtype[0] === 'str'" info="Paste user ID">
-                <font-awesome-icon class="text-muted ms-2 text-warning" role="button"
-                                   :icon="['fas','hands-holding-child']" @click="taskParams[key] = currentUserId"/>
+                <font-awesome-icon
+                  role="button"
+                  class="text-muted ms-2 text-warning"
+                  :icon="['fas', 'hands-holding-child']"
+                  @click="taskParams[key] = currentUserId" />
               </InlineToolTip>
             </label>
-            <input :type="dtype2input(dtype)" :id="`tk-${key}`" class="form-control" :aria-label="key"
-                   :class="(dtype2input(dtype) ==='checkbox') ? 'form-check-input' : 'form-control'"
-                   v-model="taskParams[key]">
+            <input
+              :type="dtype2input(dtype)"
+              :id="`tk-${key}`"
+              class="form-control"
+              :aria-label="key"
+              :class="(dtype2input(dtype) === 'checkbox') ? 'form-check-input' : 'form-control'"
+              v-model="taskParams[key]">
             <span v-if="dtype2input(dtype) === 'checkbox'">
               {{ (taskParams[key] === undefined) ? 'None' : taskParams[key] }}
             </span>
@@ -38,12 +50,15 @@
           <template v-else-if="dtype.artefact">
             <div class="border ps-1 w-100 border-bottom-0">
               <code>
-                <strong>{{ key }}:</strong><span v-if="!dtype.optional">*</span><br/>{{ $util.type2str(dtype) }}
+                <strong>{{ key }}:</strong><span v-if="!dtype.optional">*</span><br />{{ $util.type2str(dtype) }}
               </code>
             </div>
             <div class="d-flex flex-row align-items-center border ps-1 border-top-0" style="gap: 1em">
-              <font-awesome-icon role="button" class="btn btn-outline-secondary m-1 btn-sm" :icon="['fas','crosshairs']"
-                                 @click="pickReference(key, dtype.artefact)"/>
+              <font-awesome-icon
+                role="button"
+                class="btn btn-outline-secondary m-1 btn-sm"
+                :icon="['fas', 'crosshairs']"
+                @click="pickReference(key, dtype.artefact)" />
               <ul class="list-unstyled small text-muted m-0">
                 <li><strong>Task:</strong> {{ taskParams[key]?.task_id || '[REF?]' }}</li>
                 <li><strong>Artefact:</strong> {{ taskParams[key]?.artefact || '[REF?]' }}</li>
@@ -53,28 +68,32 @@
 
           <template v-else-if="isList(dtype)">
             <label :for="`tk-${key}`" class="border ps-1 w-100 border-bottom-0">
-              <code><strong>{{ key }}:</strong><span v-if="!dtype.optional">*</span><br/>{{
-                  $util.type2str(dtype)
-                }}</code>
+              <code><strong>{{ key }}:</strong><span v-if="!dtype.optional">*</span><br />
+                {{ $util.type2str(dtype) }}</code>
             </label>
             <ul v-if="!$util.isEmpty(taskParams[key])">
               <li v-for="(val, it) in taskParams[key]" :key="`${it}-${val}`">{{ val }}</li>
             </ul>
             <div class="d-flex flex-row align-items-center">
-              <input :type="getListInputType(dtype)" :id="`tk-${key}`" :aria-label="key"
-                     :class="(getListInputType(dtype) ==='checkbox') ? 'form-check-input' : 'form-control'"
-                     v-model="taskParams[`__${key}-value`]"/>
-              <font-awesome-icon role="button" class="btn btn-sm m-1 text-muted" :icon="['far','square-plus']"
-                                 @click="addListEntry(key)"
-                                 :class="{ disabled: taskParams[`__${key}-value`] === undefined }"/>
+              <input
+                :type="getListInputType(dtype)"
+                :id="`tk-${key}`"
+                :aria-label="key"
+                :class="(getListInputType(dtype) === 'checkbox') ? 'form-check-input' : 'form-control'"
+                v-model="taskParams[`__${key}-value`]" />
+              <font-awesome-icon
+                role="button"
+                class="btn btn-sm m-1 text-muted"
+                :icon="['far', 'square-plus']"
+                @click="addListEntry(key)"
+                :class="{ disabled: taskParams[`__${key}-value`] === undefined }" />
             </div>
           </template>
 
           <template v-else-if="isLiteral(dtype)">
             <label :for="`tk-${key}`" class="border ps-1 w-100 border-bottom-0">
-              <code><strong>{{ key }}:</strong><span v-if="!dtype.optional">*</span><br/>{{
-                  $util.type2str(dtype)
-                }}</code>
+              <code><strong>{{ key }}:</strong><span v-if="!dtype.optional">*</span><br />
+                {{ $util.type2str(dtype) }}</code>
             </label>
             <select :id="`tk-${key}`" class="form-select" v-model="taskParams[key]">
               <option v-for="opt in getLiteralOptions(dtype)" :key="opt" :value="opt">{{ opt }}</option>
@@ -84,7 +103,7 @@
           <template v-else> <!-- v-else-if="isComplex(dtype)" -->
             <div class="border ps-1 w-100 border-bottom-0">
               <code>
-                <strong>{{ key }}:</strong><span v-if="!dtype.optional">*</span><br/>{{ $util.type2str(dtype) }}
+                <strong>{{ key }}:</strong><span v-if="!dtype.optional">*</span><br />{{ $util.type2str(dtype) }}
               </code>
             </div>
             <span class="text-warning">Complex parameters not implemented yet.</span>
@@ -99,15 +118,12 @@
 import { PropType } from 'vue';
 import {
   ArtefactCallback,
-  ArtefactReference,
-  FunctionInfo,
-  KWARG,
-  SerializedArtefact,
   TaskConfig as TaskConfigInterface,
 } from '@/types/pipelines.d';
 import { isArtefactOrSerializedArtefact, isFunctionInfo } from '@/util/typeChecks';
 import { currentProjectStore, currentUserStore } from '@/stores';
 import InlineToolTip from '@/components/InlineToolTip.vue';
+import { FunctionInfo, SerializedArtefact, KWARG, ArtefactReference } from '@/plugins/api/api-pipe';
 
 export default {
   name: 'TaskConfig',
@@ -120,6 +136,7 @@ export default {
   props: {
     config: {
       type: Object as PropType<TaskConfigInterface>,
+      default: null,
     },
   },
   data() {

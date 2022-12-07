@@ -5,26 +5,35 @@
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title">{{ latestConfirmationRequest.title }}</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
-                    @click="resolveConfirmationRequest('IGNORE')"></button>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+              @click="resolveConfirmationRequest('IGNORE')" />
           </div>
           <div class="modal-body text-start">
-            <p v-html="latestConfirmationRequest.htmlBody"></p>
+            <p v-html="latestConfirmationRequest.htmlBody" />
           </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-outline-danger" data-bs-dismiss="modal"
-                    @click="resolveConfirmationRequest('REJECT')">
+          <div class=" modal-footer">
+            <button
+              type="button"
+              class="btn btn-outline-danger"
+              data-bs-dismiss="modal"
+              @click="resolveConfirmationRequest('REJECT')">
               {{ latestConfirmationRequest.reject }}
             </button>
-            <button type="button" class="btn btn-success"
-                    @click="resolveConfirmationRequest('ACCEPT')">
+            <button
+              type="button"
+              class="btn btn-success"
+              @click="resolveConfirmationRequest('ACCEPT')">
               {{ latestConfirmationRequest.accept }}
             </button>
           </div>
         </div>
       </div>
     </div>
-    <div class="modal-backdrop fade show"></div>
+    <div class="modal-backdrop fade show" />
   </div>
 </template>
 

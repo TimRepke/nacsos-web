@@ -1,16 +1,16 @@
 import { defineStore } from 'pinia';
 import { useStorage, RemovableRef } from '@vueuse/core';
-import { Project, ProjectPermissions } from '@/types/project.d';
+import { ProjectModel, ProjectPermissionsModel } from '@/plugins/api/api-core';
 import Serializer from '@/types/serializer';
 
-const ProjectSerializer = Serializer<Project>();
-const ProjectPermissionSerializer = Serializer<ProjectPermissions>();
+const ProjectSerializer = Serializer<ProjectModel>();
+const ProjectPermissionSerializer = Serializer<ProjectPermissionsModel>();
 
 export type CurrentProjectStoreType = {
   projectId: RemovableRef<string>,
-  project: RemovableRef<Project>,
-  projectPermissions: RemovableRef<ProjectPermissions>,
-}
+  project: RemovableRef<ProjectModel>,
+  projectPermissions: RemovableRef<ProjectPermissionsModel>,
+};
 
 export const useCurrentProjectStore = defineStore('CurrentProjectStore', {
   state(): CurrentProjectStoreType {
@@ -24,14 +24,14 @@ export const useCurrentProjectStore = defineStore('CurrentProjectStore', {
         undefined,
       ),
       project:
-        useStorage<Project>(
+        useStorage<ProjectModel>(
           'currentProject',
           null,
           undefined,
           { serializer: ProjectSerializer },
         ),
       projectPermissions:
-        useStorage<ProjectPermissions>(
+        useStorage<ProjectPermissionsModel>(
           'currentProjectPermissions',
           null,
           undefined,

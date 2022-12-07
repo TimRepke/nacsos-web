@@ -1,7 +1,7 @@
 <template>
   <div>
     <div v-if="projectPermissions.artefacts_read">
-      <router-view></router-view>
+      <router-view />
     </div>
     <div v-else>
       Unfortunately, you don't have permission to access this page.
@@ -11,13 +11,13 @@
 
 <script lang="ts">
 import { currentProjectStore } from '@/stores';
-import { ProjectPermissions } from '@/types/project.d';
+import { ProjectPermissionsModel } from '@/plugins/api/api-core';
 
 export default {
   name: 'ArtefactsContainer',
   data() {
     return {
-      projectPermissions: currentProjectStore.projectPermissions as ProjectPermissions,
+      projectPermissions: currentProjectStore.projectPermissions as ProjectPermissionsModel,
     };
   },
 };

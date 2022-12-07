@@ -1,5 +1,5 @@
 <template>
-  <div class="text-start p-2 row">
+  <div>
     <div class="row">
       <h2>Pipeline setup</h2>
     </div>
@@ -10,12 +10,18 @@
         <div class="card">
           <div class="card-header d-flex">
             Library
-            <font-awesome-icon type="button" class="btn ms-auto small text-muted" :icon="['fas','rotate-right']"
-                               @click="reloadLibrary"/>
+            <font-awesome-icon
+              type="button"
+              class="btn ms-auto small text-muted"
+              :icon="['fas', 'rotate-right']"
+              @click="reloadLibrary" />
           </div>
           <div class="card-body p-0 pt-2">
-            <NestedExpandableComponent :tree="nestedLibrary" class="border-start-0"
-                                       @showInfo="highlight=$event" @useFunc="addTask($event)"/>
+            <NestedExpandableComponent
+              :tree="nestedLibrary"
+              class="border-start-0"
+              @showInfo="highlight = $event"
+              @useFunc="addTask($event)" />
           </div>
         </div>
       </div>
@@ -26,12 +32,16 @@
         <div class="card">
           <div class="card-body">
             <div class="d-flex mb-2">
-              <button class="btn btn-success ms-auto" @click="submitTasks">Submit</button>
+              <button type="button" class="btn btn-success ms-auto" @click="submitTasks">Submit</button>
             </div>
 
             <template v-for="config in configs" :key="config.task.task_id">
-              <TaskConfigComponent :config="config" class="mb-2" ref="taskConfigs"
-                                   @showInfo="highlight=$event" @pickArtefactReference="pickReference($event)"/>
+              <TaskConfigComponent
+                :config="config"
+                class="mb-2"
+                ref="taskConfigs"
+                @showInfo="highlight = $event"
+                @pickArtefactReference="pickReference($event)" />
             </template>
           </div>
         </div>
@@ -48,8 +58,12 @@
           <div class="modal-content">
             <div class="modal-header">
               <h5 class="modal-title">{{ highlight.name }}</h5>
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
-                      @click="highlight=undefined"></button>
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+                @click="highlight = undefined" />
             </div>
             <div class="modal-body text-start">
               <div class="d-flex flex-row flex-wrap" style="gap: 2rem">
@@ -58,7 +72,8 @@
                   <li><strong>Parameters:</strong>
                     <ul class="list-unstyled ms-2">
                       <li v-for="(tp, arg) in highlight.kwargs" :key="arg">
-                        <code><strong>{{ arg }}:</strong><span v-if="tp.optional !== true">*</span> {{ $util.type2str(tp) }}</code>
+                        <code><strong>{{ arg }}:</strong><span v-if="tp.optional !== true">*</span>
+                          {{ $util.type2str(tp) }}</code>
                       </li>
                     </ul>
                   </li>
@@ -81,14 +96,14 @@
                   </li>
                 </ul>
                 <pre class="card p-2 pb-0 flex-fill col-md-6">
-                  <code v-html="md2html(highlight.docstring)"></code>
+                  <code v-html="md2html(highlight.docstring)" />
                 </pre>
               </div>
             </div>
           </div>
         </div>
       </div>
-      <div class="modal-backdrop fade show"></div>
+      <div class="modal-backdrop fade show" />
     </div>
     <!-- /FunctionInfo Card -->
 
@@ -99,35 +114,52 @@
           <div class="modal-content">
             <div class="modal-header">
               <h5 class="modal-title">Pick reference for artefact</h5>
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
-                      @click="resolveReferenceQuery(false)"></button>
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+                @click="resolveReferenceQuery(false)" />
             </div>
             <div class="modal-body text-start">
-              <font-awesome-icon type="button" class="btn ms-auto small text-muted" :icon="['fas','rotate-right']"
-                                 @click="loadQueuedTasks"/>
+              <font-awesome-icon
+                type="button"
+                class="btn ms-auto small text-muted"
+                :icon="['fas', 'rotate-right']"
+                @click="loadQueuedTasks" />
               <ul class="list-group">
 
                 <!-- List of tasks currently configured -->
-                <li class="list-group-item list-group-item-warning"
-                    v-for="config in configs" :key="config.task.task_id">
+                <li
+                  class="list-group-item list-group-item-warning"
+                  v-for="config in configs"
+                  :key="config.task.task_id">
                   <strong>{{ config.task.task_id }}</strong> {{ config.info.name }}
-                  <code>{{ config.info.function }}(&sdot;)</code><br/>
-                  <button type="button" class="btn btn-outline-secondary btn-sm"
-                          v-for="(atype, art) in config.info.artefacts" :key="art"
-                          @click="selectReference(config.task.task_id, art)">
+                  <code>{{ config.info.function }}(&sdot;)</code><br />
+                  <button
+                    type="button"
+                    class="btn btn-outline-secondary btn-sm"
+                    v-for="(atype, art) in config.info.artefacts"
+                    :key="art"
+                    @click="selectReference(config.task.task_id, art)">
                     <strong>{{ art }}:</strong> <code>Artefact[{{ atype.serializer }}, {{ atype.dtype }}]</code>
                   </button>
                 </li>
 
                 <!-- List of tasks in the DB -->
-                <li class="list-group-item list-group-item-info"
-                    v-for="task in queuedTasks" :key="task.task_id">
+                <li
+                  class="list-group-item list-group-item-info"
+                  v-for="task in queuedTasks"
+                  :key="task.task_id">
                   <strong>{{ task.task_id }}</strong>
-                  <code>{{ task.function_name }}(&sdot;)</code><br/>
+                  <code>{{ task.function_name }}(&sdot;)</code><br />
                   {{ task.comment }}
-                  <button type="button" class="btn btn-outline-secondary btn-sm"
-                          v-for="(atype, art) in getInfoByName(task.function_name).artefacts" :key="art"
-                          @click="selectReference(task.task_id, art)">
+                  <button
+                    type="button"
+                    class="btn btn-outline-secondary btn-sm"
+                    v-for="(atype, art) in getInfoByName(task.function_name).artefacts"
+                    :key="art"
+                    @click="selectReference(task.task_id, art)">
                     <strong>{{ art }}:</strong> <code>Artefact[{{ atype.serializer }}, {{ atype.dtype }}]</code>
                   </button>
                 </li>
@@ -138,34 +170,22 @@
                 <li><strong>Artefact:</strong> {{ artefactQueryReference.artefact || '[REF?]' }}</li>
               </ul>
               <div class="d-flex justify-content-end">
-                <button class="btn btn-outline-secondary m-2" @click="resolveReferenceQuery(false)">Cancel</button>
-                <button class="btn btn-success m-2" @click="resolveReferenceQuery(true)">Select</button>
+                <button type="button" class="btn btn-outline-secondary m-2" @click="resolveReferenceQuery(false)">
+                  Cancel
+                </button>
+                <button type="button" class="btn btn-success m-2" @click="resolveReferenceQuery(true)">Select</button>
               </div>
             </div>
           </div>
         </div>
       </div>
-      <div class="modal-backdrop fade show"></div>
+      <div class="modal-backdrop fade show" />
     </div>
     <!-- /Artefact Reference Picker -->
   </div>
 </template>
 
 <script lang="ts">
-import {
-  ArtefactCallback,
-  ArtefactReference,
-  FunctionInfo,
-  NestedLibrary,
-  SerializedArtefact,
-  TaskConfig,
-  TaskInDB,
-} from '@/types/pipelines.d';
-import {
-  callPipelineLibraryEndpoint,
-  callPipelineRefreshLibraryEndpoint,
-  callPipelineTaskSearchEndpoint, callPipelineTasksSubmitEndpoint,
-} from '@/plugins/api/pipelines';
 import { EventBus } from '@/plugins/events';
 import { ToastEvent } from '@/plugins/events/events/toast';
 import { marked } from 'marked';
@@ -173,6 +193,9 @@ import NestedExpandableComponent from '@/components/pipelines/NestedExpandableCo
 import TaskConfigComponent from '@/components/pipelines/TaskConfig.vue';
 import { ConfirmationRequestEvent } from '@/plugins/events/events/confirmation';
 import { currentProjectStore, currentUserStore } from '@/stores';
+import { API, toastReject } from '@/plugins/api';
+import { FunctionInfo, SerializedArtefact, TaskInDB, ArtefactReference } from '@/plugins/api/api-pipe';
+import { ArtefactCallback, TaskConfig, NestedLibrary } from '@/types/pipelines.d';
 
 export default {
   name: 'PipelinesSetupView',
@@ -189,15 +212,19 @@ export default {
     };
   },
   async mounted() {
-    this.library = (await callPipelineLibraryEndpoint()).payload;
+    API.pipe.library.getFullLibraryApiLibraryListGet()
+      .then((response) => { this.library = response.data; })
+      .catch(toastReject);
   },
   methods: {
     async reloadLibrary() {
-      const numFunctions = (await callPipelineRefreshLibraryEndpoint()).payload;
-      callPipelineLibraryEndpoint().then((response) => {
-        this.library = response.payload;
-      });
-      EventBus.emit(new ToastEvent('INFO', `Reload of library done, fetched ${numFunctions} functions.`));
+      try {
+        const numFunctions = (await API.pipe.library.reloadLibraryApiLibraryRefreshPatch()).data;
+        this.library = (await API.pipe.library.getFullLibraryApiLibraryListGet()).data;
+        EventBus.emit(new ToastEvent('INFO', `Reload of library done, found ${numFunctions} functions.`));
+      } catch (e) {
+        console.error(e);
+      }
     },
     md2html(s: string): string {
       return marked(s.trim());
@@ -205,9 +232,9 @@ export default {
     async loadQueuedTasks() {
       // TODO: Add type matching -> Only show tasks where an output artefact matches the type of the param artefact type
       // FIXME: Add some filters? Ideally configurable in the interface (only this project, only current user).
-      const response = (await callPipelineTaskSearchEndpoint()).payload;
-      if (response) this.queuedTasks = response;
-      else EventBus.emit(new ToastEvent('ERROR', 'Failed to load task queue.'));
+      API.pipe.queue.searchTasksApiQueueSearchGet({})
+        .then((response) => { this.queuedTasks = response.data; })
+        .catch(toastReject);
     },
     pickReference(query: [SerializedArtefact, ArtefactReference]) {
       const [artefact, cb] = query;
@@ -253,8 +280,8 @@ export default {
         'This will submit all the tasks configured in this view to the compute pipeline. '
         + 'Please only proceed if you know exactly what you are doing!\n\n'
         + 'Cancellation of tasks is currently not implemented, so proceeding is extra-dangerous.',
-        (response) => {
-          if (response === 'ACCEPT') {
+        (confirmationResponse) => {
+          if (confirmationResponse === 'ACCEPT') {
             // TODO implement
 
             const tasks = JSON.parse(JSON.stringify(Object.fromEntries(
@@ -264,15 +291,13 @@ export default {
             this.$refs.taskConfigs.forEach((config: any) => {
               tasks[config.config.task.task_id].params = JSON.stringify(config.getTaskParams());
             });
-
-            callPipelineTasksSubmitEndpoint(Object.values(tasks))
-              .then((res) => {
-                console.log(res.payload);
-                EventBus.emit(new ToastEvent('SUCCESS', `Submitted ${res.payload?.length} tasks to the queue!`));
+            API.pipe.queue.submitBulkApiQueueSubmitTasksPut({ requestBody: Object.values(tasks) })
+              .then((response) => {
+                EventBus.emit(new ToastEvent('SUCCESS', `Submitted ${response.data?.length} tasks to the queue!`));
               })
               .catch((reason) => {
-                EventBus.emit(new ToastEvent('ERROR', 'Failed to submit tasks!'));
                 console.error(reason);
+                EventBus.emit(new ToastEvent('ERROR', 'Failed to submit tasks!'));
               });
           }
         },
@@ -291,7 +316,7 @@ export default {
       //      -> has matching artefact in queue (non-failed tasks)
       return this.library;
     },
-    nestedLibrary() : NestedLibrary {
+    nestedLibrary(): NestedLibrary {
       const ret: NestedLibrary = {};
 
       function setInfo(path: string[], info: FunctionInfo) {

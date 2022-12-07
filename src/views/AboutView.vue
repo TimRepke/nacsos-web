@@ -1,9 +1,12 @@
 <template>
-  <div class="text-start m-2">
+  <div>
     <h2>About NACSOS</h2>
     <p>
       This platform was developed in the
-      <a href="https://www.mcc-berlin.net/en/research/working-groups/applied-sustainability-science.html" target="_blank">
+      <a
+        href="https://www.mcc-berlin.net/en/research/working-groups/applied-sustainability-science.html"
+        target="_blank"
+        rel="noopener noreferrer">
         APSIS group
       </a>
       of the MCC Berlin. Their <a href="https://www.mcc-berlin.net/en/imprint.html">imprint</a> applies here as well.
