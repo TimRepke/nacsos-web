@@ -27,7 +27,45 @@ export const $AcademicItemModel = {
     },
     text: {
       type: 'string',
-      isRequired: true,
+    },
+    doi: {
+      type: 'string',
+    },
+    wos_id: {
+      type: 'string',
+    },
+    scopus_id: {
+      type: 'string',
+    },
+    openalex_id: {
+      type: 'string',
+    },
+    s2_id: {
+      type: 'string',
+    },
+    title: {
+      type: 'string',
+    },
+    title_slug: {
+      type: 'string',
+    },
+    publication_year: {
+      type: 'number',
+    },
+    source: {
+      type: 'string',
+    },
+    keywords: {
+      type: 'array',
+      contains: {
+        type: 'string',
+      },
+    },
+    authors: {
+      type: 'array',
+      contains: {
+        type: 'AcademicAuthorModel',
+      },
     },
   },
 } as const;

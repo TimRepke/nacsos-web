@@ -21,7 +21,7 @@ export type TwitterItemModel = {
   item_id?: string;
   project_id?: string;
   type?: ItemType;
-  text: string;
+  text?: string;
   twitter_id?: string;
   twitter_author_id?: string;
   created_at: string;

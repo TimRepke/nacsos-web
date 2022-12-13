@@ -30,7 +30,6 @@ export const $TwitterItemModel = {
     },
     text: {
       type: 'string',
-      isRequired: true,
     },
     twitter_id: {
       type: 'string',

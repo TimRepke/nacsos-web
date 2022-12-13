@@ -60,15 +60,10 @@
           <!-- Item viewer container -->
           <div class="d-flex flex-row flex-wrap p-2 overflow-auto">
             <template v-if="this.itemList && this.itemList.length > 0">
-              <template v-if="projectType === 'twitter'">
-                <AnyItemComponent
-                  v-for="(item) in itemList"
-                  :key="item.item_id"
-                  :item="item" />
-              </template>
-              <template v-else>
-                This type of data can not be rendered. Sorry.
-              </template>
+              <AnyItemComponent
+                v-for="(item) in itemList"
+                :key="item.item_id"
+                :item="item" />
             </template>
             <template v-else>
               No data loaded yet or no data available.

@@ -4,7 +4,9 @@
 export { CoreClient } from './CoreClient';
 
 
+export type { AcademicAuthorModel } from './models/AcademicAuthorModel';
 export type { AcademicItemModel } from './models/AcademicItemModel';
+export type { AffiliationModel } from './models/AffiliationModel';
 export type { AnnotatedItem } from './models/AnnotatedItem';
 export type { AnnotationCollection } from './models/AnnotationCollection';
 export type { AnnotationCollectionDB } from './models/AnnotationCollectionDB';
@@ -38,6 +40,7 @@ export type { HTTPValidationError } from './models/HTTPValidationError';
 export { ImportConfigJSONL } from './models/ImportConfigJSONL';
 export type { ImportConfigRIS } from './models/ImportConfigRIS';
 export { ImportConfigTwitter } from './models/ImportConfigTwitter';
+export type { ImportConfigWoS } from './models/ImportConfigWoS';
 export type { ImportModel } from './models/ImportModel';
 export { ImportType } from './models/ImportType';
 export { ItemType } from './models/ItemType';
@@ -65,7 +68,9 @@ export type { UserPermission } from './models/UserPermission';
 export type { UserProjectAssignmentScope } from './models/UserProjectAssignmentScope';
 export type { ValidationError } from './models/ValidationError';
 
+export { $AcademicAuthorModel } from './schemas/$AcademicAuthorModel';
 export { $AcademicItemModel } from './schemas/$AcademicItemModel';
+export { $AffiliationModel } from './schemas/$AffiliationModel';
 export { $AnnotatedItem } from './schemas/$AnnotatedItem';
 export { $AnnotationCollection } from './schemas/$AnnotationCollection';
 export { $AnnotationCollectionDB } from './schemas/$AnnotationCollectionDB';
@@ -99,6 +104,7 @@ export { $HTTPValidationError } from './schemas/$HTTPValidationError';
 export { $ImportConfigJSONL } from './schemas/$ImportConfigJSONL';
 export { $ImportConfigRIS } from './schemas/$ImportConfigRIS';
 export { $ImportConfigTwitter } from './schemas/$ImportConfigTwitter';
+export { $ImportConfigWoS } from './schemas/$ImportConfigWoS';
 export { $ImportModel } from './schemas/$ImportModel';
 export { $ImportType } from './schemas/$ImportType';
 export { $ItemType } from './schemas/$ItemType';

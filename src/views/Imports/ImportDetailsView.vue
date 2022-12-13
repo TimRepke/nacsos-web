@@ -97,6 +97,7 @@ import { CompatibilityMapping, ComponentMapping } from '@/types/imports.d';
 import { ImportModel, ImportType, ItemType, ProjectModel, ProjectPermissionsModel } from '@/plugins/api/api-core';
 import ConfigTwitter from '@/components/imports/ConfigTwitter.vue';
 import ConfigJSONL from '@/components/imports/ConfigJSONL.vue';
+import ConfigWoS from '@/components/imports/ConfigWoS.vue';
 import ConfigRIS from '@/components/imports/ConfigRIS.vue';
 import { currentProjectStore, currentUserStore } from '@/stores';
 import { ConfirmationRequestEvent } from '@/plugins/events/events/confirmation';
@@ -116,6 +117,7 @@ export const projectTypeImportTypeCompatibility: CompatibilityMapping = {
 
 const type2component: ComponentMapping = {
   ris: ['Upload RIS file(s)', ConfigRIS],
+  wos: ['Upload Web of Science text file(s)', ConfigWoS],
   jsonl: ['Upload JSONL file(s)', ConfigJSONL],
   twitter: ['Twitter Search API', ConfigTwitter],
 };
@@ -188,6 +190,7 @@ export default {
                 EventBus.emit(new ToastEvent('SUCCESS', `Saved import settings.  \n**ID:** ${response.data}`));
                 if (this.isNewImport) {
                   this.isNewImport = false;
+                  this.importId = response.data;
                   this.$router.replace({ name: 'project-imports-details', params: { import_id: response.data } });
                 }
               })

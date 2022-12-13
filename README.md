@@ -4,6 +4,12 @@ This repository hosts the client-side interface code for the NACSOS platform.
 Steps to set up your local development environment are described below.
 
 ## Project setup
+
+If you are on an old machine with Ubuntu 18, you will need a lower version of node
+```
+nvm install v16.18.1
+```
+
 ```
 npm install
 ```
