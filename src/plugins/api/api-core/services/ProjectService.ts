@@ -42,7 +42,7 @@ export class ProjectService {
 
   /**
    * Save Project
-   * @returns any Successful Response
+   * @returns string Successful Response
    * @throws ApiError
    */
   public saveProjectApiProjectInfoPut({
@@ -51,7 +51,7 @@ export class ProjectService {
   }: {
     xProjectId: string,
     requestBody: ProjectModel,
-  }, options?: Partial<ApiRequestOptions>): CancelablePromise<any> {
+  }, options?: Partial<ApiRequestOptions>): CancelablePromise<string> {
     return this.httpRequest.request({
       method: 'PUT',
       url: '/api/project/info',
@@ -143,7 +143,7 @@ export class ProjectService {
 
   /**
    * Save Project Permission
-   * @returns any Successful Response
+   * @returns string Successful Response
    * @throws ApiError
    */
   public saveProjectPermissionApiProjectPermissionsPermissionPut({
@@ -152,7 +152,7 @@ export class ProjectService {
   }: {
     xProjectId: string,
     requestBody: ProjectPermissionsModel,
-  }, options?: Partial<ApiRequestOptions>): CancelablePromise<any> {
+  }, options?: Partial<ApiRequestOptions>): CancelablePromise<string> {
     return this.httpRequest.request({
       method: 'PUT',
       url: '/api/project/permissions/permission',

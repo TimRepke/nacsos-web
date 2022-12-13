@@ -71,6 +71,8 @@ export const $ImportModel = {
         type: 'ImportConfigTwitter',
       }, {
         type: 'ImportConfigJSONL',
+      }, {
+        type: 'ImportConfigWoS',
       }],
     },
   },

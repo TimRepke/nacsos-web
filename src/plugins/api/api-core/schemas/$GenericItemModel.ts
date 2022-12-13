@@ -27,7 +27,6 @@ export const $GenericItemModel = {
     },
     text: {
       type: 'string',
-      isRequired: true,
     },
     meta: {
       properties: {
