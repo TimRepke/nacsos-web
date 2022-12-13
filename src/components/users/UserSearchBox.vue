@@ -33,6 +33,8 @@ import { UserBaseModel } from '@/plugins/api/api-core';
 import { currentProjectStore } from '@/stores';
 import { API } from '@/plugins/api';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import { EventBus } from '@/plugins/events';
+import { ToastEvent } from '@/plugins/events/events/toast';
 
 type SearchData = {
   users: Array<UserBaseModel>;
@@ -59,14 +61,18 @@ export default {
     };
   },
   mounted() {
-    API.core.users.getAllUsersApiUsersListAllGet({ xProjectId: currentProjectStore.projectId })
-      .then((response) => {
-        const { data } = response;
-        this.users = data;
+    if (this.projectId) {
+      API.core.users.getProjectUsersApiUsersListProjectProjectIdGet({
+        xProjectId: currentProjectStore.projectId,
+        projectId: currentProjectStore.projectId,
       })
-      .catch((reason) => {
-        console.log(reason);
-      });
+        .then((response) => { this.users = response.data; })
+        .catch(() => { EventBus.emit(new ToastEvent('WARN', 'Failed to load list of users.')); });
+    } else {
+      API.core.users.getAllUsersApiUsersListAllGet({ xProjectId: currentProjectStore.projectId })
+        .then((response) => { this.users = response.data; })
+        .catch(() => { EventBus.emit(new ToastEvent('WARN', 'Failed to load list of users.')); });
+    }
   },
   computed: {
     usernames(): Array<{ name: string, user_id: string }> {
