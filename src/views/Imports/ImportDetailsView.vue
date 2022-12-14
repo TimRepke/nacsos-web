@@ -156,7 +156,7 @@ export default {
         name: 'New import',
         description: '',
         config: undefined,
-      },
+      } as Omit<ImportModel, 'type'> & { type?: string },
       importStats: {
         numItems: undefined,
       },
