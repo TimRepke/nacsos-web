@@ -1,15 +1,61 @@
 <template>
   <div class="card m-2 p-0 text-start w-100">
+    <div class="card-header d-flex justify-content-between">
+      <div style="line-height: 2rem">
+        {{ item.title }}
+      </div>
+      <div>
+        <inline-tool-tip info="DOI">
+          <a
+            :href="`https://dx.doi.org/${item.doi || ''}`"
+            class="float-end link-secondary"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="DOI">
+            <font-awesome-icon :icon="['fas', 'file-lines']" class="me-2" />
+          </a>
+        </inline-tool-tip>
+      </div>
+    </div>
     <div class="card-body">
-      <h5 class="card-title">{{ item.title }}</h5>
-      <h6 class="card-subtitle">{{ item.publication_year }}</h6>
-      {{ item.text }}
+      <div class="d-flex small text-muted">
+        <div v-if="item.publication_year" class="flex-nowrap d-flex me-4">
+          <font-awesome-icon :icon="['fas', 'calendar-days']" class="me-2" />
+          {{ item.publication_year }}
+        </div>
+        <div v-if="item.authors" class="flex-nowrap d-flex me-4">
+          <font-awesome-icon :icon="['fas', 'people-group']" class="me-2" />
+          <ul class="list-inline">
+            <li v-for="author in item.authors" :key="author.name" class="list-inline-item">
+              <template v-if="author.orcid">
+                <a
+                  :href="`https://orcid.org/${author.orcid}`"
+                  target="_blank"
+                  rel="noopener noreferrer">
+                  {{ author.name }}
+                </a>
+              </template>
+              <template v-else>
+                {{ author.name }}
+              </template>
+            </li>
+          </ul>
+        </div>
+      </div>
+      <template v-if="!item.text">
+        <p class="text-warning">
+          <font-awesome-icon :icon="['fas', 'notdef']" class="me-2" />
+          [Abstract missing]
+        </p>
+      </template>
+      <template v-else>
+        <p class="card-text text-muted" v-html="htmlAbstract" /> <!-- style="font-family: serif" -->
+      </template>
     </div>
     <div class="card-footer d-flex justify-content-between">
-      <small class="text-muted">
-        <ul class="list-unstyled">
-          <li v-for="author in item.authors" :key="author.name"><font-awesome-icon :icon="['fas', 'user-large']" class="me-2" />{{ author.name }}</li>
-        </ul>
+      <small v-if="item.keywords" class="text-muted">
+        <font-awesome-icon :icon="['fas', 'tags']" class="me-2" />
+        {{ item.keywords.join(' | ') }}
       </small>
     </div>
   </div>
@@ -18,9 +64,11 @@
 <script lang="ts">
 import { PropType } from 'vue';
 import { AcademicItemModel } from '@/plugins/api/api-core';
+import InlineToolTip from '@/components/InlineToolTip.vue';
 
 export default {
   name: 'AcademicItem',
+  components: { InlineToolTip },
   props: {
     item: {
       type: Object as PropType<AcademicItemModel>,
@@ -29,8 +77,8 @@ export default {
     },
   },
   computed: {
-    renderedStatus() {
-      return this.item.text;
+    htmlAbstract() {
+      return (this.item.text || '').replaceAll('\n', '<br />');
     },
   },
 };
