@@ -58,7 +58,7 @@
       <div class="col">
         <div class="d-flex flex-column flex-shrink-1 item-container">
           <!-- Item viewer container -->
-          <div class="d-flex flex-row flex-wrap p-2 overflow-auto">
+          <div class="d-flex flex-row flex-wrap p-2 overflow-auto border-bottom">
             <template v-if="this.itemList && this.itemList.length > 0">
               <AnyItemComponent
                 v-for="(item) in itemList"
