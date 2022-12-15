@@ -23,7 +23,10 @@ export const $AcademicItemModel = {
       }],
     },
     type: {
-      type: 'ItemType',
+      type: 'all-of',
+      contains: [{
+        type: 'ItemType',
+      }],
     },
     text: {
       type: 'string',
@@ -41,6 +44,9 @@ export const $AcademicItemModel = {
       type: 'string',
     },
     s2_id: {
+      type: 'string',
+    },
+    pubmed_id: {
       type: 'string',
     },
     title: {
@@ -65,6 +71,10 @@ export const $AcademicItemModel = {
       type: 'array',
       contains: {
         type: 'AcademicAuthorModel',
+      },
+    },
+    meta: {
+      properties: {
       },
     },
   },

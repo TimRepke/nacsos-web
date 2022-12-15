@@ -37,6 +37,36 @@
                 </div>
               </div>
             </div>
+            <div class="row mb-2" v-if="user.hasNewPassword">
+              <div class="col">
+                <div>
+                  <strong>Temporary password:</strong> {{ user.password }}
+                </div>
+                <div class="text-muted small">
+                  (Only valid after saved)
+                </div>
+              </div>
+            </div>
+            <div class="row mb-2" v-if="user.isNew">
+              <div class="col">
+                <label :for="`user-${user.user_id}`" class="form-label">Username</label>
+                <input
+                  :id="`user-${user.user_id}`"
+                  class="form-control form-control-sm"
+                  type="text"
+                  v-model="user.username">
+              </div>
+              <div class="col">
+                <label :for="`passwd-${user.user_id}`" class="form-label">Password</label>
+                <input
+                  :id="`passwd-${user.user_id}`"
+                  class="form-control form-control-sm"
+                  type="text"
+                  disabled
+                  v-model="user.password">
+              </div>
+              <div class="col" />
+            </div>
             <div class="row">
               <div class="col">
                 <label :for="`username-${user.user_id}`" class="form-label">Full name</label>
@@ -94,15 +124,21 @@ import { EventBus } from '@/plugins/events';
 import { ToastEvent } from '@/plugins/events/events/toast';
 import { UserBaseModel } from '@/plugins/api/api-core';
 
+type UserModel = UserBaseModel & {
+  password?: string,
+  isNew?: boolean,
+  hasNewPassword?: boolean,
+};
+
 type UserManagementViewData = {
-  users: Array<UserBaseModel>;
+  users: Array<UserModel>;
 };
 
 export default {
   name: 'UserManagementView',
   data(): UserManagementViewData {
     return {
-      users: [] as UserBaseModel[],
+      users: [] as UserModel[],
     };
   },
   mounted() {
@@ -120,6 +156,8 @@ export default {
         affiliation: '',
         is_superuser: false,
         is_active: true,
+        password: this.generateRandomPassword(),
+        isNew: true,
       });
     },
     deleteUser() {
@@ -139,8 +177,20 @@ export default {
         EventBus.emit(new ToastEvent('ERROR', 'Failed to save user.'));
       });
     },
-    resetPassword() {
-      EventBus.emit(new ToastEvent('INFO', 'Not implemented (yet).'));
+    resetPassword(user: UserModel) {
+      // eslint-disable-next-line no-param-reassign
+      user.password = this.generateRandomPassword();
+      // eslint-disable-next-line no-param-reassign
+      user.hasNewPassword = true;
+      console.log(user);
+    },
+    generateRandomPassword() {
+      return Math.random().toString(36).slice(2)
+        + Math.random().toString(36).slice(2)
+        + Math.random().toString(36).slice(2)
+        + Math.random().toString(36).slice(2)
+        + Math.random().toString(36).slice(2)
+        + Math.random().toString(36).slice(2);
     },
   },
 };

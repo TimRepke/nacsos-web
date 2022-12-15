@@ -129,7 +129,7 @@ export class UsersService {
   public saveUserApiUsersDetailsPut({
     requestBody,
   }: {
-    requestBody: (UserModel | UserInDBModel),
+    requestBody: (UserInDBModel | UserModel),
   }, options?: Partial<ApiRequestOptions>): CancelablePromise<any> {
     return this.httpRequest.request({
       method: 'PUT',

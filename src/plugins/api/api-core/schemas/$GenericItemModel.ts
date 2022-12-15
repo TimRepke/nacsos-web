@@ -23,7 +23,10 @@ export const $GenericItemModel = {
       }],
     },
     type: {
-      type: 'ItemType',
+      type: 'all-of',
+      contains: [{
+        type: 'ItemType',
+      }],
     },
     text: {
       type: 'string',
