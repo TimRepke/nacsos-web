@@ -18,11 +18,13 @@ export type AcademicItemModel = {
   scopus_id?: string;
   openalex_id?: string;
   s2_id?: string;
+  pubmed_id?: string;
   title?: string;
   title_slug?: string;
   publication_year?: number;
   source?: string;
   keywords?: Array<string>;
   authors?: Array<AcademicAuthorModel>;
+  meta?: any;
 };
 

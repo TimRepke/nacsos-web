@@ -2,6 +2,7 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { UserBaseModel } from '../models/UserBaseModel';
+import type { UserInDBModel } from '../models/UserInDBModel';
 import type { UserModel } from '../models/UserModel';
 
 import type { CancelablePromise } from '@/plugins/api/core/CancelablePromise';
@@ -113,6 +114,28 @@ export class UsersService {
       query: {
         'user_id': userId,
       },
+      errors: {
+        422: `Validation Error`,
+      },
+      ...options,
+    });
+  }
+
+  /**
+   * Save User
+   * @returns any Successful Response
+   * @throws ApiError
+   */
+  public saveUserApiUsersDetailsPut({
+    requestBody,
+  }: {
+    requestBody: (UserInDBModel | UserModel),
+  }, options?: Partial<ApiRequestOptions>): CancelablePromise<any> {
+    return this.httpRequest.request({
+      method: 'PUT',
+      url: '/api/users/details',
+      body: requestBody,
+      mediaType: 'application/json',
       errors: {
         422: `Validation Error`,
       },

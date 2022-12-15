@@ -10,13 +10,13 @@ export const $Event = {
     payload: {
       type: 'any-of',
       contains: [{
-        type: 'PipelineTaskStatusStartedEvent',
-      }, {
         type: 'PipelineTaskStatusChangedEvent',
+      }, {
+        type: 'PipelineTaskStatusFailedEvent',
       }, {
         type: 'PipelineTaskStatusCompletedEvent',
       }, {
-        type: 'PipelineTaskStatusFailedEvent',
+        type: 'PipelineTaskStatusStartedEvent',
       }],
       isRequired: true,
     },

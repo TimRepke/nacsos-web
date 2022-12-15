@@ -235,7 +235,7 @@ export class ProjectService {
   }: {
     itemType: 'generic' | 'twitter' | 'academic' | 'patents',
     xProjectId: string,
-  }, options?: Partial<ApiRequestOptions>): CancelablePromise<Array<(GenericItemModel | TwitterItemModel | AcademicItemModel)>> {
+  }, options?: Partial<ApiRequestOptions>): CancelablePromise<(Array<TwitterItemModel> | Array<AcademicItemModel> | Array<GenericItemModel>)> {
     return this.httpRequest.request({
       method: 'GET',
       url: '/api/project/items/{item_type}/list',
@@ -267,7 +267,7 @@ export class ProjectService {
     page: number,
     pageSize: number,
     xProjectId: string,
-  }, options?: Partial<ApiRequestOptions>): CancelablePromise<Array<(GenericItemModel | TwitterItemModel | AcademicItemModel)>> {
+  }, options?: Partial<ApiRequestOptions>): CancelablePromise<(Array<TwitterItemModel> | Array<AcademicItemModel> | Array<GenericItemModel>)> {
     return this.httpRequest.request({
       method: 'GET',
       url: '/api/project/items/{item_type}/list/{page}/{page_size}',
