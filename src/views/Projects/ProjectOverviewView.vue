@@ -9,24 +9,7 @@
         <div class="col">
           <h5>Your permissions</h5>
           <h6>In this project, you have the following permissions</h6>
-          <div class="card p-3">
-            <div class="row gy-3 gx-4">
-              <div
-                v-for="(hint, setting) in hints"
-                :key="setting"
-                class="col-lg-3">
-                <div>
-                  <code>{{ setting }}</code>
-                  <font-awesome-icon
-                    :icon="[(permissions[setting]) ? 'fas' : 'far', (permissions[setting]) ? 'circle-check' : 'circle-xmark']"
-                    class="ms-2" />
-                </div>
-                <div class="text-muted small">
-                  {{ hint }}
-                </div>
-              </div>
-            </div>
-          </div>
+          <permission-settings-card-read-only :permissions="permissions" />
         </div>
       </div>
     </div>
@@ -47,19 +30,19 @@
 import { ProjectModel, ProjectPermissionsModel } from '@/plugins/api/api-core';
 import { currentProjectStore } from '@/stores';
 import { marked } from 'marked';
-import { PermissionKeys, ProjectPermissionHints } from '@/types/permissions';
+import PermissionSettingsCardReadOnly from '@/components/users/PermissionSettingsCardReadOnly.vue';
 
 type ProjectOverview = {
   project?: ProjectModel;
   permissions?: ProjectPermissionsModel;
-  hints: Record<PermissionKeys, string>;
 };
 
 export default {
   name: 'ProjectOverviewView',
+  components: { PermissionSettingsCardReadOnly },
   data(): ProjectOverview {
     return {
-      hints: ProjectPermissionHints,
+      // pass
     };
   },
   computed: {
