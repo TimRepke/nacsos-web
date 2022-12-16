@@ -29,7 +29,8 @@
         {{ item.quote_count }}
       </small>
       <small class="text-muted">
-        5
+        <!-- Footer right side -->
+        &nbsp;
       </small>
     </div>
   </div>
