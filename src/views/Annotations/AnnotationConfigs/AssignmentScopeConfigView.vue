@@ -293,6 +293,9 @@ export default {
                 })
                 .catch((res) => {
                   EventBus.emit(new ToastEvent('ERROR', 'Something failed while creating assignments.'));
+                  if (res.error?.detail && typeof res.error?.detail === 'string') {
+                    EventBus.emit(new ToastEvent('WARN', res.error?.detail));
+                  }
                   console.error(res);
                 });
             }
