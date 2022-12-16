@@ -99,8 +99,32 @@
           </div>
         </template>
         <template v-else-if="label.kind === 'multi'">
-          <!-- TODO -->
-          Multi-selector not implemented yet
+          <div class="list-group">
+            <label
+              v-for="(choice, index) in label.choices"
+              :key="index"
+              class="list-group-item list-group-item-action"
+              :class="{ 'list-group-item-dark': multiIntContains(label.annotation, choice.value) }">
+              <input
+                type="checkbox"
+                class="form-check-input me-1"
+                :value="multiIntContains(label.annotation, choice.value)"
+                :checked="multiIntContains(label.annotation, choice.value)"
+                @change="multiIntUpdate(label.annotation, choice.value)" />
+              <InlineToolTip :info="choice.hint">
+                <span class="ms-2">{{ choice.name }}</span>
+              </InlineToolTip>
+            </label>
+          </div>
+          <div
+            v-for="child in multiIntChildren(label)"
+            :key="child.key"
+            class="ms-3 mt-2">
+            <AnnotationLabels
+              :labels="child.labels"
+              :assignment="assignment"
+              :key="child.key" />
+          </div>
         </template>
         <template v-else-if="label.kind === 'int'">
           <!-- TODO -->
@@ -112,6 +136,7 @@
         </template>
         <template v-else-if="label.kind === 'str'">
           <!-- TODO -->
+          <!-- https://vueform.com/reference/1.x/multiselect-element -->
           string input not implemented yet
         </template>
       </div>
@@ -125,6 +150,8 @@
 import { PropType } from 'vue';
 import InlineToolTip from '@/components/InlineToolTip.vue';
 import { AnnotationSchemeLabel, AssignmentModel, AnnotationModel } from '@/plugins/api/api-core';
+
+type SubLabels = { labels: AnnotationSchemeLabel[]; key: number; };
 
 export default {
   name: 'AnnotationLabels',
@@ -147,12 +174,44 @@ export default {
       annotation.value_bool = undefined;
       annotation.value_str = undefined;
       annotation.value_float = undefined;
+      annotation.multi_int = undefined;
     },
-    hasAnnotation(annotation: AnnotationModel) {
+    hasAnnotation(annotation: AnnotationModel): boolean {
       return annotation.value_int !== undefined
         || annotation.value_str !== undefined
         || annotation.value_bool !== undefined
-        || annotation.value_float !== undefined;
+        || annotation.value_float !== undefined
+        || annotation.multi_int !== undefined;
+    },
+    multiIntContains(annotation: AnnotationModel, value: number): boolean {
+      if (!annotation.multi_int) return false;
+      return annotation.multi_int.indexOf(value) >= 0;
+    },
+    multiIntUpdate(annotation: AnnotationModel, value: number) {
+      if (!annotation.multi_int) annotation.multi_int = [];
+      const index = annotation.multi_int.indexOf(value);
+      if (index >= 0) {
+        annotation.multi_int.splice(index, 1);
+      } else {
+        annotation.multi_int.push(value);
+      }
+      if (annotation.multi_int.length === 0) annotation.multi_int = undefined;
+    },
+    multiIntChildren(label: AnnotationSchemeLabel): Array<SubLabels> {
+      function hasLabels(child: SubLabels | undefined): child is SubLabels {
+        return child !== undefined;
+      }
+
+      if (!label.annotation?.multi_int) return [];
+      return label.annotation.multi_int.map((key) => {
+        if (!label.choices) return undefined;
+        const { children } = label.choices[key];
+        if (!children) return undefined;
+        return {
+          labels: children,
+          key,
+        };
+      }).filter(hasLabels);
     },
     duplicateLabel(label: AnnotationSchemeLabel, labelIndex: number) {
       if (this.keyCounts[label.key] < (label.max_repeat ?? 1)) {
