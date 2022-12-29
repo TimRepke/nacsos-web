@@ -4,10 +4,10 @@ import { PipelinesClient } from './api-pipe';
 
 const API = {
   pipe: new PipelinesClient({
-    BASE: 'http://localhost:8000',
+    BASE: process.env.VUE_APP_NACSOS_PIPE_URL,
   }),
   core: new CoreClient({
-    BASE: 'http://localhost:8081',
+    BASE: process.env.VUE_APP_NACSOS_CORE_URL,
   }),
 };
 
