@@ -8,6 +8,14 @@
 # https://hub.docker.com/r/library/python/tags/
 image: node:latest
 
+before_script:
+  - apk add lftp
+
+stages:
+  - build
+  - test
+  - deploy
+
 cache:
   paths:
     - node_modules/
@@ -15,15 +23,28 @@ cache:
 build-job:
   stage: build
   script:
+    - echo "Building the static sources"
     - npm install -g @vue/cli@latest
     - npm install
-    - npm run build-dev
+    - npm run build
   artifacts:
     paths:
       - dist/
-    expire_in: 1 hour
+    expire_in: 24 hours
 
 test-job:
   stage: test
   script:
     - npm run lint
+
+deploy-to-production:
+  stage: deploy
+  script:
+    - echo "Deploying to production"
+    - lftp --version
+    - ls -lisah
+    - ls -lisah dist
+    - lftp -c "open -u $FTP_USERNAME,$FTP_PASSWORD $FTP_HOSTNAME; mirror -Renv dist/ /var/www/nacsos-web/"
+  when: manual
+  only:
+    - production
