@@ -50,7 +50,7 @@
           </div>
         </div>
         <div class="row g-0">
-          <AnnotationLabels :labels="labels" :assignment="assignment" />
+          <AnnotationLabels :labels="labels" :assignment="assignment" :key="rerenderCounter" />
         </div>
         <div class="row g-0 border-top pt-2">
           <div class="col text-start">
@@ -120,6 +120,7 @@ type AnnotationsViewData = {
   scope?: AssignmentScopeModel;
   sidebarWidth: number;
   labels?: AnnotationSchemeLabel[];
+  rerenderCounter: number; // this is a hack to force-update the AnnotationLabels-component
 };
 
 export default {
@@ -134,6 +135,7 @@ export default {
       scope: undefined,
       sidebarWidth: 5,
       labels: undefined,
+      rerenderCounter: 0,
     };
   },
   async mounted() {
@@ -197,7 +199,8 @@ export default {
         if (label.annotation?.value_int === undefined
           && label.annotation?.value_str === undefined
           && label.annotation?.value_bool === undefined
-          && label.annotation?.value_float === undefined) {
+          && label.annotation?.value_float === undefined
+          && label.annotation?.multi_int === undefined) {
           // eslint-disable-next-line no-param-reassign
           delete label.annotation;
         }
@@ -258,6 +261,7 @@ export default {
       this.scope = annotationItem.scope;
       this.item = annotationItem.item;
       this.labels = this.populateEmptyAnnotations(this.scheme.labels);
+      this.rerenderCounter += 1;
 
       // update the assignments progress bar
       API.core.annotations.getAssignmentsForScopeApiAnnotationsAnnotateAssignmentsScopeAssignmentScopeIdGet({

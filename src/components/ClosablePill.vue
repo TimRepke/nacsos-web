@@ -1,9 +1,11 @@
 <template>
   <span class="badge align-middle" :class="[background, (rounded) ? 'rounded-pill' : '']">
-    <span class="pill-text me-1">
+    <span class="pill-text mb-1 mt-1 me-2">
       <slot />
     </span>
-    <button type="button" class="btn-close btn-close-white" aria-label="Close" @click="$emit('clicked-x')" />
+    <span class="pill-text">
+      <button type="button" class="btn-close btn-close-white" aria-label="Close" @click="$emit('clicked-x')" />
+    </span>
   </span>
 </template>
 
@@ -35,15 +37,19 @@ export default {
 </script>
 
 <style scoped>
+.pill-text > .btn-close {
+  font-size: 0.5em;
+}
 .pill-text {
   vertical-align: middle;
   display: inline-block;
-  height: 1.3em;
+  /*height: 1.3em;*/
 }
-
+/*
 .badge {
   --bs-badge-padding-y: 0.15em;
   --bs-badge-font-size: 0.7em;
   --bs-badge-font-weight: 500;
 }
+*/
 </style>

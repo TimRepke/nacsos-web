@@ -12,8 +12,8 @@
 
     <div class="dropdown ps-2 d-inline-block">
       <font-awesome-icon
-        :icon="['fas', annotation2icon(botAnnotation.value_bool)]"
-        :class="annotation2classes(botAnnotation.value_bool)"
+        :icon="['fas', annotation2icon(botAnnotation?.value_bool)]"
+        :class="annotation2classes(botAnnotation?.value_bool)"
         class="border border-dark border-2 rounded-3 text-light p-1 dropdown-toggle"
         role="button"
         style="height: 1rem; width: 1rem;"
@@ -69,7 +69,8 @@ export default {
     },
     botAnnotation: {
       type: Object as PropType<BotAnnotationModel>,
-      required: true,
+      required: false,
+      default: () => undefined,
     },
   },
   methods: {

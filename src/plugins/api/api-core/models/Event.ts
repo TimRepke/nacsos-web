@@ -9,16 +9,15 @@ import type { PipelineTaskStatusStartedEvent } from './PipelineTaskStatusStarted
 
 export type Event = {
   event: Event.event;
-  payload: (PipelineTaskStatusChangedEvent | PipelineTaskStatusFailedEvent | PipelineTaskStatusCompletedEvent | PipelineTaskStatusStartedEvent);
+  payload: (PipelineTaskStatusFailedEvent | PipelineTaskStatusChangedEvent | PipelineTaskStatusCompletedEvent | PipelineTaskStatusStartedEvent);
 };
 
 export namespace Event {
 
   export enum event {
-    PIPELINE_TASK_STATUS_CHANGED_EVENT = 'PipelineTaskStatusChangedEvent',
     PIPELINE_TASK_STATUS_FAILED_EVENT = 'PipelineTaskStatusFailedEvent',
+    PIPELINE_TASK_STATUS_CHANGED_EVENT = 'PipelineTaskStatusChangedEvent',
     PIPELINE_TASK_STATUS_COMPLETED_EVENT = 'PipelineTaskStatusCompletedEvent',
-    PIPELINE_TASK_STATUS_STARTED_EVENT = 'PipelineTaskStatusStartedEvent',
   }
 
 

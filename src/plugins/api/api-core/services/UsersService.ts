@@ -123,14 +123,14 @@ export class UsersService {
 
   /**
    * Save User
-   * @returns any Successful Response
+   * @returns string Successful Response
    * @throws ApiError
    */
   public saveUserApiUsersDetailsPut({
     requestBody,
   }: {
     requestBody: (UserInDBModel | UserModel),
-  }, options?: Partial<ApiRequestOptions>): CancelablePromise<any> {
+  }, options?: Partial<ApiRequestOptions>): CancelablePromise<string> {
     return this.httpRequest.request({
       method: 'PUT',
       url: '/api/users/details',
