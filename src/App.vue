@@ -1,7 +1,7 @@
 <template>
-  <div>
-    <TopBar v-if="userStore.isLoggedIn" class="d-flex flex-row vw-100" style="height: var(--topnav-height)" />
-    <div class="d-flex flex-row">
+  <div class="w-100 h-100">
+    <TopBar v-if="viewNeedsTopNav" class="d-flex flex-row vw-100" style="height: var(--topnav-height)" />
+    <div class="d-flex flex-row" :class="{ 'w-100': !viewNeedsTopNav, 'h-100': !viewNeedsTopNav }">
       <SideBar
         v-show="viewNeedsSidebar"
         style="height: calc(100vh - var(--topnav-height));" />
@@ -10,7 +10,7 @@
         v-slot="{ Component }"
         class="col overflow-auto p-2 ps-md-3 pe-md-4 pb-3 text-start"
         :class="{ 'pt-4': !viewNeedsSidebar }"
-        style="height: calc(100vh - var(--topnav-height));">
+        :style="{ height: (viewNeedsTopNav) ? 'calc(100vh - var(--topnav-height))' : undefined }">
         <template v-if="Component">
           <Transition mode="out-in">
             <KeepAlive>
@@ -71,6 +71,9 @@ export default {
           || isOnRoute(this.$route, 'user')
           || this.$route.name === 'project-list'
           || this.$route.name === 'about');
+    },
+    viewNeedsTopNav(): boolean {
+      return currentUserStore.isLoggedIn;
     },
   },
 };
