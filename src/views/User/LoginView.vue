@@ -81,10 +81,12 @@ input {
 
 .wrapper {
   background-image: url('@/assets/img/Portara_Naxos_26.jpg');
-  height: 100vh;
-  width: 100vw;
+  /*
+  height: 100%;
+  width: 100%;
   margin: 0 !important;
   padding: 0 !important;
+  */
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center

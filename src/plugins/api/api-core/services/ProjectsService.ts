@@ -30,4 +30,26 @@ export class ProjectsService {
     });
   }
 
+  /**
+   * Create Project
+   * @returns string Successful Response
+   * @throws ApiError
+   */
+  public createProjectApiProjectsCreatePut({
+    requestBody,
+  }: {
+    requestBody: ProjectModel,
+  }, options?: Partial<ApiRequestOptions>): CancelablePromise<string> {
+    return this.httpRequest.request({
+      method: 'PUT',
+      url: '/api/projects/create',
+      body: requestBody,
+      mediaType: 'application/json',
+      errors: {
+        422: `Validation Error`,
+      },
+      ...options,
+    });
+  }
+
 }
