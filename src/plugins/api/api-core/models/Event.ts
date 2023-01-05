@@ -18,7 +18,6 @@ export namespace Event {
     PIPELINE_TASK_STATUS_FAILED_EVENT = 'PipelineTaskStatusFailedEvent',
     PIPELINE_TASK_STATUS_CHANGED_EVENT = 'PipelineTaskStatusChangedEvent',
     PIPELINE_TASK_STATUS_COMPLETED_EVENT = 'PipelineTaskStatusCompletedEvent',
-    PIPELINE_TASK_STATUS_STARTED_EVENT = 'PipelineTaskStatusStartedEvent',
   }
 
 

@@ -16,7 +16,7 @@ export const $Event = {
       }, {
         type: 'PipelineTaskStatusCompletedEvent',
       }, {
-        type: 'PipelineTaskStatusStartedEvent',
+        type: 'PipelineTaskStatusCompletedEvent',
       }],
       isRequired: true,
     },

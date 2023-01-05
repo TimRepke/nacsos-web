@@ -200,14 +200,18 @@
               </div>
               <div class="row">
                 <div class="col text-end">
-                  <button class="btn btn-primary" type="button" disabled v-if="loadingProposals">
+                  <button
+                    v-if="loadingProposals"
+                    class="btn btn-primary"
+                    type="button"
+                    disabled>
                     <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
                     Loading...
                   </button>
                   <button
+                    v-else
                     class="btn btn-primary"
                     type="button"
-                    v-else
                     @click="fetchProposal"
                     :disabled="!isConfigValid || !isNew">
                     Load
@@ -257,15 +261,13 @@
                       style="position: absolute; right: 0; transform: translateX(-30px);" />
                     <h3 class="popover-header text-dark">{{ schemeLookup[skey.key].name }}</h3>
                     <div class="popover-body">
-                      <template v-if="schemeLookup[skey.key].choices">
+                      Type: {{ schemeLookup[skey.key].kind }}
+                      <template v-if="hasChoices(schemeLookup[skey.key].choices)">
                         <ul class="list-unstyled">
                           <li v-for="choice in schemeLookup[skey.key].choices" :key="choice.value">
                             <strong>{{ choice.value }}:</strong> {{ choice.name }}
                           </li>
                         </ul>
-                      </template>
-                      <template v-else>
-                        {{ schemeLookup[skey.key].kind }}
                       </template>
                     </div>
                   </div>
@@ -309,6 +311,14 @@
                     :users="userLookup"
                     @bot-annotation-changed="handleChangedBotAnnotation" />
                 </template>
+                <template v-else-if="schemeLookup[labelInfo.path[0].key]?.kind === 'multi'">
+                  <MultiLabel
+                    :user-annotations="matrix[itemId][strLabel].users"
+                    :bot-annotation="matrix[itemId][strLabel].bot"
+                    :info="schemeLookup[labelInfo.path[0].key]"
+                    :users="userLookup"
+                    @bot-annotation-changed="handleChangedBotAnnotation" />
+                </template>
                 <template v-else>
                   Unhandled "{{ schemeLookup[labelInfo.path[0].key]?.kind }}"
                 </template>
@@ -335,7 +345,7 @@ import {
   AnnotationCollection,
   Label,
   UserModel,
-  AnnotationCollectionDB,
+  AnnotationCollectionDB, AnnotationSchemeLabelChoiceFlat,
 } from '@/plugins/api/api-core';
 import { API } from '@/plugins/api';
 import BoolLabel from '@/components/annotations/resolve/BoolLabel.vue';
@@ -344,6 +354,7 @@ import ChoiceLabel from '@/components/annotations/resolve/ChoiceLabel.vue';
 import ToolTip from '@/components/ToolTip.vue';
 import { EventBus } from '@/plugins/events';
 import { ToastEvent } from '@/plugins/events/events/toast';
+import MultiLabel from '@/components/annotations/resolve/MultiLabel.vue';
 
 type LookupMatrix = Record<string, Record<string, { users: AnnotationModel[], bot: BotAnnotationModel | undefined }>>;
 type LabelLookupValue = {
@@ -378,7 +389,7 @@ type ResolveData = {
 
 export default {
   name: 'AnnotationConfigResolveView',
-  components: { ToolTip, ItemModal, BoolLabel, ChoiceLabel },
+  components: { MultiLabel, ToolTip, ItemModal, BoolLabel, ChoiceLabel },
   data(): ResolveData {
     const botAnnotationMetaDataId: string | undefined = this.$route.params.bot_annotation_metadata_id;
 
@@ -488,7 +499,11 @@ export default {
       //        than explicitly not selected in this configuration)
       if (!(labelInfo.strParent in this.labels)) return true;
       // check if parent choice has this label as child
-      return this.matrix[itemId][labelInfo.strParent].bot?.value_int === this.schemeLookup[labelInfo.path[0].key].parent_choice;
+      return this.matrix[itemId][labelInfo.strParent].bot?.value_int === this.schemeLookup[labelInfo.path[0].key].parent_choice
+        || this.matrix[itemId][labelInfo.strParent].bot?.multi_int?.indexOf(this.schemeLookup[labelInfo.path[0].key].parent_choice) >= 0;
+    },
+    hasChoices(value: AnnotationSchemeLabelChoiceFlat[] | undefined) {
+      return value !== undefined && Array.isArray(value) && value.length > 0;
     },
     fetchProposal() {
       this.loadingProposals = true;
@@ -507,6 +522,14 @@ export default {
         this.collection = data.collection;
         this.botAnnotations = data.proposal;
         this.loadingProposals = false;
+      }).catch((reason) => {
+        if (reason.error?.detail?.type === 'EmptyAnnotationsError') {
+          EventBus.emit(new ToastEvent('WARN', reason.error?.detail?.message));
+        } else {
+          EventBus.emit(new ToastEvent('ERROR', 'Something failed in the backend. '
+            + 'Please check for potentially implausible configuration or contact a developer.'));
+        }
+        this.loadingProposals = false;
       });
     },
     fetchProjectSchemas() {
@@ -520,7 +543,6 @@ export default {
     },
     handleChangedBotAnnotation(updatedBotAnnotation: BotAnnotationModel) {
       console.log(updatedBotAnnotation);
-      console.log('asd');
     },
     save() {
       if (!this.isNew) {
