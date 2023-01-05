@@ -27,17 +27,18 @@
 </template>
 
 <script lang="ts">
-import { ProjectModel, ProjectPermissionsModel } from '@/plugins/api/api-core';
+import type { ProjectModel, ProjectPermissionsModel } from '@/plugins/api/api-core';
 import { currentProjectStore } from '@/stores';
 import { marked } from 'marked';
 import PermissionSettingsCardReadOnly from '@/components/users/PermissionSettingsCardReadOnly.vue';
+import { defineComponent } from 'vue';
 
 type ProjectOverview = {
   project?: ProjectModel;
   permissions?: ProjectPermissionsModel;
 };
 
-export default {
+export default defineComponent({
   name: 'ProjectOverviewView',
   components: { PermissionSettingsCardReadOnly },
   data(): ProjectOverview {
@@ -58,7 +59,7 @@ export default {
       return marked(txt);
     },
   },
-};
+});
 </script>
 
 <style scoped>

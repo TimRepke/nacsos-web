@@ -1,5 +1,5 @@
 /* eslint-disable max-classes-per-file, no-underscore-dangle, lines-between-class-members */
-import { AxiosResponse } from 'axios';
+import type { AxiosResponse } from 'axios';
 import { EventBus } from '@/plugins/events';
 import { ToastEvent } from '@/plugins/events/events/toast';
 

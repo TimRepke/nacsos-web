@@ -7,12 +7,13 @@
 <script lang="ts">
 import { currentProjectStore } from '@/stores';
 import { marked } from 'marked';
+import { defineComponent } from 'vue';
 
 type UserManagementViewData = {
   tmp: string;
 };
 
-export default {
+export default defineComponent({
   name: 'UserProfileView',
   data(): UserManagementViewData {
     return {
@@ -29,7 +30,7 @@ export default {
       return marked(txt);
     },
   },
-};
+});
 </script>
 
 <style scoped>

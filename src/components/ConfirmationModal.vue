@@ -38,10 +38,12 @@
 </template>
 
 <script lang="ts">
-import { ConfirmationRequestEvent, ConfirmationResponse } from '@/plugins/events/events/confirmation';
+import { ConfirmationRequestEvent } from '@/plugins/events/events/confirmation';
+import type { ConfirmationResponse } from '@/plugins/events/events/confirmation';
 import { marked } from 'marked';
+import { defineComponent } from 'vue';
 
-export default {
+export default defineComponent({
   name: 'ConfirmationModal',
   created() {
     this.$eventBus.on(ConfirmationRequestEvent, (event: ConfirmationRequestEvent) => {
@@ -72,7 +74,7 @@ export default {
       latestConfirmationRequest.callback(response);
     },
   },
-};
+});
 </script>
 
 <style>

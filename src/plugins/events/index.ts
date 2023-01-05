@@ -1,5 +1,5 @@
-import { App } from 'vue';
-import { BaseEvent } from '@/plugins/events/baseEvent';
+import type { App } from 'vue';
+import type { BaseEvent } from '@/plugins/events/baseEvent';
 
 // eslint-disable-next-line  @typescript-eslint/no-explicit-any
 type CallbackHandler = (payload: any) => void;

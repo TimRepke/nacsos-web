@@ -29,19 +29,20 @@
 </template>
 
 <script lang="ts">
-import { UserBaseModel } from '@/plugins/api/api-core';
+import type { UserBaseModel } from '@/plugins/api/api-core';
 import { currentProjectStore } from '@/stores';
 import { API } from '@/plugins/api';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { EventBus } from '@/plugins/events';
 import { ToastEvent } from '@/plugins/events/events/toast';
+import { defineComponent } from 'vue';
 
 type SearchData = {
   users: Array<UserBaseModel>;
   search: string;
 };
 
-export default {
+export default defineComponent({
   name: 'UserSearchBox',
   components: { FontAwesomeIcon },
   emits: ['userSelected'],
@@ -89,5 +90,5 @@ export default {
       return this.usernames.filter((user: { name: string, user_id: string }) => user.name.toLowerCase().indexOf(this.search) >= 0);
     },
   },
-};
+});
 </script>

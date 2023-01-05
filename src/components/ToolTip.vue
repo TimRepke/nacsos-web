@@ -16,9 +16,11 @@ TODO: make size adaptable to content
 TODO: make sure this works on mobile (or hints are hidden on mobile)
 TODO: should this always be a question mark or could it also be a lower-cased "i"?
 */
-export default {
+import { defineComponent } from 'vue';
+
+export default defineComponent({
   name: 'ToolTip',
-};
+});
 </script>
 
 <style scoped>

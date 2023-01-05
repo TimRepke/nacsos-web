@@ -29,8 +29,10 @@
 </template>
 
 <script lang="ts">
-import { ToastEvent, ToastType } from '@/plugins/events/events/toast';
+import { ToastEvent } from '@/plugins/events/events/toast';
+import type { ToastType } from '@/plugins/events/events/toast';
 import { marked } from 'marked';
+import { defineComponent } from 'vue';
 
 interface Toast {
   key: number;
@@ -53,7 +55,7 @@ const textColorClass = {
   WARN: 'text-dark',
   ERROR: 'text-white',
 };
-export default {
+export default defineComponent({
   name: 'ToastsViewer',
   created() {
     this.$eventBus.on(ToastEvent, (event: ToastEvent) => {
@@ -89,5 +91,5 @@ export default {
       }
     },
   },
-};
+});
 </script>

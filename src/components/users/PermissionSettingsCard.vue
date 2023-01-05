@@ -72,16 +72,18 @@
 </template>
 
 <script lang="ts">
-import { PropType } from 'vue';
-import { UserPermission } from '@/plugins/api/api-core';
+import type { PropType } from 'vue';
+import type { UserPermission } from '@/plugins/api/api-core';
 import ExpandableBox from '@/components/ExpandableBox.vue';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import { ProjectPermissionHints, PermissionPresets, Permissions, PermissionKeys } from '@/types/permissions';
+import { ProjectPermissionHints, PermissionPresets } from '@/types/permissions';
+import type { Permissions, PermissionKeys } from '@/types/permissions';
 import { EventBus } from '@/plugins/events';
 import { ToastEvent } from '@/plugins/events/events/toast';
 import { currentProjectStore } from '@/stores';
 import { API } from '@/plugins/api';
 import { ConfirmationRequestEvent } from '@/plugins/events/events/confirmation';
+import { defineComponent } from 'vue';
 
 type PermissionSettingsData = {
   permission: UserPermission;
@@ -89,7 +91,7 @@ type PermissionSettingsData = {
   hints: Record<PermissionKeys, string>;
 };
 
-export default {
+export default defineComponent({
   name: 'PermissionSettingsCard',
   components: { FontAwesomeIcon, ExpandableBox },
   emits: ['userDeleted', 'userSaved'],
@@ -116,7 +118,7 @@ export default {
     saveUser() {
       API.core.project.saveProjectPermissionApiProjectPermissionsPermissionPut({
         requestBody: this.permission,
-        xProjectId: currentProjectStore.projectId,
+        xProjectId: currentProjectStore.projectId as string,
       })
         .then(() => {
           this.$emit('userSaved', this.permission);
@@ -132,8 +134,8 @@ export default {
         (confirmationResponse) => {
           if (confirmationResponse === 'ACCEPT') {
             API.core.project.removeProjectPermissionApiProjectPermissionsPermissionDelete({
-              projectPermissionId: this.permission.project_permission_id,
-              xProjectId: currentProjectStore.projectId,
+              projectPermissionId: this.permission.project_permission_id as string,
+              xProjectId: currentProjectStore.projectId as string,
             })
               .then(() => {
                 this.$emit('userDeleted', this.permission);
@@ -149,5 +151,5 @@ export default {
       ));
     },
   },
-};
+});
 </script>

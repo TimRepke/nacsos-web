@@ -68,12 +68,12 @@ import { EventBus } from '@/plugins/events';
 import { ToastEvent } from '@/plugins/events/events/toast';
 import { ConfirmationRequestEvent } from '@/plugins/events/events/confirmation';
 import { currentProjectStore } from '@/stores';
-import { ref } from 'vue';
+import { defineComponent, ref } from 'vue';
 import AnnotationSchemeLabelsEditor from '@/components/annotations/AnnotationSchemeLabelsEditor.vue';
-import { AnnotationSchemeModel } from '@/plugins/api/api-core';
+import type { AnnotationSchemeModel } from '@/plugins/api/api-core';
 import { API } from '@/plugins/api';
 
-export default {
+export default defineComponent({
   name: 'AnnotationConfigEditView',
   components: { AnnotationSchemeLabelsEditor },
   data() {
@@ -97,7 +97,7 @@ export default {
     if (!this.isNewScheme) {
       API.core.annotations.getSchemeDefinitionApiAnnotationsSchemesDefinitionAnnotationSchemeIdGet({
         annotationSchemeId: this.annotationSchemeId,
-        xProjectId: currentProjectStore.projectId,
+        xProjectId: currentProjectStore.projectId as string,
         flat: false,
       })
         .then((response) => {
@@ -117,7 +117,7 @@ export default {
         (response) => {
           if (response === 'ACCEPT') {
             API.core.annotations.putAnnotationSchemeApiAnnotationsSchemesDefinitionPut({
-              xProjectId: currentProjectStore.projectId,
+              xProjectId: currentProjectStore.projectId as string,
               requestBody: this.scheme,
             })
               .then((res) => {
@@ -151,7 +151,7 @@ export default {
       return marked(this.scheme.description);
     },
   },
-};
+});
 </script>
 
 <style scoped>

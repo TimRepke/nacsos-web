@@ -5,14 +5,16 @@
 </template>
 
 <script lang="ts">
-export default {
+import { defineComponent } from 'vue';
+
+export default defineComponent({
   name: 'OverviewView',
   data() {
     return {
       // pass
     };
   },
-};
+});
 </script>
 
 <style scoped>

@@ -11,15 +11,16 @@
 
 <script lang="ts">
 import { currentProjectStore } from '@/stores';
+import { defineComponent } from 'vue';
 
-export default {
+export default defineComponent({
   name: 'AnnotationConfigsContainer',
   data() {
     return {
       projectPermissions: currentProjectStore.projectPermissions,
     };
   },
-};
+});
 </script>
 
 <style scoped>

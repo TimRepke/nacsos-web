@@ -20,14 +20,15 @@
 
 <script lang="ts">
 
-import { PropType } from 'vue';
+import type { PropType } from 'vue';
 import { EventBus } from '@/plugins/events';
 import { ToastEvent } from '@/plugins/events/events/toast';
-import { AssignmentModel, UserModel } from '@/plugins/api/api-core';
+import type { AssignmentModel, UserModel } from '@/plugins/api/api-core';
 import { API } from '@/plugins/api';
 import { currentProjectStore } from '@/stores';
+import { defineComponent } from 'vue';
 
-export default {
+export default defineComponent({
   name: 'AssignmentsVisualiser',
   props: {
     assignments: {
@@ -44,7 +45,7 @@ export default {
     };
   },
   computed: {
-    lookup() {
+    lookup(): Record<string, AssignmentModel[]> {
       const ret = this.itemIds.reduce((acc: { [key: string]: AssignmentModel[] }, itemId: string) => {
         acc[itemId] = [];
         return acc;
@@ -54,13 +55,13 @@ export default {
       });
       return ret;
     },
-    userIds() {
-      return [...new Set(this.assignments.map((assignment: AssignmentModel) => assignment.user_id))];
+    userIds(): Array<string> {
+      return [...new Set(this.assignments.map((assignment: AssignmentModel) => assignment.user_id))] as string[];
     },
-    itemIds() {
-      return [...new Set(this.assignments.map((assignment: AssignmentModel) => assignment.item_id))];
+    itemIds(): Array<string> {
+      return [...new Set(this.assignments.map((assignment: AssignmentModel) => assignment.item_id))] as string[];
     },
-    userLookup() {
+    userLookup(): Record<string, UserModel> {
       return this.users.reduce((acc: { [key: string]: UserModel }, user: UserModel) => {
         acc[user.user_id as string] = user;
         return acc;
@@ -98,7 +99,7 @@ export default {
       }
     },
   },
-};
+});
 </script>
 
 <style scoped>

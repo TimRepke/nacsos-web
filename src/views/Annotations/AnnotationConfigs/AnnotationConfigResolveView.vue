@@ -334,7 +334,7 @@
 
 <script lang="ts">
 import { currentProjectStore } from '@/stores';
-import {
+import type {
   AnnotationSchemeModel,
   AnnotationModel,
   FlattenedAnnotationSchemeLabel,
@@ -345,7 +345,8 @@ import {
   AnnotationCollection,
   Label,
   UserModel,
-  AnnotationCollectionDB, AnnotationSchemeLabelChoiceFlat,
+  AnnotationCollectionDB,
+  AnnotationSchemeLabelChoiceFlat,
 } from '@/plugins/api/api-core';
 import { API } from '@/plugins/api';
 import BoolLabel from '@/components/annotations/resolve/BoolLabel.vue';
@@ -355,6 +356,7 @@ import ToolTip from '@/components/ToolTip.vue';
 import { EventBus } from '@/plugins/events';
 import { ToastEvent } from '@/plugins/events/events/toast';
 import MultiLabel from '@/components/annotations/resolve/MultiLabel.vue';
+import { defineComponent } from 'vue';
 
 type LookupMatrix = Record<string, Record<string, { users: AnnotationModel[], bot: BotAnnotationModel | undefined }>>;
 type LabelLookupValue = {
@@ -387,7 +389,7 @@ type ResolveData = {
   itemIdSearch: string,
 };
 
-export default {
+export default defineComponent({
   name: 'AnnotationConfigResolveView',
   components: { MultiLabel, ToolTip, ItemModal, BoolLabel, ChoiceLabel },
   data(): ResolveData {
@@ -425,7 +427,7 @@ export default {
     if (!this.isNew && this.botAnnotationMetaDataId !== undefined) {
       API.core.annotations.getSavedResolvedAnnotationsApiAnnotationsConfigResolvedBotAnnotationMetaIdGet({
         botAnnotationMetadataId: this.botAnnotationMetaDataId,
-        xProjectId: currentProjectStore.projectId,
+        xProjectId: currentProjectStore.projectId as string,
       }).then((response) => {
         const { data } = response;
 
@@ -447,7 +449,7 @@ export default {
           // fetch `AssignmentScope`s for the current `AnnotationScheme`
           API.core.annotations.getAssignmentScopesForSchemeApiAnnotationsConfigScopesSchemeIdGet({
             schemeId,
-            xProjectId: currentProjectStore.projectId,
+            xProjectId: currentProjectStore.projectId as string,
           }).then((response) => {
             const { data } = response;
             this.assignmentScopes = data;
@@ -456,7 +458,7 @@ export default {
           // fetch `Users`s that created annotations linked to the current `AnnotationScheme`
           API.core.annotations.getAnnotatorsForSchemeApiAnnotationsConfigAnnotatorsSchemeIdGet({
             schemeId,
-            xProjectId: currentProjectStore.projectId,
+            xProjectId: currentProjectStore.projectId as string,
           }).then((response) => {
             const { data } = response;
             this.annotators = data;
@@ -465,7 +467,7 @@ export default {
           // fetch flattened annotation scheme
           API.core.annotations.getSchemeDefinitionApiAnnotationsSchemesDefinitionAnnotationSchemeIdGet({
             annotationSchemeId: schemeId,
-            xProjectId: currentProjectStore.projectId,
+            xProjectId: currentProjectStore.projectId as string,
             flat: true,
           }).then((response) => {
             const { data } = response;
@@ -534,8 +536,8 @@ export default {
     },
     fetchProjectSchemas() {
       API.core.annotations.getSchemeDefinitionsForProjectApiAnnotationsSchemesListProjectIdGet({
-        projectId: currentProjectStore.projectId,
-        xProjectId: currentProjectStore.projectId,
+        projectId: currentProjectStore.projectId as string,
+        xProjectId: currentProjectStore.projectId as string,
       }).then((response) => {
         const { data } = response;
         this.projectAnnotationSchemes = data;
@@ -555,7 +557,7 @@ export default {
       API.core.annotations.updateResolvedAnnotationsApiAnnotationsConfigResolveUpdatePut({
         botAnnotationMetadataId: this.botAnnotationMetaDataId,
         name: this.name,
-        xProjectId: currentProjectStore.projectId,
+        xProjectId: currentProjectStore.projectId as string,
         requestBody: this.flattenBotAnnotations(),
       });
     },
@@ -568,7 +570,7 @@ export default {
       const collection: AnnotationCollectionDB = JSON.parse(JSON.stringify(this.collection));
       collection.annotators = this.collection.annotators.map((user: UserModel) => user.user_id);
       API.core.annotations.saveResolvedAnnotationsApiAnnotationsConfigResolvePut({
-        xProjectId: currentProjectStore.projectId,
+        xProjectId: currentProjectStore.projectId as string,
         requestBody: {
           name: this.name,
           strategy: this.algorithm,
@@ -657,7 +659,7 @@ export default {
       return matrix;
     },
   },
-};
+});
 </script>
 
 <style scoped>

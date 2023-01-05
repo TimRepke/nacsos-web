@@ -36,10 +36,13 @@
 </template>
 
 <script lang="ts">
-import FilesUploader, { UploadFile } from '@/components/FilesUploader.vue';
-import { PropType } from 'vue';
-import { ImportConfigWoS } from '@/plugins/api/api-core';
-import useVuelidate, { BaseValidation, ValidationRule } from '@vuelidate/core';
+import type { PropType } from 'vue';
+import { defineComponent } from 'vue';
+import FilesUploader from '@/components/FilesUploader.vue';
+import type { UploadFile } from '@/components/FilesUploader.vue';
+import type { ImportConfigWoS } from '@/plugins/api/api-core';
+import useVuelidate from '@vuelidate/core';
+import type { BaseValidation, ValidationRule } from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
 
 const areFilesUploaded: ValidationRule = {
@@ -51,7 +54,7 @@ const areFilesUploaded: ValidationRule = {
   $message: 'Files not uploaded yet.',
 };
 
-export default {
+export default defineComponent({
   name: 'ConfigWoS',
   components: { FilesUploader },
   emits: ['configChanged'],
@@ -107,7 +110,7 @@ export default {
       this.config.filenames = (filenames.length === 0) ? undefined : filenames;
     },
   },
-};
+});
 </script>
 
 <style scoped>

@@ -37,8 +37,9 @@
 </template>
 
 <script lang="ts">
-import { PropType } from 'vue';
-import { TwitterItemModel, Hashtag, Mention, URL } from '@/plugins/api/api-core';
+import type { PropType } from 'vue';
+import type { TwitterItemModel, Hashtag, Mention, URL } from '@/plugins/api/api-core';
+import { defineComponent } from 'vue';
 
 interface Replacement {
   start: number;
@@ -46,7 +47,7 @@ interface Replacement {
   html: string;
 }
 
-export default {
+export default defineComponent({
   name: 'TwitterItem',
   props: {
     item: {
@@ -99,7 +100,7 @@ export default {
       return ret;
     },
   },
-};
+});
 </script>
 
 <style scoped>

@@ -74,11 +74,12 @@
 </template>
 
 <script lang="ts">
-import { PropType } from 'vue';
-import { AcademicAuthorModel, AcademicItemModel, AffiliationModel } from '@/plugins/api/api-core';
+import type { PropType } from 'vue';
+import type { AcademicAuthorModel, AcademicItemModel, AffiliationModel } from '@/plugins/api/api-core';
 import InlineToolTip from '@/components/InlineToolTip.vue';
+import { defineComponent } from 'vue';
 
-export default {
+export default defineComponent({
   name: 'AcademicItem',
   components: { InlineToolTip },
   props: {
@@ -105,7 +106,7 @@ export default {
       ).join(';');
     },
   },
-};
+});
 </script>
 
 <style scoped>

@@ -59,16 +59,17 @@
 
 <script lang="ts">
 
-import { UserModel } from '@/plugins/api/api-core';
+import type { UserModel } from '@/plugins/api/api-core';
 import { currentUserStore } from '@/stores';
 import { EventBus } from '@/plugins/events';
 import { LoggedOutEvent } from '@/plugins/events/events/auth';
+import { defineComponent } from 'vue';
 
-export default {
+export default defineComponent({
   name: 'TopBar',
   computed: {
     user(): UserModel {
-      return currentUserStore.user;
+      return currentUserStore.user as UserModel;
     },
   },
   methods: {
@@ -77,7 +78,7 @@ export default {
       EventBus.emit(new LoggedOutEvent());
     },
   },
-};
+});
 </script>
 
 <style scoped>

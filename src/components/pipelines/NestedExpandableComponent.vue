@@ -37,11 +37,12 @@
 </template>
 
 <script lang="ts">
-import { PropType } from 'vue';
-import { NestedLibrary } from '@/types/pipelines.d';
-import { FunctionInfo } from '@/plugins/api/api-pipe';
+import type { PropType } from 'vue';
+import type { NestedLibrary } from '@/types/pipelines.d';
+import type { FunctionInfo } from '@/plugins/api/api-pipe';
+import { defineComponent } from 'vue';
 
-export default {
+export default defineComponent({
   name: 'NestedExpandableComponent',
   emits: {
     showInfo: (info: FunctionInfo) => info,
@@ -59,7 +60,7 @@ export default {
       opened: Object.fromEntries(Object.keys(this.tree).map((key: string) => [key, true])),
     };
   },
-};
+});
 </script>
 
 <style scoped>

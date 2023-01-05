@@ -46,8 +46,9 @@
 import NacsosLogo from '@/components/NacsosLogo.vue';
 import { EventBus } from '@/plugins/events';
 import { AuthFailedEvent, UserLoginEvent, LoginSuccessEvent } from '@/plugins/events/events/auth';
+import { defineComponent } from 'vue';
 
-export default {
+export default defineComponent({
   name: 'LoginView',
   components: { NacsosLogo },
   data() {
@@ -71,7 +72,7 @@ export default {
       });
     },
   },
-};
+});
 </script>
 
 <style scoped>

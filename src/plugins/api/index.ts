@@ -1,13 +1,13 @@
-import { App } from 'vue';
+import type { App } from 'vue';
 import { CoreClient } from './api-core';
 import { PipelinesClient } from './api-pipe';
 
 const API = {
   pipe: new PipelinesClient({
-    BASE: process.env.VUE_APP_NACSOS_PIPE_URL,
+    BASE: import.meta.env.VITE_NACSOS_PIPE_URL,
   }),
   core: new CoreClient({
-    BASE: process.env.VUE_APP_NACSOS_CORE_URL,
+    BASE: import.meta.env.VITE_NACSOS_CORE_URL,
   }),
 };
 

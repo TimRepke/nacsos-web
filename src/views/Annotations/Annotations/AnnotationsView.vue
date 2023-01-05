@@ -73,16 +73,17 @@ import AnyItemComponent from '@/components/items/AnyItem.vue';
 import AnnotationLabels from '@/components/annotations/AnnotationLabels.vue';
 import { EventBus } from '@/plugins/events';
 import { ToastEvent } from '@/plugins/events/events/toast';
-import {
+import type {
   AnnotationItem,
   AnnotationSchemeLabel,
   AnnotationSchemeModel,
   AssignmentModel,
   AssignmentScopeModel,
 } from '@/plugins/api/api-core';
-import { AnyItem } from '@/types/items.d';
+import type { AnyItem } from '@/types/items.d';
 import { API, ignore } from '@/plugins/api';
 import { currentProjectStore } from '@/stores';
+import { defineComponent } from 'vue';
 
 const motivationalQuotes = [
   // https://www.howmuchisthefish.de/
@@ -123,7 +124,7 @@ type AnnotationsViewData = {
   rerenderCounter: number; // this is a hack to force-update the AnnotationLabels-component
 };
 
-export default {
+export default defineComponent({
   name: 'AnnotationsView',
   components: { AnnotationLabels, AnyItemComponent },
   data(): AnnotationsViewData {
@@ -285,7 +286,7 @@ export default {
       await this.save();
 
       API.core.annotations.getAssignmentApiAnnotationsAnnotateAssignmentAssignmentIdGet({
-        xProjectId: currentProjectStore.projectId,
+        xProjectId: currentProjectStore.projectId as string,
         assignmentId: targetAssignmentId,
       })
         .then((response) => { this.setCurrentAssignment(response.data); })
@@ -312,7 +313,7 @@ export default {
       return `col-md-${this.sidebarWidth}`;
     },
   },
-};
+});
 </script>
 
 <style scoped>

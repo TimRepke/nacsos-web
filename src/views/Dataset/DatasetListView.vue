@@ -146,18 +146,19 @@
 <script lang="ts">
 import { currentProjectStore } from '@/stores';
 import AnyItemComponent from '@/components/items/AnyItem.vue';
-import { useOffsetPagination, UseOffsetPaginationReturn } from '@vueuse/core';
+import { useOffsetPagination } from '@vueuse/core';
+import type { UseOffsetPaginationReturn } from '@vueuse/core';
 import ClosablePill from '@/components/ClosablePill.vue';
-import { reactive } from 'vue';
-import { AnyItem } from '@/types/items.d';
+import { defineComponent, reactive } from 'vue';
+import type { AnyItem } from '@/types/items.d';
 import { API, toastReject } from '@/plugins/api';
 
-export default {
+export default defineComponent({
   name: 'ProjectDataView',
   components: { ClosablePill, AnyItemComponent },
   data() {
     return {
-      projectType: currentProjectStore.project.type,
+      projectType: currentProjectStore.project?.type,
       itemList: [] as AnyItem[],
       showSearchBar: true,
       navPagesWindowSize: 3,
@@ -185,10 +186,10 @@ export default {
   methods: {
     fetchData({ currentPage, currentPageSize }: UseOffsetPaginationReturn): void {
       API.core.project.listProjectDataPagedApiProjectItemsItemTypeListPagePageSizeGet({
-        xProjectId: currentProjectStore.projectId,
+        xProjectId: currentProjectStore.projectId as string,
         page: this.pagination.currentPage,
         pageSize: this.pagination.currentPageSize,
-        itemType: currentProjectStore.project.type,
+        itemType: currentProjectStore.project!.type,
       })
         .then((response) => {
           this.itemList = response.data;
@@ -209,7 +210,7 @@ export default {
       return [...this.$util.range(start, end)];
     },
   },
-};
+});
 </script>
 
 <style scoped>

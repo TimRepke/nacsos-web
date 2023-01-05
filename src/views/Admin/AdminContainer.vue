@@ -11,19 +11,20 @@
 
 <script lang="ts">
 import { currentUserStore } from '@/stores';
-import { UserModel } from '@/plugins/api/api-core';
+import type { UserModel } from '@/plugins/api/api-core';
+import { defineComponent } from 'vue';
 
 type AdminContainerData = {
   user: UserModel,
 };
-export default {
+export default defineComponent({
   name: 'AdminContainer',
   data(): AdminContainerData {
     return {
       user: currentUserStore.user as UserModel,
     };
   },
-};
+});
 </script>
 
 <style scoped>

@@ -162,14 +162,16 @@ import { EventBus } from '@/plugins/events';
 import { ConfirmationRequestEvent } from '@/plugins/events/events/confirmation';
 import AssignmentsVisualiser from '@/components/annotations/assignments/AssignmentsVisualiser.vue';
 import { ToastEvent } from '@/plugins/events/events/toast';
-import {
+import type {
   AssignmentCounts,
   AssignmentModel,
   AssignmentScopeModel,
   AssignmentScopeRandomConfig,
   UserModel,
 } from '@/plugins/api/api-core';
-import { API, ApiResponseReject } from '@/plugins/api';
+import { API } from '@/plugins/api';
+import type { ApiResponseReject } from '@/plugins/api';
+import { defineComponent } from 'vue';
 import { currentProjectStore } from '@/stores';
 
 type AssignmentScopeConfigData = {
@@ -191,7 +193,7 @@ type AssignmentScopeConfigData = {
   assignmentScope: AssignmentScopeModel;
 };
 
-export default {
+export default defineComponent({
   name: 'AssignmentScopeConfigView',
   components: { AssignmentsVisualiser, RandomAssignmentConfig },
   data(): AssignmentScopeConfigData {
@@ -223,11 +225,11 @@ export default {
     if (!this.isNewScope) {
       Promise.allSettled([
         API.core.annotations.getAssignmentScopeApiAnnotationsAnnotateScopeAssignmentScopeIdGet({
-          xProjectId: currentProjectStore.projectId,
+          xProjectId: currentProjectStore.projectId as string,
           assignmentScopeId: this.scopeId,
         }),
         API.core.annotations.getNumAssignmentsForScopeApiAnnotationsAnnotateScopeCountsAssignmentScopeIdGet({
-          xProjectId: currentProjectStore.projectId,
+          xProjectId: currentProjectStore.projectId as string,
           assignmentScopeId: this.scopeId,
         }),
       ])
@@ -242,7 +244,7 @@ export default {
           if (this.assignmentScope.config?.users?.length > 0) {
             this.strategyConfigType = this.assignmentScope.config.config_type;
             API.core.users.getUsersByIdsApiUsersDetailsGet({
-              xProjectId: currentProjectStore.projectId,
+              xProjectId: currentProjectStore.projectId as string,
               userId: this.assignmentScope.config.users,
             })
               .then((response) => {
@@ -280,7 +282,7 @@ export default {
               payload.config.users = this.selectedUserIds;
 
               API.core.annotations.makeAssignmentsApiAnnotationsConfigAssignmentsPost({
-                xProjectId: currentProjectStore.projectId,
+                xProjectId: currentProjectStore.projectId as string,
                 requestBody: payload,
               })
                 .then((res) => {
@@ -314,7 +316,7 @@ export default {
               scope.config.users = this.selectedUserIds;
             }
             API.core.annotations.putAssignmentScopeApiAnnotationsAnnotateScopePut({
-              xProjectId: currentProjectStore.projectId,
+              xProjectId: currentProjectStore.projectId as string,
               requestBody: scope,
             })
               .then((res) => {
@@ -346,14 +348,14 @@ export default {
     loadResults() {
       if (this.assignmentScope.assignment_scope_id) {
         API.core.annotations.getNumAssignmentsForScopeApiAnnotationsAnnotateScopeCountsAssignmentScopeIdGet({
-          xProjectId: currentProjectStore.projectId,
+          xProjectId: currentProjectStore.projectId as string,
           assignmentScopeId: this.assignmentScope.assignment_scope_id,
         })
           .then((result) => { this.assignmentCounts = result.data; })
           .catch(() => { EventBus.emit(new ToastEvent('ERROR', 'Failed to load assignment counts.')); });
 
         API.core.annotations.getAssignmentsForScopeApiAnnotationsAnnotateAssignmentsScopeAssignmentScopeIdGet({
-          xProjectId: currentProjectStore.projectId,
+          xProjectId: currentProjectStore.projectId as string,
           assignmentScopeId: this.assignmentScope.assignment_scope_id,
         })
           .then((result) => { this.assignments = result.data; })
@@ -363,8 +365,8 @@ export default {
     async loadListOfUsers() {
       this.users = undefined;
       API.core.users.getProjectUsersApiUsersListProjectProjectIdGet({
-        xProjectId: currentProjectStore.projectId,
-        projectId: currentProjectStore.projectId,
+        xProjectId: currentProjectStore.projectId as string,
+        projectId: currentProjectStore.projectId as string,
       })
         .then((response) => { this.users = response.data; })
         .catch(() => { EventBus.emit(new ToastEvent('WARN', 'Failed to load list of users.')); });
@@ -408,7 +410,7 @@ export default {
       return !!this.assignmentCounts && this.assignmentCounts.num_total > 0;
     },
   },
-};
+});
 </script>
 
 <style scoped>

@@ -115,17 +115,18 @@
 </template>
 
 <script lang="ts">
-import { PropType } from 'vue';
-import {
+import type { PropType } from 'vue';
+import type {
   ArtefactCallback,
   TaskConfig as TaskConfigInterface,
 } from '@/types/pipelines.d';
 import { isArtefactOrSerializedArtefact, isFunctionInfo } from '@/util/typeChecks';
 import { currentProjectStore, currentUserStore } from '@/stores';
 import InlineToolTip from '@/components/InlineToolTip.vue';
-import { FunctionInfo, SerializedArtefact, KWARG, ArtefactReference } from '@/plugins/api/api-pipe';
+import type { FunctionInfo, SerializedArtefact, KWARG, ArtefactReference } from '@/plugins/api/api-pipe';
+import { defineComponent } from 'vue';
 
-export default {
+export default defineComponent({
   name: 'TaskConfig',
   components: { InlineToolTip },
   emits: {
@@ -142,7 +143,7 @@ export default {
   data() {
     return {
       currentProjectId: currentProjectStore.projectId,
-      currentUserId: currentUserStore.user.user_id,
+      currentUserId: currentUserStore.user?.user_id,
       expanded: true,
       taskParams: Object.fromEntries(Object.entries(this.config.info.kwargs).map((entry) => {
         const [key, dtype] = entry as [string, KWARG];
@@ -221,7 +222,7 @@ export default {
       ]);
     },
   },
-};
+});
 </script>
 
 <style scoped>

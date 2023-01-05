@@ -29,10 +29,11 @@
 <script lang="ts">
 import { currentProjectStore } from '@/stores';
 import InlineToolTip from '@/components/InlineToolTip.vue';
-import { UserProjectAssignmentScope } from '@/plugins/api/api-core';
+import type { UserProjectAssignmentScope } from '@/plugins/api/api-core';
 import { API, ignore } from '@/plugins/api';
+import { defineComponent } from 'vue';
 
-export default {
+export default defineComponent({
   name: 'AssignmentScopesView',
   components: { InlineToolTip },
   data() {
@@ -42,8 +43,8 @@ export default {
   },
   async mounted() {
     API.core.annotations.getAssignmentScopesForUserApiAnnotationsAnnotateScopesProjectIdGet({
-      projectId: currentProjectStore.projectId,
-      xProjectId: currentProjectStore.projectId,
+      projectId: currentProjectStore.projectId as string,
+      xProjectId: currentProjectStore.projectId as string,
     })
       .then((response) => { this.annotationScopes = response.data; })
       .catch(ignore);
@@ -51,7 +52,7 @@ export default {
   methods: {
     // none
   },
-};
+});
 </script>
 
 <style scoped>

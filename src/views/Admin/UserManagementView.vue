@@ -122,7 +122,8 @@
 import { API } from '@/plugins/api';
 import { EventBus } from '@/plugins/events';
 import { ToastEvent } from '@/plugins/events/events/toast';
-import { UserBaseModel } from '@/plugins/api/api-core';
+import type { UserBaseModel } from '@/plugins/api/api-core';
+import { defineComponent } from 'vue';
 
 type UserModel = UserBaseModel & {
   password?: string,
@@ -134,7 +135,7 @@ type UserManagementViewData = {
   users: Array<UserModel>;
 };
 
-export default {
+export default defineComponent({
   name: 'UserManagementView',
   data(): UserManagementViewData {
     return {
@@ -193,7 +194,7 @@ export default {
         + Math.random().toString(36).slice(2);
     },
   },
-};
+});
 </script>
 
 <style scoped>

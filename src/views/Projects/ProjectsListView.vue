@@ -11,10 +11,11 @@
 <script lang="ts">
 import { EventBus } from '@/plugins/events';
 import { CurrentProjectSelectedEvent, CurrentProjectSetEvent } from '@/plugins/events/events/projects';
-import { ProjectModel } from '@/plugins/api/api-core';
+import type { ProjectModel } from '@/plugins/api/api-core';
 import { API, toastReject } from '@/plugins/api';
+import { defineComponent } from 'vue';
 
-export default {
+export default defineComponent({
   name: 'ProjectListView',
   data() {
     return {
@@ -37,7 +38,7 @@ export default {
       });
     },
   },
-};
+});
 </script>
 
 <style scoped>

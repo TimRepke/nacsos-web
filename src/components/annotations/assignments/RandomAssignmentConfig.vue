@@ -62,10 +62,11 @@
 </template>
 
 <script lang="ts">
-import { AssignmentScopeRandomConfig } from '@/plugins/api/api-core';
-import { PropType } from 'vue';
+import type { AssignmentScopeRandomConfig } from '@/plugins/api/api-core';
+import { defineComponent } from 'vue';
+import type { PropType } from 'vue';
 
-export default {
+export default defineComponent({
   name: 'RandomAssignmentConfig',
   emits: ['configChanged'],
   props: {
@@ -102,7 +103,7 @@ export default {
       deep: true,
     },
   },
-};
+});
 </script>
 
 <style scoped>

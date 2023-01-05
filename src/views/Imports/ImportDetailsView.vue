@@ -90,11 +90,12 @@
 </template>
 
 <script lang="ts">
-import { Component } from 'vue';
+import type { Component } from 'vue';
 import { ToastEvent } from '@/plugins/events/events/toast';
 import { EventBus } from '@/plugins/events';
-import { CompatibilityMapping, ComponentMapping } from '@/types/imports.d';
-import { ImportModel, ImportType, ItemType, ProjectModel, ProjectPermissionsModel } from '@/plugins/api/api-core';
+import type { CompatibilityMapping, ComponentMapping } from '@/types/imports.d';
+import { ImportType, ItemType } from '@/plugins/api/api-core';
+import type { ImportModel, ProjectModel, ProjectPermissionsModel } from '@/plugins/api/api-core';
 import ConfigTwitter from '@/components/imports/ConfigTwitter.vue';
 import ConfigJSONL from '@/components/imports/ConfigJSONL.vue';
 import ConfigWoS from '@/components/imports/ConfigWoS.vue';
@@ -102,6 +103,7 @@ import ConfigRIS from '@/components/imports/ConfigRIS.vue';
 import { currentProjectStore, currentUserStore } from '@/stores';
 import { ConfirmationRequestEvent } from '@/plugins/events/events/confirmation';
 import { API, logReject, toastReject } from '@/plugins/api';
+import { defineComponent } from 'vue';
 
 type ImportConfig = ImportModel['config'];
 
@@ -136,7 +138,7 @@ type ImportDetails = {
   }
 };
 
-export default {
+export default defineComponent({
   name: 'ImportDetailsView',
   components: { ConfigRIS, ConfigJSONL, ConfigTwitter },
   data(): ImportDetails {
@@ -261,7 +263,7 @@ export default {
       );
     },
   },
-};
+});
 </script>
 
 <style scoped>

@@ -49,8 +49,9 @@ import ToastsViewer from '@/components/ToastsViewer.vue';
 import ConfirmationModal from '@/components/ConfirmationModal.vue';
 import { currentProjectStore, currentUserStore } from '@/stores';
 import { isOnRoute } from '@/util';
+import { defineComponent } from 'vue';
 
-export default {
+export default defineComponent({
   components: {
     NacsosLogo,
     ConfirmationModal,
@@ -76,7 +77,7 @@ export default {
       return currentUserStore.isLoggedIn;
     },
   },
-};
+});
 </script>
 
 <style lang="scss">

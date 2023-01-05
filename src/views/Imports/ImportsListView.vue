@@ -54,14 +54,15 @@
 </template>
 
 <script lang="ts">
-import { ImportModel } from '@/plugins/api/api-core';
+import type { ImportModel } from '@/plugins/api/api-core';
 import InlineToolTip from '@/components/InlineToolTip.vue';
 import { EventBus } from '@/plugins/events';
 import { ToastEvent } from '@/plugins/events/events/toast';
 import { currentProjectStore } from '@/stores';
 import { API, toastReject } from '@/plugins/api';
+import { defineComponent } from 'vue';
 
-export default {
+export default defineComponent({
   name: 'ProjectListView',
   components: { InlineToolTip },
   data() {
@@ -71,7 +72,7 @@ export default {
   },
   async mounted() {
     API.core.imports.getAllImportsForProjectApiImportsListGet({
-      xProjectId: currentProjectStore.projectId,
+      xProjectId: currentProjectStore.projectId as string,
     })
       .then((response) => { this.imports = response.data; })
       .catch(toastReject);
@@ -93,7 +94,7 @@ export default {
       EventBus.emit(new ToastEvent('WARN', 'Not implemented yet, sorry.'));
     },
   },
-};
+});
 </script>
 
 <style scoped>

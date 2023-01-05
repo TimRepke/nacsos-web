@@ -194,10 +194,11 @@ import TaskConfigComponent from '@/components/pipelines/TaskConfig.vue';
 import { ConfirmationRequestEvent } from '@/plugins/events/events/confirmation';
 import { currentProjectStore, currentUserStore } from '@/stores';
 import { API, toastReject } from '@/plugins/api';
-import { FunctionInfo, SerializedArtefact, TaskInDB, ArtefactReference } from '@/plugins/api/api-pipe';
-import { ArtefactCallback, TaskConfig, NestedLibrary } from '@/types/pipelines.d';
+import type { FunctionInfo, SerializedArtefact, TaskInDB, ArtefactReference } from '@/plugins/api/api-pipe';
+import type { ArtefactCallback, TaskConfig, NestedLibrary } from '@/types/pipelines.d';
+import { defineComponent } from 'vue';
 
-export default {
+export default defineComponent({
   name: 'PipelinesSetupView',
   components: { TaskConfigComponent, NestedExpandableComponent },
   data() {
@@ -267,7 +268,7 @@ export default {
           function_name: `${info.module}.${info.function}`,
           force_run: false,
           params: {},
-          user_id: currentUserStore.user.user_id,
+          user_id: currentUserStore.user?.user_id,
           project_id: currentProjectStore.projectId,
         },
         info,
@@ -338,7 +339,7 @@ export default {
       return ret;
     },
   },
-};
+});
 </script>
 
 <style scoped>
