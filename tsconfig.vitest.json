@@ -21,13 +21,15 @@
     ],
     "types": [
       "node",
-      "jsdom"
+      "jsdom",
+      "vite/client"
     ],
     "target": "esnext",
     "module": "esnext",
     "jsx": "preserve",
     "moduleResolution": "node",
     "skipLibCheck": true,
+    "strictNullChecks": true,
     "esModuleInterop": true,
     "noImplicitAny": true,
     "noImplicitThis": false,
@@ -42,5 +44,8 @@
         "src/*"
       ]
     }
+  },
+  "vueCompilerOptions": {
+    "skipTemplateCodegen": true
   }
 }
