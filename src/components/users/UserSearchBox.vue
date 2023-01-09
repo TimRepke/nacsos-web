@@ -64,13 +64,13 @@ export default defineComponent({
   mounted() {
     if (this.projectId) {
       API.core.users.getProjectUsersApiUsersListProjectProjectIdGet({
-        xProjectId: currentProjectStore.projectId,
-        projectId: currentProjectStore.projectId,
+        xProjectId: currentProjectStore.projectId as string,
+        projectId: currentProjectStore.projectId as string,
       })
         .then((response) => { this.users = response.data; })
         .catch(() => { EventBus.emit(new ToastEvent('WARN', 'Failed to load list of users.')); });
     } else {
-      API.core.users.getAllUsersApiUsersListAllGet({ xProjectId: currentProjectStore.projectId })
+      API.core.users.getAllUsersApiUsersListAllGet({ xProjectId: currentProjectStore.projectId as string })
         .then((response) => { this.users = response.data; })
         .catch(() => { EventBus.emit(new ToastEvent('WARN', 'Failed to load list of users.')); });
     }
@@ -79,7 +79,7 @@ export default defineComponent({
     usernames(): Array<{ name: string, user_id: string }> {
       return this.users.map((user: UserBaseModel) => ({
         name: `${user.username} (${user.full_name} | ${user.email} | ${user.affiliation})`,
-        user_id: user.user_id,
+        user_id: user.user_id as string,
       }));
     },
     userLookup(): Record<string, UserBaseModel> {

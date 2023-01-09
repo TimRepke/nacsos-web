@@ -6,7 +6,7 @@
 import type { AnyItem } from '@/types/items.d';
 import type { PropType, Component } from 'vue';
 import { useCurrentProjectStore } from '@/stores/CurrentProjectStore';
-import type { ItemType } from '@/plugins/api/api-core';
+import type { ItemType, ProjectModel } from '@/plugins/api/api-core';
 import { defineAsyncComponent, defineComponent, markRaw } from 'vue';
 
 type TypeMapType = { [key in ItemType]: Component };
@@ -28,9 +28,9 @@ export default defineComponent({
       patents: markRaw(defineAsyncComponent(() => import('@/components/items/GenericItem.vue'))), // FIXME: replace with correct component
     };
     const store = useCurrentProjectStore();
-    const { type } = store.project;
+    const { type } = store.project as ProjectModel;
     return {
-      component: typeMap[type],
+      component: typeMap[type as ItemType] as Component,
     };
   },
 });

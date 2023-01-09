@@ -31,7 +31,7 @@
                     class="form-check-input"
                     type="checkbox"
                     role="switch"
-                    aria-checked="undefined"
+                    :aria-checked="undefined"
                     :id="`active-${user.user_id}`"
                     v-model="user.is_active" />
                 </div>

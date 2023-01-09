@@ -175,8 +175,8 @@ import { defineComponent } from 'vue';
 import { currentProjectStore } from '@/stores';
 
 type AssignmentScopeConfigData = {
-  scopeId: string;
-  annotationSchemeId: string;
+  scopeId?: string;
+  annotationSchemeId?: string;
   // list of all users in the system
   users: UserModel[];
   // search query for filtering list of users
@@ -190,15 +190,15 @@ type AssignmentScopeConfigData = {
   // holds the assignment counts (or undefined if none exist)
   assignmentCounts?: AssignmentCounts;
   assignments: AssignmentModel[];
-  assignmentScope: AssignmentScopeModel;
+  assignmentScope: Partial<AssignmentScopeModel>;
 };
 
 export default defineComponent({
   name: 'AssignmentScopeConfigView',
   components: { AssignmentsVisualiser, RandomAssignmentConfig },
   data(): AssignmentScopeConfigData {
-    const scopeId = this.$route.params.scope_id;
-    const annotationSchemeId = this.$route.query.annotation_scheme_id;
+    const scopeId = this.$route.params.scope_id as string | undefined;
+    const annotationSchemeId = this.$route.query.annotation_scheme_id as string | undefined;
 
     return {
       scopeId,
@@ -208,7 +208,7 @@ export default defineComponent({
       selectedUsers: [],
       strategyConfigType: undefined,
       // indicates whether this is (or will be) a newly created scope
-      isNewScope: !scopeId && annotationSchemeId,
+      isNewScope: !scopeId && !!annotationSchemeId,
       // holds the assignment counts (or undefined if none exist)
       assignmentCounts: undefined,
       assignments: [],
@@ -226,11 +226,11 @@ export default defineComponent({
       Promise.allSettled([
         API.core.annotations.getAssignmentScopeApiAnnotationsAnnotateScopeAssignmentScopeIdGet({
           xProjectId: currentProjectStore.projectId as string,
-          assignmentScopeId: this.scopeId,
+          assignmentScopeId: this.scopeId as string,
         }),
         API.core.annotations.getNumAssignmentsForScopeApiAnnotationsAnnotateScopeCountsAssignmentScopeIdGet({
           xProjectId: currentProjectStore.projectId as string,
-          assignmentScopeId: this.scopeId,
+          assignmentScopeId: this.scopeId as string,
         }),
       ])
         .then(([scopePromise, countsPromise]) => {
@@ -241,11 +241,11 @@ export default defineComponent({
             EventBus.emit(new ToastEvent('ERROR', 'Failed to load assignment scope info. Please try reloading.'));
           }
 
-          if (this.assignmentScope.config?.users?.length > 0) {
-            this.strategyConfigType = this.assignmentScope.config.config_type;
+          if ((this.assignmentScope.config?.users || []).length > 0) {
+            this.strategyConfigType = this.assignmentScope.config!.config_type;
             API.core.users.getUsersByIdsApiUsersDetailsGet({
               xProjectId: currentProjectStore.projectId as string,
-              userId: this.assignmentScope.config.users,
+              userId: this.assignmentScope.config!.users as string[],
             })
               .then((response) => {
                 this.selectedUsers = response.data;
@@ -274,8 +274,8 @@ export default defineComponent({
           (response) => {
             if (response === 'ACCEPT') {
               const payload = {
-                annotation_scheme_id: this.assignmentScope.annotation_scheme_id,
-                scope_id: this.assignmentScope.assignment_scope_id,
+                annotation_scheme_id: this.assignmentScope.annotation_scheme_id as string,
+                scope_id: this.assignmentScope.assignment_scope_id as string,
                 save: true,
                 config: JSON.parse(JSON.stringify(this.assignmentScope.config)),
               };
@@ -363,7 +363,7 @@ export default defineComponent({
       }
     },
     async loadListOfUsers() {
-      this.users = undefined;
+      this.users = [];
       API.core.users.getProjectUsersApiUsersListProjectProjectIdGet({
         xProjectId: currentProjectStore.projectId as string,
         projectId: currentProjectStore.projectId as string,
@@ -377,14 +377,15 @@ export default defineComponent({
       }
     },
     unselectUser(user: UserModel) {
-      const userIndex = this.selectedUserIds.indexOf(user.user_id);
+      const userIndex = this.selectedUserIds.indexOf(user.user_id as string);
       this.selectedUsers.splice(userIndex, 1);
     },
     updateConfig(eventPayload: AssignmentScopeRandomConfig.config_type | undefined) { // FIXME
+      // @ts-ignore FIXME
       this.assignmentScope.config = eventPayload;
     },
     isSelected(user: UserModel) {
-      return this.selectedUserIds.indexOf(user.user_id) >= 0;
+      return this.selectedUserIds.indexOf(user.user_id as string) >= 0;
     },
   },
   computed: {
@@ -398,12 +399,12 @@ export default defineComponent({
     },
     selectedUserIds(): string[] {
       if (this.selectedUsers && this.selectedUsers.length > 0) {
-        return this.selectedUsers.map((user: UserModel) => user.user_id);
+        return this.selectedUsers.map((user: UserModel) => user.user_id as string);
       }
       return [];
     },
     statsLoaded(): boolean {
-      return this.assignments && this.assignments.length > 0 && this.assignmentCounts;
+      return (this.assignments || []).length > 0 && this.assignmentCounts !== undefined;
     },
     // indicates whether assignments were already performed in this scope
     scopeHasAssignments(): boolean {

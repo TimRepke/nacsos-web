@@ -146,11 +146,11 @@ export default defineComponent({
     const userId = currentUserStore.user?.user_id;
 
     return {
-      importId,
+      importId: importId as string | undefined,
       isNewImport: !importId,
       importStarted: false,
-      currentProject: currentProjectStore.project,
-      projectPermissions: currentProjectStore.projectPermissions,
+      currentProject: currentProjectStore.project as ProjectModel,
+      projectPermissions: currentProjectStore.projectPermissions as ProjectPermissionsModel,
       importDetails: {
         project_id: currentProjectStore.projectId,
         user_id: userId,
@@ -168,7 +168,7 @@ export default defineComponent({
     if (this.importId) {
       API.core.imports.getImportDetailsApiImportsImportImportIdGet({
         importId: this.importId,
-        xProjectId: currentProjectStore.projectId,
+        xProjectId: currentProjectStore.projectId as string,
       })
         .then((response) => { this.importDetails = response.data; })
         .catch(toastReject);
@@ -185,8 +185,9 @@ export default defineComponent({
         (confirmationResponse) => {
           if (confirmationResponse === 'ACCEPT') {
             API.core.imports.putImportDetailsApiImportsImportPut({
+              // @ts-ignore
               requestBody: this.importDetails,
-              xProjectId: currentProjectStore.projectId,
+              xProjectId: currentProjectStore.projectId as string,
             })
               .then((response) => {
                 EventBus.emit(new ToastEvent('SUCCESS', `Saved import settings.  \n**ID:** ${response.data}`));
@@ -217,8 +218,8 @@ export default defineComponent({
         (response) => {
           if (response === 'ACCEPT') {
             API.core.imports.triggerImportApiImportsImportImportIdPost({
-              importId: this.importId,
-              xProjectId: currentProjectStore.projectId,
+              importId: this.importId as string,
+              xProjectId: currentProjectStore.projectId as string,
             })
               .then(() => {
                 EventBus.emit(new ToastEvent('SUCCESS', 'Probably submitted an import job, may now take a while.'));
@@ -238,8 +239,8 @@ export default defineComponent({
     },
     async loadImportStats() {
       API.core.imports.getImportCountsApiImportsImportImportIdCountGet({
-        importId: this.importId,
-        xProjectId: currentProjectStore.projectId,
+        importId: this.importId as string,
+        xProjectId: currentProjectStore.projectId as string,
       })
         .then((response) => { this.importStats.numItems = response.data; })
         .catch(logReject);
@@ -252,10 +253,11 @@ export default defineComponent({
       }
       return undefined;
     },
-    compatibleImportTypes() {
-      const projectType: ItemType = this.currentProject.type;
+    compatibleImportTypes(): Record<string, [string, Component]> {
+      const projectType: ItemType = this.currentProject.type as ItemType;
       const compatibleTypes = projectTypeImportTypeCompatibility[projectType];
 
+      // @ts-ignore FIXME
       return Object.fromEntries(
         compatibleTypes
           .filter((importType: ImportType) => importType in type2component)

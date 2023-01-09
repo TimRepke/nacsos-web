@@ -76,7 +76,7 @@ export default defineComponent({
   methods: {
     fetchUserInfos() {
       API.core.users.getUsersByIdsApiUsersDetailsGet({
-        xProjectId: currentProjectStore.projectId,
+        xProjectId: currentProjectStore.projectId as string,
         userId: this.userIds,
       })
         .then((result) => { this.users = result.data; })

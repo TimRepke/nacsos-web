@@ -87,7 +87,7 @@ export default defineComponent({
       min_assignments_per_item: 2,
       max_assignments_per_item: 3,
       random_seed: 10829,
-    };
+    } as AssignmentScopeRandomConfig;
     if (!this.existingConfig) {
       this.$emit('configChanged', config);
     }

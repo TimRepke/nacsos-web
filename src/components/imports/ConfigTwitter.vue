@@ -257,7 +257,7 @@ export default defineComponent({
       sort_order: 'recency',
       start_time: undefined,
       end_time: undefined,
-    };
+    } as ImportConfigTwitter;
     if (!this.existingConfig) {
       this.$emit('configChanged', config);
     }

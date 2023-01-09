@@ -247,7 +247,7 @@
                   placeholder="Filter item_id"
                   v-model="itemIdSearch" />
               </th>
-              <th v-for="label in collection.labels" :key="label" class="text-end">
+              <th v-for="label in collection.labels" :key="label2string(label)" class="text-end">
                 <div v-for="skey in label.slice().reverse()" :key="skey.key" class="nacsos-tooltip label-pill m-1">
                   <span>{{ skey.key }}</span>
                   <span>{{ skey.repeat }}</span>
@@ -339,15 +339,15 @@ import type {
   AnnotationModel,
   FlattenedAnnotationSchemeLabel,
   AssignmentScopeModel,
-  BotMetaResolve,
   BotAnnotationModel,
   AnnotationFilters,
-  AnnotationCollection,
   Label,
   UserModel,
   AnnotationCollectionDB,
   AnnotationSchemeLabelChoiceFlat,
+  AnnotationCollection,
 } from '@/plugins/api/api-core';
+import { BotMetaResolve, ResolutionPayload } from '@/plugins/api/api-core';
 import { API } from '@/plugins/api';
 import BoolLabel from '@/components/annotations/resolve/BoolLabel.vue';
 import ItemModal from '@/components/items/ItemModal.vue';
@@ -376,7 +376,7 @@ type ResolveData = {
   ignoreOrder: boolean,
   filters: Partial<AnnotationFilters>,
   schemeFlat: FlattenedAnnotationSchemeLabel[],
-  collection: AnnotationCollection | undefined,
+  collection: AnnotationCollectionDB | AnnotationCollection | undefined,
   botAnnotations: Record<string, Array<[Label[], BotAnnotationModel]>>,
   // id of item in focus (to be opened in modal)
   focusItem: string | undefined,
@@ -393,7 +393,7 @@ export default defineComponent({
   name: 'AnnotationConfigResolveView',
   components: { MultiLabel, ToolTip, ItemModal, BoolLabel, ChoiceLabel },
   data(): ResolveData {
-    const botAnnotationMetaDataId: string | undefined = this.$route.params.bot_annotation_metadata_id;
+    const botAnnotationMetaDataId: string | undefined = this.$route.params.bot_annotation_metadata_id as string | undefined;
 
     return {
       botAnnotationMetaDataId,
@@ -410,7 +410,7 @@ export default defineComponent({
       ignoreHierarchy: false,
       ignoreOrder: false,
       schemeFlat: [] as FlattenedAnnotationSchemeLabel[],
-      collection: undefined as AnnotationCollection | undefined,
+      collection: undefined as AnnotationCollectionDB | AnnotationCollection | undefined,
       botAnnotations: {} as Record<string, Array<[Label[], BotAnnotationModel]>>,
       focusItem: undefined as string | undefined,
       projectAnnotationSchemes: [] as AnnotationSchemeModel[],
@@ -437,7 +437,7 @@ export default defineComponent({
         this.ignoreOrder = data.meta.ignore_repeat;
         this.ignoreHierarchy = data.meta.ignore_hierarchy;
         this.collection = data.meta.collection;
-        this.botAnnotations = data.saved;
+        this.botAnnotations = data.saved as unknown as Record<string, [Label[], BotAnnotationModel][]>;
       });
     }
   },
@@ -471,7 +471,7 @@ export default defineComponent({
             flat: true,
           }).then((response) => {
             const { data } = response;
-            this.schemeFlat = data.labels;
+            this.schemeFlat = data.labels as FlattenedAnnotationSchemeLabel[];
           });
         }
       },
@@ -500,9 +500,14 @@ export default defineComponent({
       // FIXME: verify that this is safe to assume (e.g. what if parent choice was never assigned rather
       //        than explicitly not selected in this configuration)
       if (!(labelInfo.strParent in this.labels)) return true;
+
       // check if parent choice has this label as child
-      return this.matrix[itemId][labelInfo.strParent].bot?.value_int === this.schemeLookup[labelInfo.path[0].key].parent_choice
-        || this.matrix[itemId][labelInfo.strParent].bot?.multi_int?.indexOf(this.schemeLookup[labelInfo.path[0].key].parent_choice) >= 0;
+      const parentValueInt: number | undefined = this.matrix[itemId][labelInfo.strParent].bot?.value_int;
+      const parentValueMultiInt: number[] | undefined = this.matrix[itemId][labelInfo.strParent].bot?.multi_int;
+      const validParentInScheme: number = this.schemeLookup[labelInfo.path[0].key].parent_choice as number;
+
+      return (parentValueInt === validParentInScheme)
+        || (!!parentValueMultiInt && parentValueMultiInt.indexOf(validParentInScheme) >= 0);
     },
     hasChoices(value: AnnotationSchemeLabelChoiceFlat[] | undefined) {
       return value !== undefined && Array.isArray(value) && value.length > 0;
@@ -511,18 +516,18 @@ export default defineComponent({
       this.loadingProposals = true;
       API.core.annotations.getResolvedAnnotationsApiAnnotationsConfigResolveGet({
         strategy: this.algorithm,
-        xProjectId: currentProjectStore.projectId,
-        schemeId: this.filters.scheme_id,
-        scopeId: (!this.filters.scope_id) ? undefined : [this.filters.scope_id],
-        userId: (!this.filters.user_id) ? undefined : [this.filters.user_id],
-        key: (!this.filters.key) ? undefined : [this.filters.key],
-        repeat: (!this.filters.repeat) ? undefined : [this.filters.repeat],
+        xProjectId: currentProjectStore.projectId as string,
+        schemeId: this.filters.scheme_id as string,
+        scopeId: (!this.filters.scope_id) ? undefined : [this.filters.scope_id] as string[],
+        userId: (!this.filters.user_id) ? undefined : [this.filters.user_id] as string[],
+        key: (!this.filters.key) ? undefined : [this.filters.key] as string[],
+        repeat: (!this.filters.repeat) ? undefined : [this.filters.repeat] as number[],
         ignoreHierarchy: this.ignoreHierarchy,
         ignoreOrder: this.ignoreOrder,
       }).then((response) => {
         const { data } = response;
         this.collection = data.collection;
-        this.botAnnotations = data.proposal;
+        this.botAnnotations = data.proposal as unknown as Record<string, [Label[], BotAnnotationModel][]>;
         this.loadingProposals = false;
       }).catch((reason) => {
         if (reason.error?.detail?.type === 'EmptyAnnotationsError') {
@@ -555,7 +560,7 @@ export default defineComponent({
     },
     update() {
       API.core.annotations.updateResolvedAnnotationsApiAnnotationsConfigResolveUpdatePut({
-        botAnnotationMetadataId: this.botAnnotationMetaDataId,
+        botAnnotationMetadataId: this.botAnnotationMetaDataId as string,
         name: this.name,
         xProjectId: currentProjectStore.projectId as string,
         requestBody: this.flattenBotAnnotations(),
@@ -567,14 +572,19 @@ export default defineComponent({
           .map(([, annotation]) => annotation)).flat();
     },
     saveNew() {
+      if (!this.collection) {
+        EventBus.emit(new ToastEvent('WARN', 'Nothing to save (yet)!'));
+        return;
+      }
+      const annotatorUserIds: string [] = (this.collection.annotators as UserModel[]).map((user: UserModel) => user.user_id as string);
       const collection: AnnotationCollectionDB = JSON.parse(JSON.stringify(this.collection));
-      collection.annotators = this.collection.annotators.map((user: UserModel) => user.user_id);
+      collection.annotators = annotatorUserIds;
       API.core.annotations.saveResolvedAnnotationsApiAnnotationsConfigResolvePut({
         xProjectId: currentProjectStore.projectId as string,
         requestBody: {
           name: this.name,
-          strategy: this.algorithm,
-          filters: this.filters,
+          strategy: this.algorithm as unknown as ResolutionPayload.strategy,
+          filters: this.filters as AnnotationFilters,
           ignore_order: this.ignoreOrder,
           ignore_hierarchy: this.ignoreHierarchy,
           collection,
@@ -619,11 +629,11 @@ export default defineComponent({
       return Object.fromEntries(this.schemeFlat.map((label: FlattenedAnnotationSchemeLabel) => [label.key, label]));
     },
     isTableReady(): boolean {
-      return this.collection && this.collection.annotations && Object.keys(this.labels).length > 0;
+      return !!this.collection && this.collection.annotations && Object.keys(this.labels).length > 0;
     },
     isConfigValid(): boolean {
       // returns true if all necessary data is available to request a resolution proposal
-      return this.filters.scheme_id && this.filters.key.length > 0 && this.filters.user_id.length > 0;
+      return !!this.filters.scheme_id && (this.filters.key || []).length > 0 && (this.filters.user_id || []).length > 0;
     },
     matrix(): LookupMatrix {
       if (!this.collection || !this.collection.annotations) {

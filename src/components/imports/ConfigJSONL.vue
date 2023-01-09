@@ -106,12 +106,12 @@ export default defineComponent({
     const config: ImportConfigJSONL = (this.existingConfig) ? this.existingConfig : {
       filenames: [] as string[],
       line_type: undefined as ImportConfigJSONL.line_type | undefined,
-    };
+    } as ImportConfigJSONL;
     if (!this.existingConfig) {
       this.$emit('configChanged', config);
     }
     return {
-      compatibleTypes: jsonlTypeCompatibility[currentProjectStore.project.type],
+      compatibleTypes: jsonlTypeCompatibility[currentProjectStore.project!.type],
       uploadsEnabled: this.editable && config.filenames.length === 0,
       files: [] as UploadFile[],
       config,

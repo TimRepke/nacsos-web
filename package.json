@@ -8,13 +8,12 @@
   },
   "scripts": {
     "serve": "vite --host 127.0.0.1 --port 8080",
-    "dev": "vite",
-    "build": "run-p type-check build-only",
-    "preview": "vite preview",
-    "test:unit": "vitest --environment jsdom --root src/",
+    "preview": "vite preview --host 127.0.0.1 --port 8080",
     "build-only": "vite build --outDir dist",
+    "build": "run-p type-check build-only",
     "type-check": "vue-tsc --noEmit -p tsconfig.vitest.json --composite false",
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --ignore-path .gitignore --ignore-pattern tools/*",
+    "test:unit": "vitest --environment jsdom --root src/",
     "api-core": "node ./tools/openapi-gen/bin/index.js --input $npm_package_config_nacsos_core/openapi.json --output src/plugins/api/api-core --name CoreClient --client axios --indent 2 --useOptions --exportModels true --exportServices true --exportSchemas true --exportCore false --corePathTop @/plugins/api/core --corePathDeep @/plugins/api/core",
     "api-pipe": "node ./tools/openapi-gen/bin/index.js --input $npm_package_config_nacsos_pipe/openapi.json --output src/plugins/api/api-pipe --name PipelinesClient --client axios --indent 2 --useOptions --exportModels true --exportServices true --exportSchemas true --exportCore false --corePathTop @/plugins/api/core --corePathDeep @/plugins/api/core"
   },

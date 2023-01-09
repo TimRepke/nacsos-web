@@ -59,7 +59,7 @@
         <div class="d-flex flex-column flex-shrink-1 item-container">
           <!-- Item viewer container -->
           <div class="d-flex flex-row flex-wrap p-2 overflow-auto border-bottom">
-            <template v-if="this.itemList && this.itemList.length > 0">
+            <template v-if="itemList && itemList.length > 0">
               <AnyItemComponent
                 v-for="(item) in itemList"
                 :key="item.item_id"
@@ -168,17 +168,17 @@ export default defineComponent({
   },
   async mounted() {
     API.core.project.countProjectItemsApiProjectItemsCountGet({
-      xProjectId: currentProjectStore.projectId,
+      xProjectId: currentProjectStore.projectId as string,
     })
       .then((response) => {
         this.totalNumItems = response.data;
-        this.pagination = useOffsetPagination({
+        this.pagination = reactive(useOffsetPagination({
           total: this.totalNumItems,
           page: this.$route.query.page || 1,
           pageSize: this.$route.query.pageSize || 20,
           onPageChange: this.fetchData,
           onPageSizeChange: this.fetchData,
-        });
+        }));
         this.fetchData(this.pagination);
       })
       .catch(toastReject);
