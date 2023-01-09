@@ -3,14 +3,15 @@
 </template>
 
 <script lang="ts">
-import { AnyItem } from '@/types/items.d';
-import { PropType, Component, markRaw, defineAsyncComponent } from 'vue';
+import type { AnyItem } from '@/types/items.d';
+import type { PropType, Component } from 'vue';
 import { useCurrentProjectStore } from '@/stores/CurrentProjectStore';
-import { ItemType } from '@/plugins/api/api-core';
+import type { ItemType, ProjectModel } from '@/plugins/api/api-core';
+import { defineAsyncComponent, defineComponent, markRaw } from 'vue';
 
 type TypeMapType = { [key in ItemType]: Component };
 
-export default {
+export default defineComponent({
   name: 'GenericItem',
   props: {
     item: {
@@ -27,12 +28,12 @@ export default {
       patents: markRaw(defineAsyncComponent(() => import('@/components/items/GenericItem.vue'))), // FIXME: replace with correct component
     };
     const store = useCurrentProjectStore();
-    const { type } = store.project;
+    const { type } = store.project as ProjectModel;
     return {
-      component: typeMap[type],
+      component: typeMap[type as ItemType] as Component,
     };
   },
-};
+});
 </script>
 
 <style scoped>

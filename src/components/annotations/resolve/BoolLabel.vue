@@ -32,18 +32,24 @@
 </template>
 
 <script lang="ts">
-import { AnnotationModel, BotAnnotationModel, FlattenedAnnotationSchemeLabel, UserModel } from '@/plugins/api/api-core';
+import type {
+  AnnotationModel,
+  BotAnnotationModel,
+  FlattenedAnnotationSchemeLabel,
+  UserModel,
+} from '@/plugins/api/api-core';
 import InlineToolTip from '@/components/InlineToolTip.vue';
-import { PropType } from 'vue';
+import type { PropType } from 'vue';
 import { EventBus } from '@/plugins/events';
 import { ToastEvent } from '@/plugins/events/events/toast';
+import { defineComponent } from 'vue';
 
 interface BoolLabelData {
   changed: boolean,
   editMode: boolean,
 }
 
-export default {
+export default defineComponent({
   name: 'BoolLabel',
   components: { InlineToolTip },
   data(): BoolLabelData {
@@ -103,5 +109,5 @@ export default {
   computed: {
     // pass
   },
-};
+});
 </script>

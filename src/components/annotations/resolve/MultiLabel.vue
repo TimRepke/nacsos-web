@@ -27,16 +27,18 @@
 
 <script lang="ts">
 
-import {
+import type {
   AnnotationModel,
   AnnotationSchemeLabelChoiceFlat,
   BotAnnotationModel,
-  FlattenedAnnotationSchemeLabel, UserModel,
+  FlattenedAnnotationSchemeLabel,
+  UserModel,
 } from '@/plugins/api/api-core';
-import { PropType } from 'vue';
+import type { PropType } from 'vue';
 import { EventBus } from '@/plugins/events';
 import { ToastEvent } from '@/plugins/events/events/toast';
 import ClosablePill from '@/components/ClosablePill.vue';
+import { defineComponent } from 'vue';
 
 function hasValue(model: AnnotationModel | BotAnnotationModel | undefined | null):
   model is (AnnotationModel | BotAnnotationModel) & { multi_int: number } {
@@ -49,7 +51,7 @@ interface MultiLabelData {
   editMode: boolean,
 }
 
-export default {
+export default defineComponent({
   name: 'MultiLabel',
   components: { ClosablePill },
   data(): MultiLabelData {
@@ -126,7 +128,7 @@ export default {
       return Object.fromEntries(this.info.choices.map((choice: AnnotationSchemeLabelChoiceFlat) => [choice.value, choice]));
     },
   },
-};
+});
 </script>
 
 <style scoped>

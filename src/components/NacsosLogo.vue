@@ -114,8 +114,9 @@
 
 <script lang="ts">
 import { RequestGatewayStatusChangeEvent } from '@/plugins/events/events/general';
+import { defineComponent } from 'vue';
 
-export default {
+export default defineComponent({
   name: 'NacsosLogo',
   props: {
     animated: {
@@ -138,7 +139,7 @@ export default {
       return this.animated || this.activeRequests;
     },
   },
-};
+});
 </script>
 
 <style scoped>

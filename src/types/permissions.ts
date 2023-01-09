@@ -1,4 +1,4 @@
-import { UserPermission } from '@/plugins/api/api-core';
+import type { UserPermission } from '@/plugins/api/api-core';
 
 // https://github.com/typescript-eslint/typescript-eslint/issues/1824
 export type PermissionKeys = 'owner' // eslint-disable-next-line @typescript-eslint/indent

@@ -187,16 +187,17 @@
 </template>
 
 <script lang="ts">
-import { PropType } from 'vue';
+import type { PropType } from 'vue';
 import ToolTip from '@/components/ToolTip.vue';
 import { AnnotationSchemeLabel } from '@/plugins/api/api-core';
+import { defineComponent } from 'vue';
 
 type KeyedAnnotationSchemeLabel = AnnotationSchemeLabel & { tmpKey?: string };
 
 // TODO flatten list of all keys and make sure they are all unique (probably in AnnotationConfigEditView)
 // TODO general input validation
 
-export default {
+export default defineComponent({
   name: 'AnnotationSchemeLabelsEditor',
   components: { ToolTip },
   props: {
@@ -305,7 +306,7 @@ export default {
       // deep: true,
     },
   },
-};
+});
 </script>
 
 <style scoped>

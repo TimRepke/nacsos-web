@@ -6,7 +6,7 @@ import type { FunctionInfo } from '../models/FunctionInfo';
 import type { CancelablePromise } from '@/plugins/api/core/CancelablePromise';
 import type { BaseHttpRequest } from '@/plugins/api/core/BaseHttpRequest';
 
-import { ApiRequestOptions } from '@/plugins/api/core/ApiRequestOptions';
+import type { ApiRequestOptions } from '@/plugins/api/core/ApiRequestOptions';
 
 export class LibraryService {
 

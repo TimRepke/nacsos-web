@@ -29,19 +29,20 @@
 </template>
 
 <script lang="ts">
-import { UserBaseModel } from '@/plugins/api/api-core';
+import type { UserBaseModel } from '@/plugins/api/api-core';
 import { currentProjectStore } from '@/stores';
 import { API } from '@/plugins/api';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { EventBus } from '@/plugins/events';
 import { ToastEvent } from '@/plugins/events/events/toast';
+import { defineComponent } from 'vue';
 
 type SearchData = {
   users: Array<UserBaseModel>;
   search: string;
 };
 
-export default {
+export default defineComponent({
   name: 'UserSearchBox',
   components: { FontAwesomeIcon },
   emits: ['userSelected'],
@@ -63,13 +64,13 @@ export default {
   mounted() {
     if (this.projectId) {
       API.core.users.getProjectUsersApiUsersListProjectProjectIdGet({
-        xProjectId: currentProjectStore.projectId,
-        projectId: currentProjectStore.projectId,
+        xProjectId: currentProjectStore.projectId as string,
+        projectId: currentProjectStore.projectId as string,
       })
         .then((response) => { this.users = response.data; })
         .catch(() => { EventBus.emit(new ToastEvent('WARN', 'Failed to load list of users.')); });
     } else {
-      API.core.users.getAllUsersApiUsersListAllGet({ xProjectId: currentProjectStore.projectId })
+      API.core.users.getAllUsersApiUsersListAllGet({ xProjectId: currentProjectStore.projectId as string })
         .then((response) => { this.users = response.data; })
         .catch(() => { EventBus.emit(new ToastEvent('WARN', 'Failed to load list of users.')); });
     }
@@ -78,7 +79,7 @@ export default {
     usernames(): Array<{ name: string, user_id: string }> {
       return this.users.map((user: UserBaseModel) => ({
         name: `${user.username} (${user.full_name} | ${user.email} | ${user.affiliation})`,
-        user_id: user.user_id,
+        user_id: user.user_id as string,
       }));
     },
     userLookup(): Record<string, UserBaseModel> {
@@ -89,5 +90,5 @@ export default {
       return this.usernames.filter((user: { name: string, user_id: string }) => user.name.toLowerCase().indexOf(this.search) >= 0);
     },
   },
-};
+});
 </script>

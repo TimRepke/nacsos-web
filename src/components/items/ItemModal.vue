@@ -41,18 +41,19 @@
 
 <script lang="ts">
 
-import { AnyItem } from '@/types/items';
+import type { AnyItem } from '@/types/items';
 import { API } from '@/plugins/api';
 import { currentProjectStore } from '@/stores';
-import { CancelablePromise } from '@/plugins/api/core/CancelablePromise';
+import type { CancelablePromise } from '@/plugins/api/core/CancelablePromise';
 import AnyItemComponent from '@/components/items/AnyItem.vue';
+import { defineComponent } from 'vue';
 
 type ItemModalData = {
   itemInfo: AnyItem | undefined,
   requestPromise: CancelablePromise<AnyItem> | undefined,
 };
 
-export default {
+export default defineComponent({
   components: { AnyItemComponent },
   props: ['itemId'],
   emits: ['dismissed'],
@@ -76,7 +77,7 @@ export default {
       this.itemInfo = null;
       this.requestPromise = API.core.project.getDetailForItemApiProjectItemsDetailItemIdGet({
         itemId,
-        xProjectId: currentProjectStore.projectId,
+        xProjectId: currentProjectStore.projectId as string,
       }).then((result) => {
         this.itemInfo = result.data;
         this.requestPromise = undefined;
@@ -106,5 +107,5 @@ export default {
       }
     },
   },
-};
+});
 </script>

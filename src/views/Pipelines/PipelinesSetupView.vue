@@ -157,17 +157,17 @@
                   <button
                     type="button"
                     class="btn btn-outline-secondary btn-sm"
-                    v-for="(atype, art) in getInfoByName(task.function_name).artefacts"
+                    v-for="(atype, art) in getInfoByName(task.function_name)?.artefacts"
                     :key="art"
-                    @click="selectReference(task.task_id, art)">
+                    @click="selectReference(task.task_id as string, art)">
                     <strong>{{ art }}:</strong> <code>Artefact[{{ atype.serializer }}, {{ atype.dtype }}]</code>
                   </button>
                 </li>
               </ul>
               <h5 class="mt-2">Selected:</h5>
               <ul class="list-unstyled">
-                <li><strong>Task:</strong> {{ artefactQueryReference.task_id || '[REF?]' }}</li>
-                <li><strong>Artefact:</strong> {{ artefactQueryReference.artefact || '[REF?]' }}</li>
+                <li><strong>Task:</strong> {{ artefactQueryReference?.task_id || '[REF?]' }}</li>
+                <li><strong>Artefact:</strong> {{ artefactQueryReference?.artefact || '[REF?]' }}</li>
               </ul>
               <div class="d-flex justify-content-end">
                 <button type="button" class="btn btn-outline-secondary m-2" @click="resolveReferenceQuery(false)">
@@ -194,10 +194,11 @@ import TaskConfigComponent from '@/components/pipelines/TaskConfig.vue';
 import { ConfirmationRequestEvent } from '@/plugins/events/events/confirmation';
 import { currentProjectStore, currentUserStore } from '@/stores';
 import { API, toastReject } from '@/plugins/api';
-import { FunctionInfo, SerializedArtefact, TaskInDB, ArtefactReference } from '@/plugins/api/api-pipe';
-import { ArtefactCallback, TaskConfig, NestedLibrary } from '@/types/pipelines.d';
+import type { FunctionInfo, SerializedArtefact, TaskInDB, ArtefactReference } from '@/plugins/api/api-pipe';
+import type { ArtefactCallback, TaskConfig, NestedLibrary } from '@/types/pipelines.d';
+import { defineComponent } from 'vue';
 
-export default {
+export default defineComponent({
   name: 'PipelinesSetupView',
   components: { TaskConfigComponent, NestedExpandableComponent },
   data() {
@@ -239,18 +240,23 @@ export default {
     pickReference(query: [SerializedArtefact, ArtefactReference]) {
       const [artefact, cb] = query;
       this.artefactQuery = artefact;
+      // @ts-ignore FIXME
       this.artefactQueryCallback = cb;
       this.artefactQueryReference = {
+        // @ts-ignore FIXME
         task_id: undefined,
+        // @ts-ignore FIXME
         artefact: undefined,
       };
     },
     selectReference(taskId: string, artefact: string) {
-      this.artefactQueryReference.task_id = taskId;
-      this.artefactQueryReference.artefact = artefact;
+      if (this.artefactQueryReference) {
+        this.artefactQueryReference.task_id = taskId;
+        this.artefactQueryReference.artefact = artefact;
+      }
     },
     resolveReferenceQuery(respond = true) {
-      if (respond) {
+      if (respond && this.artefactQueryCallback) {
         this.artefactQueryCallback(JSON.parse(JSON.stringify(this.artefactQueryReference)));
       }
       this.artefactQuery = undefined;
@@ -267,7 +273,7 @@ export default {
           function_name: `${info.module}.${info.function}`,
           force_run: false,
           params: {},
-          user_id: currentUserStore.user.user_id,
+          user_id: currentUserStore.user?.user_id,
           project_id: currentProjectStore.projectId,
         },
         info,
@@ -288,6 +294,7 @@ export default {
               this.configs.map((config: TaskConfig) => [config.task.task_id, config.task]),
             )));
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            // @ts-ignore FIXME
             this.$refs.taskConfigs.forEach((config: any) => {
               tasks[config.config.task.task_id].params = JSON.stringify(config.getTaskParams());
             });
@@ -338,7 +345,7 @@ export default {
       return ret;
     },
   },
-};
+});
 </script>
 
 <style scoped>

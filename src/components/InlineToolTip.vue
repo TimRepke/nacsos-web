@@ -16,7 +16,9 @@
 
 // type Placement = 'top' | 'left' | 'bottom' | 'right';
 // type Size = 'small' | 'medium' | 'wide';
-export default {
+import { defineComponent } from 'vue';
+
+export default defineComponent({
   name: 'InlineToolTip',
   props: {
     info: {
@@ -35,5 +37,5 @@ export default {
       default: 'small',
     },
   },
-};
+});
 </script>

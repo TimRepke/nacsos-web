@@ -82,15 +82,17 @@
 </template>
 
 <script lang="ts">
+import { defineComponent } from 'vue';
 import { currentProjectStore } from '@/stores';
 import { EventBus } from '@/plugins/events';
 import { ConfirmationRequestEvent } from '@/plugins/events/events/confirmation';
 import InlineToolTip from '@/components/InlineToolTip.vue';
 import { ToastEvent } from '@/plugins/events/events/toast';
-import { AnnotationSchemeModel, AssignmentScopeModel } from '@/plugins/api/api-core';
-import { API, ApiResponseReject } from '@/plugins/api';
+import type { AnnotationSchemeModel, AssignmentScopeModel } from '@/plugins/api/api-core';
+import type { ApiResponseReject } from '@/plugins/api';
+import { API } from '@/plugins/api';
 
-export default {
+export default defineComponent({
   name: 'AnnotationConfigListView',
   components: { InlineToolTip },
   data() {
@@ -102,11 +104,11 @@ export default {
   async mounted() {
     try {
       this.projectSchemes = (await API.core.annotations.getSchemeDefinitionsForProjectApiAnnotationsSchemesListProjectIdGet({
-        projectId: currentProjectStore.projectId,
-        xProjectId: currentProjectStore.projectId,
+        projectId: currentProjectStore.projectId as string,
+        xProjectId: currentProjectStore.projectId as string,
       })).data;
       this.projectScopes = (await API.core.annotations.getAssignmentScopesForProjectApiAnnotationsAnnotateScopesGet({
-        xProjectId: currentProjectStore.projectId,
+        xProjectId: currentProjectStore.projectId as string,
       })).data;
     } catch (e) {
       console.error(e);
@@ -122,14 +124,14 @@ export default {
 
       try {
         const copyId = await API.core.annotations.putAnnotationSchemeApiAnnotationsSchemesDefinitionPut({
-          xProjectId: currentProjectStore.projectId,
+          xProjectId: currentProjectStore.projectId as string,
           requestBody: copy,
         });
         EventBus.emit(new ToastEvent('SUCCESS', `Created copy of the annotation scheme "${scheme.name}" with ID ${copyId.data}.`));
 
         const schemes = await API.core.annotations.getSchemeDefinitionsForProjectApiAnnotationsSchemesListProjectIdGet({
-          projectId: currentProjectStore.projectId,
-          xProjectId: currentProjectStore.projectId,
+          projectId: currentProjectStore.projectId as string,
+          xProjectId: currentProjectStore.projectId as string,
         });
         this.projectSchemes = schemes.data;
       } catch (e) {
@@ -150,7 +152,7 @@ export default {
         (confirmationResponse) => {
           if (confirmationResponse === 'ACCEPT') {
             API.core.annotations.removeAnnotationSchemeApiAnnotationsSchemesDefinitionSchemeIdDelete({
-              xProjectId: currentProjectStore.projectId,
+              xProjectId: currentProjectStore.projectId as string,
               annotationSchemeId: scheme.annotation_scheme_id as string,
             })
               .then(() => {
@@ -181,7 +183,7 @@ export default {
         (confirmationResponse) => {
           if (confirmationResponse === 'ACCEPT') {
             API.core.annotations.removeAssignmentScopeApiAnnotationsAnnotateScopeAssignmentScopeIdDelete({
-              xProjectId: currentProjectStore.projectId,
+              xProjectId: currentProjectStore.projectId as string,
               assignmentScopeId: scope.assignment_scope_id as string,
             })
               .then(() => {
@@ -216,7 +218,7 @@ export default {
       }, {});
     },
   },
-};
+});
 </script>
 
 <style scoped>

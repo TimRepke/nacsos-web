@@ -20,11 +20,13 @@
 </template>
 
 <script lang="ts">
-import { PropType } from 'vue';
-import { ProjectPermissionsModel } from '@/plugins/api/api-core';
-import { PermissionKeys, ProjectPermissionHints } from '@/types/permissions';
+import type { PropType } from 'vue';
+import { defineComponent } from 'vue';
+import type { ProjectPermissionsModel } from '@/plugins/api/api-core';
+import type { PermissionKeys } from '@/types/permissions';
+import { ProjectPermissionHints } from '@/types/permissions';
 
-export default {
+export default defineComponent({
   name: 'PermissionSettingsCardReadOnly',
   props: {
     permissions: {
@@ -37,5 +39,5 @@ export default {
       hints: ProjectPermissionHints as Record<PermissionKeys, string>,
     };
   },
-};
+});
 </script>

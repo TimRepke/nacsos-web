@@ -53,17 +53,19 @@
 
 <script lang="ts">
 
-import {
+import type {
   AnnotationModel,
   AnnotationSchemeLabelChoiceFlat,
   BotAnnotationModel,
-  FlattenedAnnotationSchemeLabel, UserModel,
+  FlattenedAnnotationSchemeLabel,
+  UserModel,
 } from '@/plugins/api/api-core';
 import InlineToolTip from '@/components/InlineToolTip.vue';
-import { PropType } from 'vue';
+import type { PropType } from 'vue';
 import { cmap10, cmap20 } from '@/types/colours';
 import { EventBus } from '@/plugins/events';
 import { ToastEvent } from '@/plugins/events/events/toast';
+import { defineComponent } from 'vue';
 
 function hasValue(model: AnnotationModel | BotAnnotationModel | undefined | null):
   model is (AnnotationModel | BotAnnotationModel) & { value_int: number } {
@@ -76,7 +78,7 @@ interface ChoiceLabelData {
   editMode: boolean,
 }
 
-export default {
+export default defineComponent({
   name: 'ChoiceLabel',
   components: { InlineToolTip },
   data(): ChoiceLabelData {
@@ -146,5 +148,5 @@ export default {
       return Object.fromEntries(this.info.choices.map((choice: AnnotationSchemeLabelChoiceFlat) => [choice.value, choice]));
     },
   },
-};
+});
 </script>

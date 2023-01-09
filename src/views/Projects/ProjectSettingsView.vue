@@ -71,7 +71,7 @@
 </template>
 
 <script lang="ts">
-import { ProjectModel, UserBaseModel, UserPermission } from '@/plugins/api/api-core';
+import type { ProjectModel, UserBaseModel, UserPermission } from '@/plugins/api/api-core';
 import { currentProjectStore } from '@/stores';
 import { API } from '@/plugins/api';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
@@ -79,7 +79,9 @@ import { EventBus } from '@/plugins/events';
 import { ToastEvent } from '@/plugins/events/events/toast';
 import PermissionSettingsCard from '@/components/users/PermissionSettingsCard.vue';
 import UserSearchBox from '@/components/users/UserSearchBox.vue';
-import { PermissionPresets, Permissions } from '@/types/permissions';
+import type { Permissions } from '@/types/permissions';
+import { PermissionPresets } from '@/types/permissions';
+import { defineComponent } from 'vue';
 
 type SettingsData = {
   project: ProjectModel | undefined;
@@ -87,7 +89,7 @@ type SettingsData = {
   presets: Record<string, Permissions>;
 };
 
-export default {
+export default defineComponent({
   name: 'ProjectSettingsView',
   components: { UserSearchBox, PermissionSettingsCard, FontAwesomeIcon },
   data(): SettingsData {
@@ -98,7 +100,7 @@ export default {
     };
   },
   mounted() {
-    API.core.project.getProjectApiProjectInfoGet({ xProjectId: currentProjectStore.projectId })
+    API.core.project.getProjectApiProjectInfoGet({ xProjectId: currentProjectStore.projectId as string })
       .then((response) => {
         const { data } = response;
         this.project = data;
@@ -107,7 +109,7 @@ export default {
         console.log(reason);
       });
     API.core.project.getAllUserPermissionsApiProjectPermissionsListUsersGet({
-      xProjectId: currentProjectStore.projectId,
+      xProjectId: currentProjectStore.projectId as string,
     })
       .then((response) => {
         const { data } = response;
@@ -135,8 +137,6 @@ export default {
       }
     },
     removeUser(userPermission: UserPermission) {
-      console.log(userPermission);
-      console.log(this.permission);
       // remove from the page so it's hidden
       const rmIdx: number = this.permissions
         .findIndex((permission: UserPermission) => permission.project_permission_id === userPermission.project_permission_id);
@@ -149,7 +149,7 @@ export default {
       if (this.project !== undefined) {
         API.core.project.saveProjectApiProjectInfoPut({
           requestBody: this.project,
-          xProjectId: currentProjectStore.projectId,
+          xProjectId: currentProjectStore.projectId as string,
         })
           .then(() => {
             EventBus.emit(new ToastEvent('SUCCESS', 'Saved!'));
@@ -163,5 +163,5 @@ export default {
       }
     },
   },
-};
+});
 </script>

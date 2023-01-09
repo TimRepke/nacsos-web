@@ -11,11 +11,12 @@
 
 <script lang="ts">
 
-import { PropType } from 'vue';
+import type { PropType } from 'vue';
+import { defineComponent } from 'vue';
 
 type BackgroundColour = 'primary' | 'secondary' | 'success' | 'danger' | 'warning' | 'info' | 'dark' | 'light';
 
-export default {
+export default defineComponent({
   name: 'ClosablePill',
   emits: ['clicked-x'],
   props: {
@@ -33,18 +34,20 @@ export default {
       return `text-bg-${this.colour}`;
     },
   },
-};
+});
 </script>
 
 <style scoped>
 .pill-text > .btn-close {
   font-size: 0.5em;
 }
+
 .pill-text {
   vertical-align: middle;
   display: inline-block;
   /*height: 1.3em;*/
 }
+
 /*
 .badge {
   --bs-badge-padding-y: 0.15em;

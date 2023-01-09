@@ -11,16 +11,17 @@
 
 <script lang="ts">
 import { currentProjectStore } from '@/stores';
-import { ProjectPermissionsModel } from '@/plugins/api/api-core';
+import type { ProjectPermissionsModel } from '@/plugins/api/api-core';
+import { defineComponent } from 'vue';
 
-export default {
+export default defineComponent({
   name: 'PipelinesContainer',
   data() {
     return {
       projectPermissions: currentProjectStore.projectPermissions as ProjectPermissionsModel,
     };
   },
-};
+});
 </script>
 
 <style scoped>

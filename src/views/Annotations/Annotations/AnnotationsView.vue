@@ -73,16 +73,17 @@ import AnyItemComponent from '@/components/items/AnyItem.vue';
 import AnnotationLabels from '@/components/annotations/AnnotationLabels.vue';
 import { EventBus } from '@/plugins/events';
 import { ToastEvent } from '@/plugins/events/events/toast';
-import {
+import type {
   AnnotationItem,
   AnnotationSchemeLabel,
   AnnotationSchemeModel,
   AssignmentModel,
   AssignmentScopeModel,
 } from '@/plugins/api/api-core';
-import { AnyItem } from '@/types/items.d';
+import type { AnyItem } from '@/types/items.d';
 import { API, ignore } from '@/plugins/api';
 import { currentProjectStore } from '@/stores';
+import { defineComponent } from 'vue';
 
 const motivationalQuotes = [
   // https://www.howmuchisthefish.de/
@@ -123,18 +124,18 @@ type AnnotationsViewData = {
   rerenderCounter: number; // this is a hack to force-update the AnnotationLabels-component
 };
 
-export default {
+export default defineComponent({
   name: 'AnnotationsView',
   components: { AnnotationLabels, AnyItemComponent },
   data(): AnnotationsViewData {
     return {
-      item: undefined,
-      assignment: undefined,
-      assignments: undefined,
-      scheme: undefined,
-      scope: undefined,
+      item: undefined as AnyItem | undefined,
+      assignment: undefined as AssignmentModel | undefined,
+      assignments: undefined as AssignmentModel[] | undefined,
+      scheme: undefined as AnnotationSchemeModel | undefined,
+      scope: undefined as AssignmentScopeModel | undefined,
       sidebarWidth: 5,
-      labels: undefined,
+      labels: undefined as AnnotationSchemeLabel[] | undefined,
       rerenderCounter: 0,
     };
   },
@@ -146,12 +147,12 @@ export default {
       let response: AnnotationItem;
       if (currentAssignmentId) {
         response = (await API.core.annotations.getAssignmentApiAnnotationsAnnotateAssignmentAssignmentIdGet({
-          xProjectId: currentProjectStore.projectId,
+          xProjectId: currentProjectStore.projectId as string,
           assignmentId: currentAssignmentId,
         })).data;
       } else {
         response = (await API.core.annotations.getNextOpenAssignmentForScopeForUserApiAnnotationsAnnotateNextAssignmentScopeIdGet({
-          xProjectId: currentProjectStore.projectId,
+          xProjectId: currentProjectStore.projectId as string,
           assignmentScopeId,
         })).data;
       }
@@ -166,10 +167,10 @@ export default {
     },
     populateEmptyAnnotations(labels: AnnotationSchemeLabel[]) {
       return labels.map((label: AnnotationSchemeLabel) => {
-        if (!label.annotation) {
+        if (!label.annotation && !!this.assignment) {
           // eslint-disable-next-line no-param-reassign
           label.annotation = {
-            assignment_id: this.assignment.assignment_id,
+            assignment_id: this.assignment.assignment_id as string,
             user_id: this.assignment.user_id,
             item_id: this.assignment.item_id,
             annotation_scheme_id: this.assignment.annotation_scheme_id,
@@ -218,10 +219,10 @@ export default {
 
       // Send data to the server
       API.core.annotations.saveAnnotationApiAnnotationsAnnotateSavePost({
-        xProjectId: currentProjectStore.projectId,
+        xProjectId: currentProjectStore.projectId as string,
         requestBody: {
           scheme,
-          assignment: this.assignment,
+          assignment: this.assignment as AssignmentModel,
         },
       })
         .then((response) => {
@@ -265,7 +266,7 @@ export default {
 
       // update the assignments progress bar
       API.core.annotations.getAssignmentsForScopeApiAnnotationsAnnotateAssignmentsScopeAssignmentScopeIdGet({
-        xProjectId: currentProjectStore.projectId,
+        xProjectId: currentProjectStore.projectId as string,
         assignmentScopeId: annotationItem.scope.assignment_scope_id as string,
       })
         .then(async (response) => {
@@ -274,8 +275,8 @@ export default {
           await this.$router.push({
             name: 'project-annotate-item',
             params: {
-              scope_id: this.scope.assignment_scope_id,
-              assignment_id: this.assignment.assignment_id,
+              scope_id: this.scope!.assignment_scope_id,
+              assignment_id: this.assignment!.assignment_id,
             },
           });
         })
@@ -285,7 +286,7 @@ export default {
       await this.save();
 
       API.core.annotations.getAssignmentApiAnnotationsAnnotateAssignmentAssignmentIdGet({
-        xProjectId: currentProjectStore.projectId,
+        xProjectId: currentProjectStore.projectId as string,
         assignmentId: targetAssignmentId,
       })
         .then((response) => { this.setCurrentAssignment(response.data); })
@@ -299,9 +300,9 @@ export default {
 
       API.core.annotations
         .getNextAssignmentForScopeForUserApiAnnotationsAnnotateNextAssignmentScopeIdCurrentAssignmentIdGet({
-          xProjectId: currentProjectStore.projectId,
-          assignmentScopeId: this.assignment.assignment_scope_id,
-          currentAssignmentId: this.assignment.assignment_id,
+          xProjectId: currentProjectStore.projectId as string,
+          assignmentScopeId: this.assignment!.assignment_scope_id,
+          currentAssignmentId: this.assignment!.assignment_id as string,
         })
         .then((response) => { this.setCurrentAssignment(response.data); })
         .catch(ignore);
@@ -312,7 +313,7 @@ export default {
       return `col-md-${this.sidebarWidth}`;
     },
   },
-};
+});
 </script>
 
 <style scoped>

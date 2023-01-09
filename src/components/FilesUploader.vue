@@ -58,6 +58,7 @@ import { ToastEvent } from '@/plugins/events/events/toast';
 import { EventBus } from '@/plugins/events';
 import InlineToolTip from '@/components/InlineToolTip.vue';
 import { API } from '@/plugins/api';
+import { defineComponent } from 'vue';
 
 type UploadStatus = 'PENDING' | 'UPLOADING' | 'SUCCESS' | 'FAILED';
 
@@ -69,7 +70,7 @@ export interface UploadFile {
   status: UploadStatus;
 }
 
-export default {
+export default defineComponent({
   name: 'FilesUploader',
   components: { InlineToolTip },
   emits: ['filesUpdated'],
@@ -137,5 +138,5 @@ export default {
       deep: true,
     },
   },
-};
+});
 </script>

@@ -58,15 +58,17 @@ import { currentProjectStore } from '@/stores';
 import { EventBus } from '@/plugins/events';
 import InlineToolTip from '@/components/InlineToolTip.vue';
 import { ToastEvent } from '@/plugins/events/events/toast';
-import { API, ApiResponseReject } from '@/plugins/api';
-import { BotAnnotationMetaDataBaseModel } from '@/plugins/api/api-core';
+import type { ApiResponseReject } from '@/plugins/api';
+import type { BotAnnotationMetaDataBaseModel } from '@/plugins/api/api-core';
 import { ConfirmationRequestEvent } from '@/plugins/events/events/confirmation';
+import { defineComponent } from 'vue';
+import { API } from '@/plugins/api';
 
 type DataModel = {
   exports: BotAnnotationMetaDataBaseModel[],
 };
 
-export default {
+export default defineComponent({
   name: 'AnnotationConfigResolvedListView',
   components: { InlineToolTip },
   data(): DataModel {
@@ -80,7 +82,7 @@ export default {
   methods: {
     refreshData() {
       API.core.annotations.listSavedResolvedAnnotationsApiAnnotationsConfigResolvedListGet({
-        xProjectId: currentProjectStore.projectId,
+        xProjectId: currentProjectStore.projectId as string,
       }).then((response) => {
         const { data } = response;
         this.exports = data;
@@ -113,7 +115,7 @@ export default {
           if (confirmationResponse === 'ACCEPT') {
             API.core.annotations.deleteSavedResolvedAnnotationsApiAnnotationsConfigResolvedBotAnnotationMetaIdDelete({
               botAnnotationMetadataId: meta.bot_annotation_metadata_id!,
-              xProjectId: currentProjectStore.projectId,
+              xProjectId: currentProjectStore.projectId as string,
             }).then(() => {
               EventBus.emit(new ToastEvent('SUCCESS', `Deleted ${meta.bot_annotation_metadata_id}`));
               this.refreshData();
@@ -129,7 +131,7 @@ export default {
       ));
     },
   },
-};
+});
 </script>
 
 <style scoped>

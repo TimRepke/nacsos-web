@@ -5,8 +5,9 @@
 </template>
 
 <script lang="ts">
-import { PropType } from 'vue';
+import type { PropType } from 'vue';
 import InlineToolTip from '@/components/InlineToolTip.vue';
+import { defineComponent } from 'vue';
 
 type ProjectType =
   'generic'
@@ -14,7 +15,7 @@ type ProjectType =
   | 'academic' // eslint-disable-line @typescript-eslint/indent
   | 'patents'; // eslint-disable-line @typescript-eslint/indent
 
-export default {
+export default defineComponent({
   name: 'ProjectTypeIcon',
   components: { InlineToolTip },
   props: {
@@ -40,5 +41,5 @@ export default {
       return ['fas', 'question'];
     },
   },
-};
+});
 </script>

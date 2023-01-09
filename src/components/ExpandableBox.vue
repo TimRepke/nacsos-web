@@ -20,7 +20,9 @@
 </template>
 
 <script lang="ts">
-export default {
+import { defineComponent } from 'vue';
+
+export default defineComponent({
   name: 'ExpandableBox',
   props: {
     initiallyOpen: {
@@ -33,7 +35,7 @@ export default {
       expanded: this.initiallyOpen,
     };
   },
-};
+});
 </script>
 
 <style scoped>

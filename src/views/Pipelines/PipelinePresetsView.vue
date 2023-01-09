@@ -15,7 +15,9 @@
 
 <script lang="ts">
 
-export default {
+import { defineComponent } from 'vue';
+
+export default defineComponent({
   name: 'PipelinePresetsView',
   data() {
     return {
@@ -31,7 +33,7 @@ export default {
   computed: {
     // pass
   },
-};
+});
 </script>
 
 <style scoped>

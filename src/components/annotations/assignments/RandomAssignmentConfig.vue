@@ -62,10 +62,11 @@
 </template>
 
 <script lang="ts">
-import { AssignmentScopeRandomConfig } from '@/plugins/api/api-core';
-import { PropType } from 'vue';
+import type { AssignmentScopeRandomConfig } from '@/plugins/api/api-core';
+import { defineComponent } from 'vue';
+import type { PropType } from 'vue';
 
-export default {
+export default defineComponent({
   name: 'RandomAssignmentConfig',
   emits: ['configChanged'],
   props: {
@@ -86,7 +87,7 @@ export default {
       min_assignments_per_item: 2,
       max_assignments_per_item: 3,
       random_seed: 10829,
-    };
+    } as AssignmentScopeRandomConfig;
     if (!this.existingConfig) {
       this.$emit('configChanged', config);
     }
@@ -102,7 +103,7 @@ export default {
       deep: true,
     },
   },
-};
+});
 </script>
 
 <style scoped>

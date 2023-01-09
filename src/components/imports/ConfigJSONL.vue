@@ -48,12 +48,15 @@
 </template>
 
 <script lang="ts">
-import FilesUploader, { UploadFile } from '@/components/FilesUploader.vue';
-import { PropType } from 'vue';
+import type { PropType } from 'vue';
+import { defineComponent } from 'vue';
 import { ImportConfigJSONL, ItemType } from '@/plugins/api/api-core';
+import FilesUploader from '@/components/FilesUploader.vue';
+import type { UploadFile } from '@/components/FilesUploader.vue';
 import { currentProjectStore } from '@/stores';
-import useVuelidate, { BaseValidation, ValidationRule } from '@vuelidate/core';
+import useVuelidate from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
+import type { BaseValidation, ValidationRule } from '@vuelidate/core';
 import types = ImportConfigJSONL.line_type;
 
 type CompatibilityMapping = { [key in ItemType]: types[] };
@@ -79,7 +82,7 @@ const isValidLineType: ValidationRule = {
   $message: 'Not a line encoding type.',
 };
 
-export default {
+export default defineComponent({
   name: 'ConfigJSONL',
   components: { FilesUploader },
   emits: ['configChanged'],
@@ -103,12 +106,12 @@ export default {
     const config: ImportConfigJSONL = (this.existingConfig) ? this.existingConfig : {
       filenames: [] as string[],
       line_type: undefined as ImportConfigJSONL.line_type | undefined,
-    };
+    } as ImportConfigJSONL;
     if (!this.existingConfig) {
       this.$emit('configChanged', config);
     }
     return {
-      compatibleTypes: jsonlTypeCompatibility[currentProjectStore.project.type],
+      compatibleTypes: jsonlTypeCompatibility[currentProjectStore.project!.type],
       uploadsEnabled: this.editable && config.filenames.length === 0,
       files: [] as UploadFile[],
       config,
@@ -140,7 +143,7 @@ export default {
       this.config.filenames = (filenames.length === 0) ? undefined : filenames;
     },
   },
-};
+});
 </script>
 
 <style scoped>

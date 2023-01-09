@@ -79,11 +79,12 @@
 
 <script lang="ts">
 import { marked } from 'marked';
-import { TaskInDB, FunctionInfo, FileOnDisk, QueueService } from '@/plugins/api/api-pipe';
+import type { TaskInDB, FunctionInfo, FileOnDisk, QueueService } from '@/plugins/api/api-pipe';
 import { EventBus } from '@/plugins/events';
 import { ToastEvent } from '@/plugins/events/events/toast';
 import { API } from '@/plugins/api';
 import { currentProjectStore, currentUserStore } from '@/stores';
+import { defineComponent } from 'vue';
 
 type SearchParams = Parameters<QueueService['searchTasksApiQueueSearchGet']>[0];
 
@@ -104,7 +105,7 @@ type ArtefactListData = {
   searchByTags?: string;
 };
 
-export default {
+export default defineComponent({
   name: 'ArtefactsListView',
   data(): ArtefactListData {
     return {
@@ -176,13 +177,13 @@ export default {
         searchObj.projectId = currentProjectStore.projectId;
       }
       if (this.searchByUser) {
-        searchObj.userId = currentUserStore.user.user_id;
+        searchObj.userId = currentUserStore.user?.user_id;
       }
       // TODO add the other search params
       return searchObj;
     },
   },
-};
+});
 </script>
 
 <style scoped>

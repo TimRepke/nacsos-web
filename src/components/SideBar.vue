@@ -101,10 +101,11 @@
 
 <script lang="ts">
 import { currentProjectStore, currentUserStore } from '@/stores';
-import { ProjectPermissionsModel, UserModel } from '@/plugins/api/api-core';
-import { RouteLocationMatched } from 'vue-router';
+import type { ProjectPermissionsModel, UserModel } from '@/plugins/api/api-core';
+import type { RouteLocationMatched } from 'vue-router';
+import { defineComponent } from 'vue';
 
-export default {
+export default defineComponent({
   name: 'SideBar',
   data(): object {
     return {
@@ -127,7 +128,7 @@ export default {
       return currentProjectStore.projectPermissions || {};
     },
     currentUser(): UserModel {
-      return currentUserStore.user;
+      return currentUserStore.user as UserModel;
     },
   },
   methods: {
@@ -146,7 +147,7 @@ export default {
       this.windowWidth = window.innerWidth;
     };
   },
-};
+});
 </script>
 
 <style scoped>

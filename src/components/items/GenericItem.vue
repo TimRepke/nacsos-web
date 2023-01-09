@@ -16,11 +16,12 @@
 </template>
 
 <script lang="ts">
-import { PropType } from 'vue';
+import type { PropType } from 'vue';
 import { marked } from 'marked';
-import { BaseItem as BaseItemModel } from '@/types/items.d';
+import type { BaseItem as BaseItemModel } from '@/types/items.d';
+import { defineComponent } from 'vue';
 
-export default {
+export default defineComponent({
   name: 'GenericItem',
   props: {
     item: {
@@ -34,7 +35,7 @@ export default {
       return marked(this.item.text);
     },
   },
-};
+});
 </script>
 
 <style scoped>

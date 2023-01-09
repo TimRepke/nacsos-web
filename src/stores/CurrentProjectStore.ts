@@ -1,15 +1,16 @@
 import { defineStore } from 'pinia';
-import { useStorage, RemovableRef } from '@vueuse/core';
-import { ProjectModel, ProjectPermissionsModel } from '@/plugins/api/api-core';
+import { useStorage } from '@vueuse/core';
+import type { RemovableRef } from '@vueuse/core';
+import type { ProjectModel, ProjectPermissionsModel } from '@/plugins/api/api-core';
 import Serializer from '@/types/serializer';
 
 const ProjectSerializer = Serializer<ProjectModel>();
 const ProjectPermissionSerializer = Serializer<ProjectPermissionsModel>();
 
 export type CurrentProjectStoreType = {
-  projectId: RemovableRef<string>,
-  project: RemovableRef<ProjectModel>,
-  projectPermissions: RemovableRef<ProjectPermissionsModel>,
+  projectId: RemovableRef<string | undefined>,
+  project: RemovableRef<ProjectModel | undefined>,
+  projectPermissions: RemovableRef<ProjectPermissionsModel | undefined>,
 };
 
 export const useCurrentProjectStore = defineStore('CurrentProjectStore', {

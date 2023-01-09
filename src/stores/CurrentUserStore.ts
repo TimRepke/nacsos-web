@@ -1,7 +1,8 @@
 import { defineStore } from 'pinia';
-import { useStorage, RemovableRef } from '@vueuse/core';
+import { useStorage } from '@vueuse/core';
+import type { RemovableRef } from '@vueuse/core';
 import Serializer from '@/types/serializer';
-import { UserModel } from '@/plugins/api/api-core';
+import type { UserModel } from '@/plugins/api/api-core';
 import { API } from '@/plugins/api';
 import { EventBus } from '@/plugins/events';
 import { AuthFailedEvent, LoginSuccessEvent } from '@/plugins/events/events/auth';
@@ -9,8 +10,8 @@ import { AuthFailedEvent, LoginSuccessEvent } from '@/plugins/events/events/auth
 const UserSerializer = Serializer<UserModel>();
 
 export type CurrentUserStoreType = {
-  user: RemovableRef<UserModel>,
-  accessToken: RemovableRef<string>,
+  user: RemovableRef<UserModel | undefined>,
+  accessToken: RemovableRef<string | undefined>,
 };
 
 export const useCurrentUserStore = defineStore('CurrentUserStore', {

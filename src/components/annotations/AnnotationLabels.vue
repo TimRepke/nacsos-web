@@ -147,13 +147,14 @@
 <script lang="ts">
 /* eslint no-param-reassign: "off" */
 
-import { PropType } from 'vue';
+import type { PropType } from 'vue';
 import InlineToolTip from '@/components/InlineToolTip.vue';
-import { AnnotationSchemeLabel, AssignmentModel, AnnotationModel } from '@/plugins/api/api-core';
+import type { AnnotationSchemeLabel, AssignmentModel, AnnotationModel } from '@/plugins/api/api-core';
+import { defineComponent } from 'vue';
 
 type SubLabels = { labels: AnnotationSchemeLabel[]; key: number; };
 
-export default {
+export default defineComponent({
   name: 'AnnotationLabels',
   components: { InlineToolTip },
   props: {
@@ -256,7 +257,7 @@ export default {
       }, {});
     },
   },
-};
+});
 </script>
 
 <style scoped>

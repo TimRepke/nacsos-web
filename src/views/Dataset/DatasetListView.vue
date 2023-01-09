@@ -59,7 +59,7 @@
         <div class="d-flex flex-column flex-shrink-1 item-container">
           <!-- Item viewer container -->
           <div class="d-flex flex-row flex-wrap p-2 overflow-auto border-bottom">
-            <template v-if="this.itemList && this.itemList.length > 0">
+            <template v-if="itemList && itemList.length > 0">
               <AnyItemComponent
                 v-for="(item) in itemList"
                 :key="item.item_id"
@@ -146,18 +146,19 @@
 <script lang="ts">
 import { currentProjectStore } from '@/stores';
 import AnyItemComponent from '@/components/items/AnyItem.vue';
-import { useOffsetPagination, UseOffsetPaginationReturn } from '@vueuse/core';
+import { useOffsetPagination } from '@vueuse/core';
+import type { UseOffsetPaginationReturn } from '@vueuse/core';
 import ClosablePill from '@/components/ClosablePill.vue';
-import { reactive } from 'vue';
-import { AnyItem } from '@/types/items.d';
+import { defineComponent, reactive } from 'vue';
+import type { AnyItem } from '@/types/items.d';
 import { API, toastReject } from '@/plugins/api';
 
-export default {
+export default defineComponent({
   name: 'ProjectDataView',
   components: { ClosablePill, AnyItemComponent },
   data() {
     return {
-      projectType: currentProjectStore.project.type,
+      projectType: currentProjectStore.project?.type,
       itemList: [] as AnyItem[],
       showSearchBar: true,
       navPagesWindowSize: 3,
@@ -167,17 +168,17 @@ export default {
   },
   async mounted() {
     API.core.project.countProjectItemsApiProjectItemsCountGet({
-      xProjectId: currentProjectStore.projectId,
+      xProjectId: currentProjectStore.projectId as string,
     })
       .then((response) => {
         this.totalNumItems = response.data;
-        this.pagination = useOffsetPagination({
+        this.pagination = reactive(useOffsetPagination({
           total: this.totalNumItems,
           page: this.$route.query.page || 1,
           pageSize: this.$route.query.pageSize || 20,
           onPageChange: this.fetchData,
           onPageSizeChange: this.fetchData,
-        });
+        }));
         this.fetchData(this.pagination);
       })
       .catch(toastReject);
@@ -185,10 +186,10 @@ export default {
   methods: {
     fetchData({ currentPage, currentPageSize }: UseOffsetPaginationReturn): void {
       API.core.project.listProjectDataPagedApiProjectItemsItemTypeListPagePageSizeGet({
-        xProjectId: currentProjectStore.projectId,
+        xProjectId: currentProjectStore.projectId as string,
         page: this.pagination.currentPage,
         pageSize: this.pagination.currentPageSize,
-        itemType: currentProjectStore.project.type,
+        itemType: currentProjectStore.project!.type,
       })
         .then((response) => {
           this.itemList = response.data;
@@ -209,7 +210,7 @@ export default {
       return [...this.$util.range(start, end)];
     },
   },
-};
+});
 </script>
 
 <style scoped>

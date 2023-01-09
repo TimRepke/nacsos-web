@@ -75,15 +75,17 @@
 import { API } from '@/plugins/api';
 import { EventBus } from '@/plugins/events';
 import { ToastEvent } from '@/plugins/events/events/toast';
-import { ItemType, ProjectModel } from '@/plugins/api/api-core';
+import type { ProjectModel } from '@/plugins/api/api-core';
+import { ItemType } from '@/plugins/api/api-core';
 import ProjectTypeIcon from '@/components/ProjectTypeIcon.vue';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { CurrentProjectSelectedEvent, CurrentProjectSetEvent } from '@/plugins/events/events/projects';
 import { ConfirmationRequestEvent } from '@/plugins/events/events/confirmation';
+import { defineComponent } from 'vue';
 
 type ProjectModelExt = ProjectModel & { isNew?: boolean };
 
-export default {
+export default defineComponent({
   name: 'ProjectManagementView',
   components: { FontAwesomeIcon, ProjectTypeIcon },
   data() {
@@ -170,5 +172,5 @@ export default {
       );
     },
   },
-};
+});
 </script>

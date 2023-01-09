@@ -190,10 +190,12 @@
 </template>
 
 <script lang="ts">
-import { PropType } from 'vue';
-import useVuelidate, { BaseValidation, ValidationRule } from '@vuelidate/core';
+import type { PropType } from 'vue';
+import useVuelidate from '@vuelidate/core';
+import type { BaseValidation, ValidationRule } from '@vuelidate/core';
 import { required, between, alphaNum, integer } from '@vuelidate/validators';
-import { ImportConfigTwitter } from '@/plugins/api/api-core';
+import type { ImportConfigTwitter } from '@/plugins/api/api-core';
+import { defineComponent } from 'vue';
 
 const isValidISO8601: ValidationRule = {
   $validator(value: string): boolean {
@@ -226,7 +228,7 @@ const isValidSortOrder: ValidationRule = {
   $message: 'Not a valid sort order',
 };
 
-export default {
+export default defineComponent({
   name: 'ConfigTwitter',
   emits: ['configChanged'],
   props: {
@@ -255,7 +257,7 @@ export default {
       sort_order: 'recency',
       start_time: undefined,
       end_time: undefined,
-    };
+    } as ImportConfigTwitter;
     if (!this.existingConfig) {
       this.$emit('configChanged', config);
     }
@@ -290,7 +292,7 @@ export default {
       deep: true,
     },
   },
-};
+});
 </script>
 
 <style scoped>
