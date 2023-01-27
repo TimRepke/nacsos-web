@@ -146,4 +146,32 @@ export class ImportsService {
     });
   }
 
+  /**
+   * Delete Import Details
+   * @returns string Successful Response
+   * @throws ApiError
+   */
+  public deleteImportDetailsApiImportsImportDeleteImportIdDelete({
+    importId,
+    xProjectId,
+  }: {
+    importId: string,
+    xProjectId: string,
+  }, options?: Partial<ApiRequestOptions>): CancelablePromise<string> {
+    return this.httpRequest.request({
+      method: 'DELETE',
+      url: '/api/imports/import/delete/{import_id}',
+      path: {
+        'import_id': importId,
+      },
+      headers: {
+        'x-project-id': xProjectId,
+      },
+      errors: {
+        422: `Validation Error`,
+      },
+      ...options,
+    });
+  }
+
 }
