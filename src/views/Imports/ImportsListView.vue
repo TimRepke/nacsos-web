@@ -113,8 +113,9 @@ export default defineComponent({
               xProjectId: currentProjectStore.projectId as string,
             })
               .then(() => {
-                const isImportModel = (element) => element.import_id === importDetails.import_id;
-                const importIndex = this.imports.findIndex(isImportModel);
+                const importIndex = this.imports.findIndex(
+                  (element: ImportModel) => element.import_id === importDetails.import_id
+                );
                 this.imports.splice(importIndex, 1);
                 EventBus.emit(new ToastEvent('SUCCESS', 'You successfuly deleted this import and its related data.'));
               })
