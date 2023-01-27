@@ -63,7 +63,6 @@ import { API, toastReject } from '@/plugins/api';
 import { defineComponent } from 'vue';
 import { ConfirmationRequestEvent } from '@/plugins/events/events/confirmation';
 
-
 export default defineComponent({
   name: 'ProjectListView',
   components: { InlineToolTip },
@@ -80,11 +79,11 @@ export default defineComponent({
       .catch(toastReject);
   },
   methods: {
-    copyImport(importDetails: ImportModel, imports) {
-      const newImport = JSON.parse(JSON.stringify(importDetails))
+    copyImport(importDetails: ImportModel) {
+      const newImport = JSON.parse(JSON.stringify(importDetails));
       newImport.import_id = null;
       newImport.time_created = null;
-      newImport.name = newImport.name + ' copy';
+      newImport.name += ' copy';
       API.core.imports.putImportDetailsApiImportsImportPut({
         // @ts-ignore
         requestBody: newImport,
@@ -95,7 +94,6 @@ export default defineComponent({
           newImport.import_id = importId;
           this.imports.push(newImport);
           EventBus.emit(new ToastEvent('SUCCESS', 'You successfuly copied this import configuration'));
-
         })
         .catch((reason) => {
           console.error(reason);
@@ -109,14 +107,13 @@ export default defineComponent({
         + ' other imports). Any annotations associated with these items will also be lost.',
         (confirmationResponse) => {
           if (confirmationResponse === 'ACCEPT') {
-            console.log("OK, I'm going to delete this")
             API.core.imports.deleteImportDetailsApiImportsImportDeleteImportIdDelete({
               // @ts-ignore
               importId: importDetails.import_id,
               xProjectId: currentProjectStore.projectId as string,
             })
               .then(() => {
-                const isImportModel = (element) => element.import_id == importDetails.import_id;
+                const isImportModel = (element) => element.import_id === importDetails.import_id;
                 const importIndex = this.imports.findIndex(isImportModel);
                 this.imports.splice(importIndex, 1);
                 EventBus.emit(new ToastEvent('SUCCESS', 'You successfuly deleted this import and its related data.'));
