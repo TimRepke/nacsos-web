@@ -12,7 +12,19 @@
             v-if="projectPermissions.imports_read"
             to="/project/imports"
             class="list-group-item list-group-item-action border-end-0"
-            active-class="active"> Imports
+            active-class="active"> Data Import
+          </router-link>
+          <router-link
+            v-if="projectPermissions.imports_read && isActive('project-imports')"
+            to="/project/imports"
+            class="list-group-item list-group-item-action list-group-item-info border-end-0 sub-link"
+            :class="{ active: anyOf(['project-imports-details', 'project-imports-list']) }"> Manage Imports
+          </router-link>
+          <router-link
+            v-if="projectPermissions.imports_read && isActive('project-imports')"
+            to="/project/imports/search"
+            class="list-group-item list-group-item-action list-group-item-info border-end-0 sub-link"
+            :class="{ active: anyOf(['project-imports-search']) }"> Archive Search
           </router-link>
           <router-link
             v-if="projectPermissions.dataset_read"

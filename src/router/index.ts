@@ -9,26 +9,22 @@ const routes: Array<RouteRecordRaw> = [
     path: '/',
     name: 'home',
     component: HomeView,
-  },
-  {
+  }, {
     path: '/about',
     name: 'about',
     // route level code-splitting
     // this generates a separate chunk (about.[hash].js) for this route
     // which is lazy-loaded when the route is visited.
     component: () => import(/* webpackChunkName: "about" */ '../views/AboutView.vue'),
-  },
-  {
+  }, {
     path: '/project-list',
     name: 'project-list',
     component: () => import(/* webpackChunkName: "ProjectListView" */ '../views/Projects/ProjectsListView.vue'),
-  },
-  {
+  }, {
     path: '/project/overview',
     name: 'project-overview',
     component: () => import(/* webpackChunkName: "ProjectOverviewView" */ '../views/Projects/ProjectOverviewView.vue'),
-  },
-  {
+  }, {
     path: '/project/artefacts',
     name: 'project-artefacts',
     component: () => import(/* webpackChunkName: "ArtefactsContainer" */ '../views/Artefacts/ArtefactsContainer.vue'),
@@ -38,15 +34,13 @@ const routes: Array<RouteRecordRaw> = [
         alias: ['', 'list'],
         name: 'project-artefacts-list',
         component: () => import(/* webpackChunkName: "ArtefactsListView" */ '../views/Artefacts/ArtefactsListView.vue'),
-      },
-      {
+      }, {
         path: 'details/:taskId',
         name: 'project-artefacts-details',
         component: () => import(/* webpackChunkName: "ArtefactsListView" */ '../views/Artefacts/ArtefactsListView.vue'),
       },
     ],
-  },
-  {
+  }, {
     path: '/project/pipelines',
     name: 'project-pipelines',
     component: () => import(/* webpackChunkName: "PipelinesContainer" */ '../views/Pipelines/PipelinesContainer.vue'),
@@ -56,15 +50,13 @@ const routes: Array<RouteRecordRaw> = [
         alias: ['', 'setup'],
         name: 'project-pipelines-setup',
         component: () => import(/* webpackChunkName: "PipelinesSetupView" */ '../views/Pipelines/PipelinesSetupView.vue'),
-      },
-      {
+      }, {
         path: 'presets',
         name: 'project-pipelines-presets',
         component: () => import(/* webpackChunkName: "PipelinePresetsView" */ '../views/Pipelines/PipelinePresetsView.vue'),
       },
     ],
-  },
-  {
+  }, {
     path: '/project/imports',
     name: 'project-imports',
     component: () => import(/* webpackChunkName: "ImportsContainer" */ '../views/Imports/ImportsContainer.vue'),
@@ -74,15 +66,17 @@ const routes: Array<RouteRecordRaw> = [
         alias: ['', 'list'],
         name: 'project-imports-list',
         component: () => import(/* webpackChunkName: "ImportsListView" */ '../views/Imports/ImportsListView.vue'),
-      },
-      {
+      }, {
         path: 'details/:import_id?',
         name: 'project-imports-details',
         component: () => import(/* webpackChunkName: "ImportDetailsView" */ '../views/Imports/ImportDetailsView.vue'),
+      }, {
+        path: 'search',
+        name: 'project-imports-search',
+        component: () => import(/* webpackChunkName: "ImportSearchView" */ '../views/Imports/ImportSearchView.vue'),
       },
     ],
-  },
-  {
+  }, {
     path: '/project/dataset',
     name: 'project-dataset',
     component: () => import(/* webpackChunkName: "DatasetContainer" */ '../views/Dataset/DatasetContainer.vue'),
@@ -94,8 +88,7 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import(/* webpackChunkName: "DatasetListView" */ '../views/Dataset/DatasetListView.vue'),
       },
     ],
-  },
-  {
+  }, {
     path: '/project/annotate',
     name: 'project-annotate',
     component: () => import(/* webpackChunkName: "AnnotationsContainer" */ '../views/Annotations/Annotations/AnnotationsContainer.vue'),
@@ -105,15 +98,13 @@ const routes: Array<RouteRecordRaw> = [
         alias: ['', 'scopes'],
         name: 'project-annotate-assignments',
         component: () => import(/* webpackChunkName: "AssignmentScopesView" */ '../views/Annotations/Annotations/AssignmentScopesView.vue'),
-      },
-      {
+      }, {
         path: 'item/:scope_id/:assignment_id?',
         name: 'project-annotate-item',
         component: () => import(/* webpackChunkName: "AnnotationsView" */ '../views/Annotations/Annotations/AnnotationsView.vue'),
       },
     ],
-  },
-  {
+  }, {
     path: '/project/config/annotations',
     name: 'config-annotation-schemes',
     component: () => import(/* webpackChunkName: "AnnotationConfigsContainer" */ '../views/Annotations/AnnotationConfigs/AnnotationConfigsContainer.vue'),
@@ -123,30 +114,25 @@ const routes: Array<RouteRecordRaw> = [
         alias: ['', 'list'],
         name: 'config-annotation-scheme-list',
         component: () => import(/* webpackChunkName: "AnnotationConfigListView" */ '../views/Annotations/AnnotationConfigs/AnnotationConfigListView.vue'),
-      },
-      {
+      }, {
         path: 'scope/:scope_id?',
         name: 'config-annotation-scheme-scope',
         component: () => import(/* webpackChunkName: "AssignmentScopeConfigView" */ '../views/Annotations/AnnotationConfigs/AssignmentScopeConfigView.vue'),
-      },
-      {
+      }, {
         path: 'scheme/:annotation_scheme_id?',
         name: 'config-annotation-scheme-edit',
         component: () => import(/* webpackChunkName: "AnnotationConfigEditView" */ '../views/Annotations/AnnotationConfigs/AnnotationConfigEditView.vue'),
-      },
-      {
+      }, {
         path: 'resolved/',
         name: 'config-resolved-annotations-list',
         component: () => import(/* webpackChunkName: "AnnotationConfigResolveView" */ '../views/Annotations/AnnotationConfigs/AnnotationConfigResolvedListView.vue'),
-      },
-      {
+      }, {
         path: 'resolve/:bot_annotation_metadata_id?',
         name: 'config-annotation-resolve',
         component: () => import(/* webpackChunkName: "AnnotationConfigResolveView" */ '../views/Annotations/AnnotationConfigs/AnnotationConfigResolveView.vue'),
       },
     ],
-  },
-  {
+  }, {
     path: '/project/settings',
     name: 'project-settings',
     component: () => import(/* webpackChunkName: "ProjectSettingsContainer" */ '../views/Projects/ProjectSettingsContainer.vue'),
@@ -158,8 +144,7 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import(/* webpackChunkName: "ProjectSettingsView" */ '../views/Projects/ProjectSettingsView.vue'),
       },
     ],
-  },
-  {
+  }, {
     path: '/admin',
     name: 'admin',
     component: () => import(/* webpackChunkName: "AdminContainer" */ '../views/Admin/AdminContainer.vue'),
@@ -169,20 +154,17 @@ const routes: Array<RouteRecordRaw> = [
         alias: ['', 'overview'],
         name: 'admin-overview',
         component: () => import(/* webpackChunkName: "OverviewView" */ '../views/Admin/OverviewView.vue'),
-      },
-      {
+      }, {
         path: 'users/',
         name: 'admin-users',
         component: () => import(/* webpackChunkName: "OverviewView" */ '../views/Admin/UserManagementView.vue'),
-      },
-      {
+      }, {
         path: 'projects/',
         name: 'admin-projects',
         component: () => import(/* webpackChunkName: "ProjectManagementView" */ '../views/Admin/ProjectManagementView.vue'),
       },
     ],
-  },
-  {
+  }, {
     path: '/user',
     name: 'user',
     component: () => import(/* webpackChunkName: "UserContainer" */ '../views/User/UserContainer.vue'),
@@ -191,8 +173,7 @@ const routes: Array<RouteRecordRaw> = [
         path: 'login',
         name: 'user-login',
         component: () => import(/* webpackChunkName: "LoginView" */ '../views/User/LoginView.vue'),
-      },
-      {
+      }, {
         path: 'profile',
         name: 'user-profile',
         component: () => import(/* webpackChunkName: "UserProfileView" */ '../views/User/UserProfileView.vue'),
