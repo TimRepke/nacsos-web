@@ -28,6 +28,7 @@ export type UserPermission = {
   pipelines_edit?: boolean;
   artefacts_read?: boolean;
   artefacts_edit?: boolean;
+  search?: boolean;
   user: UserBaseModel;
 };
 

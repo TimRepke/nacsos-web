@@ -72,6 +72,9 @@ export const $UserPermission = {
     artefacts_edit: {
       type: 'boolean',
     },
+    search: {
+      type: 'boolean',
+    },
     user: {
       type: 'UserBaseModel',
       isRequired: true,

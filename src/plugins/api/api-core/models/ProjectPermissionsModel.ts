@@ -26,5 +26,6 @@ export type ProjectPermissionsModel = {
   pipelines_edit?: boolean;
   artefacts_read?: boolean;
   artefacts_edit?: boolean;
+  search?: boolean;
 };
 

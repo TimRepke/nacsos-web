@@ -12,6 +12,7 @@ import { ImportsService } from './services/ImportsService';
 import { OauthService } from './services/OauthService';
 import { ProjectService } from './services/ProjectService';
 import { ProjectsService } from './services/ProjectsService';
+import { SearchService } from './services/SearchService';
 import { UsersService } from './services/UsersService';
 
 type HttpRequestConstructor = new (config: OpenAPIConfig) => BaseHttpRequest;
@@ -25,6 +26,7 @@ export class CoreClient {
   public readonly oauth: OauthService;
   public readonly project: ProjectService;
   public readonly projects: ProjectsService;
+  public readonly search: SearchService;
   public readonly users: UsersService;
 
   public readonly request: BaseHttpRequest;
@@ -49,6 +51,7 @@ export class CoreClient {
     this.oauth = new OauthService(this.request);
     this.project = new ProjectService(this.request);
     this.projects = new ProjectsService(this.request);
+    this.search = new SearchService(this.request);
     this.users = new UsersService(this.request);
   }
 }

@@ -72,5 +72,8 @@ export const $ProjectPermissionsModel = {
     artefacts_edit: {
       type: 'boolean',
     },
+    search: {
+      type: 'boolean',
+    },
   },
 } as const;
