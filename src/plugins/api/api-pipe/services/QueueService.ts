@@ -2,7 +2,8 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { SubmittedTask } from '../models/SubmittedTask';
-import type { TaskInDB } from '../models/TaskInDB';
+import type { TaskModel } from '../models/TaskModel';
+import type { TaskStatus } from '../models/TaskStatus';
 
 import type { CancelablePromise } from '@/plugins/api/core/CancelablePromise';
 import type { BaseHttpRequest } from '@/plugins/api/core/BaseHttpRequest';
@@ -15,10 +16,10 @@ export class QueueService {
 
   /**
    * Get All
-   * @returns TaskInDB Successful Response
+   * @returns TaskModel Successful Response
    * @throws ApiError
    */
-  public getAllApiQueueListGet(options?: Partial<ApiRequestOptions>): CancelablePromise<Array<TaskInDB>> {
+  public getAllApiQueueListGet(options?: Partial<ApiRequestOptions>): CancelablePromise<Array<TaskModel>> {
     return this.httpRequest.request({
       method: 'GET',
       url: '/api/queue/list',
@@ -28,14 +29,14 @@ export class QueueService {
 
   /**
    * Get By Status
-   * @returns TaskInDB Successful Response
+   * @returns TaskModel Successful Response
    * @throws ApiError
    */
   public getByStatusApiQueueListStatusGet({
     status,
   }: {
-    status: 'PENDING' | 'RUNNING' | 'COMPLETED' | 'FAILED' | 'CANCELLED',
-  }, options?: Partial<ApiRequestOptions>): CancelablePromise<Array<TaskInDB>> {
+    status: TaskStatus,
+  }, options?: Partial<ApiRequestOptions>): CancelablePromise<Array<TaskModel>> {
     return this.httpRequest.request({
       method: 'GET',
       url: '/api/queue/list/{status}',
@@ -51,19 +52,19 @@ export class QueueService {
 
   /**
    * Get All For Project
-   * @returns TaskInDB Successful Response
+   * @returns TaskModel Successful Response
    * @throws ApiError
    */
-  public getAllForProjectApiQueueProjectProjectIdListGet({
-    projectId,
+  public getAllForProjectApiQueueProjectListGet({
+    xProjectId,
   }: {
-    projectId: string,
-  }, options?: Partial<ApiRequestOptions>): CancelablePromise<Array<TaskInDB>> {
+    xProjectId: string,
+  }, options?: Partial<ApiRequestOptions>): CancelablePromise<Array<TaskModel>> {
     return this.httpRequest.request({
       method: 'GET',
-      url: '/api/queue/project/{project_id}/list',
-      path: {
-        'project_id': projectId,
+      url: '/api/queue/project/list',
+      headers: {
+        'x-project-id': xProjectId,
       },
       errors: {
         422: `Validation Error`,
@@ -74,22 +75,24 @@ export class QueueService {
 
   /**
    * Get By Status For Project
-   * @returns TaskInDB Successful Response
+   * @returns TaskModel Successful Response
    * @throws ApiError
    */
-  public getByStatusForProjectApiQueueProjectProjectIdListStatusGet({
-    projectId,
+  public getByStatusForProjectApiQueueProjectListStatusGet({
     status,
+    xProjectId,
   }: {
-    projectId: string,
-    status: 'PENDING' | 'RUNNING' | 'COMPLETED' | 'FAILED' | 'CANCELLED',
-  }, options?: Partial<ApiRequestOptions>): CancelablePromise<Array<TaskInDB>> {
+    status: TaskStatus,
+    xProjectId: string,
+  }, options?: Partial<ApiRequestOptions>): CancelablePromise<Array<TaskModel>> {
     return this.httpRequest.request({
       method: 'GET',
-      url: '/api/queue/project/{project_id}/list/{status}',
+      url: '/api/queue/project/list/{status}',
       path: {
-        'project_id': projectId,
         'status': status,
+      },
+      headers: {
+        'x-project-id': xProjectId,
       },
       errors: {
         422: `Validation Error`,
@@ -100,33 +103,35 @@ export class QueueService {
 
   /**
    * Search Tasks
-   * @returns TaskInDB Successful Response
+   * @returns TaskModel Successful Response
    * @throws ApiError
    */
   public searchTasksApiQueueSearchGet({
+    xProjectId,
     functionName,
     fingerprint,
-    projectId,
     userId,
     location,
     status,
     orderByFields,
   }: {
+    xProjectId: string,
     functionName?: string,
     fingerprint?: string,
-    projectId?: string,
     userId?: string,
     location?: string,
     status?: string,
     orderByFields?: Array<string>,
-  }, options?: Partial<ApiRequestOptions>): CancelablePromise<Array<TaskInDB>> {
+  }, options?: Partial<ApiRequestOptions>): CancelablePromise<Array<TaskModel>> {
     return this.httpRequest.request({
       method: 'GET',
       url: '/api/queue/search',
+      headers: {
+        'x-project-id': xProjectId,
+      },
       query: {
         'function_name': functionName,
         'fingerprint': fingerprint,
-        'project_id': projectId,
         'user_id': userId,
         'location': location,
         'status': status,
@@ -141,19 +146,24 @@ export class QueueService {
 
   /**
    * Get Status
-   * @returns string Successful Response
+   * @returns TaskStatus Successful Response
    * @throws ApiError
    */
   public getStatusApiQueueStatusTaskIdGet({
     taskId,
+    xProjectId,
   }: {
     taskId: string,
-  }, options?: Partial<ApiRequestOptions>): CancelablePromise<'PENDING' | 'RUNNING' | 'COMPLETED' | 'FAILED' | 'CANCELLED'> {
+    xProjectId: string,
+  }, options?: Partial<ApiRequestOptions>): CancelablePromise<TaskStatus> {
     return this.httpRequest.request({
       method: 'GET',
       url: '/api/queue/status/{task_id}',
       path: {
         'task_id': taskId,
+      },
+      headers: {
+        'x-project-id': xProjectId,
       },
       errors: {
         422: `Validation Error`,
@@ -169,14 +179,19 @@ export class QueueService {
    */
   public forceRunApiQueueForceRunTaskIdPost({
     taskId,
+    xProjectId,
   }: {
     taskId: string,
+    xProjectId: string,
   }, options?: Partial<ApiRequestOptions>): CancelablePromise<any> {
     return this.httpRequest.request({
       method: 'POST',
       url: '/api/queue/force-run/{task_id}',
       path: {
         'task_id': taskId,
+      },
+      headers: {
+        'x-project-id': xProjectId,
       },
       errors: {
         422: `Validation Error`,
@@ -191,13 +206,18 @@ export class QueueService {
    * @throws ApiError
    */
   public submitBulkApiQueueSubmitTasksPut({
+    xProjectId,
     requestBody,
   }: {
+    xProjectId: string,
     requestBody: Array<SubmittedTask>,
   }, options?: Partial<ApiRequestOptions>): CancelablePromise<Array<string>> {
     return this.httpRequest.request({
       method: 'PUT',
       url: '/api/queue/submit/tasks',
+      headers: {
+        'x-project-id': xProjectId,
+      },
       body: requestBody,
       mediaType: 'application/json',
       errors: {
@@ -213,13 +233,18 @@ export class QueueService {
    * @throws ApiError
    */
   public submitSingleApiQueueSubmitTaskPut({
+    xProjectId,
     requestBody,
   }: {
+    xProjectId: string,
     requestBody: SubmittedTask,
   }, options?: Partial<ApiRequestOptions>): CancelablePromise<string> {
     return this.httpRequest.request({
       method: 'PUT',
       url: '/api/queue/submit/task',
+      headers: {
+        'x-project-id': xProjectId,
+      },
       body: requestBody,
       mediaType: 'application/json',
       errors: {
@@ -236,14 +261,19 @@ export class QueueService {
    */
   public cancelTaskApiQueueCancelTaskIdPut({
     taskId,
+    xProjectId,
   }: {
     taskId: string,
+    xProjectId: string,
   }, options?: Partial<ApiRequestOptions>): CancelablePromise<any> {
     return this.httpRequest.request({
       method: 'PUT',
       url: '/api/queue/cancel/{task_id}',
       path: {
         'task_id': taskId,
+      },
+      headers: {
+        'x-project-id': xProjectId,
       },
       errors: {
         422: `Validation Error`,
@@ -259,14 +289,19 @@ export class QueueService {
    */
   public deleteTaskApiQueueTaskTaskIdDelete({
     taskId,
+    xProjectId,
   }: {
     taskId: string,
+    xProjectId: string,
   }, options?: Partial<ApiRequestOptions>): CancelablePromise<any> {
     return this.httpRequest.request({
       method: 'DELETE',
       url: '/api/queue/task/{task_id}',
       path: {
         'task_id': taskId,
+      },
+      headers: {
+        'x-project-id': xProjectId,
       },
       errors: {
         422: `Validation Error`,

@@ -79,7 +79,7 @@
 
 <script lang="ts">
 import { marked } from 'marked';
-import type { TaskInDB, FunctionInfo, FileOnDisk, QueueService } from '@/plugins/api/api-pipe';
+import type { TaskModel, FunctionInfo, FileOnDisk, QueueService } from '@/plugins/api/api-pipe';
 import { EventBus } from '@/plugins/events';
 import { ToastEvent } from '@/plugins/events/events/toast';
 import { API } from '@/plugins/api';
@@ -89,7 +89,7 @@ import { defineComponent } from 'vue';
 type SearchParams = Parameters<QueueService['searchTasksApiQueueSearchGet']>[0];
 
 interface Entry {
-  task: TaskInDB;
+  task: TaskModel;
   info: FunctionInfo;
   showArtefacts: boolean;
   showLog: boolean;
@@ -128,7 +128,7 @@ export default defineComponent({
           return;
         }
 
-        const funcNames: string[] = Array.from(new Set(tasks.map((task: TaskInDB) => task.function_name)));
+        const funcNames: string[] = Array.from(new Set(tasks.map((task: TaskModel) => task.function_name)));
         const funcInfos = (await API.pipe.library.getFunctionInfosApiLibraryInfosGet({ funcName: funcNames })).data;
         if (!funcInfos) {
           EventBus.emit(new ToastEvent('ERROR', 'Failed to load function infos. Please try reloading the page.'));
@@ -137,7 +137,7 @@ export default defineComponent({
 
         const funcs = Object.fromEntries(funcInfos.map((func: FunctionInfo) => [`${func.module}.${func.function}`, func]));
 
-        this.entries = tasks.map((task: TaskInDB) => ({
+        this.entries = tasks.map((task: TaskModel) => ({
           task,
           info: funcs[task.function_name],
           showArtefacts: false,
@@ -153,7 +153,10 @@ export default defineComponent({
       return marked(s);
     },
     async toggleEntry(entry: Entry) {
-      const artefacts = (await API.pipe.artefacts.getArtefactsApiArtefactsListTaskIdGet({ taskId: entry.task.task_id as string })).data;
+      const artefacts = (await API.pipe.artefacts.getArtefactsApiArtefactsListGet({
+        xTaskId: entry.task.task_id as string,
+        xProjectId: currentProjectStore.projectId as string,
+      })).data;
       if (!artefacts) {
         EventBus.emit(new ToastEvent('WARN', `Failed to load additional info for task ${entry.task.task_id}`));
       } else {
@@ -172,10 +175,9 @@ export default defineComponent({
   },
   computed: {
     searchObject(): SearchParams {
-      const searchObj: SearchParams = {};
-      if (this.searchByProject) {
-        searchObj.projectId = currentProjectStore.projectId;
-      }
+      const searchObj: SearchParams = {
+        xProjectId: currentProjectStore.projectId as string,
+      };
       if (this.searchByUser) {
         searchObj.userId = currentUserStore.user?.user_id;
       }

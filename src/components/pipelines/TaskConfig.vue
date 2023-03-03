@@ -123,7 +123,7 @@ import type {
 import { isArtefactOrSerializedArtefact, isFunctionInfo } from '@/util/typeChecks';
 import { currentProjectStore, currentUserStore } from '@/stores';
 import InlineToolTip from '@/components/InlineToolTip.vue';
-import type { FunctionInfo, SerializedArtefact, KWARG, ArtefactReference } from '@/plugins/api/api-pipe';
+import type { FunctionInfo, SerializedArtefact, KWARG } from '@/plugins/api/api-pipe';
 import { defineComponent } from 'vue';
 
 export default defineComponent({
@@ -216,7 +216,7 @@ export default defineComponent({
     pickReference(key: string, artefact: SerializedArtefact) {
       this.$emit('pickArtefactReference', [
         artefact,
-        (artefactRef: ArtefactReference) => {
+        (artefactRef: SerializedArtefact) => {
           this.taskParams[key] = artefactRef;
         },
       ]);

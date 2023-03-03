@@ -3,6 +3,7 @@
 /* eslint-disable */
 
 import type { Artefact } from './Artefact';
+import type { CPULoadClassification } from './CPULoadClassification';
 import type { KWARG } from './KWARG';
 
 export type FunctionInfo = {
@@ -15,20 +16,7 @@ export type FunctionInfo = {
   filepath: string;
   filepath_rel: string;
   tags?: Array<string>;
-  est_cpu_load?: FunctionInfo.est_cpu_load;
+  est_cpu_load?: CPULoadClassification;
   recommended_lifetime?: number;
 };
-
-export namespace FunctionInfo {
-
-  export enum est_cpu_load {
-    VHIGH = 'VHIGH',
-    HIGH = 'HIGH',
-    MEDIUM = 'MEDIUM',
-    LOW = 'LOW',
-    MINIMAL = 'MINIMAL',
-  }
-
-
-}
 

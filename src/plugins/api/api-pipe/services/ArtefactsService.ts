@@ -20,16 +20,19 @@ export class ArtefactsService {
    * @returns FileOnDisk Successful Response
    * @throws ApiError
    */
-  public getArtefactsApiArtefactsListTaskIdGet({
-    taskId,
+  public getArtefactsApiArtefactsListGet({
+    xTaskId,
+    xProjectId,
   }: {
-    taskId: string,
+    xTaskId: string,
+    xProjectId: string,
   }, options?: Partial<ApiRequestOptions>): CancelablePromise<Array<FileOnDisk>> {
     return this.httpRequest.request({
       method: 'GET',
-      url: '/api/artefacts/list/{task_id}',
-      path: {
-        'task_id': taskId,
+      url: '/api/artefacts/list',
+      headers: {
+        'x-task-id': xTaskId,
+        'x-project-id': xProjectId,
       },
       errors: {
         422: `Validation Error`,
@@ -43,16 +46,19 @@ export class ArtefactsService {
    * @returns string Successful Response
    * @throws ApiError
    */
-  public getTaskLogApiArtefactsLogTaskIdGet({
-    taskId,
+  public getTaskLogApiArtefactsLogGet({
+    xTaskId,
+    xProjectId,
   }: {
-    taskId: string,
+    xTaskId: string,
+    xProjectId: string,
   }, options?: Partial<ApiRequestOptions>): CancelablePromise<string> {
     return this.httpRequest.request({
       method: 'GET',
-      url: '/api/artefacts/log/{task_id}',
-      path: {
-        'task_id': taskId,
+      url: '/api/artefacts/log',
+      headers: {
+        'x-task-id': xTaskId,
+        'x-project-id': xProjectId,
       },
       errors: {
         422: `Validation Error`,
@@ -68,12 +74,20 @@ export class ArtefactsService {
    */
   public getFileApiArtefactsFileGet({
     filename,
+    xTaskId,
+    xProjectId,
   }: {
     filename: string,
+    xTaskId: string,
+    xProjectId: string,
   }, options?: Partial<ApiRequestOptions>): CancelablePromise<any> {
     return this.httpRequest.request({
       method: 'GET',
       url: '/api/artefacts/file',
+      headers: {
+        'x-task-id': xTaskId,
+        'x-project-id': xProjectId,
+      },
       query: {
         'filename': filename,
       },
@@ -89,17 +103,50 @@ export class ArtefactsService {
    * @returns any Successful Response
    * @throws ApiError
    */
-  public getArchiveApiArtefactsFilesTaskIdGet({
-    taskId,
+  public getArchiveApiArtefactsFilesGet({
+    xTaskId,
+    xProjectId,
   }: {
-    taskId: string,
+    xTaskId: string,
+    xProjectId: string,
   }, options?: Partial<ApiRequestOptions>): CancelablePromise<any> {
     return this.httpRequest.request({
       method: 'GET',
-      url: '/api/artefacts/files/{task_id}',
-      path: {
-        'task_id': taskId,
+      url: '/api/artefacts/files',
+      headers: {
+        'x-task-id': xTaskId,
+        'x-project-id': xProjectId,
       },
+      errors: {
+        422: `Validation Error`,
+      },
+      ...options,
+    });
+  }
+
+  /**
+   * Delete Files
+   * @returns any Successful Response
+   * @throws ApiError
+   */
+  public deleteFilesApiArtefactsFilesDelete({
+    xTaskId,
+    xProjectId,
+    requestBody,
+  }: {
+    xTaskId: string,
+    xProjectId: string,
+    requestBody: DeletionRequest,
+  }, options?: Partial<ApiRequestOptions>): CancelablePromise<any> {
+    return this.httpRequest.request({
+      method: 'DELETE',
+      url: '/api/artefacts/files',
+      headers: {
+        'x-task-id': xTaskId,
+        'x-project-id': xProjectId,
+      },
+      body: requestBody,
+      mediaType: 'application/json',
       errors: {
         422: `Validation Error`,
       },
@@ -113,15 +160,20 @@ export class ArtefactsService {
    * @throws ApiError
    */
   public uploadFileApiArtefactsFilesUploadPost({
+    xProjectId,
     formData,
     folder,
   }: {
+    xProjectId: string,
     formData: Body_upload_file_api_artefacts_files_upload_post,
     folder?: string,
   }, options?: Partial<ApiRequestOptions>): CancelablePromise<string> {
     return this.httpRequest.request({
       method: 'POST',
       url: '/api/artefacts/files/upload',
+      headers: {
+        'x-project-id': xProjectId,
+      },
       query: {
         'folder': folder,
       },
@@ -140,15 +192,20 @@ export class ArtefactsService {
    * @throws ApiError
    */
   public uploadFilesApiArtefactsFilesUploadManyPost({
+    xProjectId,
     formData,
     folder,
   }: {
+    xProjectId: string,
     formData: Body_upload_files_api_artefacts_files_upload_many_post,
     folder?: string,
   }, options?: Partial<ApiRequestOptions>): CancelablePromise<Array<string>> {
     return this.httpRequest.request({
       method: 'POST',
       url: '/api/artefacts/files/upload-many',
+      headers: {
+        'x-project-id': xProjectId,
+      },
       query: {
         'folder': folder,
       },
@@ -162,42 +219,23 @@ export class ArtefactsService {
   }
 
   /**
-   * Delete Files
-   * @returns any Successful Response
-   * @throws ApiError
-   */
-  public deleteFilesApiArtefactsFilesDelete({
-    requestBody,
-  }: {
-    requestBody: DeletionRequest,
-  }, options?: Partial<ApiRequestOptions>): CancelablePromise<any> {
-    return this.httpRequest.request({
-      method: 'DELETE',
-      url: '/api/artefacts/files',
-      body: requestBody,
-      mediaType: 'application/json',
-      errors: {
-        422: `Validation Error`,
-      },
-      ...options,
-    });
-  }
-
-  /**
    * Delete Task Files
    * @returns any Successful Response
    * @throws ApiError
    */
-  public deleteTaskFilesApiArtefactsTaskTaskIdDelete({
-    taskId,
+  public deleteTaskFilesApiArtefactsTaskDelete({
+    xTaskId,
+    xProjectId,
   }: {
-    taskId: string,
+    xTaskId: string,
+    xProjectId: string,
   }, options?: Partial<ApiRequestOptions>): CancelablePromise<any> {
     return this.httpRequest.request({
       method: 'DELETE',
-      url: '/api/artefacts/task/{task_id}',
-      path: {
-        'task_id': taskId,
+      url: '/api/artefacts/task',
+      headers: {
+        'x-task-id': xTaskId,
+        'x-project-id': xProjectId,
       },
       errors: {
         422: `Validation Error`,

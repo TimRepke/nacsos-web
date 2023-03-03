@@ -4,7 +4,13 @@
 export const $SubmittedTask = {
   properties: {
     task_id: {
-      type: 'string',
+      type: 'any-of',
+      contains: [{
+        type: 'string',
+      }, {
+        type: 'string',
+        format: 'uuid',
+      }],
     },
     function_name: {
       type: 'string',
@@ -23,7 +29,7 @@ export const $SubmittedTask = {
           }, {
             type: 'string',
           }, {
-            type: 'ArtefactReference',
+            type: 'SerializedArtefactReference',
           }],
         },
       }, {
@@ -31,25 +37,49 @@ export const $SubmittedTask = {
       }],
     },
     user_id: {
-      type: 'string',
+      type: 'any-of',
+      contains: [{
+        type: 'string',
+      }, {
+        type: 'string',
+        format: 'uuid',
+      }],
     },
     project_id: {
-      type: 'string',
+      type: 'any-of',
+      contains: [{
+        type: 'string',
+      }, {
+        type: 'string',
+        format: 'uuid',
+      }],
     },
     comment: {
       type: 'string',
     },
     location: {
-      type: 'Enum',
+      type: 'all-of',
+      contains: [{
+        type: 'ExecutionLocation',
+      }],
     },
     force_run: {
       type: 'boolean',
     },
     forced_dependencies: {
-      type: 'array',
-      contains: {
-        type: 'string',
-      },
+      type: 'any-of',
+      contains: [{
+        type: 'array',
+        contains: {
+          type: 'string',
+        },
+      }, {
+        type: 'array',
+        contains: {
+          type: 'string',
+          format: 'uuid',
+        },
+      }],
     },
   },
 } as const;
