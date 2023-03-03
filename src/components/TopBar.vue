@@ -62,7 +62,7 @@
 import type { UserModel } from '@/plugins/api/api-core';
 import { currentUserStore } from '@/stores';
 import { EventBus } from '@/plugins/events';
-import { LoggedOutEvent } from '@/plugins/events/events/auth';
+import { LoggedOutEvent, LogoutSuccessEvent } from '@/plugins/events/events/auth';
 import { defineComponent } from 'vue';
 
 export default defineComponent({
@@ -74,8 +74,11 @@ export default defineComponent({
   },
   methods: {
     logout() {
-      this.$router.push({ name: 'user-login' });
       EventBus.emit(new LoggedOutEvent());
+      EventBus.once(LogoutSuccessEvent, () => {
+        console.log('loe');
+        this.$router.push({ name: 'user-login' });
+      });
     },
   },
 });

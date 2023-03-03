@@ -2,23 +2,19 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { PipelineTaskStatusChangedEvent } from './PipelineTaskStatusChangedEvent';
-import type { PipelineTaskStatusCompletedEvent } from './PipelineTaskStatusCompletedEvent';
-import type { PipelineTaskStatusFailedEvent } from './PipelineTaskStatusFailedEvent';
-import type { PipelineTaskStatusStartedEvent } from './PipelineTaskStatusStartedEvent';
+import type { ExampleEvent } from './ExampleEvent';
+import type { ExampleSubEvent } from './ExampleSubEvent';
 
 export type Event = {
   event: Event.event;
-  payload: (PipelineTaskStatusChangedEvent | PipelineTaskStatusCompletedEvent | PipelineTaskStatusFailedEvent | PipelineTaskStatusStartedEvent);
+  payload: (ExampleSubEvent | ExampleEvent);
 };
 
 export namespace Event {
 
   export enum event {
-    PIPELINE_TASK_STATUS_CHANGED_EVENT = 'PipelineTaskStatusChangedEvent',
-    PIPELINE_TASK_STATUS_COMPLETED_EVENT = 'PipelineTaskStatusCompletedEvent',
-    PIPELINE_TASK_STATUS_FAILED_EVENT = 'PipelineTaskStatusFailedEvent',
-    PIPELINE_TASK_STATUS_STARTED_EVENT = 'PipelineTaskStatusStartedEvent',
+    EXAMPLE_SUB_EVENT = 'ExampleSubEvent',
+    EXAMPLE_EVENT = 'ExampleEvent',
   }
 
 

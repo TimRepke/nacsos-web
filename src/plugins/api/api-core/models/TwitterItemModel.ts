@@ -34,7 +34,7 @@ export type TwitterItemModel = {
   mentions?: Array<Mention>;
   urls?: Array<URL>;
   cashtags?: Array<Cashtag>;
-  annotations?: Array<ContextAnnotation>;
+  context_annotations?: Array<ContextAnnotation>;
   retweet_count: number;
   reply_count: number;
   like_count: number;

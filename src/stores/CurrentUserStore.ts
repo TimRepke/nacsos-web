@@ -5,7 +5,7 @@ import Serializer from '@/types/serializer';
 import type { UserModel } from '@/plugins/api/api-core';
 import { API } from '@/plugins/api';
 import { EventBus } from '@/plugins/events';
-import { AuthFailedEvent, LoginSuccessEvent } from '@/plugins/events/events/auth';
+import { AuthFailedEvent, LoginSuccessEvent, LogoutSuccessEvent } from '@/plugins/events/events/auth';
 
 const UserSerializer = Serializer<UserModel>();
 
@@ -34,7 +34,7 @@ export const useCurrentUserStore = defineStore('CurrentUserStore', {
     async login(username: string, password: string) {
       try {
         const token = await API.core.oauth.loginForAccessTokenApiLoginTokenPost({ formData: { username, password } });
-        this.setAccessToken(token.data.access_token);
+        this.setAccessToken(token.data.token_id);
         const me = await API.core.oauth.readUsersMeApiLoginMeGet();
         this.setUser(me.data);
         EventBus.emit(new LoginSuccessEvent(me.data));
@@ -44,8 +44,14 @@ export const useCurrentUserStore = defineStore('CurrentUserStore', {
         EventBus.emit(new AuthFailedEvent());
       }
     },
-    logout() {
+    async logout() {
+      try {
+        await API.core.oauth.logoutApiLoginLogoutGet();
+      } catch (reason) {
+        console.error(reason);
+      }
       this.clear();
+      EventBus.emit(new LogoutSuccessEvent());
     },
     clear() {
       this.accessToken = undefined;

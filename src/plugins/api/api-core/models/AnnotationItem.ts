@@ -13,6 +13,6 @@ export type AnnotationItem = {
   scheme: AnnotationSchemeModel;
   assignment: AssignmentModel;
   scope: AssignmentScopeModel;
-  item: (GenericItemModel | TwitterItemModel | AcademicItemModel);
+  item: (TwitterItemModel | AcademicItemModel | GenericItemModel);
 };
 

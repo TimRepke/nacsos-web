@@ -1,8 +1,8 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+import type { AuthTokenModel } from '../models/AuthTokenModel';
 import type { Body_login_for_access_token_api_login_token_post } from '../models/Body_login_for_access_token_api_login_token_post';
-import type { Token } from '../models/Token';
 import type { UserModel } from '../models/UserModel';
 
 import type { CancelablePromise } from '@/plugins/api/core/CancelablePromise';
@@ -16,14 +16,14 @@ export class OauthService {
 
   /**
    * Login For Access Token
-   * @returns Token Successful Response
+   * @returns AuthTokenModel Successful Response
    * @throws ApiError
    */
   public loginForAccessTokenApiLoginTokenPost({
     formData,
   }: {
     formData: Body_login_for_access_token_api_login_token_post,
-  }, options?: Partial<ApiRequestOptions>): CancelablePromise<Token> {
+  }, options?: Partial<ApiRequestOptions>): CancelablePromise<AuthTokenModel> {
     return this.httpRequest.request({
       method: 'POST',
       url: '/api/login/token',
@@ -45,6 +45,19 @@ export class OauthService {
     return this.httpRequest.request({
       method: 'GET',
       url: '/api/login/me',
+      ...options,
+    });
+  }
+
+  /**
+   * Logout
+   * @returns any Successful Response
+   * @throws ApiError
+   */
+  public logoutApiLoginLogoutGet(options?: Partial<ApiRequestOptions>): CancelablePromise<any> {
+    return this.httpRequest.request({
+      method: 'GET',
+      url: '/api/login/logout',
       ...options,
     });
   }

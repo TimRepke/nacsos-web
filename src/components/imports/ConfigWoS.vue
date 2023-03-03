@@ -2,7 +2,7 @@
   <div class="m-2">
     <div class="row">
       <div class="col-xxl-7">
-        <h4>JSONL import</h4>
+        <h4>Web of Science import</h4>
         <p class="text-muted">
           Import method for Web of Science text files. These can be obtained by querying web of science, clicking
           "export" and selecting "Plain text file"
