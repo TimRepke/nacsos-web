@@ -62,7 +62,7 @@
 import type { UserModel } from '@/plugins/api/api-core';
 import { currentUserStore } from '@/stores';
 import { EventBus } from '@/plugins/events';
-import { LoggedOutEvent, LoginSuccessEvent, LogoutSuccessEvent } from '@/plugins/events/events/auth';
+import { LoggedOutEvent, LogoutSuccessEvent } from '@/plugins/events/events/auth';
 import { defineComponent } from 'vue';
 
 export default defineComponent({
