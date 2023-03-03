@@ -59,6 +59,7 @@ import { EventBus } from '@/plugins/events';
 import InlineToolTip from '@/components/InlineToolTip.vue';
 import { API } from '@/plugins/api';
 import { defineComponent } from 'vue';
+import { currentProjectStore } from '@/stores';
 
 type UploadStatus = 'PENDING' | 'UPLOADING' | 'SUCCESS' | 'FAILED';
 
@@ -100,6 +101,7 @@ export default defineComponent({
 
       return new Promise((resolve, reject) => {
         API.pipe.artefacts.uploadFileApiArtefactsFilesUploadPost({
+          xProjectId: currentProjectStore.projectId as string,
           folder,
           formData: { file: uploadFile.file },
         }, {

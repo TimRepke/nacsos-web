@@ -48,7 +48,10 @@ export const $FunctionInfo = {
       },
     },
     est_cpu_load: {
-      type: 'Enum',
+      type: 'all-of',
+      contains: [{
+        type: 'CPULoadClassification',
+      }],
     },
     recommended_lifetime: {
       type: 'number',

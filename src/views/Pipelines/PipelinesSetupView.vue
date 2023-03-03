@@ -159,7 +159,7 @@
                     class="btn btn-outline-secondary btn-sm"
                     v-for="(atype, art) in getInfoByName(task.function_name)?.artefacts"
                     :key="art"
-                    @click="selectReference(task.task_id as string, art)">
+                    @click="selectReference(task.task_id, art)">
                     <strong>{{ art }}:</strong> <code>Artefact[{{ atype.serializer }}, {{ atype.dtype }}]</code>
                   </button>
                 </li>
@@ -194,7 +194,7 @@ import TaskConfigComponent from '@/components/pipelines/TaskConfig.vue';
 import { ConfirmationRequestEvent } from '@/plugins/events/events/confirmation';
 import { currentProjectStore, currentUserStore } from '@/stores';
 import { API, toastReject } from '@/plugins/api';
-import type { FunctionInfo, SerializedArtefact, TaskInDB, ArtefactReference } from '@/plugins/api/api-pipe';
+import type { FunctionInfo, SerializedArtefact, TaskModel, SerializedArtefactReference } from '@/plugins/api/api-pipe';
 import type { ArtefactCallback, TaskConfig, NestedLibrary } from '@/types/pipelines.d';
 import { defineComponent } from 'vue';
 
@@ -207,8 +207,8 @@ export default defineComponent({
       highlight: undefined as FunctionInfo | undefined,
       artefactQuery: undefined as SerializedArtefact | undefined,
       artefactQueryCallback: undefined as ArtefactCallback | undefined,
-      artefactQueryReference: undefined as ArtefactReference | undefined,
-      queuedTasks: [] as TaskInDB[],
+      artefactQueryReference: undefined as SerializedArtefactReference | undefined,
+      queuedTasks: [] as TaskModel[],
       configs: [] as TaskConfig[],
     };
   },
@@ -233,11 +233,13 @@ export default defineComponent({
     async loadQueuedTasks() {
       // TODO: Add type matching -> Only show tasks where an output artefact matches the type of the param artefact type
       // FIXME: Add some filters? Ideally configurable in the interface (only this project, only current user).
-      API.pipe.queue.searchTasksApiQueueSearchGet({})
+      API.pipe.queue.searchTasksApiQueueSearchGet({
+        xProjectId: currentProjectStore.projectId as string,
+      })
         .then((response) => { this.queuedTasks = response.data; })
         .catch(toastReject);
     },
-    pickReference(query: [SerializedArtefact, ArtefactReference]) {
+    pickReference(query: [SerializedArtefact, SerializedArtefactReference]) {
       const [artefact, cb] = query;
       this.artefactQuery = artefact;
       // @ts-ignore FIXME
@@ -269,7 +271,7 @@ export default defineComponent({
     addTask(info: FunctionInfo) {
       this.configs.push({
         task: {
-          task_id: crypto.randomUUID().replaceAll('-', ''),
+          task_id: crypto.randomUUID(),
           function_name: `${info.module}.${info.function}`,
           force_run: false,
           params: {},
@@ -298,7 +300,10 @@ export default defineComponent({
             this.$refs.taskConfigs.forEach((config: any) => {
               tasks[config.config.task.task_id].params = JSON.stringify(config.getTaskParams());
             });
-            API.pipe.queue.submitBulkApiQueueSubmitTasksPut({ requestBody: Object.values(tasks) })
+            API.pipe.queue.submitBulkApiQueueSubmitTasksPut({
+              xProjectId: currentProjectStore.projectId as string,
+              requestBody: Object.values(tasks),
+            })
               .then((response) => {
                 EventBus.emit(new ToastEvent('SUCCESS', `Submitted ${response.data?.length} tasks to the queue!`));
               })

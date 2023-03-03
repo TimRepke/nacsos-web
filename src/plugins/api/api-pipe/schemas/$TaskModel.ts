@@ -1,10 +1,16 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-export const $TaskInDB = {
+export const $TaskModel = {
   properties: {
     task_id: {
-      type: 'string',
+      type: 'any-of',
+      contains: [{
+        type: 'string',
+      }, {
+        type: 'string',
+        format: 'uuid',
+      }],
     },
     function_name: {
       type: 'string',
@@ -23,7 +29,7 @@ export const $TaskInDB = {
           }, {
             type: 'string',
           }, {
-            type: 'ArtefactReference',
+            type: 'SerializedArtefactReference',
           }],
         },
       }, {
@@ -31,34 +37,45 @@ export const $TaskInDB = {
       }],
     },
     user_id: {
-      type: 'string',
+      type: 'any-of',
+      contains: [{
+        type: 'string',
+      }, {
+        type: 'string',
+        format: 'uuid',
+      }],
     },
     project_id: {
-      type: 'string',
+      type: 'any-of',
+      contains: [{
+        type: 'string',
+      }, {
+        type: 'string',
+        format: 'uuid',
+      }],
     },
     comment: {
       type: 'string',
     },
     location: {
-      type: 'Enum',
+      type: 'all-of',
+      contains: [{
+        type: 'ExecutionLocation',
+      }],
     },
     fingerprint: {
       type: 'string',
       isRequired: true,
     },
-    dt_submitted: {
+    time_created: {
       type: 'string',
       format: 'date-time',
     },
-    dt_started: {
+    time_started: {
       type: 'string',
       format: 'date-time',
     },
-    dt_finished: {
-      type: 'string',
-      format: 'date-time',
-    },
-    dt_cancelled: {
+    time_finished: {
       type: 'string',
       format: 'date-time',
     },
@@ -69,20 +86,35 @@ export const $TaskInDB = {
       type: 'number',
     },
     est_cpu_load: {
-      type: 'Enum',
+      type: 'all-of',
+      contains: [{
+        type: 'CPULoadClassification',
+      }],
     },
     rec_expunge: {
       type: 'string',
       format: 'date-time',
     },
     dependencies: {
-      type: 'array',
-      contains: {
-        type: 'string',
-      },
+      type: 'any-of',
+      contains: [{
+        type: 'array',
+        contains: {
+          type: 'string',
+        },
+      }, {
+        type: 'array',
+        contains: {
+          type: 'string',
+          format: 'uuid',
+        },
+      }],
     },
     status: {
-      type: 'Enum',
+      type: 'all-of',
+      contains: [{
+        type: 'TaskStatus',
+      }],
     },
   },
 } as const;
