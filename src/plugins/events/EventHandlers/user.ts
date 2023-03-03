@@ -12,7 +12,7 @@ export default () => {
     currentUserStore.clear();
   });
 
-  EventBus.on(LoggedOutEvent, () => {
-    currentUserStore.clear();
+  EventBus.on(LoggedOutEvent, async () => {
+    await currentUserStore.logout();
   });
 };

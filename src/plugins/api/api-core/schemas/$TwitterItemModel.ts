@@ -87,7 +87,7 @@ export const $TwitterItemModel = {
         type: 'Cashtag',
       },
     },
-    annotations: {
+    context_annotations: {
       type: 'array',
       contains: {
         type: 'ContextAnnotation',

@@ -23,3 +23,5 @@ export class LoginSuccessEvent extends BaseEvent {
 export class AuthFailedEvent extends BaseEvent {}
 
 export class LoggedOutEvent extends BaseEvent {}
+
+export class LogoutSuccessEvent extends BaseEvent {}

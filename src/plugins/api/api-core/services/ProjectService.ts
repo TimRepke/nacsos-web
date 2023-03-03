@@ -299,7 +299,7 @@ export class ProjectService {
     itemId: string,
     xProjectId: string,
     itemType?: 'generic' | 'twitter' | 'academic' | 'patents',
-  }, options?: Partial<ApiRequestOptions>): CancelablePromise<(GenericItemModel | TwitterItemModel | AcademicItemModel)> {
+  }, options?: Partial<ApiRequestOptions>): CancelablePromise<(TwitterItemModel | AcademicItemModel | GenericItemModel)> {
     return this.httpRequest.request({
       method: 'GET',
       url: '/api/project/items/detail/{item_id}',

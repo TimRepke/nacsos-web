@@ -1,13 +1,9 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-export const $Token = {
+export const $ExampleSubEvent = {
   properties: {
-    access_token: {
-      type: 'string',
-      isRequired: true,
-    },
-    token_type: {
+    payload_a: {
       type: 'string',
       isRequired: true,
     },
