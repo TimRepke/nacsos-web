@@ -17,7 +17,7 @@
     "api-core": "node ./tools/openapi-gen/bin/index.js --input $npm_package_config_nacsos_core/openapi.json --output src/plugins/api/api-core --name CoreClient --client axios --indent 2 --useOptions --exportModels true --exportServices true --exportSchemas true --exportCore false --corePathTop @/plugins/api/core --corePathDeep @/plugins/api/core",
     "api-pipe": "node ./tools/openapi-gen/bin/index.js --input $npm_package_config_nacsos_pipe/openapi.json --output src/plugins/api/api-pipe --name PipelinesClient --client axios --indent 2 --useOptions --exportModels true --exportServices true --exportSchemas true --exportCore false --corePathTop @/plugins/api/core --corePathDeep @/plugins/api/core"
   },
-  "dependencies": {
+   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^6.3.0",
     "@fortawesome/free-brands-svg-icons": "^6.3.0",
     "@fortawesome/free-regular-svg-icons": "^6.3.0",
