@@ -10,5 +10,6 @@ export const currentProjectStore = useCurrentProjectStore(pinia);
 
 if (currentUserStore.accessToken) {
   API.core.request.config.TOKEN = currentUserStore.accessToken;
+  API.pipe.request.config.TOKEN = currentUserStore.accessToken;
 }
 export default pinia;
