@@ -57,10 +57,12 @@ export const useCurrentUserStore = defineStore('CurrentUserStore', {
       this.accessToken = undefined;
       this.user = undefined;
       API.core.request.config.TOKEN = undefined;
+      API.pipe.request.config.TOKEN = undefined;
     },
     setAccessToken(accessToken: string) {
       this.accessToken = accessToken;
       API.core.request.config.TOKEN = accessToken;
+      API.pipe.request.config.TOKEN = accessToken;
     },
     setUser(user: UserModel) {
       this.user = user;
