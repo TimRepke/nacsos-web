@@ -3,7 +3,6 @@
 /* eslint-disable */
 
 import type { ImportConfigJSONL } from './ImportConfigJSONL';
-import type { ImportConfigRIS } from './ImportConfigRIS';
 import type { ImportConfigTwitter } from './ImportConfigTwitter';
 import type { ImportConfigWoS } from './ImportConfigWoS';
 import type { ImportType } from './ImportType';
@@ -19,6 +18,6 @@ export type ImportModel = {
   time_created?: string;
   time_started?: string;
   time_finished?: string;
-  config?: (ImportConfigRIS | ImportConfigTwitter | ImportConfigJSONL | ImportConfigWoS);
+  config?: (ImportConfigTwitter | ImportConfigJSONL | ImportConfigWoS);
 };
 
