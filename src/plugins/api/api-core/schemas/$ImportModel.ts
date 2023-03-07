@@ -66,8 +66,6 @@ export const $ImportModel = {
     config: {
       type: 'any-of',
       contains: [{
-        type: 'ImportConfigRIS',
-      }, {
         type: 'ImportConfigTwitter',
       }, {
         type: 'ImportConfigJSONL',

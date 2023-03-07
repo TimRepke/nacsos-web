@@ -5,6 +5,6 @@
 export type AuthTokenModel = {
   token_id: string;
   username: string;
-  valid_till: string;
+  valid_till?: string;
 };
 

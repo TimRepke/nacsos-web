@@ -35,10 +35,9 @@
                   {{ entry.task.status }}
                 </td>
                 <td :class="noBorderIfOpen(entry)">
-                  <span class="text-muted small"><strong>Submitted:</strong> {{ entry.task.dt_submitted }}</span><br>
-                  <span class="text-muted small"><strong>Started:</strong> {{ entry.task.dt_started }}</span><br>
-                  <span class="text-muted small"><strong>Finished:</strong>
-                    {{ entry.task.dt_finished || entry.task.dt_cancelled }}</span>
+                  <span class="text-muted small"><strong>Submitted:</strong> {{ entry.task.time_created }}</span><br>
+                  <span class="text-muted small"><strong>Started:</strong> {{ entry.task.time_started }}</span><br>
+                  <span class="text-muted small"><strong>Finished:</strong>{{ entry.task.time_finished }}</span>
                 </td>
                 <td :class="noBorderIfOpen(entry)">
                   <font-awesome-icon role="button" class="text-muted me-1" :icon="['fas', 'circle-info']" />
@@ -123,8 +122,9 @@ export default defineComponent({
     async loadEntries() {
       try {
         const tasks = (await API.pipe.queue.searchTasksApiQueueSearchGet(this.searchObject)).data;
-        if (!tasks) {
-          EventBus.emit(new ToastEvent('ERROR', 'Failed to load tasks. Please try reloading the page.'));
+
+        if (!tasks || tasks.length === 0) {
+          EventBus.emit(new ToastEvent('WARN', 'Failed to load tasks (or none found yet). Please try reloading the page later.'));
           return;
         }
 
