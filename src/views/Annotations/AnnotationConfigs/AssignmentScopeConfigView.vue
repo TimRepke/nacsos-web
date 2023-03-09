@@ -118,7 +118,7 @@
           v-if="strategyConfigType !== undefined"
           type="button"
           class="btn btn-outline-secondary"
-          :disabled="scopeHasAssignments"
+          :disabled="scopeHasAssignments || isNewScope"
           @click="createAssignments">
           Make assignments
         </button>
@@ -326,6 +326,7 @@ export default defineComponent({
                 ));
                 if (this.isNewScope) {
                   this.isNewScope = false;
+                  this.assignmentScope.assignment_scope_id = res.data;
                   this.$router.replace({ name: 'config-annotation-scheme-scope', params: { scope_id: res.data } });
                 }
               })
