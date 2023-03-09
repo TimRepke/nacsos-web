@@ -70,7 +70,7 @@ export default defineComponent({
         .then((response) => { this.users = response.data; })
         .catch(() => { EventBus.emit(new ToastEvent('WARN', 'Failed to load list of users.')); });
     } else {
-      API.core.users.getAllUsersApiUsersListAllGet({ xProjectId: currentProjectStore.projectId as string })
+      API.core.users.getAllUsersApiUsersListAllGet()
         .then((response) => { this.users = response.data; })
         .catch(() => { EventBus.emit(new ToastEvent('WARN', 'Failed to load list of users.')); });
     }
