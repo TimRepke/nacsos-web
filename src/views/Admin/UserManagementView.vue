@@ -143,7 +143,7 @@ export default defineComponent({
     };
   },
   mounted() {
-    API.core.users.getAllUsersApiUsersListAllGet({ xProjectId: '' })
+    API.core.users.getAllUsersApiUsersListAllGet()
       .then((response) => { this.users = response.data; })
       .catch(() => { EventBus.emit(new ToastEvent('WARN', 'Failed to load list of users.')); });
   },

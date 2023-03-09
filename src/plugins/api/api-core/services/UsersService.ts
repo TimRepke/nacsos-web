@@ -19,20 +19,10 @@ export class UsersService {
    * @returns UserBaseModel Successful Response
    * @throws ApiError
    */
-  public getAllUsersApiUsersListAllGet({
-    xProjectId,
-  }: {
-    xProjectId: string,
-  }, options?: Partial<ApiRequestOptions>): CancelablePromise<Array<UserBaseModel>> {
+  public getAllUsersApiUsersListAllGet(options?: Partial<ApiRequestOptions>): CancelablePromise<Array<UserBaseModel>> {
     return this.httpRequest.request({
       method: 'GET',
       url: '/api/users/list/all',
-      headers: {
-        'x-project-id': xProjectId,
-      },
-      errors: {
-        422: `Validation Error`,
-      },
       ...options,
     });
   }
