@@ -53,8 +53,8 @@ export default defineComponent({
   components: { NacsosLogo },
   data() {
     return {
-      username: 'user1',
-      password: '1234',
+      username: '',
+      password: '',
       error: false,
     };
   },
