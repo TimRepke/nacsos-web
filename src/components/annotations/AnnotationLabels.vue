@@ -90,10 +90,10 @@
             </label>
           </div>
           <div
-            v-if="label.annotation.value_int !== undefined && label.choices[label.annotation.value_int].children"
+            v-if="label.annotation.value_int !== undefined && label.choices[val2choice(label)].children"
             class="ms-3 mt-2">
             <AnnotationLabels
-              :labels="label.choices[label.annotation.value_int].children"
+              :labels="label.choices[val2choice(label)].children"
               :assignment="assignment"
               :key="label.annotation.value_int" />
           </div>
@@ -244,6 +244,13 @@ export default defineComponent({
           run += 1;
         }
       });
+    },
+    val2choice(label: AnnotationSchemeLabel): number | undefined {
+      const value: number | undefined = label.annotation?.value_int;
+      if (value !== undefined) {
+        return label.choices?.findIndex((choice) => choice.value === value);
+      }
+      return undefined;
     },
   },
   computed: {

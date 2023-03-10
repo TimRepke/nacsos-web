@@ -1,10 +1,10 @@
 <template>
-  <div class="wrapper">
-    <div class="row justify-content-center mt-2 mt-sm-5">
+  <div class="wrapper p-0 m-0 overflow-auto h-100 w-100 container-fluid d-flex justify-content-center flex-wrap">
+    <div class="flex-row mt-2 mt-sm-5 w-100">
       <NacsosLogo style="height: 200px; width:200px;" class="p-0" />
     </div>
-    <div class="row justify-content-center">
-      <div class="bg-body bg-opacity-75 rounded p-5 col-lg-4 col-md-6 col-sm-8 col-12 mt-2 mt-sm-5">
+    <div class="flex-row w-100">
+      <div class="bg-body bg-opacity-75 rounded p-5 col-lg-4 col-md-6 col-sm-8 col-12 mt-2 mt-sm-5 m-auto">
         <form @submit.prevent>
           <div class="form-floating mb-3">
             <input type="text" class="form-control" id="usernameInput" placeholder="Username" v-model="username" />

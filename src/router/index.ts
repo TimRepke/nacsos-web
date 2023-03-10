@@ -16,7 +16,7 @@ const routes: Array<RouteRecordRaw> = [
     // route level code-splitting
     // this generates a separate chunk (about.[hash].js) for this route
     // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "about" */ '../views/AboutView.vue'),
+    component: () => import(/* webpackChunkName: "AboutView" */ '../views/AboutView.vue'),
   },
   {
     path: '/project-list',
@@ -39,11 +39,11 @@ const routes: Array<RouteRecordRaw> = [
         name: 'project-artefacts-list',
         component: () => import(/* webpackChunkName: "ArtefactsListView" */ '../views/Artefacts/ArtefactsListView.vue'),
       },
-      {
-        path: 'details/:taskId',
-        name: 'project-artefacts-details',
-        component: () => import(/* webpackChunkName: "ArtefactsListView" */ '../views/Artefacts/ArtefactsListView.vue'),
-      },
+      // {
+      //   path: 'details/:taskId',
+      //   name: 'project-artefacts-details',
+      //   component: () => import(/* webpackChunkName: "ArtefactsListView" */ '../views/Artefacts/ArtefactsListView.vue'),
+      // },
     ],
   },
   {

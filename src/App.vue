@@ -1,43 +1,50 @@
 <template>
-  <div class="w-100 h-100">
-    <TopBar v-if="viewNeedsTopNav" class="d-flex flex-row vw-100" style="height: var(--topnav-height)" />
-    <div class="d-flex flex-row" :class="{ 'w-100': !viewNeedsTopNav, 'h-100': !viewNeedsTopNav }">
-      <SideBar
-        v-show="viewNeedsSidebar"
-        style="height: calc(100vh - var(--topnav-height));" />
+  <div class="w-100 h-100 p-0 m-0">
+    <template v-if="!isLoggedIn">
+      <LoginView />
+    </template>
+    <template v-else>
 
-      <RouterView
-        v-slot="{ Component }"
-        class="col overflow-auto p-2 ps-md-3 pe-md-4 pb-3 text-start"
-        :class="{ 'pt-4': !viewNeedsSidebar }"
-        :style="{ height: (viewNeedsTopNav) ? 'calc(100vh - var(--topnav-height))' : undefined }">
-        <template v-if="Component">
-          <Transition mode="out-in">
-            <KeepAlive>
-              <Suspense>
-                <!-- main content -->
-                <component :is="Component" />
+      <TopBar v-if="viewNeedsTopNav" class="d-flex flex-row vw-100" style="height: var(--topnav-height)" />
+      <div class="d-flex flex-row" :class="{ 'w-100': !viewNeedsTopNav, 'h-100': !viewNeedsTopNav }">
+        <SideBar
+          v-if="viewNeedsSidebar"
+          style="height: calc(100vh - var(--topnav-height));" />
 
-                <!-- loading state -->
-                <!--                <template #fallback>-->
-                <!--                  Loading...<br />-->
-                <!--                  If this takes longer than expected, something might be wrong.-->
-                <!--                </template>-->
-              </Suspense>
-            </KeepAlive>
-          </Transition>
-        </template>
-      </RouterView>
+        <router-view
+          v-slot="{ Component }"
+          class="col overflow-auto p-2 ps-md-3 pe-md-4 pb-3 text-start"
+          :class="{ 'pt-4': !viewNeedsSidebar }"
+          :style="{ height: (viewNeedsTopNav) ? 'calc(100vh - var(--topnav-height))' : undefined }">
+          <template v-if="Component">
+            <Transition mode="out-in">
+              <KeepAlive>
+                <Suspense>
+                  <!-- main content -->
+                  <component :is="Component" />
 
-    </div>
-    <router-link
-      to="/"
-      class="text-decoration-none text-nowrap position-absolute d-inline-block mt-1 top-0"
-      style="z-index: 2000; left:1rem;">
-      <NacsosLogo class="mt-0" />
-    </router-link>
-    <ToastsViewer />
-    <ConfirmationModal />
+                  <!-- loading state -->
+                  <!--                <template #fallback>-->
+                  <!--                  Loading...<br />-->
+                  <!--                  If this takes longer than expected, something might be wrong.-->
+                  <!--                </template>-->
+                </Suspense>
+              </KeepAlive>
+            </Transition>
+          </template>
+        </router-view>
+
+      </div>
+      <router-link
+        v-if="viewNeedsTopNav"
+        to="/"
+        class="text-decoration-none text-nowrap position-absolute d-inline-block mt-1 top-0"
+        style="z-index: 2000; left:1rem;">
+        <NacsosLogo class="mt-0" />
+      </router-link>
+      <ToastsViewer />
+      <ConfirmationModal />
+    </template>
   </div>
 </template>
 
@@ -50,6 +57,7 @@ import ConfirmationModal from '@/components/ConfirmationModal.vue';
 import { currentProjectStore, currentUserStore } from '@/stores';
 import { isOnRoute } from '@/util';
 import { defineComponent } from 'vue';
+import LoginView from '@/views/User/LoginView.vue';
 
 export default defineComponent({
   components: {
@@ -58,6 +66,7 @@ export default defineComponent({
     SideBar,
     TopBar,
     ToastsViewer,
+    LoginView,
   },
   data() {
     return {
@@ -74,6 +83,9 @@ export default defineComponent({
           || this.$route.name === 'about');
     },
     viewNeedsTopNav(): boolean {
+      return currentUserStore.isLoggedIn;
+    },
+    isLoggedIn(): boolean {
       return currentUserStore.isLoggedIn;
     },
   },
