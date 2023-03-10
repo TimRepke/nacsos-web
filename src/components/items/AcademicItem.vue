@@ -5,7 +5,7 @@
         {{ item.title }}
       </div>
       <div class="ms-auto">
-        <inline-tool-tip info="DOI" placement="left">
+        <inline-tool-tip info="DOI" placement="left" v-show="item.doi !== null">
           <a
             :href="`https://dx.doi.org/${item.doi || ''}`"
             class="float-end link-secondary"
