@@ -265,7 +265,7 @@ export default defineComponent({
       this.rerenderCounter += 1;
 
       // update the assignments progress bar
-      API.core.annotations.getAssignmentsForScopeApiAnnotationsAnnotateAssignmentsScopeAssignmentScopeIdGet({
+      API.core.annotations.getAssignmentsApiAnnotationsAnnotateAssignmentsAssignmentScopeIdGet({
         xProjectId: currentProjectStore.projectId as string,
         assignmentScopeId: annotationItem.scope.assignment_scope_id as string,
       })
@@ -305,7 +305,17 @@ export default defineComponent({
           currentAssignmentId: this.assignment!.assignment_id as string,
         })
         .then((response) => { this.setCurrentAssignment(response.data); })
-        .catch(ignore);
+        .catch((reason) => {
+          console.log(reason);
+          if (reason.error?.detail?.type === 'NoNextAssignmentWarning') {
+            EventBus.emit(new ToastEvent(
+              'INFO',
+              'Seems like you reached the end. My only friend. '
+              + 'Would you like to clear all annotations and enjoy this process once again? '
+              + 'Please shout "yes" or "no" into your microphone to delete.',
+            ));
+          }
+        });
     },
   },
   computed: {
