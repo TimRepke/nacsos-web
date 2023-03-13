@@ -1,7 +1,7 @@
 <template>
   <div class="card m-2 p-0 text-start w-100">
     <div class="card-header d-flex">
-      <div style="line-height: 2rem">
+      <div style="line-height: 2rem" class="fw-bold">
         {{ item.title }}
       </div>
       <div class="ms-auto">
@@ -28,14 +28,25 @@
           {{ JSON.stringify(item, null, 4) }}
         </pre>
       </div>
-      <div class="d-flex small text-muted">
+      <template v-if="!item.text">
+        <p class="text-warning">
+          <font-awesome-icon :icon="['fas', 'notdef']" class="me-2" />
+          [Abstract missing]
+        </p>
+      </template>
+      <template v-else>
+        <p class="card-text text-muted" v-html="htmlAbstract" /> <!-- style="font-family: serif" -->
+      </template>
+    </div>
+    <div class="card-footer d-flex justify-content-between">
+      <div class="d-flex flex-wrap small text-muted">
         <div v-if="item.publication_year" class="flex-nowrap d-flex me-4">
           <font-awesome-icon :icon="['fas', 'calendar-days']" class="me-2" />
           {{ item.publication_year }}
         </div>
         <div v-if="item.authors" class="flex-nowrap d-flex me-4">
           <font-awesome-icon :icon="['fas', 'people-group']" class="me-2" />
-          <ul class="list-inline">
+          <ul class="list-inline mb-0">
             <li v-for="author in item.authors" :key="author.name" class="list-inline-item">
               <inline-tool-tip :info="authorInstitutions(author)">
                 <template v-if="author.orcid">
@@ -53,22 +64,11 @@
             </li>
           </ul>
         </div>
+        <div v-if="item.keywords" class="d-flex me-4">
+          <font-awesome-icon :icon="['fas', 'tags']" class="me-2" />
+          {{ item.keywords.join(' | ') }}
+        </div>
       </div>
-      <template v-if="!item.text">
-        <p class="text-warning">
-          <font-awesome-icon :icon="['fas', 'notdef']" class="me-2" />
-          [Abstract missing]
-        </p>
-      </template>
-      <template v-else>
-        <p class="card-text text-muted" v-html="htmlAbstract" /> <!-- style="font-family: serif" -->
-      </template>
-    </div>
-    <div class="card-footer d-flex justify-content-between">
-      <small v-if="item.keywords" class="text-muted">
-        <font-awesome-icon :icon="['fas', 'tags']" class="me-2" />
-        {{ item.keywords.join(' | ') }}
-      </small>
     </div>
   </div>
 </template>
@@ -121,5 +121,10 @@ pre {
   white-space: -pre-wrap;
   white-space: -o-pre-wrap;
   word-wrap: break-word;
+}
+
+.list-inline-item:not(:last-child):after {
+  content: "·";
+  margin-left: 0.5rem;
 }
 </style>
