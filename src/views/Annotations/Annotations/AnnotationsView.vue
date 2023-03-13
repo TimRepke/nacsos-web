@@ -347,7 +347,7 @@ export default defineComponent({
       if (this.assignments && assignmentId) {
         let focus = this.assignments.findIndex((assignment: AssignmentModel) => assignment.assignment_id === assignmentId);
         focus = Math.min(Math.max(WINDOW, focus), this.assignments.length - WINDOW);
-        return this.assignments.map((assignment: AssignmentModel, index): AssignmentIndicator => ({
+        return this.assignments.map((assignment: AssignmentModel, index: number): AssignmentIndicator => ({
           assignmentId: assignment.assignment_id as string,
           inHighlight: ((index - WINDOW) <= focus) && (focus <= (index + WINDOW)),
           itemId: assignment.item_id,
