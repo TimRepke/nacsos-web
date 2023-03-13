@@ -6,15 +6,26 @@
     <template v-else>
       <div class="col-12 col-md overflow-auto h-md-100">
         <div class="row g-0">
-          <ul class="d-flex list-unstyled">
-            <li
-              v-for="assignmentLI in assignments"
-              :key="assignmentLI.assignment_id"
-              class="me-0 assignments-step flex-fill"
-              :class="[assignmentLI.status, (assignmentLI.assignment_id === assignment.assignment_id) ? 'current' : '']"
+          <div
+            v-if="assignmentIndicatorsNeedBirdseye"
+            class="assignments-birdseye">
+            <div
+              v-for="assignmentLI in assignmentIndicators"
+              :key="assignmentLI.assignmentId"
+              class="assignments-birdseye-step"
+              :class="{ 'assignments-birdseye-step-inview': assignmentLI.inHighlight }"
               type="button"
-              @click="saveAndGoto(assignmentLI.assignment_id)" />
-          </ul>
+              @click="saveAndGoto(assignmentLI.assignmentId)" />
+          </div>
+          <div class="assignments">
+            <div
+              v-for="assignmentLI in assignmentIndicatorsHighlighted"
+              :key="assignmentLI.assignmentId"
+              class="assignments-step"
+              :class="[assignmentLI.status, (assignmentLI.assignmentId === assignment.assignment_id) ? 'current' : '']"
+              type="button"
+              @click="saveAndGoto(assignmentLI.assignmentId)" />
+          </div>
         </div>
         <div class="row g-0">
           <AnyItemComponent :item="item" />
@@ -79,6 +90,7 @@ import type {
   AnnotationSchemeModel,
   AssignmentModel,
   AssignmentScopeModel,
+  AssignmentStatus,
 } from '@/plugins/api/api-core';
 import type { AnyItem } from '@/types/items.d';
 import { API, ignore } from '@/plugins/api';
@@ -122,6 +134,13 @@ type AnnotationsViewData = {
   sidebarWidth: number;
   labels?: AnnotationSchemeLabel[];
   rerenderCounter: number; // this is a hack to force-update the AnnotationLabels-component
+};
+
+type AssignmentIndicator = {
+  assignmentId: string;
+  itemId: string;
+  status: AssignmentStatus;
+  inHighlight: boolean;
 };
 
 export default defineComponent({
@@ -322,6 +341,30 @@ export default defineComponent({
     sidebarWidthClass() {
       return `col-md-${this.sidebarWidth}`;
     },
+    assignmentIndicators(): AssignmentIndicator[] | null {
+      const WINDOW = 50; // 100/2
+      const assignmentId = this.assignment?.assignment_id;
+      if (this.assignments && assignmentId) {
+        let focus = this.assignments.findIndex((assignment: AssignmentModel) => assignment.assignment_id === assignmentId);
+        focus = Math.min(Math.max(WINDOW, focus), this.assignments.length - WINDOW);
+        return this.assignments.map((assignment: AssignmentModel, index): AssignmentIndicator => ({
+          assignmentId: assignment.assignment_id as string,
+          inHighlight: ((index - WINDOW) <= focus) && (focus <= (index + WINDOW)),
+          itemId: assignment.item_id,
+          status: assignment.status,
+        }));
+      }
+      return null;
+    },
+    assignmentIndicatorsHighlighted(): AssignmentIndicator[] | null {
+      if (this.assignmentIndicators) {
+        return this.assignmentIndicators.filter((assignment: AssignmentIndicator) => assignment.inHighlight);
+      }
+      return null;
+    },
+    assignmentIndicatorsNeedBirdseye(): boolean {
+      return !!this.assignments && this.assignments.length > 100;
+    },
   },
 });
 </script>
@@ -351,44 +394,63 @@ export default defineComponent({
   }
 }
 
+.assignments {
+  overflow: hidden;
+  display: flex;
+  flex-wrap: wrap;
+}
+
 .assignments-step {
+  flex: 1;
   min-width: 0.2rem;
-  max-width: 0.5rem;
-  height: 1rem;
-  margin: 0.1rem;
+  max-width: 1rem;
+  height: 0.8rem;
+  margin: 0.05rem;
   border: .1rem solid gray;
-  display: block;
-  font-size: 0.3rem;
 }
 
 .assignments-step.current {
   border: 0.2rem dashed black;
 }
 
-.assignments-step a {
-  text-decoration: none;
-  height: 100%;
-  width: 100%;
-  display: block;
-}
-
 .assignments-step.FULL {
   background-color: #42b983;
-}
-
-.assignments-step.FULL a {
-  color: #42b983;
 }
 
 .assignments-step.PARTIAL {
   background-color: yellow;
 }
 
-.assignments-step.PARTIAL a {
-  color: yellow;
+.assignments-birdseye {
+  display: flex;
+  overflow: hidden;
+  height: 0.5rem;
+  border: 1px solid gray;
 }
 
-.assignments-step.OPEN a {
-  color: white;
+.assignments-birdseye-step {
+  flex: 1;
+  align-items: center;
 }
+
+.assignments-birdseye-step:nth-child(10n):not(:last-child) {
+  border-right: 1px dotted darkslategrey;
+}
+
+.assignments-birdseye-step-inview {
+  border-bottom: 2px solid darkslategrey;
+}
+
+.assignments-birdseye-step.FULL {
+  background-color: #42b983;
+}
+
+.assignments-birdseye-step.PARTIAL {
+  background-color: yellow;
+}
+
+.assignments-birdseye-step.OPEN {
+  background-color: white;
+}
+
 </style>
