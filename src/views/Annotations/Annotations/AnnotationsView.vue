@@ -13,7 +13,7 @@
               v-for="assignmentLI in assignmentIndicators"
               :key="assignmentLI.assignmentId"
               class="assignments-birdseye-step"
-              :class="{ 'assignments-birdseye-step-inview': assignmentLI.inHighlight }"
+              :class="[(assignmentLI.inHighlight) ? 'assignments-birdseye-step-inview' : '', assignmentLI.status]"
               type="button"
               @click="saveAndGoto(assignmentLI.assignmentId)" />
           </div>
