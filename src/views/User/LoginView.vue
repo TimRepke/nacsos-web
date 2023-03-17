@@ -30,6 +30,11 @@
         </form>
       </div>
     </div>
+
+    <div class="imprint">
+      <router-link :to="{ name: 'about' }">Imprint/Legal/Cookies</router-link>
+    </div>
+
     <div class="license">
       Picture:
       <a href="https://creativecommons.org/licenses/by/3.0" target="_blank" rel="noopener noreferrer">CC BY 3.0</a>
@@ -97,6 +102,14 @@ input {
   position: absolute;
   bottom: 1rem;
   right: 1rem;
+  background: #ffffff73;
+  padding: 0.25rem;
+  font-size: 0.7rem;
+}
+.imprint {
+  position: absolute;
+  bottom: 1rem;
+  left: 1rem;
   background: #ffffff73;
   padding: 0.25rem;
   font-size: 0.7rem;

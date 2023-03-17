@@ -1,6 +1,6 @@
 <template>
   <div class="w-100 h-100 p-0 m-0">
-    <template v-if="!isLoggedIn">
+    <template v-if="!isLoggedIn && $route.name !== 'about'">
       <LoginView />
     </template>
     <template v-else>
