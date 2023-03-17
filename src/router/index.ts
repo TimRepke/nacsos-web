@@ -230,8 +230,7 @@ router.beforeEach(async (to) => {
   if (to.name === 'user-login') {
     currentUserStore.clear();
   }
-  console.log('valid');
-  console.log(to);
+
   // otherwise, navigation is valid, so continue
   return true;
 });

@@ -357,6 +357,7 @@ import { EventBus } from '@/plugins/events';
 import { ToastEvent } from '@/plugins/events/events/toast';
 import MultiLabel from '@/components/annotations/resolve/MultiLabel.vue';
 import { defineComponent } from 'vue';
+import { ConfirmationRequestEvent } from '@/plugins/events/events/confirmation';
 
 type LookupMatrix = Record<string, Record<string, { users: AnnotationModel[], bot: BotAnnotationModel | undefined }>>;
 type LabelLookupValue = {
@@ -387,6 +388,8 @@ type ResolveData = {
   annotators: UserModel[],
   loadingProposals: boolean,
   itemIdSearch: string,
+  // timeout-interval handler for auto-saving
+  autoSave: number | undefined,
 };
 
 export default defineComponent({
@@ -418,11 +421,16 @@ export default defineComponent({
       annotators: [] as UserModel[],
       loadingProposals: false,
       itemIdSearch: '',
+      autoSave: undefined,
     };
   },
 
   mounted() {
     this.fetchProjectSchemas();
+
+    this.autoSave = setInterval(() => {
+      EventBus.emit(new ToastEvent('INFO', 'You might want to click save every now and then...'));
+    }, 300000); // called every 5 min
 
     if (!this.isNew && this.botAnnotationMetaDataId !== undefined) {
       API.core.annotations.getSavedResolvedAnnotationsApiAnnotationsConfigResolvedBotAnnotationMetaIdGet({
@@ -668,6 +676,22 @@ export default defineComponent({
       }
       return matrix;
     },
+  },
+  beforeRouteLeave(to, from, next) {
+    EventBus.emit(new ConfirmationRequestEvent(
+      'You will loose data if you have not clicked "save".',
+      (confirmationResponse) => {
+        if (confirmationResponse === 'ACCEPT') {
+          clearInterval(this.autoSave);
+          next(true);
+        } else {
+          next(false);
+        }
+      },
+      'Do you really want to leave?',
+      'I understand.',
+      'Oh right, stop, let me save first.',
+    ));
   },
 });
 </script>
