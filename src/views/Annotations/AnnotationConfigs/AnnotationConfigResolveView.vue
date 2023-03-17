@@ -229,6 +229,9 @@
           <thead class="sticky-top bg-light">
             <tr>
               <th>
+                #
+              </th>
+              <th>
                 Item
                 <label for="item-id-search" class="d-none">Search</label>
                 <input
@@ -268,9 +271,12 @@
           </thead>
           <tbody>
             <tr
-              v-for="itemId in Object.keys(collection.annotations)"
+              v-for="(itemId, run) in Object.keys(collection.annotations)"
               :key="itemId"
               v-show="itemIdSearch === '' || itemId.indexOf(itemIdSearch) >= 0">
+              <td class="text-muted small">
+                {{ run }}
+              </td>
               <td>
                 <span
                   class="text-muted font-monospace fs-fn text-break me-2 d-inline-block"
@@ -390,6 +396,8 @@ type ResolveData = {
   itemIdSearch: string,
   // timeout-interval handler for auto-saving
   autoSave: number | undefined,
+  // if this is set to true, the item text is loaded and shown in the table
+  showText: boolean,
 };
 
 export default defineComponent({
@@ -422,6 +430,7 @@ export default defineComponent({
       loadingProposals: false,
       itemIdSearch: '',
       autoSave: undefined,
+      showText: false,
     };
   },
 
@@ -431,6 +440,13 @@ export default defineComponent({
     this.autoSave = setInterval(() => {
       EventBus.emit(new ToastEvent('INFO', 'You might want to click save every now and then...'));
     }, 300000); // called every 5 min
+
+    // Prevent browser page reload and tab closure
+    window.addEventListener('beforeunload', (event) => {
+      event.preventDefault();
+      // eslint-disable-next-line no-param-reassign
+      event.returnValue = '';
+    });
 
     if (!this.isNew && this.botAnnotationMetaDataId !== undefined) {
       API.core.annotations.getSavedResolvedAnnotationsApiAnnotationsConfigResolvedBotAnnotationMetaIdGet({
