@@ -223,16 +223,7 @@
         </div>
       </div>
     </div>
-    <div class="row text-end" v-if="isTableReady">
-      <div class="col">
-        <button
-          @click="save"
-          type="button"
-          class="btn btn-success m-2">Save
-        </button>
-      </div>
-    </div>
-    <div class="row" v-if="isTableReady">
+    <div class="row mb-5" v-if="isTableReady">
       <div class="table-responsive-sm position-relative">
         <table class="table" style="width: calc(100% - 1rem)">
           <thead class="sticky-top bg-light">
@@ -326,6 +317,15 @@
             </tr>
           </tbody>
         </table>
+      </div>
+    </div>
+    <div v-if="isTableReady" class="bg-light p-1" style="position: absolute; right: 2rem; bottom: 1rem;">
+      <div class="col">
+        <button
+          @click="save"
+          type="button"
+          class="btn btn-success m-2">Save
+        </button>
       </div>
     </div>
     <ItemModal :item-id="focusItem" @dismissed="focusItem = undefined" />
