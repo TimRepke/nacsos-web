@@ -320,6 +320,34 @@ export class ProjectService {
   }
 
   /**
+   * Get Text For Item
+   * @returns string Successful Response
+   * @throws ApiError
+   */
+  public getTextForItemApiProjectItemsTextItemIdGet({
+    itemId,
+    xProjectId,
+  }: {
+    itemId: string,
+    xProjectId: string,
+  }, options?: Partial<ApiRequestOptions>): CancelablePromise<string> {
+    return this.httpRequest.request({
+      method: 'GET',
+      url: '/api/project/items/text/{item_id}',
+      path: {
+        'item_id': itemId,
+      },
+      headers: {
+        'x-project-id': xProjectId,
+      },
+      errors: {
+        422: `Validation Error`,
+      },
+      ...options,
+    });
+  }
+
+  /**
    * Count Project Items
    * @returns number Successful Response
    * @throws ApiError

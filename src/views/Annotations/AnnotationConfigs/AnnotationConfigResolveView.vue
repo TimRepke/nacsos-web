@@ -199,6 +199,10 @@
                 </div>
               </div>
               <div class="row">
+                <div class="col text-start">
+                  <input type="checkbox" name="showText" id="showText-check" v-model="showText" />
+                  <label for="showText-check" class="ms-1">Show text</label>
+                </div>
                 <div class="col text-end">
                   <button
                     v-if="loadingProposals"
@@ -278,14 +282,18 @@
                 {{ run }}
               </td>
               <td>
-                <span
+                <div
                   class="text-muted font-monospace fs-fn text-break me-2 d-inline-block"
                   style="width: 20ch;"
                   role="button"
                   tabindex="-1"
                   @click="this.focusItem = itemId">
                   {{ itemId }}
-                </span>
+                </div>
+                <div
+                  v-if="this.showText && this.texts[itemId]"
+                  class="text-muted fs-fn p-1 rounded border border-secondary"
+                  v-html="(this.texts[itemId] || '').replaceAll('\n', '<br />')" />
               </td>
               <td
                 v-for="(labelInfo, strLabel) in labels"
@@ -398,6 +406,8 @@ type ResolveData = {
   autoSave: number | undefined,
   // if this is set to true, the item text is loaded and shown in the table
   showText: boolean,
+  // key: `item.item_id`, value: `item.text`
+  texts: Record<string, string>,
 };
 
 export default defineComponent({
@@ -431,6 +441,7 @@ export default defineComponent({
       itemIdSearch: '',
       autoSave: undefined,
       showText: false,
+      texts: {} as Record<string, string>,
     };
   },
 
@@ -500,6 +511,28 @@ export default defineComponent({
         }
       },
       immediate: true,
+    },
+    showText: {
+      handler() {
+        // if the user wants to see texts and we have a collection loaded ...
+        if (this.showText && this.collection && this.collection.annotations) {
+          // ... iterate all item_ids for the annotations ...
+          Object.keys(this.collection.annotations).forEach((itemId: string) => {
+            // ... and if we don't have the text already ...
+            if (!(itemId in this.texts)) {
+              // ... fetch it from the server and remember it.
+              API.core.project.getTextForItemApiProjectItemsTextItemIdGet({
+                itemId,
+                xProjectId: currentProjectStore.projectId as string,
+              }).then((response) => {
+                this.texts[itemId] = response.data;
+              }).catch(() => {
+                EventBus.emit(new ToastEvent('WARN', `No text found for item ${itemId}!`));
+              });
+            }
+          });
+        }
+      },
     },
   },
 
