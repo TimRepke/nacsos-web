@@ -27,7 +27,7 @@
                 role="button"
                 class="text-muted"
                 :icon="['fas', 'delete-left']"
-                @click="clearAnnotation(label.annotation)" />
+                @click="clearAnnotation(label)" />
             </InlineToolTip>
           </sup>
         </div>
@@ -83,7 +83,8 @@
                 type="radio"
                 class="form-check-input me-1"
                 v-bind:value="choice.value"
-                v-model="label.annotation.value_int" />
+                v-model="label.annotation.value_int"
+                @change="singleIntUpdate(label)" />
               <InlineToolTip :info="choice.hint">
                 <span class="ms-2">{{ choice.name }}</span>
               </InlineToolTip>
@@ -110,7 +111,7 @@
                 class="form-check-input me-1"
                 :value="multiIntContains(label.annotation, choice.value)"
                 :checked="multiIntContains(label.annotation, choice.value)"
-                @change="multiIntUpdate(label.annotation, choice.value)" />
+                @change="multiIntUpdate(label, choice.value)" />
               <InlineToolTip :info="choice.hint">
                 <span class="ms-2">{{ choice.name }}</span>
               </InlineToolTip>
@@ -149,7 +150,8 @@
 
 import type { PropType } from 'vue';
 import InlineToolTip from '@/components/InlineToolTip.vue';
-import type { AnnotationSchemeLabel, AssignmentModel, AnnotationModel } from '@/plugins/api/api-core';
+import type { AssignmentModel, AnnotationModel, AnnotationSchemeLabelChoice } from '@/plugins/api/api-core';
+import { AnnotationSchemeLabel } from '@/plugins/api/api-core';
 import { defineComponent } from 'vue';
 
 type SubLabels = { labels: AnnotationSchemeLabel[]; key: number; };
@@ -170,12 +172,25 @@ export default defineComponent({
     },
   },
   methods: {
-    clearAnnotation(annotation: AnnotationModel) {
-      annotation.value_int = undefined;
-      annotation.value_bool = undefined;
-      annotation.value_str = undefined;
-      annotation.value_float = undefined;
-      annotation.multi_int = undefined;
+    clearAnnotation(label: AnnotationSchemeLabel) {
+      // recurse clearance to children (if present)
+      if ((label.kind === AnnotationSchemeLabel.kind.SINGLE
+          || label.kind === AnnotationSchemeLabel.kind.MULTI)
+        && label.choices) {
+        label.choices.forEach((choice: AnnotationSchemeLabelChoice) => {
+          choice.children?.forEach((childLabel: AnnotationSchemeLabel) => {
+            this.clearAnnotation(childLabel);
+          });
+        });
+      }
+
+      if (label.annotation) {
+        label.annotation.value_int = undefined;
+        label.annotation.value_bool = undefined;
+        label.annotation.value_str = undefined;
+        label.annotation.value_float = undefined;
+        label.annotation.multi_int = undefined;
+      }
     },
     hasAnnotation(annotation: AnnotationModel): boolean {
       return annotation.value_int !== undefined
@@ -188,15 +203,34 @@ export default defineComponent({
       if (!annotation.multi_int) return false;
       return annotation.multi_int.indexOf(value) >= 0;
     },
-    multiIntUpdate(annotation: AnnotationModel, value: number) {
-      if (!annotation.multi_int) annotation.multi_int = [];
-      const index = annotation.multi_int.indexOf(value);
-      if (index >= 0) {
-        annotation.multi_int.splice(index, 1);
-      } else {
-        annotation.multi_int.push(value);
+    singleIntUpdate(label: AnnotationSchemeLabel) {
+      const index = this.val2choice(label);
+      if (index !== undefined) {
+        if (label.choices) {
+          label.choices[index].children?.forEach((lab: AnnotationSchemeLabel) => {
+            this.clearAnnotation(lab);
+          });
+        }
       }
-      if (annotation.multi_int.length === 0) annotation.multi_int = undefined;
+    },
+    multiIntUpdate(label: AnnotationSchemeLabel, value: number) {
+      const { annotation } = label;
+      if (annotation) {
+        if (!annotation.multi_int) annotation.multi_int = [];
+        const index = annotation.multi_int.indexOf(value);
+        if (index >= 0) {
+          annotation.multi_int.splice(index, 1);
+          // propagate deletion to children
+          if (label.choices) {
+            label.choices[index].children?.forEach((lab: AnnotationSchemeLabel) => {
+              this.clearAnnotation(lab);
+            });
+          }
+        } else {
+          annotation.multi_int.push(value);
+        }
+        if (annotation.multi_int.length === 0) annotation.multi_int = undefined;
+      }
     },
     multiIntChildren(label: AnnotationSchemeLabel): Array<SubLabels> {
       function hasLabels(child: SubLabels | undefined): child is SubLabels {
