@@ -210,7 +210,7 @@ const router = createRouter({
 router.beforeEach(async (to) => {
   // if user is not authenticated -> redirect to login page
   // prevent infinite redirects if user isn't logged in
-  if (!currentUserStore.isLoggedIn && to.name !== 'user-login') {
+  if (!currentUserStore.isLoggedIn && to.name !== 'user-login' && to.name !== 'about') {
     return { name: 'user-login' };
   }
 

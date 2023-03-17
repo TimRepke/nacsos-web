@@ -199,6 +199,10 @@
                 </div>
               </div>
               <div class="row">
+                <div class="col text-start">
+                  <input type="checkbox" name="showText" id="showText-check" v-model="showText" />
+                  <label for="showText-check" class="ms-1">Show text</label>
+                </div>
                 <div class="col text-end">
                   <button
                     v-if="loadingProposals"
@@ -223,20 +227,14 @@
         </div>
       </div>
     </div>
-    <div class="row text-end" v-if="isTableReady">
-      <div class="col">
-        <button
-          @click="save"
-          type="button"
-          class="btn btn-success m-2">Save
-        </button>
-      </div>
-    </div>
-    <div class="row" v-if="isTableReady">
+    <div class="row mb-5" v-if="isTableReady">
       <div class="table-responsive-sm position-relative">
         <table class="table" style="width: calc(100% - 1rem)">
           <thead class="sticky-top bg-light">
             <tr>
+              <th>
+                #
+              </th>
               <th>
                 Item
                 <label for="item-id-search" class="d-none">Search</label>
@@ -277,18 +275,25 @@
           </thead>
           <tbody>
             <tr
-              v-for="itemId in Object.keys(collection.annotations)"
+              v-for="(itemId, run) in Object.keys(collection.annotations)"
               :key="itemId"
               v-show="itemIdSearch === '' || itemId.indexOf(itemIdSearch) >= 0">
+              <td class="text-muted small">
+                {{ run }}
+              </td>
               <td>
-                <span
+                <div
                   class="text-muted font-monospace fs-fn text-break me-2 d-inline-block"
                   style="width: 20ch;"
                   role="button"
                   tabindex="-1"
                   @click="this.focusItem = itemId">
                   {{ itemId }}
-                </span>
+                </div>
+                <div
+                  v-if="this.showText && this.texts[itemId]"
+                  class="text-muted fs-fn p-1 rounded border border-secondary"
+                  v-html="(this.texts[itemId] || '').replaceAll('\n', '<br />')" />
               </td>
               <td
                 v-for="(labelInfo, strLabel) in labels"
@@ -328,6 +333,15 @@
         </table>
       </div>
     </div>
+    <div v-if="isTableReady" class="bg-light p-1" style="position: absolute; right: 2rem; bottom: 1rem;">
+      <div class="col">
+        <button
+          @click="save"
+          type="button"
+          class="btn btn-success m-2">Save
+        </button>
+      </div>
+    </div>
     <ItemModal :item-id="focusItem" @dismissed="focusItem = undefined" />
   </div>
 </template>
@@ -357,6 +371,7 @@ import { EventBus } from '@/plugins/events';
 import { ToastEvent } from '@/plugins/events/events/toast';
 import MultiLabel from '@/components/annotations/resolve/MultiLabel.vue';
 import { defineComponent } from 'vue';
+import { ConfirmationRequestEvent } from '@/plugins/events/events/confirmation';
 
 type LookupMatrix = Record<string, Record<string, { users: AnnotationModel[], bot: BotAnnotationModel | undefined }>>;
 type LabelLookupValue = {
@@ -387,6 +402,12 @@ type ResolveData = {
   annotators: UserModel[],
   loadingProposals: boolean,
   itemIdSearch: string,
+  // timeout-interval handler for auto-saving
+  autoSave: number | undefined,
+  // if this is set to true, the item text is loaded and shown in the table
+  showText: boolean,
+  // key: `item.item_id`, value: `item.text`
+  texts: Record<string, string>,
 };
 
 export default defineComponent({
@@ -418,11 +439,25 @@ export default defineComponent({
       annotators: [] as UserModel[],
       loadingProposals: false,
       itemIdSearch: '',
+      autoSave: undefined,
+      showText: false,
+      texts: {} as Record<string, string>,
     };
   },
 
   mounted() {
     this.fetchProjectSchemas();
+
+    this.autoSave = setInterval(() => {
+      EventBus.emit(new ToastEvent('INFO', 'You might want to click save every now and then...'));
+    }, 300000); // called every 5 min
+
+    // Prevent browser page reload and tab closure
+    window.addEventListener('beforeunload', (event) => {
+      event.preventDefault();
+      // eslint-disable-next-line no-param-reassign
+      event.returnValue = '';
+    });
 
     if (!this.isNew && this.botAnnotationMetaDataId !== undefined) {
       API.core.annotations.getSavedResolvedAnnotationsApiAnnotationsConfigResolvedBotAnnotationMetaIdGet({
@@ -476,6 +511,28 @@ export default defineComponent({
         }
       },
       immediate: true,
+    },
+    showText: {
+      handler() {
+        // if the user wants to see texts and we have a collection loaded ...
+        if (this.showText && this.collection && this.collection.annotations) {
+          // ... iterate all item_ids for the annotations ...
+          Object.keys(this.collection.annotations).forEach((itemId: string) => {
+            // ... and if we don't have the text already ...
+            if (!(itemId in this.texts)) {
+              // ... fetch it from the server and remember it.
+              API.core.project.getTextForItemApiProjectItemsTextItemIdGet({
+                itemId,
+                xProjectId: currentProjectStore.projectId as string,
+              }).then((response) => {
+                this.texts[itemId] = response.data;
+              }).catch(() => {
+                EventBus.emit(new ToastEvent('WARN', `No text found for item ${itemId}!`));
+              });
+            }
+          });
+        }
+      },
     },
   },
 
@@ -668,6 +725,22 @@ export default defineComponent({
       }
       return matrix;
     },
+  },
+  beforeRouteLeave(to, from, next) {
+    EventBus.emit(new ConfirmationRequestEvent(
+      'You will loose data if you have not clicked "save".',
+      (confirmationResponse) => {
+        if (confirmationResponse === 'ACCEPT') {
+          clearInterval(this.autoSave);
+          next(true);
+        } else {
+          next(false);
+        }
+      },
+      'Do you really want to leave?',
+      'I understand.',
+      'Oh right, stop, let me save first.',
+    ));
   },
 });
 </script>

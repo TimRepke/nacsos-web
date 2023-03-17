@@ -103,6 +103,8 @@ const motivationalQuotes = [
   'It’s the first page of the second chapter – Scooter',
   'Let’s blow a hole in the bowl – Scooter',
   'Our lyrics fly like birds in the sky – Scooter',
+  'It’s nice to be important, but it’s more important to be nice – Scooter',
+  'Before success can manifest. You’ve got to go through the learning process. – Scooter',
   // https://kanye.rest/
   'Distraction is the enemy of vision – Kanye West',
   'I love sleep; it’s my favorite. – Kanye West',
