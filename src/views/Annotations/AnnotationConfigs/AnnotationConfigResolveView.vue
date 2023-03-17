@@ -302,6 +302,7 @@
                 :class="{ 'bg-warning': !isValid(labelInfo, itemId, strLabel) }">
                 <template v-if="schemeLookup[labelInfo.path[0].key]?.kind === 'bool'">
                   <BoolLabel
+                    class="d-flex justify-content-end"
                     :user-annotations="matrix[itemId][strLabel].users"
                     :bot-annotation="matrix[itemId][strLabel].bot"
                     :info="schemeLookup[labelInfo.path[0].key]"
@@ -310,6 +311,7 @@
                 </template>
                 <template v-else-if="schemeLookup[labelInfo.path[0].key]?.kind === 'single'">
                   <ChoiceLabel
+                    class="d-flex justify-content-end"
                     :user-annotations="matrix[itemId][strLabel].users"
                     :bot-annotation="matrix[itemId][strLabel].bot"
                     :info="schemeLookup[labelInfo.path[0].key]"
@@ -318,6 +320,7 @@
                 </template>
                 <template v-else-if="schemeLookup[labelInfo.path[0].key]?.kind === 'multi'">
                   <MultiLabel
+                    class="d-flex justify-content-end"
                     :user-annotations="matrix[itemId][strLabel].users"
                     :bot-annotation="matrix[itemId][strLabel].bot"
                     :info="schemeLookup[labelInfo.path[0].key]"
