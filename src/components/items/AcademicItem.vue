@@ -81,7 +81,7 @@ import type {
   AcademicAuthorModel,
   AcademicItemModel,
   AffiliationModel,
-  HighlighterModel
+  HighlighterModel,
 } from '@/plugins/api/api-core';
 
 export default defineComponent({
