@@ -10,9 +10,8 @@
 </template>
 
 <script lang="ts">
-
-import type { PropType } from 'vue';
 import { defineComponent } from 'vue';
+import type { PropType } from 'vue';
 
 type BackgroundColour = 'primary' | 'secondary' | 'success' | 'danger' | 'warning' | 'info' | 'dark' | 'light';
 

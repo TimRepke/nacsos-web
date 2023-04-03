@@ -2,17 +2,18 @@
 /* tslint:disable */
 /* eslint-disable */
 
-export type AssignmentScopeRandomConfig = {
-  config_type?: AssignmentScopeRandomConfig.config_type;
+export type AssignmentScopeRandomWithExclusionConfig = {
+  config_type?: AssignmentScopeRandomWithExclusionConfig.config_type;
   users?: Array<string>;
   num_items: number;
   min_assignments_per_item: number;
   max_assignments_per_item: number;
   num_multi_coded_items: number;
   random_seed: number;
+  excluded_scopes: Array<string>;
 };
 
-export namespace AssignmentScopeRandomConfig {
+export namespace AssignmentScopeRandomWithExclusionConfig {
 
   export enum config_type {
     RANDOM = 'random',

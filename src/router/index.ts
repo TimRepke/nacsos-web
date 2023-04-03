@@ -144,6 +144,11 @@ const routes: Array<RouteRecordRaw> = [
         name: 'config-annotation-resolve',
         component: () => import(/* webpackChunkName: "AnnotationConfigResolveView" */ '../views/Annotations/AnnotationConfigs/AnnotationConfigResolveView.vue'),
       },
+      {
+        path: 'highlighters',
+        name: 'config-annotation-highlighters',
+        component: () => import(/* webpackChunkName: "HighlightersView" */ '../views/Annotations/AnnotationConfigs/HighlightersView.vue'),
+      },
     ],
   },
   {

@@ -22,13 +22,23 @@
             placeholder="Name for this scope"
             v-model="assignmentScope.name" />
         </div>
-        <div>
+        <div class="mb-3">
           <label for="scopeDescription" class="form-label">Scope description</label>
           <textarea
             class="form-control"
             id="scopeDescription"
             rows="3"
             v-model="assignmentScope.description" />
+        </div>
+        <div class="mb-3">
+          <label for="scopeHighlighter" class="form-label">Highlighter</label>
+          <select v-model="assignmentScope.highlighter_id" class="form-select form-select-sm">
+            <option
+              v-for="highlighter in projectHighlighters"
+              :key="highlighter.highlighter_id"
+              :value="highlighter.highlighter_id">{{ highlighter.name }}
+            </option>
+          </select>
         </div>
       </div>
     </div>
@@ -105,11 +115,17 @@
           <select v-model="strategyConfigType" aria-label="Strategy Config Option" :disabled="scopeHasAssignments">
             <option disabled :value="undefined">Select strategy</option>
             <option value="random">Random assignment</option>
+            <option value="random_exclusion">Random assignment with scope exclusion</option>
           </select>
         </div>
         <div class="mb-2">
           <RandomAssignmentConfig
             v-if="strategyConfigType === 'random'"
+            :existing-config="assignmentScope.config"
+            :editable="!scopeHasAssignments"
+            @config-changed="updateConfig($event)" />
+          <RandomAssignmentWithExclusionConfig
+            v-if="strategyConfigType === 'random_exclusion'"
             :existing-config="assignmentScope.config"
             :editable="!scopeHasAssignments"
             @config-changed="updateConfig($event)" />
@@ -157,21 +173,25 @@
 </template>
 
 <script lang="ts">
-import RandomAssignmentConfig from '@/components/annotations/assignments/RandomAssignmentConfig.vue';
-import { EventBus } from '@/plugins/events';
-import { ConfirmationRequestEvent } from '@/plugins/events/events/confirmation';
+import { defineComponent } from 'vue';
 import AssignmentsVisualiser from '@/components/annotations/assignments/AssignmentsVisualiser.vue';
+import RandomAssignmentConfig from '@/components/annotations/assignments/RandomAssignmentConfig.vue';
+import RandomAssignmentWithExclusionConfig
+  from '@/components/annotations/assignments/RandomAssignmentWithExclusionConfig.vue';
+
+import { EventBus } from '@/plugins/events';
 import { ToastEvent } from '@/plugins/events/events/toast';
+import { ConfirmationRequestEvent } from '@/plugins/events/events/confirmation';
+import { API } from '@/plugins/api';
+import type { ApiResponseReject } from '@/plugins/api';
 import type {
   AssignmentCounts,
   AssignmentModel,
   AssignmentScopeModel,
   AssignmentScopeRandomConfig,
+  HighlighterModel,
   UserModel,
 } from '@/plugins/api/api-core';
-import { API } from '@/plugins/api';
-import type { ApiResponseReject } from '@/plugins/api';
-import { defineComponent } from 'vue';
 import { currentProjectStore } from '@/stores';
 
 type AssignmentScopeConfigData = {
@@ -191,11 +211,12 @@ type AssignmentScopeConfigData = {
   assignmentCounts?: AssignmentCounts;
   assignments: AssignmentModel[];
   assignmentScope: Partial<AssignmentScopeModel>;
+  projectHighlighters: Partial<HighlighterModel>[];
 };
 
 export default defineComponent({
   name: 'AssignmentScopeConfigView',
-  components: { AssignmentsVisualiser, RandomAssignmentConfig },
+  components: { RandomAssignmentWithExclusionConfig, AssignmentsVisualiser, RandomAssignmentConfig },
   data(): AssignmentScopeConfigData {
     const scopeId = this.$route.params.scope_id as string | undefined;
     const annotationSchemeId = this.$route.query.annotation_scheme_id as string | undefined;
@@ -218,10 +239,20 @@ export default defineComponent({
         time_created: undefined,
         name: '',
         description: '',
+        highlighter_id: undefined,
       },
+      projectHighlighters: [{ highlighter_id: undefined, name: 'No highlighter' } as Partial<HighlighterModel>],
     };
   },
   async mounted() {
+    API.core.highlighters.getProjectHighlightersApiHighlightersProjectGet({
+      xProjectId: currentProjectStore.projectId as string,
+    }).then((response) => {
+      this.projectHighlighters = response.data;
+      this.projectHighlighters.push({ highlighter_id: undefined, name: 'No highlighter' });
+    }).catch(() => {
+      // pass
+    });
     if (!this.isNewScope) {
       Promise.allSettled([
         API.core.annotations.getAssignmentScopeApiAnnotationsAnnotateScopeAssignmentScopeIdGet({
@@ -237,6 +268,10 @@ export default defineComponent({
           if (scopePromise.status === 'fulfilled' && countsPromise.status === 'fulfilled') {
             this.assignmentScope = scopePromise.value.data;
             this.assignmentCounts = countsPromise.value.data;
+
+            if (this.assignmentScope.highlighter_id === null) {
+              this.assignmentScope.highlighter_id = undefined;
+            }
           } else {
             EventBus.emit(new ToastEvent('ERROR', 'Failed to load assignment scope info. Please try reloading.'));
           }

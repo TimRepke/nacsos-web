@@ -74,10 +74,15 @@
 </template>
 
 <script lang="ts">
-import type { PropType } from 'vue';
-import type { AcademicAuthorModel, AcademicItemModel, AffiliationModel } from '@/plugins/api/api-core';
-import InlineToolTip from '@/components/InlineToolTip.vue';
 import { defineComponent } from 'vue';
+import type { PropType } from 'vue';
+import InlineToolTip from '@/components/InlineToolTip.vue';
+import type {
+  AcademicAuthorModel,
+  AcademicItemModel,
+  AffiliationModel,
+  HighlighterModel,
+} from '@/plugins/api/api-core';
 
 export default defineComponent({
   name: 'AcademicItem',
@@ -88,6 +93,11 @@ export default defineComponent({
       required: true,
       default: null,
     },
+    highlighter: {
+      type: Object as PropType<HighlighterModel>,
+      required: false,
+      default: undefined,
+    },
   },
   data() {
     return {
@@ -96,7 +106,12 @@ export default defineComponent({
   },
   computed: {
     htmlAbstract() {
-      return (this.item.text || '').replaceAll('\n', '<br />');
+      let txt = (this.item.text || '');
+      if (this.highlighter) {
+        const regex = new RegExp(this.highlighter.keywords.join('|'), 'g');
+        txt = txt.replaceAll(regex, `<span style="${this.highlighter.style}">$&</span>`);
+      }
+      return txt.replaceAll('\n', '<br />');
     },
   },
   methods: {

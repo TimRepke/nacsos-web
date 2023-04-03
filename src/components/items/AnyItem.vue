@@ -1,12 +1,12 @@
 <template>
-  <component :is="component" :item="item" />
+  <component :is="component" :item="item" :highlighter="highlighter" />
 </template>
 
 <script lang="ts">
 import type { AnyItem } from '@/types/items.d';
 import type { PropType, Component } from 'vue';
 import { useCurrentProjectStore } from '@/stores/CurrentProjectStore';
-import type { ItemType, ProjectModel } from '@/plugins/api/api-core';
+import type { HighlighterModel, ItemType, ProjectModel } from '@/plugins/api/api-core';
 import { defineAsyncComponent, defineComponent, markRaw } from 'vue';
 
 type TypeMapType = { [key in ItemType]: Component };
@@ -18,6 +18,11 @@ export default defineComponent({
       type: Object as PropType<AnyItem>,
       required: true,
       default: null,
+    },
+    highlighter: {
+      type: Object as PropType<HighlighterModel>,
+      required: false,
+      default: undefined,
     },
   },
   data() {
