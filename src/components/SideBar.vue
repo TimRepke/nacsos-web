@@ -76,6 +76,13 @@
             Label Centre
           </router-link>
           <router-link
+            v-if="projectPermissions.annotations_edit && isActive('config-annotation-schemes')"
+            to="/project/config/annotations/highlighters"
+            class="list-group-item list-group-item-action list-group-item-info border-end-0 sub-link"
+            active-class="active">
+            Highlighters
+          </router-link>
+          <router-link
             v-if="projectPermissions.owner"
             to="/project/settings"
             class="list-group-item list-group-item-action border-end-0"

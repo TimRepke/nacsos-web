@@ -22,13 +22,23 @@
             placeholder="Name for this scope"
             v-model="assignmentScope.name" />
         </div>
-        <div>
+        <div class="mb-3">
           <label for="scopeDescription" class="form-label">Scope description</label>
           <textarea
             class="form-control"
             id="scopeDescription"
             rows="3"
             v-model="assignmentScope.description" />
+        </div>
+        <div class="mb-3">
+          <label for="scopeHighlighter" class="form-label">Highlighter</label>
+          <select v-model="assignmentScope.highlighter_id" class="form-select form-select-sm">
+            <option
+              v-for="highlighter in projectHighlighters"
+              :key="highlighter.highlighter_id"
+              :value="highlighter.highlighter_id">{{ highlighter.name }}
+            </option>
+          </select>
         </div>
       </div>
     </div>
@@ -167,6 +177,7 @@ import type {
   AssignmentModel,
   AssignmentScopeModel,
   AssignmentScopeRandomConfig,
+  HighlighterModel,
   UserModel,
 } from '@/plugins/api/api-core';
 import { API } from '@/plugins/api';
@@ -191,6 +202,7 @@ type AssignmentScopeConfigData = {
   assignmentCounts?: AssignmentCounts;
   assignments: AssignmentModel[];
   assignmentScope: Partial<AssignmentScopeModel>;
+  projectHighlighters: Partial<HighlighterModel>[];
 };
 
 export default defineComponent({
@@ -218,10 +230,20 @@ export default defineComponent({
         time_created: undefined,
         name: '',
         description: '',
+        highlighter_id: undefined,
       },
+      projectHighlighters: [{ highlighter_id: undefined, name: 'No highlighter' } as Partial<HighlighterModel>],
     };
   },
   async mounted() {
+    API.core.highlighters.getProjectHighlightersApiHighlightersProjectGet({
+      xProjectId: currentProjectStore.projectId as string,
+    }).then((response) => {
+      this.projectHighlighters = response.data;
+      this.projectHighlighters.push({ highlighter_id: undefined, name: 'No highlighter' });
+    }).catch(() => {
+      // pass
+    });
     if (!this.isNewScope) {
       Promise.allSettled([
         API.core.annotations.getAssignmentScopeApiAnnotationsAnnotateScopeAssignmentScopeIdGet({
@@ -237,6 +259,10 @@ export default defineComponent({
           if (scopePromise.status === 'fulfilled' && countsPromise.status === 'fulfilled') {
             this.assignmentScope = scopePromise.value.data;
             this.assignmentCounts = countsPromise.value.data;
+
+            if (this.assignmentScope.highlighter_id === null) {
+              this.assignmentScope.highlighter_id = undefined;
+            }
           } else {
             EventBus.emit(new ToastEvent('ERROR', 'Failed to load assignment scope info. Please try reloading.'));
           }

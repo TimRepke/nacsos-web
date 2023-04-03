@@ -20,5 +20,6 @@ export type AssignmentScopeModel = {
   name: string;
   description?: string;
   config?: AssignmentScopeRandomConfig;
+  highlighter_id?: string;
 };
 

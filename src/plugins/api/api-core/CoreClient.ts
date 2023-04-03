@@ -8,6 +8,7 @@ import { AxiosHttpRequest } from '@/plugins/api/core/AxiosHttpRequest';
 import { AnnotationsService } from './services/AnnotationsService';
 import { DefaultService } from './services/DefaultService';
 import { EventsService } from './services/EventsService';
+import { HighlightersService } from './services/HighlightersService';
 import { ImportsService } from './services/ImportsService';
 import { OauthService } from './services/OauthService';
 import { ProjectService } from './services/ProjectService';
@@ -21,6 +22,7 @@ export class CoreClient {
   public readonly annotations: AnnotationsService;
   public readonly default: DefaultService;
   public readonly events: EventsService;
+  public readonly highlighters: HighlightersService;
   public readonly imports: ImportsService;
   public readonly oauth: OauthService;
   public readonly project: ProjectService;
@@ -45,6 +47,7 @@ export class CoreClient {
     this.annotations = new AnnotationsService(this.request);
     this.default = new DefaultService(this.request);
     this.events = new EventsService(this.request);
+    this.highlighters = new HighlightersService(this.request);
     this.imports = new ImportsService(this.request);
     this.oauth = new OauthService(this.request);
     this.project = new ProjectService(this.request);

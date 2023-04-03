@@ -43,5 +43,14 @@ export const $AssignmentScopeModel = {
     config: {
       type: 'AssignmentScopeRandomConfig',
     },
+    highlighter_id: {
+      type: 'any-of',
+      contains: [{
+        type: 'string',
+      }, {
+        type: 'string',
+        format: 'uuid',
+      }],
+    },
   },
 } as const;
