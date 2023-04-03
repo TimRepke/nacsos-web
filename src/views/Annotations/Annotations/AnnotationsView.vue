@@ -28,7 +28,7 @@
           </div>
         </div>
         <div class="row g-0">
-          <AnyItemComponent :item="item" />
+          <AnyItemComponent :item="item" :highlighter="highlighter" />
         </div>
       </div>
       <div class="col border-start p-2 overflow-auto h-md-100 position-relative" :class="sidebarWidthClass">
@@ -90,7 +90,7 @@ import type {
   AnnotationSchemeModel,
   AssignmentModel,
   AssignmentScopeModel,
-  AssignmentStatus,
+  AssignmentStatus, HighlighterModel,
 } from '@/plugins/api/api-core';
 import type { AnyItem } from '@/types/items.d';
 import { API, ignore } from '@/plugins/api';
@@ -135,6 +135,7 @@ type AnnotationsViewData = {
   scope?: AssignmentScopeModel;
   sidebarWidth: number;
   labels?: AnnotationSchemeLabel[];
+  highlighter?: HighlighterModel;
   rerenderCounter: number; // this is a hack to force-update the AnnotationLabels-component
 };
 
@@ -157,6 +158,7 @@ export default defineComponent({
       scope: undefined as AssignmentScopeModel | undefined,
       sidebarWidth: 5,
       labels: undefined as AnnotationSchemeLabel[] | undefined,
+      highlighter: undefined as HighlighterModel | undefined,
       rerenderCounter: 0,
     };
   },
@@ -177,6 +179,16 @@ export default defineComponent({
           assignmentScopeId,
         })).data;
       }
+
+      API.core.highlighters.getScopeHighlighterApiHighlightersScopeAssignmentScopeIdGet({
+        xProjectId: currentProjectStore.projectId as string,
+        assignmentScopeId,
+      }).then((resp) => {
+        this.highlighter = resp.data;
+      }).catch(() => {
+        // ignore
+      });
+
       await this.setCurrentAssignment(response);
     } catch (e) {
       console.error(e);
