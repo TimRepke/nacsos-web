@@ -74,11 +74,15 @@
 </template>
 
 <script lang="ts">
-import type { PropType } from 'vue';
-import type { AcademicAuthorModel, AcademicItemModel, AffiliationModel } from '@/plugins/api/api-core';
-import InlineToolTip from '@/components/InlineToolTip.vue';
 import { defineComponent } from 'vue';
-import type { HighlighterModel } from '@/plugins/api/api-core';
+import type { PropType } from 'vue';
+import InlineToolTip from '@/components/InlineToolTip.vue';
+import type {
+  AcademicAuthorModel,
+  AcademicItemModel,
+  AffiliationModel,
+  HighlighterModel
+} from '@/plugins/api/api-core';
 
 export default defineComponent({
   name: 'AcademicItem',
