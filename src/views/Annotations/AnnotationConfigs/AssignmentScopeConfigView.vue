@@ -115,11 +115,17 @@
           <select v-model="strategyConfigType" aria-label="Strategy Config Option" :disabled="scopeHasAssignments">
             <option disabled :value="undefined">Select strategy</option>
             <option value="random">Random assignment</option>
+            <option value="random_exclusion">Random assignment with scope exclusion</option>
           </select>
         </div>
         <div class="mb-2">
           <RandomAssignmentConfig
             v-if="strategyConfigType === 'random'"
+            :existing-config="assignmentScope.config"
+            :editable="!scopeHasAssignments"
+            @config-changed="updateConfig($event)" />
+          <RandomAssignmentWithExclusionConfig
+            v-if="strategyConfigType === 'random_exclusion'"
             :existing-config="assignmentScope.config"
             :editable="!scopeHasAssignments"
             @config-changed="updateConfig($event)" />
@@ -167,11 +173,17 @@
 </template>
 
 <script lang="ts">
-import RandomAssignmentConfig from '@/components/annotations/assignments/RandomAssignmentConfig.vue';
-import { EventBus } from '@/plugins/events';
-import { ConfirmationRequestEvent } from '@/plugins/events/events/confirmation';
+import { defineComponent } from 'vue';
 import AssignmentsVisualiser from '@/components/annotations/assignments/AssignmentsVisualiser.vue';
+import RandomAssignmentConfig from '@/components/annotations/assignments/RandomAssignmentConfig.vue';
+import RandomAssignmentWithExclusionConfig
+  from '@/components/annotations/assignments/RandomAssignmentWithExclusionConfig.vue';
+
+import { EventBus } from '@/plugins/events';
 import { ToastEvent } from '@/plugins/events/events/toast';
+import { ConfirmationRequestEvent } from '@/plugins/events/events/confirmation';
+import { API } from '@/plugins/api';
+import type { ApiResponseReject } from '@/plugins/api';
 import type {
   AssignmentCounts,
   AssignmentModel,
@@ -180,9 +192,6 @@ import type {
   HighlighterModel,
   UserModel,
 } from '@/plugins/api/api-core';
-import { API } from '@/plugins/api';
-import type { ApiResponseReject } from '@/plugins/api';
-import { defineComponent } from 'vue';
 import { currentProjectStore } from '@/stores';
 
 type AssignmentScopeConfigData = {
@@ -207,7 +216,7 @@ type AssignmentScopeConfigData = {
 
 export default defineComponent({
   name: 'AssignmentScopeConfigView',
-  components: { AssignmentsVisualiser, RandomAssignmentConfig },
+  components: { RandomAssignmentWithExclusionConfig, AssignmentsVisualiser, RandomAssignmentConfig },
   data(): AssignmentScopeConfigData {
     const scopeId = this.$route.params.scope_id as string | undefined;
     const annotationSchemeId = this.$route.query.annotation_scheme_id as string | undefined;

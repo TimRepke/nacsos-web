@@ -12,7 +12,12 @@ export const $MakeAssignmentsRequestModel = {
       isRequired: true,
     },
     config: {
-      type: 'AssignmentScopeRandomConfig',
+      type: 'any-of',
+      contains: [{
+        type: 'AssignmentScopeRandomConfig',
+      }, {
+        type: 'AssignmentScopeRandomWithExclusionConfig',
+      }],
       isRequired: true,
     },
     save: {

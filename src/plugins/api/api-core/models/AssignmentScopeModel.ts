@@ -3,6 +3,7 @@
 /* eslint-disable */
 
 import type { AssignmentScopeRandomConfig } from './AssignmentScopeRandomConfig';
+import type { AssignmentScopeRandomWithExclusionConfig } from './AssignmentScopeRandomWithExclusionConfig';
 
 /**
  * AssignmentScope can be used to logically group a set of Assignments.
@@ -19,7 +20,7 @@ export type AssignmentScopeModel = {
   time_created?: string;
   name: string;
   description?: string;
-  config?: AssignmentScopeRandomConfig;
+  config?: (AssignmentScopeRandomConfig | AssignmentScopeRandomWithExclusionConfig);
   highlighter_id?: string;
 };
 
