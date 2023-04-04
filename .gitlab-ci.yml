@@ -48,7 +48,7 @@ deploy-to-production:
     - lftp --version
     - ls -lisah
     - ls -lisah dist
-    - lftp -c "open -u $FTP_USERNAME,$FTP_PASSWORD $FTP_HOSTNAME; mirror -Renv dist/ ./nacsos-web/"
+    - lftp -c "open -u $FTP_USERNAME,$FTP_PASSWORD $FTP_HOSTNAME; mirror -Renv dist/ $NACSOS_WEB_WWW"
   when: manual
   only:
     - production
