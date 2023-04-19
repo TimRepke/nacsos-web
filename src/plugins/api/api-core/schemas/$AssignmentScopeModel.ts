@@ -43,18 +43,24 @@ export const $AssignmentScopeModel = {
     config: {
       type: 'any-of',
       contains: [{
-        type: 'AssignmentScopeRandomConfig',
-      }, {
         type: 'AssignmentScopeRandomWithExclusionConfig',
+      }, {
+        type: 'AssignmentScopeRandomConfig',
       }],
     },
-    highlighter_id: {
+    highlighter_ids: {
       type: 'any-of',
       contains: [{
-        type: 'string',
+        type: 'array',
+        contains: {
+          type: 'string',
+        },
       }, {
-        type: 'string',
-        format: 'uuid',
+        type: 'array',
+        contains: {
+          type: 'string',
+          format: 'uuid',
+        },
       }],
     },
   },

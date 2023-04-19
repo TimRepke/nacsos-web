@@ -47,12 +47,12 @@ export const $AssignmentScopeRandomWithExclusionConfig = {
         type: 'array',
         contains: {
           type: 'string',
-          format: 'uuid',
         },
       }, {
         type: 'array',
         contains: {
           type: 'string',
+          format: 'uuid',
         },
       }],
       isRequired: true,

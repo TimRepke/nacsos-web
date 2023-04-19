@@ -13,17 +13,17 @@ export class HighlightersService {
   constructor(public readonly httpRequest: BaseHttpRequest) {}
 
   /**
-   * Get Scope Highlighter
+   * Get Scope Highlighters
    * @returns HighlighterModel Successful Response
    * @throws ApiError
    */
-  public getScopeHighlighterApiHighlightersScopeAssignmentScopeIdGet({
+  public getScopeHighlightersApiHighlightersScopeAssignmentScopeIdGet({
     assignmentScopeId,
     xProjectId,
   }: {
     assignmentScopeId: string,
     xProjectId: string,
-  }, options?: Partial<ApiRequestOptions>): CancelablePromise<HighlighterModel> {
+  }, options?: Partial<ApiRequestOptions>): CancelablePromise<Array<HighlighterModel>> {
     return this.httpRequest.request({
       method: 'GET',
       url: '/api/highlighters/scope/{assignment_scope_id}',
