@@ -1,3 +1,4 @@
+import { useRequestsStore } from '@/stores/RequestsStore';
 import type { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
 import axios from 'axios';
 import FormData from 'form-data';
@@ -263,7 +264,9 @@ const catchErrorCodes = (options: ApiRequestOptions, result: ApiResult): void =>
 // eslint-disable-next-line import/prefer-default-export
 export const request = <T>(config: OpenAPIConfig, options: ApiRequestOptions): CancelablePromise<T> => (
   new CancelablePromise(async (resolvePromise, rejectPromise, onCancel) => {
+    const requestsStore = useRequestsStore();
     try {
+      requestsStore.logRequestStart();
       const url = getUrl(config, options);
       const formData = getFormData(options);
       const body = getRequestBody(options);
@@ -273,6 +276,7 @@ export const request = <T>(config: OpenAPIConfig, options: ApiRequestOptions): C
         const response = await sendRequest<T>(config, options, url, body, formData, headers, onCancel);
         const responseBody = getResponseBody(response);
         const responseHeader = getResponseHeader(response, options.responseHeader);
+        requestsStore.logRequestEnd();
 
         const result: ApiResult = {
           url,
@@ -291,8 +295,11 @@ export const request = <T>(config: OpenAPIConfig, options: ApiRequestOptions): C
           response,
           data: result.body,
         });
+      } else {
+        requestsStore.logRequestEnd();
       }
     } catch (error) {
+      requestsStore.logRequestEnd();
       if (error instanceof ApiError) {
         const reason = {
           ok: error.ok,

@@ -113,8 +113,8 @@
 </template>
 
 <script lang="ts">
-import { RequestGatewayStatusChangeEvent } from '@/plugins/events/events/general';
 import { defineComponent } from 'vue';
+import { requestsStore } from '@/stores';
 
 export default defineComponent({
   name: 'NacsosLogo',
@@ -125,18 +125,11 @@ export default defineComponent({
     },
   },
   created() {
-    this.$eventBus.on(RequestGatewayStatusChangeEvent, (event: RequestGatewayStatusChangeEvent) => {
-      this.activeRequests = event.newState;
-    });
-  },
-  data() {
-    return {
-      activeRequests: false,
-    };
+    // pass
   },
   computed: {
     loading() {
-      return this.animated || this.activeRequests;
+      return this.animated || requestsStore.hasActiveRequest;
     },
   },
 });

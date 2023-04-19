@@ -1,6 +1,9 @@
 <template>
   <ul class="list-unstyled">
-    <li v-for="(label, labelIndex) in labels" :key="`${label.key}-${label.annotation.repeat}`" class="mb-3">
+    <li
+      v-for="(label, labelIndex) in labels"
+      :key="`${label.key}-${label.annotation.repeat}`"
+      class="mb-3">
       <div class="mb-2">
         <div>
           <strong>{{ label.name }}</strong>
@@ -47,7 +50,7 @@
               <label class="tristate-checkbox false">
                 <input
                   type="radio"
-                  name="toggle-state"
+                  :name="`toggle-state-${label.annotation.key}-${label.annotation.repeat}`"
                   v-bind:value="false"
                   v-model="label.annotation.value_bool" />
                 <span class="checkmark" />
@@ -55,7 +58,7 @@
               <label class="tristate-checkbox undetermined">
                 <input
                   type="radio"
-                  name="toggle-state"
+                  :name="`toggle-state-${label.annotation.key}-${label.annotation.repeat}`"
                   v-bind:value="undefined"
                   v-model="label.annotation.value_bool"
                   disabled />
@@ -64,7 +67,7 @@
               <label class="tristate-checkbox true">
                 <input
                   type="radio"
-                  name="toggle-state"
+                  :name="`toggle-state-${label.annotation.key}-${label.annotation.repeat}`"
                   v-bind:value="true"
                   v-model="label.annotation.value_bool" />
                 <span class="checkmark" />

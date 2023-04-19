@@ -93,8 +93,8 @@ export default defineComponent({
       required: true,
       default: null,
     },
-    highlighter: {
-      type: Object as PropType<HighlighterModel>,
+    highlighters: {
+      type: Object as PropType<Array<HighlighterModel>>,
       required: false,
       default: undefined,
     },
@@ -107,9 +107,11 @@ export default defineComponent({
   computed: {
     htmlAbstract() {
       let txt = (this.item.text || '');
-      if (this.highlighter) {
-        const regex = new RegExp(this.highlighter.keywords.join('|'), 'g');
-        txt = txt.replaceAll(regex, `<span style="${this.highlighter.style}">$&</span>`);
+      if (this.highlighters) {
+        this.highlighters.forEach((highlighter: HighlighterModel) => {
+          const regex = new RegExp(highlighter.keywords.join('|'), 'g');
+          txt = txt.replaceAll(regex, `<span style="${highlighter.style}">$&</span>`);
+        });
       }
       return txt.replaceAll('\n', '<br />');
     },

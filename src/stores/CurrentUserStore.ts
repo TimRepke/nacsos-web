@@ -18,13 +18,13 @@ export const useCurrentUserStore = defineStore('CurrentUserStore', {
   state(): CurrentUserStoreType {
     return {
       user: useStorage<UserModel>(
-        'currentUser',
+        'nacsos:UserStore:currentUser',
         null,
         undefined,
         { serializer: UserSerializer },
       ),
       accessToken: useStorage<string>(
-        'accessToken',
+        'nacsos:UserStore:accessToken',
         null,
         undefined,
       ),

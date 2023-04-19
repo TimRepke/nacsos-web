@@ -8,7 +8,7 @@ import type { AssignmentScopeRandomWithExclusionConfig } from './AssignmentScope
 export type MakeAssignmentsRequestModel = {
   annotation_scheme_id: string;
   scope_id: string;
-  config: (AssignmentScopeRandomConfig | AssignmentScopeRandomWithExclusionConfig);
+  config: (AssignmentScopeRandomWithExclusionConfig | AssignmentScopeRandomConfig);
   save?: boolean;
 };
 

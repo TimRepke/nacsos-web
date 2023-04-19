@@ -1,5 +1,5 @@
 <template>
-  <component :is="component" :item="item" :highlighter="highlighter" />
+  <component :is="component" :item="item" :highlighters="highlighters" />
 </template>
 
 <script lang="ts">
@@ -19,8 +19,8 @@ export default defineComponent({
       required: true,
       default: null,
     },
-    highlighter: {
-      type: Object as PropType<HighlighterModel>,
+    highlighters: {
+      type: Object as PropType<Array<HighlighterModel>>,
       required: false,
       default: undefined,
     },
