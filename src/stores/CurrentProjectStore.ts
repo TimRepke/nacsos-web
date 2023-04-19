@@ -20,20 +20,20 @@ export const useCurrentProjectStore = defineStore('CurrentProjectStore', {
 
     return {
       projectId: useStorage<string>(
-        'currentProjectId',
+        'nacsos:ProjectStore:currentProjectId',
         null,
         undefined,
       ),
       project:
         useStorage<ProjectModel>(
-          'currentProject',
+          'nacsos:ProjectStore:currentProject',
           null,
           undefined,
           { serializer: ProjectSerializer },
         ),
       projectPermissions:
         useStorage<ProjectPermissionsModel>(
-          'currentProjectPermissions',
+          'nacsos:ProjectStore:currentProjectPermissions',
           null,
           undefined,
           { serializer: ProjectPermissionSerializer },
