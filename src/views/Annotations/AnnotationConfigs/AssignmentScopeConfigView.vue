@@ -31,14 +31,23 @@
             v-model="assignmentScope.description" />
         </div>
         <div class="mb-3">
-          <label for="scopeHighlighter" class="form-label">Highlighter</label>
-          <select v-model="assignmentScope.highlighter_id" class="form-select form-select-sm">
-            <option
+          <label for="scopeHighlighter" class="form-label">Highlighters</label>
+          <ul class="list-group mt-0 ps-4 pe-4">
+            <li
               v-for="highlighter in projectHighlighters"
               :key="highlighter.highlighter_id"
-              :value="highlighter.highlighter_id">{{ highlighter.name }}
-            </option>
-          </select>
+              class="list-group-item">
+              <input
+                :id="`hl-${highlighter.highlighter_id}`"
+                :value="highlighter.highlighter_id"
+                v-model="assignmentScope.highlighter_ids"
+                class="form-check-input me-1"
+                type="checkbox">
+              <label :for="`hl-${highlighter.highlighter_id}`" class="form-check-label stretched-link">
+                {{ highlighter.name }}
+              </label>
+            </li>
+          </ul>
         </div>
       </div>
     </div>
@@ -239,9 +248,9 @@ export default defineComponent({
         time_created: undefined,
         name: '',
         description: '',
-        highlighter_id: undefined,
+        highlighter_ids: undefined,
       },
-      projectHighlighters: [{ highlighter_id: undefined, name: 'No highlighter' } as Partial<HighlighterModel>],
+      projectHighlighters: [],
     };
   },
   async mounted() {
@@ -249,7 +258,6 @@ export default defineComponent({
       xProjectId: currentProjectStore.projectId as string,
     }).then((response) => {
       this.projectHighlighters = response.data;
-      this.projectHighlighters.push({ highlighter_id: undefined, name: 'No highlighter' });
     }).catch(() => {
       // pass
     });
@@ -269,8 +277,8 @@ export default defineComponent({
             this.assignmentScope = scopePromise.value.data;
             this.assignmentCounts = countsPromise.value.data;
 
-            if (this.assignmentScope.highlighter_id === null) {
-              this.assignmentScope.highlighter_id = undefined;
+            if (this.assignmentScope.highlighter_ids === null) {
+              this.assignmentScope.highlighter_ids = undefined;
             }
           } else {
             EventBus.emit(new ToastEvent('ERROR', 'Failed to load assignment scope info. Please try reloading.'));
@@ -349,6 +357,9 @@ export default defineComponent({
             const scope = JSON.parse(JSON.stringify(this.assignmentScope)); // clone the object
             if (scope.config) {
               scope.config.users = this.selectedUserIds;
+            }
+            if (!scope.highlighter_ids || scope.highlighter_ids.length === 0){
+              scope.highlighter_ids = undefined;
             }
             API.core.annotations.putAssignmentScopeApiAnnotationsAnnotateScopePut({
               xProjectId: currentProjectStore.projectId as string,

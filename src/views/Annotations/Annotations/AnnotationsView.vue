@@ -28,20 +28,20 @@
           </div>
         </div>
         <div class="row g-0">
-          <AnyItemComponent :item="item" :highlighter="highlighter" />
+          <AnyItemComponent :item="item" :highlighters="highlighters" />
         </div>
       </div>
       <div class="col border-start p-2 overflow-auto h-md-100 position-relative" :class="sidebarWidthClass">
         <div
           class="position-fixed bottom-0 border border-end-0 rounded-start text-muted text-center"
           style="margin-left: -1.325rem; width: 0.75rem; font-size: 0.75rem;"
-          @click="(sidebarWidth < 12) && sidebarWidth++">
+          @click="(uiSettings.annotation.sidebarWidth < 12) && uiSettings.annotation.sidebarWidth++">
           <font-awesome-icon :icon="['fas', 'caret-left']" />
         </div>
         <div
           class="position-fixed bottom-0 border border-start-0 rounded-end text-muted text-center"
           style="margin-left: -.5rem; width: 0.75rem; font-size: 0.75rem;"
-          @click="(sidebarWidth > 0) && sidebarWidth--">
+          @click="(uiSettings.annotation.sidebarWidth > 0) && uiSettings.annotation.sidebarWidth--">
           <font-awesome-icon :icon="['fas', 'caret-right']" />
         </div>
 
@@ -94,7 +94,8 @@ import type {
 } from '@/plugins/api/api-core';
 import type { AnyItem } from '@/types/items.d';
 import { API, ignore } from '@/plugins/api';
-import { currentProjectStore } from '@/stores';
+import { currentProjectStore, interfaceSettingsStore } from '@/stores';
+import type { InterfaceSettingsStoreType } from '@/stores/InterfaceSettingsStore';
 import { defineComponent } from 'vue';
 
 const motivationalQuotes = [
@@ -125,6 +126,7 @@ const motivationalQuotes = [
   'Change the world by being yourself. – Amy Poehler',
   'Change the game, don’t let the game change you. – Macklemore',
   // https://pypi.org/project/quotes-generator/
+  'Your Skepticism Is My Fuel. — Minx',
 ];
 
 type AnnotationsViewData = {
@@ -133,9 +135,9 @@ type AnnotationsViewData = {
   assignments?: AssignmentModel[];
   scheme?: AnnotationSchemeModel;
   scope?: AssignmentScopeModel;
-  sidebarWidth: number;
   labels?: AnnotationSchemeLabel[];
-  highlighter?: HighlighterModel;
+  highlighters?: HighlighterModel[];
+  uiSettings: InterfaceSettingsStoreType;
   rerenderCounter: number; // this is a hack to force-update the AnnotationLabels-component
 };
 
@@ -150,16 +152,19 @@ export default defineComponent({
   name: 'AnnotationsView',
   components: { AnnotationLabels, AnyItemComponent },
   data(): AnnotationsViewData {
+    console.log(interfaceSettingsStore.annotation.sidebarWidth);
+    console.log(interfaceSettingsStore.annotation.tmp);
+
     return {
       item: undefined as AnyItem | undefined,
       assignment: undefined as AssignmentModel | undefined,
       assignments: undefined as AssignmentModel[] | undefined,
       scheme: undefined as AnnotationSchemeModel | undefined,
       scope: undefined as AssignmentScopeModel | undefined,
-      sidebarWidth: 5,
       labels: undefined as AnnotationSchemeLabel[] | undefined,
-      highlighter: undefined as HighlighterModel | undefined,
+      highlighters: undefined as HighlighterModel[] | undefined,
       rerenderCounter: 0,
+      uiSettings: interfaceSettingsStore,
     };
   },
   async mounted() {
@@ -180,11 +185,11 @@ export default defineComponent({
         })).data;
       }
 
-      API.core.highlighters.getScopeHighlighterApiHighlightersScopeAssignmentScopeIdGet({
+      API.core.highlighters.getScopeHighlightersApiHighlightersScopeAssignmentScopeIdGet({
         xProjectId: currentProjectStore.projectId as string,
         assignmentScopeId,
       }).then((resp) => {
-        this.highlighter = resp.data;
+        this.highlighters = resp.data;
       }).catch(() => {
         // ignore
       });
@@ -353,7 +358,7 @@ export default defineComponent({
   },
   computed: {
     sidebarWidthClass() {
-      return `col-md-${this.sidebarWidth}`;
+      return `col-md-${interfaceSettingsStore.annotation.sidebarWidth}`;
     },
     assignmentIndicators(): AssignmentIndicator[] | null {
       const WINDOW = 50; // 100/2
