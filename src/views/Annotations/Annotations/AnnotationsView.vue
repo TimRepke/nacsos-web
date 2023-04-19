@@ -152,9 +152,6 @@ export default defineComponent({
   name: 'AnnotationsView',
   components: { AnnotationLabels, AnyItemComponent },
   data(): AnnotationsViewData {
-    console.log(interfaceSettingsStore.annotation.sidebarWidth);
-    console.log(interfaceSettingsStore.annotation.tmp);
-
     return {
       item: undefined as AnyItem | undefined,
       assignment: undefined as AssignmentModel | undefined,

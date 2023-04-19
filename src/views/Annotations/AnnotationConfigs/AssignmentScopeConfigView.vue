@@ -358,7 +358,7 @@ export default defineComponent({
             if (scope.config) {
               scope.config.users = this.selectedUserIds;
             }
-            if (!scope.highlighter_ids || scope.highlighter_ids.length === 0){
+            if (!scope.highlighter_ids || scope.highlighter_ids.length === 0) {
               scope.highlighter_ids = undefined;
             }
             API.core.annotations.putAssignmentScopeApiAnnotationsAnnotateScopePut({

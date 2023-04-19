@@ -113,8 +113,6 @@
 </template>
 
 <script lang="ts">
-import { EventBus } from '@/plugins/events';
-import { RequestGatewayStatusChangeEvent } from '@/plugins/events/events/general';
 import { defineComponent } from 'vue';
 import { requestsStore } from '@/stores';
 

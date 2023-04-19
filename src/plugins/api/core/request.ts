@@ -1,3 +1,4 @@
+import { useRequestsStore } from '@/stores/RequestsStore';
 import type { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
 import axios from 'axios';
 import FormData from 'form-data';
@@ -8,7 +9,6 @@ import { ApiError } from './ApiError';
 import type { ApiRequestOptions } from './ApiRequestOptions';
 import type { ApiResult } from './ApiResult';
 import type { OpenAPIConfig } from './OpenAPI';
-import { requestsStore } from '@/stores';
 
 const isDefined = <T>(value: T | null | undefined): value is Exclude<T, null | undefined> => value !== undefined && value !== null;
 
@@ -264,6 +264,7 @@ const catchErrorCodes = (options: ApiRequestOptions, result: ApiResult): void =>
 // eslint-disable-next-line import/prefer-default-export
 export const request = <T>(config: OpenAPIConfig, options: ApiRequestOptions): CancelablePromise<T> => (
   new CancelablePromise(async (resolvePromise, rejectPromise, onCancel) => {
+    const requestsStore = useRequestsStore();
     try {
       requestsStore.logRequestStart();
       const url = getUrl(config, options);
