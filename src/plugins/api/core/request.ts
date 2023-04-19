@@ -8,6 +8,7 @@ import { ApiError } from './ApiError';
 import type { ApiRequestOptions } from './ApiRequestOptions';
 import type { ApiResult } from './ApiResult';
 import type { OpenAPIConfig } from './OpenAPI';
+import { requestsStore } from '@/stores';
 
 const isDefined = <T>(value: T | null | undefined): value is Exclude<T, null | undefined> => value !== undefined && value !== null;
 
@@ -264,6 +265,7 @@ const catchErrorCodes = (options: ApiRequestOptions, result: ApiResult): void =>
 export const request = <T>(config: OpenAPIConfig, options: ApiRequestOptions): CancelablePromise<T> => (
   new CancelablePromise(async (resolvePromise, rejectPromise, onCancel) => {
     try {
+      requestsStore.logRequestStart();
       const url = getUrl(config, options);
       const formData = getFormData(options);
       const body = getRequestBody(options);
@@ -273,6 +275,7 @@ export const request = <T>(config: OpenAPIConfig, options: ApiRequestOptions): C
         const response = await sendRequest<T>(config, options, url, body, formData, headers, onCancel);
         const responseBody = getResponseBody(response);
         const responseHeader = getResponseHeader(response, options.responseHeader);
+        requestsStore.logRequestEnd();
 
         const result: ApiResult = {
           url,
@@ -291,8 +294,11 @@ export const request = <T>(config: OpenAPIConfig, options: ApiRequestOptions): C
           response,
           data: result.body,
         });
+      } else {
+        requestsStore.logRequestEnd();
       }
     } catch (error) {
+      requestsStore.logRequestEnd();
       if (error instanceof ApiError) {
         const reason = {
           ok: error.ok,
