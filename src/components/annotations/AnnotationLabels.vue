@@ -255,7 +255,7 @@ export default defineComponent({
       if (this.keyCounts[label.key] < (label.max_repeat ?? 1)) {
         // copy the current label and remove irrelevant things
         const labelCopy = JSON.parse(JSON.stringify(label)) as AnnotationSchemeLabel;
-        if (labelCopy.annotation) this.clearAnnotation(labelCopy.annotation);
+        if (labelCopy.annotation) this.clearAnnotation(labelCopy);
 
         // eslint-disable-next-line vue/no-mutating-props
         this.labels.splice(labelIndex + 1, 0, labelCopy);
