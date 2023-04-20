@@ -9,6 +9,7 @@ import { ApiError } from './ApiError';
 import type { ApiRequestOptions } from './ApiRequestOptions';
 import type { ApiResult } from './ApiResult';
 import type { OpenAPIConfig } from './OpenAPI';
+import { useCurrentUserStore } from '@/stores/CurrentUserStore';
 
 const isDefined = <T>(value: T | null | undefined): value is Exclude<T, null | undefined> => value !== undefined && value !== null;
 
@@ -300,6 +301,7 @@ export const request = <T>(config: OpenAPIConfig, options: ApiRequestOptions): C
       }
     } catch (error) {
       requestsStore.logRequestEnd();
+
       if (error instanceof ApiError) {
         const reason = {
           ok: error.ok,
@@ -307,6 +309,13 @@ export const request = <T>(config: OpenAPIConfig, options: ApiRequestOptions): C
           response: error.response,
           error: error.body,
         };
+
+        // We might want to log-out when encountering an invalid auth error
+        if (reason.error.detail.type === 'NotAuthenticated') {
+          const userStore = useCurrentUserStore();
+          userStore.clear();
+        }
+
         rejectPromise(reason);
       } else {
         rejectPromise({
