@@ -2,6 +2,8 @@ import { useRequestsStore } from '@/stores/RequestsStore';
 import type { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
 import axios from 'axios';
 import FormData from 'form-data';
+import { EventBus } from '@/plugins/events';
+import { ClearUserStoreEvent } from '@/plugins/events/events/auth';
 
 import type { OnCancel } from './CancelablePromise';
 import { CancelablePromise, ErrorLevel } from './CancelablePromise';
@@ -9,7 +11,6 @@ import { ApiError } from './ApiError';
 import type { ApiRequestOptions } from './ApiRequestOptions';
 import type { ApiResult } from './ApiResult';
 import type { OpenAPIConfig } from './OpenAPI';
-import { useCurrentUserStore } from '@/stores/CurrentUserStore';
 
 const isDefined = <T>(value: T | null | undefined): value is Exclude<T, null | undefined> => value !== undefined && value !== null;
 
@@ -312,8 +313,9 @@ export const request = <T>(config: OpenAPIConfig, options: ApiRequestOptions): C
 
         // We might want to log-out when encountering an invalid auth error
         if (reason.error.detail.type === 'NotAuthenticated') {
-          const userStore = useCurrentUserStore();
-          userStore.clear();
+          EventBus.emit(new ClearUserStoreEvent());
+          // const userStore = useCurrentUserStore();
+          // userStore.clear();
         }
 
         rejectPromise(reason);
