@@ -222,7 +222,7 @@ router.beforeEach(async (to) => {
   // if no project is selected (and it isn't on purpose) --> redirect to project selection page
   if (!currentProjectStore.projectSelected
     && currentUserStore.isLoggedIn
-    && !(to.name === 'project-list' || isOnRoute(to, 'admin'))) {
+    && !(to.name === 'project-list' || to.name === 'about' || isOnRoute(to, 'admin'))) {
     return { name: 'project-list' };
   }
 
