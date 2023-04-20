@@ -73,6 +73,10 @@ export function isOnRoute(loc: RouteLocationNormalized, name: string): boolean {
   return loc.matched.findIndex((match: RouteRecordNormalized) => match.name === name) >= 0;
 }
 
+export function isNotNone(obj: unknown): obj is object | boolean | string | number {
+  return obj !== undefined && obj !== null;
+}
+
 export default {
   install(app: App) {
     // eslint-disable-next-line no-param-reassign
@@ -85,6 +89,7 @@ export default {
       isArtefactOrSerializedArtefact,
       type2str,
       isOnRoute,
+      isNotNone,
     };
   },
 };

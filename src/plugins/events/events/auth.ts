@@ -25,3 +25,5 @@ export class AuthFailedEvent extends BaseEvent {}
 export class LoggedOutEvent extends BaseEvent {}
 
 export class LogoutSuccessEvent extends BaseEvent {}
+
+export class ClearUserStoreEvent extends BaseEvent {}

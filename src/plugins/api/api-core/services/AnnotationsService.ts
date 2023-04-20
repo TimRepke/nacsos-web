@@ -13,6 +13,7 @@ import type { BotAnnotationMetaDataBaseModel } from '../models/BotAnnotationMeta
 import type { BotAnnotationModel } from '../models/BotAnnotationModel';
 import type { ItemWithCount } from '../models/ItemWithCount';
 import type { MakeAssignmentsRequestModel } from '../models/MakeAssignmentsRequestModel';
+import type { ProgressIndicator } from '../models/ProgressIndicator';
 import type { ResolutionPayload } from '../models/ResolutionPayload';
 import type { ResolutionProposalResponse } from '../models/ResolutionProposalResponse';
 import type { SavedResolutionResponse } from '../models/SavedResolutionResponse';
@@ -433,6 +434,42 @@ export class AnnotationsService {
   }
 
   /**
+   * Get Assignment Indicators For Scope For User
+   * @returns ProgressIndicator Successful Response
+   * @throws ApiError
+   */
+  public getAssignmentIndicatorsForScopeForUserApiAnnotationsAnnotateAssignmentProgressAssignmentScopeIdGet({
+    assignmentScopeId,
+    xProjectId,
+    key,
+    repeat,
+  }: {
+    assignmentScopeId: string,
+    xProjectId: string,
+    key?: string,
+    repeat?: number,
+  }, options?: Partial<ApiRequestOptions>): CancelablePromise<Array<ProgressIndicator>> {
+    return this.httpRequest.request({
+      method: 'GET',
+      url: '/api/annotations/annotate/assignment/progress/{assignment_scope_id}',
+      path: {
+        'assignment_scope_id': assignmentScopeId,
+      },
+      headers: {
+        'x-project-id': xProjectId,
+      },
+      query: {
+        'key': key,
+        'repeat': repeat,
+      },
+      errors: {
+        422: `Validation Error`,
+      },
+      ...options,
+    });
+  }
+
+  /**
    * Get Assignments For Scope
    * @returns AssignmentModel Successful Response
    * @throws ApiError
@@ -785,7 +822,7 @@ export class AnnotationsService {
   }, options?: Partial<ApiRequestOptions>): CancelablePromise<SavedResolutionResponse> {
     return this.httpRequest.request({
       method: 'GET',
-      url: '/api/annotations/config/resolved/:bot_annotation_meta_id',
+      url: '/api/annotations/config/resolved/{bot_annotation_meta_id}',
       headers: {
         'x-project-id': xProjectId,
       },
@@ -813,7 +850,7 @@ export class AnnotationsService {
   }, options?: Partial<ApiRequestOptions>): CancelablePromise<any> {
     return this.httpRequest.request({
       method: 'DELETE',
-      url: '/api/annotations/config/resolved/:bot_annotation_meta_id',
+      url: '/api/annotations/config/resolved/{bot_annotation_meta_id}',
       headers: {
         'x-project-id': xProjectId,
       },

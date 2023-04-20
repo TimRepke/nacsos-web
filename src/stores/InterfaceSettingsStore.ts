@@ -5,9 +5,10 @@ import type { RemovableRef } from '@vueuse/core';
 
 export interface AnnotationSettings {
   // true: colour "icons" in the progressbar by assignment status (e.g. OPEN, PARTIAL, FULL)
-  progressBarUseStatus: boolean;
+  // progressBarUseStatus: boolean; (computed)
   // if progressBarUseStatus is false, use value from this label key to colour the progress "icon"
   progressBarLabelKey?: string;
+  progressBarLabelRepeat?: number;
   // width of the annotation sidebar
   sidebarWidth: number;
 }
@@ -26,9 +27,9 @@ export const useInterfaceSettingsStore = defineStore('InterfaceSettingsStore', {
       annotation: useStorage<AnnotationSettings>(
         'nacsos:ui-settings:annotation',
         {
-          progressBarUseStatus: true,
           sidebarWidth: 5,
-        },
+          progressBarLabelRepeat: 1,
+        } as AnnotationSettings,
         undefined,
         { mergeDefaults: true },
       ),
@@ -38,6 +39,8 @@ export const useInterfaceSettingsStore = defineStore('InterfaceSettingsStore', {
     // pass
   },
   getters: {
-    // pass
+    annotationProgressBarUseStatus(): boolean {
+      return this.annotation.progressBarLabelKey === undefined;
+    },
   },
 });

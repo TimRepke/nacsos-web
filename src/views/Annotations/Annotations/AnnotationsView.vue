@@ -6,25 +6,36 @@
     <template v-else>
       <div class="col-12 col-md overflow-auto h-md-100">
         <div class="row g-0">
-          <div
-            v-if="assignmentIndicatorsNeedBirdseye"
-            class="assignments-birdseye">
-            <div
-              v-for="assignmentLI in assignmentIndicators"
-              :key="assignmentLI.assignmentId"
-              class="assignments-birdseye-step"
-              :class="[(assignmentLI.inHighlight) ? 'assignments-birdseye-step-inview' : '', assignmentLI.status]"
-              type="button"
-              @click="saveAndGoto(assignmentLI.assignmentId)" />
+          <div class="col-auto me-2 d-flex align-items-center">
+            <font-awesome-icon
+              :icon="['fas', 'gear']"
+              class="text-muted"
+              role="button"
+              @click="showStatusBarModal = true" />
           </div>
-          <div class="assignments">
+
+          <div class="col align-items-center">
             <div
-              v-for="assignmentLI in assignmentIndicatorsHighlighted"
-              :key="assignmentLI.assignmentId"
-              class="assignments-step"
-              :class="[assignmentLI.status, (assignmentLI.assignmentId === assignment.assignment_id) ? 'current' : '']"
-              type="button"
-              @click="saveAndGoto(assignmentLI.assignmentId)" />
+              v-if="assignmentIndicatorsNeedBirdseye"
+              class="assignments-birdseye">
+              <div
+                v-for="assignmentLI in assignmentIndicators"
+                :key="assignmentLI.assignmentId"
+                class="assignments-birdseye-step"
+                :class="[(assignmentLI.inHighlight) ? 'assignments-birdseye-step-inview' : '', assignmentLI.status]"
+                type="button"
+                @click="saveAndGoto(assignmentLI.assignmentId)" />
+            </div>
+            <div class="assignments align-items-center h-100">
+              <div
+                v-for="assignmentLI in assignmentIndicatorsHighlighted"
+                :key="assignmentLI.assignmentId"
+                class="assignments-step"
+                :class="{ current: assignmentLI.assignmentId === assignment.assignment_id }"
+                type="button"
+                :style="{ 'background-color': assignmentLI.colour }"
+                @click="saveAndGoto(assignmentLI.assignmentId)" />
+            </div>
           </div>
         </div>
         <div class="row g-0">
@@ -74,6 +85,53 @@
           </div>
         </div>
       </div>
+
+      <div v-if="showStatusBarModal">
+        <div class="modal fade show d-block" tabindex="-1">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title">Indicator Setup</h5>
+                <button
+                  type="button"
+                  class="btn-close"
+                  data-bs-dismiss="modal"
+                  aria-label="Close"
+                  @click="showStatusBarModal = false" />
+              </div>
+              <div class="modal-body text-start ps-4 pe-4">
+                <div class="row mb-3 g-2 text-muted">
+                  These settings allow you to choose how the colour for the items in the indicator bar is chosen.
+                  Please note, that this is a "global" setting, so you may have to manually adjust it for other
+                  assignment scopes.
+                </div>
+                <div class="row mb-3 g-2">
+                  <label for="progressBarLabelKey" class="form-label">
+                    Which label to use to colour document indicators
+                  </label>
+                  <select
+                    v-model="uiSettings.annotation.progressBarLabelKey"
+                    id="progressBarLabelKey"
+                    class="form-select">
+                    <option
+                      v-for="label in availableIndicatorLabels"
+                      :key="label.key"
+                      :value="label.key">{{ label.name }}
+                    </option>
+                  </select>
+                </div>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" @click="showStatusBarModal = false">
+                  Cancel.
+                </button>
+                <button type="button" class="btn btn-success" @click="reload()">Save.</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-backdrop fade show" />
+      </div>
     </template>
   </div>
 </template>
@@ -90,13 +148,17 @@ import type {
   AnnotationSchemeModel,
   AssignmentModel,
   AssignmentScopeModel,
-  AssignmentStatus, HighlighterModel,
+  HighlighterModel,
+  ProgressIndicator,
 } from '@/plugins/api/api-core';
+import { AssignmentStatus } from '@/plugins/api/api-core';
 import type { AnyItem } from '@/types/items.d';
 import { API, ignore } from '@/plugins/api';
 import { currentProjectStore, interfaceSettingsStore } from '@/stores';
 import type { InterfaceSettingsStoreType } from '@/stores/InterfaceSettingsStore';
 import { defineComponent } from 'vue';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import { isNotNone } from '@/util';
 
 const motivationalQuotes = [
   // https://www.howmuchisthefish.de/
@@ -132,13 +194,14 @@ const motivationalQuotes = [
 type AnnotationsViewData = {
   item?: AnyItem;
   assignment?: AssignmentModel;
-  assignments?: AssignmentModel[];
+  assignments?: ProgressIndicator[];
   scheme?: AnnotationSchemeModel;
   scope?: AssignmentScopeModel;
   labels?: AnnotationSchemeLabel[];
   highlighters?: HighlighterModel[];
   uiSettings: InterfaceSettingsStoreType;
   rerenderCounter: number; // this is a hack to force-update the AnnotationLabels-component
+  showStatusBarModal: boolean;
 };
 
 type AssignmentIndicator = {
@@ -146,22 +209,24 @@ type AssignmentIndicator = {
   itemId: string;
   status: AssignmentStatus;
   inHighlight: boolean;
+  colour: string;
 };
 
 export default defineComponent({
   name: 'AnnotationsView',
-  components: { AnnotationLabels, AnyItemComponent },
+  components: { FontAwesomeIcon, AnnotationLabels, AnyItemComponent },
   data(): AnnotationsViewData {
     return {
       item: undefined as AnyItem | undefined,
       assignment: undefined as AssignmentModel | undefined,
-      assignments: undefined as AssignmentModel[] | undefined,
+      assignments: undefined as ProgressIndicator[] | undefined,
       scheme: undefined as AnnotationSchemeModel | undefined,
       scope: undefined as AssignmentScopeModel | undefined,
       labels: undefined as AnnotationSchemeLabel[] | undefined,
       highlighters: undefined as HighlighterModel[] | undefined,
       rerenderCounter: 0,
       uiSettings: interfaceSettingsStore,
+      showStatusBarModal: false,
     };
   },
   async mounted() {
@@ -197,6 +262,10 @@ export default defineComponent({
     }
   },
   methods: {
+    reload() {
+      // eslint-disable-next-line no-restricted-globals
+      location.reload();
+    },
     markdown(md: string) {
       return marked(md);
     },
@@ -300,9 +369,11 @@ export default defineComponent({
       this.rerenderCounter += 1;
 
       // update the assignments progress bar
-      API.core.annotations.getAssignmentsApiAnnotationsAnnotateAssignmentsAssignmentScopeIdGet({
+      API.core.annotations.getAssignmentIndicatorsForScopeForUserApiAnnotationsAnnotateAssignmentProgressAssignmentScopeIdGet({
         xProjectId: currentProjectStore.projectId as string,
         assignmentScopeId: annotationItem.scope.assignment_scope_id as string,
+        key: this.uiSettings.annotation.progressBarLabelKey,
+        repeat: this.uiSettings.annotation.progressBarLabelRepeat,
       })
         .then(async (response) => {
           this.assignments = response.data;
@@ -352,6 +423,41 @@ export default defineComponent({
           }
         });
     },
+    assignmentColour(assignment: ProgressIndicator): string {
+      if (this.uiSettings.annotationProgressBarUseStatus) {
+        switch (assignment.status) {
+          case AssignmentStatus.FULL:
+            return '#42b983';
+          case AssignmentStatus.INVALID:
+            return 'red';
+          case AssignmentStatus.PARTIAL:
+            return 'yellow';
+          default: // case AssignmentStatus.OPEN:
+            return 'white';
+        }
+      }
+      const colourMap = [
+        '#C54B6C', // indian red
+        '#F7CE76', // rajah
+        '#8DA47E', // dark sea green
+        '#FFB347', // pastel orange
+        '#B6B6B4', // pastel gray
+        '#77DD77', // pastel green
+        '#AEC6CF', // pastel blue
+        '#FFAEB9', // pastel pink
+        '#CFCFC4', // pastel beige
+        '#DDBDF1', // pastel purple
+        '#FFD1DC', // pastel rose
+      ];
+      let val = (isNotNone(assignment.value_bool)) ? (+assignment.value_bool) * 2 : assignment.value_int;
+      if (val === undefined) {
+        return 'white';
+      }
+      if (val < 0) {
+        val = 0;
+      }
+      return colourMap[val];
+    },
   },
   computed: {
     sidebarWidthClass() {
@@ -361,13 +467,14 @@ export default defineComponent({
       const WINDOW = 50; // 100/2
       const assignmentId = this.assignment?.assignment_id;
       if (this.assignments && assignmentId) {
-        let focus = this.assignments.findIndex((assignment: AssignmentModel) => assignment.assignment_id === assignmentId);
+        let focus = this.assignments.findIndex((assignment: ProgressIndicator) => assignment.assignment_id === assignmentId);
         focus = Math.min(Math.max(WINDOW, focus), this.assignments.length - WINDOW);
-        return this.assignments.map((assignment: AssignmentModel, index: number): AssignmentIndicator => ({
+        return this.assignments.map((assignment: ProgressIndicator, index: number): AssignmentIndicator => ({
           assignmentId: assignment.assignment_id as string,
           inHighlight: ((index - WINDOW) <= focus) && (focus <= (index + WINDOW)),
           itemId: assignment.item_id,
           status: assignment.status,
+          colour: this.assignmentColour(assignment),
         }));
       }
       return null;
@@ -380,6 +487,15 @@ export default defineComponent({
     },
     assignmentIndicatorsNeedBirdseye(): boolean {
       return !!this.assignments && this.assignments.length > 100;
+    },
+    availableIndicatorLabels(): AnnotationSchemeLabel[] {
+      let list = [{
+        name: 'Assignment status (always fallback)',
+      } as AnnotationSchemeLabel];
+      if (this.labels !== undefined) {
+        list = list.concat(this.labels.filter((label: AnnotationSchemeLabel) => (label.kind === 'bool' || label.kind === 'single') && (label.annotation?.repeat || 1) === 1));
+      }
+      return list;
     },
   },
 });
