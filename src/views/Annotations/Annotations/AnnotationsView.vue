@@ -122,10 +122,7 @@
                 </div>
               </div>
               <div class="modal-footer">
-                <button type="button" class="btn btn-outline-secondary" @click="showStatusBarModal = false">
-                  Cancel.
-                </button>
-                <button type="button" class="btn btn-success" @click="reload()">Save.</button>
+                <button type="button" class="btn btn-success" @click="showStatusBarModal = false">Done.</button>
               </div>
             </div>
           </div>
@@ -143,22 +140,20 @@ import AnnotationLabels from '@/components/annotations/AnnotationLabels.vue';
 import { EventBus } from '@/plugins/events';
 import { ToastEvent } from '@/plugins/events/events/toast';
 import type {
-  AnnotationItem,
-  AnnotationSchemeLabel,
+  AnnotationItem, AnnotationSchemeLabelChoice,
   AnnotationSchemeModel,
   AssignmentModel,
   AssignmentScopeModel,
   HighlighterModel,
   ProgressIndicator,
 } from '@/plugins/api/api-core';
-import { AssignmentStatus } from '@/plugins/api/api-core';
+import { AssignmentStatus, AnnotationSchemeLabel } from '@/plugins/api/api-core';
 import type { AnyItem } from '@/types/items.d';
 import { API, ignore } from '@/plugins/api';
 import { currentProjectStore, interfaceSettingsStore } from '@/stores';
 import type { InterfaceSettingsStoreType } from '@/stores/InterfaceSettingsStore';
 import { defineComponent } from 'vue';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import { isNotNone } from '@/util';
 
 const motivationalQuotes = [
   // https://www.howmuchisthefish.de/
@@ -262,10 +257,6 @@ export default defineComponent({
     }
   },
   methods: {
-    reload() {
-      // eslint-disable-next-line no-restricted-globals
-      location.reload();
-    },
     markdown(md: string) {
       return marked(md);
     },
@@ -372,8 +363,6 @@ export default defineComponent({
       API.core.annotations.getAssignmentIndicatorsForScopeForUserApiAnnotationsAnnotateAssignmentProgressAssignmentScopeIdGet({
         xProjectId: currentProjectStore.projectId as string,
         assignmentScopeId: annotationItem.scope.assignment_scope_id as string,
-        key: this.uiSettings.annotation.progressBarLabelKey,
-        repeat: this.uiSettings.annotation.progressBarLabelRepeat,
       })
         .then(async (response) => {
           this.assignments = response.data;
@@ -423,41 +412,6 @@ export default defineComponent({
           }
         });
     },
-    assignmentColour(assignment: ProgressIndicator): string {
-      if (this.uiSettings.annotationProgressBarUseStatus) {
-        switch (assignment.status) {
-          case AssignmentStatus.FULL:
-            return '#42b983';
-          case AssignmentStatus.INVALID:
-            return 'red';
-          case AssignmentStatus.PARTIAL:
-            return 'yellow';
-          default: // case AssignmentStatus.OPEN:
-            return 'white';
-        }
-      }
-      const colourMap = [
-        '#C54B6C', // indian red
-        '#F7CE76', // rajah
-        '#8DA47E', // dark sea green
-        '#FFB347', // pastel orange
-        '#B6B6B4', // pastel gray
-        '#77DD77', // pastel green
-        '#AEC6CF', // pastel blue
-        '#FFAEB9', // pastel pink
-        '#CFCFC4', // pastel beige
-        '#DDBDF1', // pastel purple
-        '#FFD1DC', // pastel rose
-      ];
-      let val = (isNotNone(assignment.value_bool)) ? (+assignment.value_bool) * 2 : assignment.value_int;
-      if (val === undefined) {
-        return 'white';
-      }
-      if (val < 0) {
-        val = 0;
-      }
-      return colourMap[val];
-    },
   },
   computed: {
     sidebarWidthClass() {
@@ -474,7 +428,7 @@ export default defineComponent({
           inHighlight: ((index - WINDOW) <= focus) && (focus <= (index + WINDOW)),
           itemId: assignment.item_id,
           status: assignment.status,
-          colour: this.assignmentColour(assignment),
+          colour: this.indicatorLabelColourMapper(assignment),
         }));
       }
       return null;
@@ -496,6 +450,89 @@ export default defineComponent({
         list = list.concat(this.labels.filter((label: AnnotationSchemeLabel) => (label.kind === 'bool' || label.kind === 'single') && (label.annotation?.repeat || 1) === 1));
       }
       return list;
+    },
+    indicatorLabelColourMapper(): (indicator: ProgressIndicator) => string {
+      // Colour by assignment status is always the fallback, set up respective map and mapper function
+      const map = {
+        undefined: 'white',
+        null: 'white',
+        // @ts-ignore TS1268
+      } as { [key: undefined | null | string]: string };
+      map[AssignmentStatus.OPEN] = 'white';
+      map[AssignmentStatus.PARTIAL] = 'yellow';
+      map[AssignmentStatus.FULL] = '#42b983';
+      map[AssignmentStatus.INVALID] = 'red';
+      const indicateStatusMapper = (indicator: ProgressIndicator): string => map[indicator.status] ?? 'white';
+
+      // User selected to colour by assignment status
+      if (this.uiSettings.annotationProgressBarUseStatus) {
+        return indicateStatusMapper;
+      }
+
+      const labelKey = this.uiSettings.annotation.progressBarLabelKey;
+      if (!labelKey) {
+        return indicateStatusMapper;
+      }
+
+      // User selected a specific label for colouring, try to find it
+      const label: AnnotationSchemeLabel = (this.labels ?? []).find(
+        (lab: AnnotationSchemeLabel) => lab.key === labelKey,
+      );
+
+      // No corresponding label found in the scheme, return fallback mapper
+      if (!label) {
+        return indicateStatusMapper;
+      }
+
+      if (label.kind === AnnotationSchemeLabel.kind.SINGLE && label.choices) {
+        const cmap = {
+          undefined: 'white',
+          null: 'white',
+          // @ts-ignore TS1268
+        } as { [key: undefined | null | number]: string };
+        const colourMap = [
+          // some pastel colours
+          '#C54B6C', // indian red
+          '#F7CE76', // rajah
+          '#8DA47E', // dark sea green
+          '#FFB347', // pastel orange
+          '#B6B6B4', // pastel gray
+          '#77DD77', // pastel green
+          '#AEC6CF', // pastel blue
+          '#FFAEB9', // pastel pink
+          '#CFCFC4', // pastel beige
+          '#DDBDF1', // pastel purple
+          '#FFD1DC', // pastel rose
+          // even more as a fallback
+          'aqua', 'black', 'blue', 'fuchsia', 'gray', 'green',
+          'lime', 'maroon', 'navy', 'olive', 'orange', 'purple', 'red',
+          'silver', 'teal', 'yellow',
+        ];
+
+        label.choices
+          .map((choice: AnnotationSchemeLabelChoice): number => choice.value)
+          .sort()
+          .forEach((value) => {
+            cmap[value] = colourMap.shift() ?? 'white';
+          });
+        return (indicator: ProgressIndicator): string => cmap?.[indicator.labels?.[labelKey]?.[0]?.value_int ?? -1] ?? 'white';
+      }
+
+      if (label.kind === AnnotationSchemeLabel.kind.BOOL) {
+        const cmap = {
+          undefined: 'white',
+          null: 'white',
+          false: '#C54B6C',
+          true: '#8DA47E',
+          // @ts-ignore TS1268
+        } as { [key: undefined | null | boolean]: string };
+
+        // @ts-ignore TS2538
+        return (indicator: ProgressIndicator): string => cmap?.[indicator.labels?.[labelKey]?.[0]?.value_bool] ?? 'white';
+      }
+
+      // fallback to status mapper
+      return indicateStatusMapper;
     },
   },
 });
