@@ -37,6 +37,42 @@ export class OauthService {
   }
 
   /**
+   * Refresh Token
+   * @returns AuthTokenModel Successful Response
+   * @throws ApiError
+   */
+  public refreshTokenApiLoginTokenRefreshTokenIdPut({
+    tokenId,
+  }: {
+    tokenId: string,
+  }, options?: Partial<ApiRequestOptions>): CancelablePromise<AuthTokenModel> {
+    return this.httpRequest.request({
+      method: 'PUT',
+      url: '/api/login/token/refresh/{token_id}',
+      path: {
+        'token_id': tokenId,
+      },
+      errors: {
+        422: `Validation Error`,
+      },
+      ...options,
+    });
+  }
+
+  /**
+   * Read Tokens Me
+   * @returns AuthTokenModel Successful Response
+   * @throws ApiError
+   */
+  public readTokensMeApiLoginMyTokensGet(options?: Partial<ApiRequestOptions>): CancelablePromise<Array<AuthTokenModel>> {
+    return this.httpRequest.request({
+      method: 'GET',
+      url: '/api/login/my-tokens',
+      ...options,
+    });
+  }
+
+  /**
    * Read Users Me
    * @returns UserModel Successful Response
    * @throws ApiError

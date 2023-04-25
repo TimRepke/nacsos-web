@@ -441,13 +441,9 @@ export class AnnotationsService {
   public getAssignmentIndicatorsForScopeForUserApiAnnotationsAnnotateAssignmentProgressAssignmentScopeIdGet({
     assignmentScopeId,
     xProjectId,
-    key,
-    repeat,
   }: {
     assignmentScopeId: string,
     xProjectId: string,
-    key?: string,
-    repeat?: number,
   }, options?: Partial<ApiRequestOptions>): CancelablePromise<Array<ProgressIndicator>> {
     return this.httpRequest.request({
       method: 'GET',
@@ -457,10 +453,6 @@ export class AnnotationsService {
       },
       headers: {
         'x-project-id': xProjectId,
-      },
-      query: {
-        'key': key,
-        'repeat': repeat,
       },
       errors: {
         422: `Validation Error`,

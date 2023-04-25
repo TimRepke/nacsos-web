@@ -31,11 +31,14 @@ export const $ProgressIndicator = {
       type: 'AssignmentStatus',
       isRequired: true,
     },
-    value_int: {
-      type: 'number',
-    },
-    value_bool: {
-      type: 'boolean',
+    labels: {
+      type: 'dictionary',
+      contains: {
+        type: 'array',
+        contains: {
+          type: 'ProgressIndicatorLabel',
+        },
+      },
     },
   },
 } as const;

@@ -133,4 +133,26 @@ export class UsersService {
     });
   }
 
+  /**
+   * Save User Self
+   * @returns string Successful Response
+   * @throws ApiError
+   */
+  public saveUserSelfApiUsersMyDetailsPut({
+    requestBody,
+  }: {
+    requestBody: (UserInDBModel | UserModel),
+  }, options?: Partial<ApiRequestOptions>): CancelablePromise<string> {
+    return this.httpRequest.request({
+      method: 'PUT',
+      url: '/api/users/my-details',
+      body: requestBody,
+      mediaType: 'application/json',
+      errors: {
+        422: `Validation Error`,
+      },
+      ...options,
+    });
+  }
+
 }
