@@ -57,6 +57,7 @@
     </template>
 
     <!-- Annotation Scheme Labels (root level) -->
+    <strong>Note:</strong> Please use positive numbers only for choice values (zero included).
     <AnnotationSchemeLabelsEditor :labels="scheme.labels" />
     <button type="button" class="btn btn-success position-fixed" style="top: 4rem; right: 1rem;" @click="save()">Save</button>
   </div>

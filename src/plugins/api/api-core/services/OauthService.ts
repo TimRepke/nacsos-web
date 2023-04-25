@@ -37,6 +37,65 @@ export class OauthService {
   }
 
   /**
+   * Refresh Token
+   * @returns AuthTokenModel Successful Response
+   * @throws ApiError
+   */
+  public refreshTokenApiLoginTokenTokenIdPut({
+    tokenId,
+  }: {
+    tokenId: string,
+  }, options?: Partial<ApiRequestOptions>): CancelablePromise<AuthTokenModel> {
+    return this.httpRequest.request({
+      method: 'PUT',
+      url: '/api/login/token/{token_id}',
+      path: {
+        'token_id': tokenId,
+      },
+      errors: {
+        422: `Validation Error`,
+      },
+      ...options,
+    });
+  }
+
+  /**
+   * Revoke Token
+   * @returns any Successful Response
+   * @throws ApiError
+   */
+  public revokeTokenApiLoginTokenTokenIdDelete({
+    tokenId,
+  }: {
+    tokenId: string,
+  }, options?: Partial<ApiRequestOptions>): CancelablePromise<any> {
+    return this.httpRequest.request({
+      method: 'DELETE',
+      url: '/api/login/token/{token_id}',
+      path: {
+        'token_id': tokenId,
+      },
+      errors: {
+        422: `Validation Error`,
+      },
+      ...options,
+    });
+  }
+
+  /**
+   * Read Tokens Me
+   * @returns AuthTokenModel Successful Response
+   * @throws ApiError
+   */
+  public readTokensMeApiLoginMyTokensGet(options?: Partial<ApiRequestOptions>): CancelablePromise<Array<AuthTokenModel>> {
+    return this.httpRequest.request({
+      method: 'GET',
+      url: '/api/login/my-tokens',
+      ...options,
+    });
+  }
+
+  /**
    * Read Users Me
    * @returns UserModel Successful Response
    * @throws ApiError
