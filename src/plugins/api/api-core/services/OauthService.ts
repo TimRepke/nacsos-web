@@ -41,14 +41,37 @@ export class OauthService {
    * @returns AuthTokenModel Successful Response
    * @throws ApiError
    */
-  public refreshTokenApiLoginTokenRefreshTokenIdPut({
+  public refreshTokenApiLoginTokenTokenIdPut({
     tokenId,
   }: {
     tokenId: string,
   }, options?: Partial<ApiRequestOptions>): CancelablePromise<AuthTokenModel> {
     return this.httpRequest.request({
       method: 'PUT',
-      url: '/api/login/token/refresh/{token_id}',
+      url: '/api/login/token/{token_id}',
+      path: {
+        'token_id': tokenId,
+      },
+      errors: {
+        422: `Validation Error`,
+      },
+      ...options,
+    });
+  }
+
+  /**
+   * Revoke Token
+   * @returns any Successful Response
+   * @throws ApiError
+   */
+  public revokeTokenApiLoginTokenTokenIdDelete({
+    tokenId,
+  }: {
+    tokenId: string,
+  }, options?: Partial<ApiRequestOptions>): CancelablePromise<any> {
+    return this.httpRequest.request({
+      method: 'DELETE',
+      url: '/api/login/token/{token_id}',
       path: {
         'token_id': tokenId,
       },
