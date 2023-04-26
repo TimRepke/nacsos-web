@@ -136,7 +136,7 @@
 </template>
 
 <script lang="ts">
-import { currentProjectStore } from '@/stores';
+import { currentProjectStore, currentUserStore } from '@/stores';
 import { defineComponent } from 'vue';
 import type { AuthTokenModel, UserModel } from '@/plugins/api/api-core';
 import { API, toastReject } from '@/plugins/api';
@@ -208,12 +208,16 @@ export default defineComponent({
         .catch(toastReject);
     },
     refresh(token: AuthTokenModel) {
-      API.core.oauth
-        .refreshTokenApiLoginTokenTokenIdPut({
-          tokenId: token.token_id,
-        })
-        .then(this.refreshAuthTokens)
-        .catch(toastReject);
+      if (token.token_id === currentUserStore.authToken?.token_id) {
+        currentUserStore.extendAuthTokenValidity();
+      } else {
+        API.core.oauth
+          .refreshTokenApiLoginTokenTokenIdPut({
+            tokenId: token.token_id,
+          })
+          .then(this.refreshAuthTokens)
+          .catch(toastReject);
+      }
     },
   },
   computed: {
