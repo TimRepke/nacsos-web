@@ -248,8 +248,8 @@ export default defineComponent({
         time_created: undefined,
         name: '',
         description: '',
-        highlighter_ids: undefined,
-      },
+        highlighter_ids: [] as string[],
+      } as AssignmentScopeModel,
       projectHighlighters: [],
     };
   },
@@ -277,8 +277,8 @@ export default defineComponent({
             this.assignmentScope = scopePromise.value.data;
             this.assignmentCounts = countsPromise.value.data;
 
-            if (this.assignmentScope.highlighter_ids === null) {
-              this.assignmentScope.highlighter_ids = undefined;
+            if (!this.assignmentScope.highlighter_ids) {
+              this.assignmentScope.highlighter_ids = [];
             }
           } else {
             EventBus.emit(new ToastEvent('ERROR', 'Failed to load assignment scope info. Please try reloading.'));

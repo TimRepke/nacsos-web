@@ -102,7 +102,7 @@
             type="password"
             v-model="user.password">
           <div class="invalid-feedback">
-            This is not a good password. Needs at least 12 characters and one of each in <code>[A-Z], [a-z], [0-9], [$@!%*#^?&]</code>.
+            This is not a good password. Turn your password up to 11 and one of each in <code>[A-Z], [a-z], [0-9], [$@!%*#^?&]</code>.
           </div>
         </div>
         <div class="col">
@@ -136,7 +136,7 @@
 </template>
 
 <script lang="ts">
-import { currentProjectStore } from '@/stores';
+import { currentProjectStore, currentUserStore } from '@/stores';
 import { defineComponent } from 'vue';
 import type { AuthTokenModel, UserModel } from '@/plugins/api/api-core';
 import { API, toastReject } from '@/plugins/api';
@@ -208,12 +208,16 @@ export default defineComponent({
         .catch(toastReject);
     },
     refresh(token: AuthTokenModel) {
-      API.core.oauth
-        .refreshTokenApiLoginTokenTokenIdPut({
-          tokenId: token.token_id,
-        })
-        .then(this.refreshAuthTokens)
-        .catch(toastReject);
+      if (token.token_id === currentUserStore.authToken?.token_id) {
+        currentUserStore.extendAuthTokenValidity();
+      } else {
+        API.core.oauth
+          .refreshTokenApiLoginTokenTokenIdPut({
+            tokenId: token.token_id,
+          })
+          .then(this.refreshAuthTokens)
+          .catch(toastReject);
+      }
     },
   },
   computed: {
@@ -221,7 +225,7 @@ export default defineComponent({
       return this.passwordRepeat === this.user.password;
     },
     secure(): boolean {
-      return (/(?=.*[$@!%*#?&^])(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z]).{12,}/).test(this.user.password || '');
+      return (/(?=.*[$@!%*#?&^])(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z]).{11,}/).test(this.user.password || '');
     },
     invalidPassword(): boolean {
       return this.editPassword && (!this.matching || !this.secure);
