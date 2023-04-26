@@ -13,9 +13,12 @@ export const currentUserStore = useCurrentUserStore(pinia);
 export const currentProjectStore = useCurrentProjectStore(pinia);
 export const interfaceSettingsStore = useInterfaceSettingsStore(pinia);
 export const requestsStore = useRequestsStore(pinia);
+
 EventBus.on(ClearUserStoreEvent, currentUserStore.clear);
-if (currentUserStore.accessToken) {
-  API.core.request.config.TOKEN = currentUserStore.accessToken;
-  API.pipe.request.config.TOKEN = currentUserStore.accessToken;
+
+if (currentUserStore.isAuthTokenValid) {
+  API.core.request.config.TOKEN = currentUserStore.authToken?.token_id;
+  API.pipe.request.config.TOKEN = currentUserStore.authToken?.token_id;
 }
+
 export default pinia;
