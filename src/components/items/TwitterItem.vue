@@ -40,6 +40,7 @@
 import type { PropType } from 'vue';
 import type { TwitterItemModel, Hashtag, Mention, URL } from '@/plugins/api/api-core';
 import { defineComponent } from 'vue';
+import { HighlighterModel } from '@/plugins/api/api-core';
 
 interface Replacement {
   start: number;
@@ -54,6 +55,11 @@ export default defineComponent({
       type: Object as PropType<TwitterItemModel>,
       required: true,
       default: null,
+    },
+    highlighters: {
+      type: Object as PropType<Array<HighlighterModel>>,
+      required: false,
+      default: undefined,
     },
   },
   computed: {

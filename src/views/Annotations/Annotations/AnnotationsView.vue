@@ -247,9 +247,7 @@ export default defineComponent({
         assignmentScopeId,
       }).then((resp) => {
         this.highlighters = resp.data;
-      }).catch(() => {
-        // ignore
-      });
+      }).catch(ignore);
 
       await this.setCurrentAssignment(response);
     } catch (e) {

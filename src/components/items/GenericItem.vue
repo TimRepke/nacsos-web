@@ -20,6 +20,7 @@ import type { PropType } from 'vue';
 import { marked } from 'marked';
 import type { BaseItem as BaseItemModel } from '@/types/items.d';
 import { defineComponent } from 'vue';
+import { HighlighterModel } from '@/plugins/api/api-core';
 
 export default defineComponent({
   name: 'GenericItem',
@@ -28,6 +29,11 @@ export default defineComponent({
       type: Object as PropType<BaseItemModel>,
       required: true,
       default: null,
+    },
+    highlighters: {
+      type: Object as PropType<Array<HighlighterModel>>,
+      required: false,
+      default: undefined,
     },
   },
   computed: {
