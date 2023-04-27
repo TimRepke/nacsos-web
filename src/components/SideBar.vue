@@ -21,6 +21,27 @@
             active-class="active"> Dataset
           </router-link>
           <router-link
+            v-if="isActive('project-dataset')"
+            to="/project/dataset/list"
+            class="list-group-item list-group-item-action list-group-item-info border-end-0 sub-link"
+            :class="{ active: anyOf(['project-dataset-list']) }">
+            Explore
+          </router-link>
+          <router-link
+            v-if="isActive('project-dataset')"
+            to="/project/dataset/stats"
+            class="list-group-item list-group-item-action list-group-item-info border-end-0 sub-link"
+            :class="{ active: anyOf(['project-dataset-statistics']) }">
+            Statistics
+          </router-link>
+          <router-link
+            v-if="projectPermissions.annotations_edit && isActive('project-dataset')"
+            to="/project/dataset/export"
+            class="list-group-item list-group-item-action list-group-item-info border-end-0 sub-link"
+            :class="{ active: anyOf(['project-dataset-export']) }">
+            Export
+          </router-link>
+          <router-link
             v-if="projectPermissions.annotations_read"
             to="/project/annotate"
             class="list-group-item list-group-item-action border-end-0"

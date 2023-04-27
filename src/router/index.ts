@@ -93,6 +93,16 @@ const routes: Array<RouteRecordRaw> = [
         name: 'project-dataset-list',
         component: () => import(/* webpackChunkName: "DatasetListView" */ '../views/Dataset/DatasetListView.vue'),
       },
+      {
+        path: 'stats',
+        name: 'project-dataset-statistics',
+        component: () => import(/* webpackChunkName: "DatasetStatisticsView" */ '../views/Dataset/DatasetStatisticsView.vue'),
+      },
+      {
+        path: 'export',
+        name: 'project-dataset-export',
+        component: () => import(/* webpackChunkName: "DatasetExportView" */ '../views/Dataset/DatasetExportView.vue'),
+      },
     ],
   },
   {
