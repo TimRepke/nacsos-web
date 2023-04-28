@@ -102,8 +102,8 @@ export default defineComponent({
 
       return {
         chartData: {
-          labels: this.histogramYears.map((entry) => entry.bucket.substring(0, 4)),
-          datasets: [{ data: this.histogramYears.map((entry) => entry.num_items), label: 'Items' }]
+          labels: this.histogramYears.map((entry: HistogramEntry) => entry.bucket.substring(0, 4)),
+          datasets: [{ data: this.histogramYears.map((entry: HistogramEntry) => entry.num_items), label: 'Items' }]
         },
         chartOptions: {
           responsive: true
