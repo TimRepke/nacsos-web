@@ -35,9 +35,10 @@
             </h5>
             <ol>
               <li v-for="entry in leaderboard" :key="entry.user_id">
-                <strong>{{ entry.full_name }}:</strong> <span class="fst-italic">
-                {{ entry.num_labels }} labels for {{ entry.num_labeled_items }} items
-              </span>
+                <strong>{{ entry.full_name }}:</strong>&nbsp;
+                <span class="fst-italic">
+                  {{ entry.num_labels }} labels for {{ entry.num_labeled_items }} items
+                </span>
               </li>
             </ol>
           </div>
@@ -87,29 +88,30 @@ export default defineComponent({
   },
   mounted() {
     API.core.stats.getBasicStatsApiStatsBasicsGet({ xProjectId: currentProjectStore.projectId as string })
-      .then((response) => {this.basic = response.data;}).catch(ignore);
+      .then((response) => { this.basic = response.data; }).catch(ignore);
     API.core.stats.getAnnotatorRankingApiStatsRankGet({ xProjectId: currentProjectStore.projectId as string })
-      .then((response) => {this.leaderboard = response.data;}).catch(ignore);
+      .then((response) => { this.leaderboard = response.data; }).catch(ignore);
     API.core.stats.getPublicationYearHistogramApiStatsHistogramYearsGet({ xProjectId: currentProjectStore.projectId as string })
-      .then((response) => {this.histogramYears = response.data;}).catch(ignore);
+      .then((response) => { this.histogramYears = response.data; }).catch(ignore);
   },
   methods: {
     // pass
   },
   computed: {
     histogramChart() {
-      if (!this.histogramYears) return;
-
-      return {
-        chartData: {
-          labels: this.histogramYears.map((entry: HistogramEntry) => entry.bucket.substring(0, 4)),
-          datasets: [{ data: this.histogramYears.map((entry: HistogramEntry) => entry.num_items), label: 'Items' }]
-        },
-        chartOptions: {
-          responsive: true
-        }
-      };
-    }
+      if (this.histogramYears) {
+        return {
+          chartData: {
+            labels: this.histogramYears.map((entry: HistogramEntry) => entry.bucket.substring(0, 4)),
+            datasets: [{ data: this.histogramYears.map((entry: HistogramEntry) => entry.num_items), label: 'Items' }],
+          },
+          chartOptions: {
+            responsive: true,
+          },
+        };
+      }
+      return undefined;
+    },
   },
 });
 </script>

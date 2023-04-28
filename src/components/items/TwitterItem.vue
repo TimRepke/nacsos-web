@@ -37,10 +37,9 @@
 </template>
 
 <script lang="ts">
-import type { PropType } from 'vue';
 import { defineComponent } from 'vue';
-import type { HighlighterModel } from '@/plugins/api/api-core';
-import type { TwitterItemModel, Hashtag, Mention, URL } from '@/plugins/api/api-core';
+import type { PropType } from 'vue';
+import type { HighlighterModel, TwitterItemModel, Hashtag, Mention, URL } from '@/plugins/api/api-core';
 
 interface Replacement {
   start: number;
