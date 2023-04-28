@@ -69,7 +69,7 @@
 import { defineComponent } from 'vue';
 import { API, ignore } from '@/plugins/api';
 import { currentProjectStore } from '@/stores';
-import { BasicProjectStats, HistogramEntry, RankEntry } from '@/plugins/api/api-core';
+import type { BasicProjectStats, HistogramEntry, RankEntry } from '@/plugins/api/api-core';
 import { Bar } from 'vue-chartjs';
 import { Chart as ChartJS, Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale } from 'chart.js';
 

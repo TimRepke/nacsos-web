@@ -16,11 +16,11 @@
 </template>
 
 <script lang="ts">
-import type { PropType } from 'vue';
 import { marked } from 'marked';
-import type { BaseItem as BaseItemModel } from '@/types/items.d';
 import { defineComponent } from 'vue';
-import { HighlighterModel } from '@/plugins/api/api-core';
+import type { PropType } from 'vue';
+import type { HighlighterModel } from '@/plugins/api/api-core';
+import type { BaseItem as BaseItemModel } from '@/types/items.d';
 
 export default defineComponent({
   name: 'GenericItem',
