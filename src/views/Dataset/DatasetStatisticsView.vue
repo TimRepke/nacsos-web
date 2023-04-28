@@ -52,11 +52,11 @@
               <font-awesome-icon :icon="['fas', 'calendar-week']" class="me-2" />
               Callaghan Curve®
             </h5>
-            <ul class="list-unstyled">
-              <li v-for="entry in histogramYears" :key="entry.bucket">
-                <strong>{{ entry.bucket.substring(0, 4) }}:</strong> {{ entry.num_items }}
-              </li>
-            </ul>
+            <Bar
+              id="publication-year-chart"
+              :options="histogramChart.chartOptions"
+              :data="histogramChart.chartData"
+            />
           </div>
         </div>
       </div>
@@ -70,9 +70,14 @@ import { defineComponent } from 'vue';
 import { API, ignore } from '@/plugins/api';
 import { currentProjectStore } from '@/stores';
 import { BasicProjectStats, HistogramEntry, RankEntry } from '@/plugins/api/api-core';
+import { Bar } from 'vue-chartjs';
+import { Chart as ChartJS, Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale } from 'chart.js';
+
+ChartJS.register(Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale);
 
 export default defineComponent({
   name: 'DatasetStatisticsView',
+  components: { Bar },
   data() {
     return {
       basic: undefined as BasicProjectStats | undefined,
@@ -92,7 +97,19 @@ export default defineComponent({
     // pass
   },
   computed: {
-    // pass
+    histogramChart() {
+      if (!this.histogramYears) return;
+
+      return {
+        chartData: {
+          labels: this.histogramYears.map((entry) => entry.bucket.substring(0, 4)),
+          datasets: [{ data: this.histogramYears.map((entry) => entry.num_items), label: 'Items' }]
+        },
+        chartOptions: {
+          responsive: true
+        }
+      };
+    }
   },
 });
 </script>
