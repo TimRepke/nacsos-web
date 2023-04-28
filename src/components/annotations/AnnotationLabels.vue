@@ -242,13 +242,16 @@ export default defineComponent({
 
       if (!label.annotation?.multi_int) return [];
       return label.annotation.multi_int.map((key) => {
-        if (!label.choices) return undefined;
-        const { children } = label.choices[key];
-        if (!children) return undefined;
-        return {
-          labels: children,
-          key,
-        };
+        if (label.choices) {
+          const { children } = label.choices[key];
+          if (children) {
+            return {
+              labels: children,
+              key,
+            };
+          }
+        }
+        return undefined;
       }).filter(hasLabels);
     },
     duplicateLabel(label: AnnotationSchemeLabel, labelIndex: number) {
