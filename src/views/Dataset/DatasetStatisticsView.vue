@@ -51,7 +51,7 @@
           <div class="card-body">
             <h5 class="card-title" style="font-variant-caps: small-caps;">
               <font-awesome-icon :icon="['fas', 'calendar-week']" class="me-2" />
-              Callaghan Curve®
+              Callaghan Curve™
             </h5>
             <Bar
               id="publication-year-chart"
