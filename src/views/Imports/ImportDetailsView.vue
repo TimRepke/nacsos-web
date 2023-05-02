@@ -79,7 +79,7 @@
       <div class="col">
         <button type="button" class="btn btn-outline-secondary" @click="loadImportStats">load</button>
         <ul>
-          <li><strong>Number of items:</strong> {{ importStats.numItems || '[not loaded]' }}</li>
+          <li v-if="importStats.numItems !== undefined"><strong>Number of items:</strong> {{ importStats.numItems }}</li>
         </ul>
       </div>
     </div>

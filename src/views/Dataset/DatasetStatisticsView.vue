@@ -4,7 +4,7 @@
     <div class="row g-2">
 
       <!-- Basic stats -->
-      <div class="col-md-6">
+      <div class="col-md-4">
         <div v-if="basic" class="card">
           <div class="card-body">
             <h5 class="card-title">
