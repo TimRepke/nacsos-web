@@ -45,6 +45,22 @@
             <textarea class="form-control" id="projectDescription" rows="4" v-model="project.description" />
           </div>
         </div>
+        <div class="row g-2">
+          <div class="col-3">
+            <div class="form-check form-switch">
+              <input
+                v-model="project.setting_motivational_quotes"
+                :aria-checked="project.setting_motivational_quotes"
+                id="settingsMotivationalQuotes"
+                class="form-check-input"
+                type="checkbox"
+                role="switch">
+              <label class="form-check-label" for="settingsMotivationalQuotes">Motivational quotes during
+                annotation</label>
+            </div>
+          </div>
+        </div>
+
       </template>
       <template v-else>
         <font-awesome-icon :icon="['fas', 'circle-notch']" class="fa-spin" />
