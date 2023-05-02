@@ -34,5 +34,8 @@ export const $ProjectModel = {
       }],
       isRequired: true,
     },
+    setting_motivational_quotes: {
+      type: 'boolean',
+    },
   },
 } as const;
