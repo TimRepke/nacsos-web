@@ -8,6 +8,7 @@ import { AxiosHttpRequest } from '@/plugins/api/core/AxiosHttpRequest';
 import { AnnotationsService } from './services/AnnotationsService';
 import { DefaultService } from './services/DefaultService';
 import { EventsService } from './services/EventsService';
+import { ExportService } from './services/ExportService';
 import { HighlightersService } from './services/HighlightersService';
 import { ImportsService } from './services/ImportsService';
 import { OauthService } from './services/OauthService';
@@ -23,6 +24,7 @@ export class CoreClient {
   public readonly annotations: AnnotationsService;
   public readonly default: DefaultService;
   public readonly events: EventsService;
+  public readonly export: ExportService;
   public readonly highlighters: HighlightersService;
   public readonly imports: ImportsService;
   public readonly oauth: OauthService;
@@ -35,7 +37,7 @@ export class CoreClient {
 
   constructor(config?: Partial<OpenAPIConfig>, HttpRequest: HttpRequestConstructor = AxiosHttpRequest) {
     this.request = new HttpRequest({
-      BASE: config?.BASE ?? '',
+      BASE: config?.BASE ?? '/nacsos-core',
       VERSION: config?.VERSION ?? '0.1.0',
       WITH_CREDENTIALS: config?.WITH_CREDENTIALS ?? false,
       CREDENTIALS: config?.CREDENTIALS ?? 'include',
@@ -49,6 +51,7 @@ export class CoreClient {
     this.annotations = new AnnotationsService(this.request);
     this.default = new DefaultService(this.request);
     this.events = new EventsService(this.request);
+    this.export = new ExportService(this.request);
     this.highlighters = new HighlightersService(this.request);
     this.imports = new ImportsService(this.request);
     this.oauth = new OauthService(this.request);
