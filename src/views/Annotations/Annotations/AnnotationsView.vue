@@ -339,7 +339,7 @@ export default defineComponent({
           ));
         })
         .finally(() => {
-          if (Math.random() < 0.2) {
+          if (currentProjectStore.project?.setting_motivational_quotes && Math.random() < 0.2) {
             const quoteIndex = Math.floor(Math.random() * (motivationalQuotes.length + 1));
             EventBus.emit(new ToastEvent(
               'INFO',
