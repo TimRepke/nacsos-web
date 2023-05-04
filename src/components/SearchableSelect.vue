@@ -7,6 +7,7 @@
         <input
           class="w-100"
           type="text"
+          aria-label="Label search field"
           v-model="searchText"
           @focusin="dropdownVisible = true"
           @focusout="unfocusSearchField"
