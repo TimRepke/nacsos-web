@@ -39,6 +39,7 @@
         </div>
       </div>
       <div>
+
         <template v-if="label.kind === 'bool'">
           <div style="width: 100px">
             <div
@@ -75,12 +76,13 @@
             </div>
           </div>
         </template>
+
         <template v-else-if="label.kind === 'single'">
           <template v-if="label.dropdown">
             <SearchableSelect
               :options="label.choices"
-              :currentOption="label.annotation.value_int"
-              @update:currentOption="newValue => label.annotation.value_int = newValue" />
+              :current-option-value="label.annotation.value_int"
+              @update:current-option="newValue => singleIntNewValue(newValue, label)" />
           </template>
           <template v-else>
             <div class="list-group">
@@ -110,24 +112,45 @@
               :key="label.annotation.value_int" />
           </div>
         </template>
+
         <template v-else-if="label.kind === 'multi'">
-          <div class="list-group">
-            <label
-              v-for="(choice, index) in label.choices"
-              :key="index"
-              class="list-group-item list-group-item-action"
-              :class="{ 'list-group-item-dark': multiIntContains(label.annotation, choice.value) }">
-              <input
-                type="checkbox"
-                class="form-check-input me-1"
-                :value="multiIntContains(label.annotation, choice.value)"
-                :checked="multiIntContains(label.annotation, choice.value)"
-                @change="multiIntUpdate(label, choice.value)" />
-              <InlineToolTip :info="choice.hint">
-                <span class="ms-2">{{ choice.name }}</span>
-              </InlineToolTip>
-            </label>
-          </div>
+          <template v-if="label.dropdown">
+            <div class="mb-2">
+              <closable-pill
+                v-for="v in label.annotation.multi_int"
+                :key="v"
+                @clicked-x="multiIntUpdate(label, v)"
+                colour="info"
+                class="me-2">
+                {{ label.choices[v].name }}
+              </closable-pill>
+            </div>
+
+            <SearchableSelect
+              :reset-text="true"
+              :options="label.choices"
+              :hidden-options="label.annotation.multi_int"
+              @update:currentOption="selectedValue => multiIntUpdate(label, selectedValue)" />
+          </template>
+          <template v-else>
+            <div class="list-group">
+              <label
+                v-for="(choice, index) in label.choices"
+                :key="index"
+                class="list-group-item list-group-item-action"
+                :class="{ 'list-group-item-dark': multiIntContains(label.annotation, choice.value) }">
+                <input
+                  type="checkbox"
+                  class="form-check-input me-1"
+                  :value="multiIntContains(label.annotation, choice.value)"
+                  :checked="multiIntContains(label.annotation, choice.value)"
+                  @change="multiIntUpdate(label, choice.value)" />
+                <InlineToolTip :info="choice.hint">
+                  <span class="ms-2">{{ choice.name }}</span>
+                </InlineToolTip>
+              </label>
+            </div>
+          </template>
           <div
             v-for="child in multiIntChildren(label)"
             :key="child.key"
@@ -138,6 +161,7 @@
               :key="child.key" />
           </div>
         </template>
+
         <template v-else-if="label.kind === 'int'">
           <!-- TODO -->
           integer input not implemented yet
@@ -165,12 +189,13 @@ import SearchableSelect from '@/components/SearchableSelect.vue';
 import type { AssignmentModel, AnnotationModel, AnnotationSchemeLabelChoice } from '@/plugins/api/api-core';
 import { AnnotationSchemeLabel } from '@/plugins/api/api-core';
 import { defineComponent } from 'vue';
+import ClosablePill from '@/components/ClosablePill.vue';
 
 type SubLabels = { labels: AnnotationSchemeLabel[]; key: number; };
 
 export default defineComponent({
   name: 'AnnotationLabels',
-  components: { InlineToolTip, SearchableSelect },
+  components: { ClosablePill, InlineToolTip, SearchableSelect },
   props: {
     labels: {
       type: Object as PropType<AnnotationSchemeLabel[]>,
@@ -225,23 +250,29 @@ export default defineComponent({
         }
       }
     },
-    multiIntUpdate(label: AnnotationSchemeLabel, value: number) {
-      const { annotation } = label;
-      if (annotation) {
-        if (!annotation.multi_int) annotation.multi_int = [];
-        const index = annotation.multi_int.indexOf(value);
-        if (index >= 0) {
-          annotation.multi_int.splice(index, 1);
-          // propagate deletion to children
-          if (label.choices) {
-            label.choices[index].children?.forEach((lab: AnnotationSchemeLabel) => {
-              this.clearAnnotation(lab);
-            });
+    singleIntNewValue(value: number | undefined, label: AnnotationSchemeLabel) {
+      label.annotation!.value_int = value;
+      this.singleIntUpdate(label);
+    },
+    multiIntUpdate(label: AnnotationSchemeLabel, value: number | undefined) {
+      if (value !== undefined) {
+        const { annotation } = label;
+        if (annotation) {
+          if (!annotation.multi_int) annotation.multi_int = [];
+          const index = annotation.multi_int.indexOf(value);
+          if (index >= 0) {
+            annotation.multi_int.splice(index, 1);
+            // propagate deletion to children
+            if (label.choices) {
+              label.choices[index].children?.forEach((lab: AnnotationSchemeLabel) => {
+                this.clearAnnotation(lab);
+              });
+            }
+          } else {
+            annotation.multi_int.push(value);
           }
-        } else {
-          annotation.multi_int.push(value);
+          if (annotation.multi_int.length === 0) annotation.multi_int = undefined;
         }
-        if (annotation.multi_int.length === 0) annotation.multi_int = undefined;
       }
     },
     multiIntChildren(label: AnnotationSchemeLabel): Array<SubLabels> {
