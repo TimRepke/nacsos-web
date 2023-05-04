@@ -18,7 +18,6 @@ import type {
   FlattenedAnnotationSchemeLabel,
   UserModel,
 } from '@/plugins/api/api-core';
-import InlineToolTip from '@/components/InlineToolTip.vue';
 import type { PropType } from 'vue';
 import { EventBus } from '@/plugins/events';
 import { ToastEvent } from '@/plugins/events/events/toast';
@@ -31,7 +30,6 @@ interface BoolLabelData {
 
 export default defineComponent({
   name: 'StringLabel',
-  components: { InlineToolTip },
   data(): BoolLabelData {
     return {
       // set to true when bot annotation was manipulated
