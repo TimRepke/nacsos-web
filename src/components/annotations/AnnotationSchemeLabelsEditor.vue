@@ -67,11 +67,10 @@
               <label for="autoSizingSelect">Type</label>
               <ToolTip>
                 <strong>bool</strong> – boolean toggle<br>
-                <strong>str</strong> – free string input<br>
-                <strong>int</strong> – free integer input<br>
-                <strong>float</strong> – free float input<br>
                 <strong>single</strong> – pre-defined choices (only one can be selected)<br>
                 <strong>multi</strong> – pre-defined choices (multiple can be selected)<br>
+                <strong>str</strong> – free-text string input<br>
+                <strong>...</strong> – other types are not implemented, yet<br>
               </ToolTip>
               <select class="form-select" id="autoSizingSelect" v-model="schemeLabel.kind">
                 <option v-for="kind in annotationSchemeLabelKinds" :key="kind" :value="kind">{{ kind }}</option>
@@ -86,14 +85,25 @@
                 <input
                   type="checkbox"
                   role="switch"
-                  id="flexSwitchCheckDefault"
+                  :id="`label-required-${schemeLabel.tmpKey}`"
                   class="form-check-input"
-                  aria-checked="false"
+                  :aria-checked="schemeLabel.required"
                   v-model="schemeLabel.required" />
-                <label class="form-check-label" for="flexSwitchCheckDefault">Required</label>
+                <label class="form-check-label" :for="`label-required-${schemeLabel.tmpKey}`">Required</label>
+              </div>
+              <div class="form-check form-switch" v-if="schemeLabel.kind === 'single' || schemeLabel.kind === 'multi'">
+                <input
+                  type="checkbox"
+                  role="switch"
+                  :id="`label-dropdown-${schemeLabel.tmpKey}`"
+                  class="form-check-input"
+                  :aria-checked="schemeLabel.dropdown"
+                  v-model="schemeLabel.dropdown" />
+                <label class="form-check-label" :for="`label-required-${schemeLabel.tmpKey}`">Use dropdown</label>
               </div>
             </div>
           </div>
+
           <!-- BEGIN List label choices for pre-defined choices -->
           <div class="row ms-2" v-if="schemeLabel.kind === 'single' || schemeLabel.kind === 'multi'">
             <strong>Choices:</strong>

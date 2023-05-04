@@ -20,6 +20,9 @@ export const $AnnotationSchemeLabel = {
     required: {
       type: 'boolean',
     },
+    dropdown: {
+      type: 'boolean',
+    },
     kind: {
       type: 'Enum',
     },
