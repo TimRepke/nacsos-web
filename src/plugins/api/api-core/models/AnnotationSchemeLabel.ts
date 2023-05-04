@@ -11,6 +11,7 @@ export type AnnotationSchemeLabel = {
   hint?: string;
   max_repeat?: number;
   required?: boolean;
+  dropdown?: boolean;
   kind?: AnnotationSchemeLabel.kind;
   choices?: Array<AnnotationSchemeLabelChoice>;
   annotation?: AnnotationModel;

@@ -76,23 +76,31 @@
           </div>
         </template>
         <template v-else-if="label.kind === 'single'">
-          <div class="list-group">
-            <label
-              v-for="(choice, index) in label.choices"
-              :key="index"
-              class="list-group-item list-group-item-action"
-              :class="{ 'list-group-item-dark': label.annotation.value_int === choice.value }">
-              <input
-                type="radio"
-                class="form-check-input me-1"
-                v-bind:value="choice.value"
-                v-model="label.annotation.value_int"
-                @change="singleIntUpdate(label)" />
-              <InlineToolTip :info="choice.hint">
-                <span class="ms-2">{{ choice.name }}</span>
-              </InlineToolTip>
-            </label>
-          </div>
+          <template v-if="label.dropdown">
+            <SearchableSelect
+              :options="label.choices"
+              :currentOption="label.annotation.value_int"
+              @update:currentOption="newValue => label.annotation.value_int = newValue" />
+          </template>
+          <template v-else>
+            <div class="list-group">
+              <label
+                v-for="(choice, index) in label.choices"
+                :key="index"
+                class="list-group-item list-group-item-action"
+                :class="{ 'list-group-item-dark': label.annotation.value_int === choice.value }">
+                <input
+                  type="radio"
+                  class="form-check-input me-1"
+                  v-bind:value="choice.value"
+                  v-model="label.annotation.value_int"
+                  @change="singleIntUpdate(label)" />
+                <InlineToolTip :info="choice.hint">
+                  <span class="ms-2">{{ choice.name }}</span>
+                </InlineToolTip>
+              </label>
+            </div>
+          </template>
           <div
             v-if="label.annotation.value_int !== undefined && label.choices[val2choice(label)].children"
             class="ms-3 mt-2">
@@ -153,6 +161,7 @@
 
 import type { PropType } from 'vue';
 import InlineToolTip from '@/components/InlineToolTip.vue';
+import SearchableSelect from '@/components/SearchableSelect.vue';
 import type { AssignmentModel, AnnotationModel, AnnotationSchemeLabelChoice } from '@/plugins/api/api-core';
 import { AnnotationSchemeLabel } from '@/plugins/api/api-core';
 import { defineComponent } from 'vue';
@@ -161,7 +170,7 @@ type SubLabels = { labels: AnnotationSchemeLabel[]; key: number; };
 
 export default defineComponent({
   name: 'AnnotationLabels',
-  components: { InlineToolTip },
+  components: { InlineToolTip, SearchableSelect },
   props: {
     labels: {
       type: Object as PropType<AnnotationSchemeLabel[]>,
