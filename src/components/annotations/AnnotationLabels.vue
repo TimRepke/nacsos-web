@@ -171,9 +171,12 @@
           float input not implemented yet
         </template>
         <template v-else-if="label.kind === 'str'">
-          <!-- TODO -->
-          <!-- https://vueform.com/reference/1.x/multiselect-element -->
-          string input not implemented yet
+          <textarea
+            class="form-control"
+            :id="`str-${label.key}-${label.annotation.repeat}`"
+            :aria-label="label.name"
+            rows="3"
+            v-model="label.annotation.value_str" />
         </template>
       </div>
     </li>
