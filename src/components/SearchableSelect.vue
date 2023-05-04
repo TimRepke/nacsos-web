@@ -9,7 +9,7 @@
           type="text"
           v-model="searchText"
           @focusin="dropdownVisible = true"
-          @focusout="dropdownVisible = false"
+          @focusout="unfocusSearchField"
           style="background-color: inherit; border:none;" />
       </div>
       <div class="text-muted me-2">
@@ -19,13 +19,13 @@
         <font-awesome-icon :icon="['fas', 'circle-xmark']" @click="clear" />
       </div>
     </div>
-    <div v-if="dropdownVisible">
+    <div v-show="dropdownVisible">
       <ul class="list-group rounded-0 rounded-bottom border-top-0 overflow-auto" style="max-height: 10rem;">
         <li
           v-for="option in dropdownOptions"
           :key="`opt-${option.name}-${option.value}`"
-          @click="pickOption(option)"
-          class="list-group-item list-group-item-action">
+          class="list-group-item list-group-item-action"
+          @click="pickOption(option)">
           <InlineToolTip :info="option.hint">
             {{ option.name }}
           </InlineToolTip>
@@ -46,20 +46,24 @@ interface Option {
   hint?: string;
 }
 
-//  @input="$emit('update:modelValue', $event.target.value)"
 export default defineComponent({
   name: 'SearchableSelect',
   components: { InlineToolTip },
-  emits: ['update:currentOption'],
+  emits: ['update:current-option'],
   props: {
     options: {
       type: Object as PropType<Option[]>,
       required: true,
       default: () => [] as Option[],
     },
-    currentOption: {
+    hiddenOptions: {
+      type: Object as PropType<number[]>,
+      required: false,
+      default: () => [] as number[],
+    },
+    currentOptionValue: {
       type: Number,
-      required: true,
+      required: false,
       default: undefined,
     },
     resetText: {
@@ -72,30 +76,38 @@ export default defineComponent({
     return {
       searchText: '',
       dropdownOptions: this.options,
-      dropdownVisible: true,
+      dropdownVisible: false,
     };
   },
   computed: {
     // pass
   },
   methods: {
+    unfocusSearchField() {
+      setTimeout(() => {
+        // create a small delay, because otherwise the list entry someone clicked on is gone before the
+        // event propagates and to JS it looks like the user clicked into thin air
+        this.dropdownVisible = false;
+      }, 100);
+    },
     resetDropdownOptions() {
       this.dropdownOptions = this.options;
     },
     filterDropdownOptions() {
       this.dropdownOptions = this.options.filter(
-        (option: Option) => option.name.toLowerCase().indexOf(this.searchText.toLowerCase()) >= 0,
+        (option: Option) => option.name.toLowerCase().indexOf(this.searchText.toLowerCase()) >= 0
+          && (this.hiddenOptions ?? []).indexOf(option.value) < 0,
       );
     },
     clear() {
       this.searchText = '';
-      this.$emit('update:currentOption', undefined);
+      this.$emit('update:current-option', undefined);
     },
     pickOption(option: Option) {
-      if (this.resetText) {
+      if (!this.resetText) {
         this.searchText = option.name;
       }
-      this.$emit('update:currentOption', option.value);
+      this.$emit('update:current-option', option.value);
       this.dropdownVisible = false;
     },
   },
@@ -107,26 +119,16 @@ export default defineComponent({
         this.filterDropdownOptions();
       }
     },
+    hiddenOptions: {
+      handler() {
+        this.filterDropdownOptions();
+      },
+      deep: true,
+    },
   },
 });
 </script>
 
 <style scoped>
-.pill-text > .btn-close {
-  font-size: 0.5em;
-}
 
-.pill-text {
-  vertical-align: middle;
-  display: inline-block;
-  /*height: 1.3em;*/
-}
-
-/*
-.badge {
-  --bs-badge-padding-y: 0.15em;
-  --bs-badge-font-size: 0.7em;
-  --bs-badge-font-weight: 500;
-}
-*/
 </style>
