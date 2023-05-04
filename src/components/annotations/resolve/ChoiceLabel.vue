@@ -3,7 +3,7 @@
 
     <!-- User Annotations -->
     <span v-for="annotation in userAnnotations" :key="annotation.annotation_id">
-      <InlineToolTip :info="getPrettyUsername(annotation.user_id)">
+      <InlineToolTip :info="getPrettyIntLabelInfo(annotation)">
         <span
           class="border text-light p-1 ps-2 pe-2"
           :style="{ backgroundColor: annotation2bgColor(annotation) }">
@@ -134,18 +134,32 @@ export default defineComponent({
         EventBus.emit(new ToastEvent('WARN', 'Not implemented yet.'));
       }
     },
-    getPrettyUsername(userId: string): string {
-      const user: UserModel | undefined = this.users[userId];
-      if (!user) return '??';
-      return `${user.username} (${user.full_name})`;
+    getPrettyIntLabelInfo(annotation: AnnotationModel): string {
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      const { user_id, value_int } = annotation;
+      const user: UserModel | undefined = this.users[user_id];
+
+      let ret = '';
+      if (user) {
+        ret += user.username;
+      } else {
+        ret += '??';
+      }
+      if (value_int !== undefined && this.choiceLookup[value_int]) {
+        ret += `: ${this.choiceLookup[value_int].name}`;
+      }
+      return ret;
     },
   },
   computed: {
     cmap(): string[] {
-      return (this.info.choices.length > 10) ? cmap20 : cmap10;
+      const { choices } = this.info;
+      return (!choices || choices.length > 10) ? cmap20 : cmap10;
     },
     choiceLookup(): Record<number, AnnotationSchemeLabelChoiceFlat> {
-      return Object.fromEntries(this.info.choices.map((choice: AnnotationSchemeLabelChoiceFlat) => [choice.value, choice]));
+      const { choices } = this.info;
+      if (!choices) return {};
+      return Object.fromEntries(choices.map((choice: AnnotationSchemeLabelChoiceFlat) => [choice.value, choice]));
     },
   },
 });

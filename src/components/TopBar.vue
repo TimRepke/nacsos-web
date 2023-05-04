@@ -101,7 +101,6 @@ export default defineComponent({
     logout() {
       EventBus.emit(new LoggedOutEvent());
       EventBus.once(LogoutSuccessEvent, () => {
-        console.log('loe');
         this.$router.push({ name: 'user-login' });
       });
     },

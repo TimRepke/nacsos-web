@@ -300,6 +300,7 @@
                 :key="strLabel"
                 class="text-end"
                 :class="{ 'bg-warning': !isValid(labelInfo, itemId, strLabel) }">
+
                 <template v-if="schemeLookup[labelInfo.path[0].key]?.kind === 'bool'">
                   <BoolLabel
                     class="d-flex justify-content-end"
@@ -309,6 +310,7 @@
                     :users="userLookup"
                     @bot-annotation-changed="handleChangedBotAnnotation" />
                 </template>
+
                 <template v-else-if="schemeLookup[labelInfo.path[0].key]?.kind === 'single'">
                   <ChoiceLabel
                     class="d-flex justify-content-end"
@@ -318,6 +320,7 @@
                     :users="userLookup"
                     @bot-annotation-changed="handleChangedBotAnnotation" />
                 </template>
+
                 <template v-else-if="schemeLookup[labelInfo.path[0].key]?.kind === 'multi'">
                   <MultiLabel
                     class="d-flex justify-content-end"
@@ -327,6 +330,17 @@
                     :users="userLookup"
                     @bot-annotation-changed="handleChangedBotAnnotation" />
                 </template>
+
+                <template v-else-if="schemeLookup[labelInfo.path[0].key]?.kind === 'str'">
+                  <StringLabel
+                    class="d-flex justify-content-end"
+                    :user-annotations="matrix[itemId][strLabel].users"
+                    :bot-annotation="matrix[itemId][strLabel].bot"
+                    :info="schemeLookup[labelInfo.path[0].key]"
+                    :users="userLookup"
+                    @bot-annotation-changed="handleChangedBotAnnotation" />
+                </template>
+
                 <template v-else>
                   Unhandled "{{ schemeLookup[labelInfo.path[0].key]?.kind }}"
                 </template>
@@ -375,6 +389,7 @@ import { ToastEvent } from '@/plugins/events/events/toast';
 import MultiLabel from '@/components/annotations/resolve/MultiLabel.vue';
 import { defineComponent } from 'vue';
 import { ConfirmationRequestEvent } from '@/plugins/events/events/confirmation';
+import StringLabel from '@/components/annotations/resolve/StringLabel.vue';
 
 type LookupMatrix = Record<string, Record<string, { users: AnnotationModel[], bot: BotAnnotationModel | undefined }>>;
 type LabelLookupValue = {
@@ -415,7 +430,7 @@ type ResolveData = {
 
 export default defineComponent({
   name: 'AnnotationConfigResolveView',
-  components: { MultiLabel, ToolTip, ItemModal, BoolLabel, ChoiceLabel },
+  components: { StringLabel, MultiLabel, ToolTip, ItemModal, BoolLabel, ChoiceLabel },
   data(): ResolveData {
     const botAnnotationMetaDataId: string | undefined = this.$route.params.bot_annotation_metadata_id as string | undefined;
 

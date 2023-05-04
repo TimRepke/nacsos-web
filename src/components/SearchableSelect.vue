@@ -75,7 +75,7 @@ export default defineComponent({
   },
   data() {
     return {
-      searchText: '',
+      searchText: (this.currentOptionValue !== undefined && this.currentOptionValue < this.options.length) ? this.options[this.currentOptionValue].name : '',
       dropdownOptions: this.options,
       dropdownVisible: false,
     };
@@ -89,7 +89,7 @@ export default defineComponent({
         // create a small delay, because otherwise the list entry someone clicked on is gone before the
         // event propagates and to JS it looks like the user clicked into thin air
         this.dropdownVisible = false;
-      }, 100);
+      }, 200);
     },
     resetDropdownOptions() {
       this.dropdownOptions = this.options;
@@ -114,11 +114,15 @@ export default defineComponent({
   },
   watch: {
     searchText(newValue: string) {
-      if (newValue.length === 0) {
-        this.resetDropdownOptions();
-      } else {
-        this.filterDropdownOptions();
-      }
+      setTimeout(() => {
+        if (newValue.length === 0 || (this.currentOptionValue !== undefined
+          && this.currentOptionValue < this.options.length
+          && newValue === this.options[this.currentOptionValue].name)) {
+          this.resetDropdownOptions();
+        } else {
+          this.filterDropdownOptions();
+        }
+      }, 200);
     },
     hiddenOptions: {
       handler() {
