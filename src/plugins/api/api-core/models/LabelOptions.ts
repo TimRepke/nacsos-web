@@ -7,5 +7,6 @@ export type LabelOptions = {
   options_int?: Array<number>;
   options_bool?: Array<boolean>;
   options_multi?: Array<number>;
+  strings?: boolean;
 };
 
