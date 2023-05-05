@@ -3,6 +3,7 @@
     <tr>
       <td class="text-muted small">
         {{ rowIdx }}
+        <font-awesome-icon :icon="['fas', 'file-invoice']" @click="showItem = !showItem" />
       </td>
       <td>
         <div
