@@ -193,16 +193,14 @@
             class="list-group-item">
             <div class="d-flex">
               <div class="flex-grow-1">{{ label.key }}</div>
-              <div class="me-2">
+              <div v-if="!label.strings">
                 <button
                   type="button"
-                  class="btn btn-tiny btn-outline-secondary"
+                  class="btn btn-tiny btn-outline-secondary me-2"
                   @click="checkAllOptions(label.key)">
                   <font-awesome-icon :icon="['fas', 'list-check']" class="me-1" />
                   all
                 </button>
-              </div>
-              <div class="">
                 <button
                   type="button"
                   class="btn btn-tiny btn-outline-secondary"
@@ -211,8 +209,18 @@
                   none
                 </button>
               </div>
+              <div v-else>
+                <input
+                  :id="`lab-${label.key}_str`"
+                  v-model="labelExportSettings.labels[label.key].strings"
+                  class="form-check-input me-1"
+                  type="checkbox">
+                <label :for="`lab-${label.key}_str`" class="form-check-label text-muted">
+                  Include strings
+                </label>
+              </div>
             </div>
-            <div class="row">
+            <div class="row" v-if="!label.strings">
               <div class="col">
                 <span
                   v-for="val in (label.options_bool ?? label.options_int ?? label.options_multi)"

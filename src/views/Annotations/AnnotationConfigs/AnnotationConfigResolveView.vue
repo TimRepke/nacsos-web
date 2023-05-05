@@ -273,80 +273,20 @@
               </th>
             </tr>
           </thead>
-          <tbody>
-            <tr
-              v-for="(itemId, run) in Object.keys(collection.annotations)"
-              :key="itemId"
-              v-show="itemIdSearch === '' || itemId.indexOf(itemIdSearch) >= 0">
-              <td class="text-muted small">
-                {{ run }}
-              </td>
-              <td>
-                <div
-                  class="text-muted font-monospace fs-fn text-break me-2 d-inline-block"
-                  style="width: 20ch;"
-                  role="button"
-                  tabindex="-1"
-                  @click="this.focusItem = itemId">
-                  {{ itemId }}
-                </div>
-                <div
-                  v-if="this.showText && this.texts[itemId]"
-                  class="text-muted fs-fn p-1 rounded border border-secondary"
-                  v-html="(this.texts[itemId] || '').replaceAll('\n', '<br />')" />
-              </td>
-              <td
-                v-for="(labelInfo, strLabel) in labels"
-                :key="strLabel"
-                class="text-end"
-                :class="{ 'bg-warning': !isValid(labelInfo, itemId, strLabel) }">
-
-                <template v-if="schemeLookup[labelInfo.path[0].key]?.kind === 'bool'">
-                  <BoolLabel
-                    class="d-flex justify-content-end"
-                    :user-annotations="matrix[itemId][strLabel].users"
-                    :bot-annotation="matrix[itemId][strLabel].bot"
-                    :info="schemeLookup[labelInfo.path[0].key]"
-                    :users="userLookup"
-                    @bot-annotation-changed="handleChangedBotAnnotation" />
-                </template>
-
-                <template v-else-if="schemeLookup[labelInfo.path[0].key]?.kind === 'single'">
-                  <ChoiceLabel
-                    class="d-flex justify-content-end"
-                    :user-annotations="matrix[itemId][strLabel].users"
-                    :bot-annotation="matrix[itemId][strLabel].bot"
-                    :info="schemeLookup[labelInfo.path[0].key]"
-                    :users="userLookup"
-                    @bot-annotation-changed="handleChangedBotAnnotation" />
-                </template>
-
-                <template v-else-if="schemeLookup[labelInfo.path[0].key]?.kind === 'multi'">
-                  <MultiLabel
-                    class="d-flex justify-content-end"
-                    :user-annotations="matrix[itemId][strLabel].users"
-                    :bot-annotation="matrix[itemId][strLabel].bot"
-                    :info="schemeLookup[labelInfo.path[0].key]"
-                    :users="userLookup"
-                    @bot-annotation-changed="handleChangedBotAnnotation" />
-                </template>
-
-                <template v-else-if="schemeLookup[labelInfo.path[0].key]?.kind === 'str'">
-                  <StringLabel
-                    class="d-flex justify-content-end"
-                    :user-annotations="matrix[itemId][strLabel].users"
-                    :bot-annotation="matrix[itemId][strLabel].bot"
-                    :info="schemeLookup[labelInfo.path[0].key]"
-                    :users="userLookup"
-                    @bot-annotation-changed="handleChangedBotAnnotation" />
-                </template>
-
-                <template v-else>
-                  Unhandled "{{ schemeLookup[labelInfo.path[0].key]?.kind }}"
-                </template>
-              </td>
-            </tr>
-          </tbody>
+          <ResolverRow
+            v-for="(itemId, run) in Object.keys(collection.annotations)"
+            :key="itemId"
+            v-show="itemIdSearch === '' || itemId.indexOf(itemIdSearch) >= 0"
+            :row-idx="run"
+            :item-id="itemId"
+            :row="matrix[itemId]"
+            :label-lookup="labels"
+            :scheme-lookup="schemeLookup"
+            :user-lookup="userLookup"
+            :selected-user-lookup="selectedUserLookup"
+            :show-text="showText"
+            @bot-annotation-changed="handleChangedBotAnnotation"
+            @request-focus-item="(val) => focusItem = val" />
         </table>
       </div>
     </div>
@@ -380,16 +320,13 @@ import type {
 } from '@/plugins/api/api-core';
 import { BotMetaResolve, ResolutionPayload } from '@/plugins/api/api-core';
 import { API } from '@/plugins/api';
-import BoolLabel from '@/components/annotations/resolve/BoolLabel.vue';
 import ItemModal from '@/components/items/ItemModal.vue';
-import ChoiceLabel from '@/components/annotations/resolve/ChoiceLabel.vue';
 import ToolTip from '@/components/ToolTip.vue';
 import { EventBus } from '@/plugins/events';
 import { ToastEvent } from '@/plugins/events/events/toast';
-import MultiLabel from '@/components/annotations/resolve/MultiLabel.vue';
 import { defineComponent } from 'vue';
 import { ConfirmationRequestEvent } from '@/plugins/events/events/confirmation';
-import StringLabel from '@/components/annotations/resolve/StringLabel.vue';
+import ResolverRow from '@/components/annotations/resolve/ResolverRow.vue';
 
 type LookupMatrix = Record<string, Record<string, { users: AnnotationModel[], bot: BotAnnotationModel | undefined }>>;
 type LabelLookupValue = {
@@ -424,13 +361,11 @@ type ResolveData = {
   autoSave: number | undefined,
   // if this is set to true, the item text is loaded and shown in the table
   showText: boolean,
-  // key: `item.item_id`, value: `item.text`
-  texts: Record<string, string>,
 };
 
 export default defineComponent({
   name: 'AnnotationConfigResolveView',
-  components: { StringLabel, MultiLabel, ToolTip, ItemModal, BoolLabel, ChoiceLabel },
+  components: { ResolverRow, ToolTip, ItemModal },
   data(): ResolveData {
     const botAnnotationMetaDataId: string | undefined = this.$route.params.bot_annotation_metadata_id as string | undefined;
 
@@ -459,7 +394,6 @@ export default defineComponent({
       itemIdSearch: '',
       autoSave: undefined,
       showText: false,
-      texts: {} as Record<string, string>,
     };
   },
 
@@ -530,60 +464,9 @@ export default defineComponent({
       },
       immediate: true,
     },
-    showText: {
-      handler() {
-        // if the user wants to see texts and we have a collection loaded ...
-        if (this.showText && this.collection && this.collection.annotations) {
-          // ... iterate all item_ids for the annotations ...
-          Object.keys(this.collection.annotations).forEach((itemId: string) => {
-            // ... and if we don't have the text already ...
-            if (!(itemId in this.texts)) {
-              // ... fetch it from the server and remember it.
-              API.core.project.getTextForItemApiProjectItemsTextItemIdGet({
-                itemId,
-                xProjectId: currentProjectStore.projectId as string,
-              }).then((response) => {
-                this.texts[itemId] = response.data;
-              }).catch(() => {
-                EventBus.emit(new ToastEvent('WARN', `No text found for item ${itemId}!`));
-              });
-            }
-          });
-        }
-      },
-    },
   },
 
   methods: {
-    isValid(labelInfo: LabelLookupValue, itemId: string, strPath: string): boolean {
-      /**
-       * This function checks the validity of the resolved label for an item.
-       * A label is invalid, if the parent label does not have this one as a child.
-       */
-
-      // entries w/o parents are always valid
-      if (labelInfo.strParent === undefined) return true;
-      // empty bot annotations are always valid (independent of parent label)
-      if (this.matrix[itemId][strPath] === undefined
-        || this.matrix[itemId][strPath].bot === undefined
-        || (this.matrix[itemId][strPath].bot?.value_int === undefined
-          && this.matrix[itemId][strPath].bot?.value_bool === undefined
-          && this.matrix[itemId][strPath].bot?.value_str === undefined
-          && this.matrix[itemId][strPath].bot?.value_float === undefined
-          && this.matrix[itemId][strPath].bot?.multi_int === undefined)) return true;
-      // ignore if parent label not in this view
-      // FIXME: verify that this is safe to assume (e.g. what if parent choice was never assigned rather
-      //        than explicitly not selected in this configuration)
-      if (!(labelInfo.strParent in this.labels)) return true;
-
-      // check if parent choice has this label as child
-      const parentValueInt: number | undefined = this.matrix[itemId][labelInfo.strParent].bot?.value_int;
-      const parentValueMultiInt: number[] | undefined = this.matrix[itemId][labelInfo.strParent].bot?.multi_int;
-      const validParentInScheme: number = this.schemeLookup[labelInfo.path[0].key].parent_choice as number;
-
-      return (parentValueInt === validParentInScheme)
-        || (!!parentValueMultiInt && parentValueMultiInt.indexOf(validParentInScheme) >= 0);
-    },
     hasChoices(value: AnnotationSchemeLabelChoiceFlat[] | undefined) {
       return value !== undefined && Array.isArray(value) && value.length > 0;
     },
@@ -686,6 +569,16 @@ export default defineComponent({
         return {};
       }
       return Object.fromEntries(this.annotators.map((user: UserModel) => [user.user_id, user]));
+    },
+    selectedUserLookup(): Record<string, UserModel> {
+      if (!this.annotators) {
+        return {};
+      }
+      return Object.fromEntries(
+        this.annotators
+          .map((user: UserModel) => [user.user_id, user])
+          .filter((entry: [string, UserModel]) => (this.filters.user_id ?? []).indexOf(entry[0]) >= 0),
+      );
     },
     labels(): LabelLookup {
       if (!this.collection || !this.collection.labels || Object.keys(this.schemeLookup).length === 0) {

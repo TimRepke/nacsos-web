@@ -25,5 +25,8 @@ export const $LabelOptions = {
         type: 'number',
       },
     },
+    strings: {
+      type: 'boolean',
+    },
   },
 } as const;

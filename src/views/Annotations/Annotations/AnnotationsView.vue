@@ -1,5 +1,5 @@
 <template>
-  <div class="row">
+  <div class="row h-md-100">
     <template v-if="!assignments">
       Loading next assignment for annotation. If this takes longer than expected, something went wrong.
     </template>
@@ -42,7 +42,8 @@
           <AnyItemComponent :item="item" :highlighters="highlighters" />
         </div>
       </div>
-      <div class="col border-start p-2 overflow-auto h-md-100 position-relative" :class="sidebarWidthClass">
+
+      <div class="col border-start p-2 overflow-auto h-md-100 position-relative border-top border-md-top" :class="sidebarWidthClass">
         <div
           class="position-fixed bottom-0 border border-end-0 rounded-start text-muted text-center"
           style="margin-left: -1.325rem; width: 0.75rem; font-size: 0.75rem;"
@@ -558,6 +559,10 @@ export default defineComponent({
 @media (min-width: 768px) {
   .h-md-100 {
     height: 100% !important;
+  }
+
+  .border-md-top {
+    border-top:none !important;
   }
 }
 
