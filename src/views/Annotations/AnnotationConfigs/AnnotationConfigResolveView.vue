@@ -363,8 +363,6 @@ type ResolveData = {
   autoSave: number | undefined,
   // if this is set to true, the item text is loaded and shown in the table
   showText: boolean,
-  // key: `item.item_id`, value: `item.text`
-  texts: Record<string, string>,
 };
 
 export default defineComponent({
@@ -398,7 +396,6 @@ export default defineComponent({
       itemIdSearch: '',
       autoSave: undefined,
       showText: false,
-      texts: {} as Record<string, string>,
     };
   },
 
@@ -468,28 +465,6 @@ export default defineComponent({
         }
       },
       immediate: true,
-    },
-    showText: {
-      handler() {
-        // if the user wants to see texts and we have a collection loaded ...
-        if (this.showText && this.collection && this.collection.annotations) {
-          // ... iterate all item_ids for the annotations ...
-          Object.keys(this.collection.annotations).forEach((itemId: string) => {
-            // ... and if we don't have the text already ...
-            if (!(itemId in this.texts)) {
-              // ... fetch it from the server and remember it.
-              API.core.project.getTextForItemApiProjectItemsTextItemIdGet({
-                itemId,
-                xProjectId: currentProjectStore.projectId as string,
-              }).then((response) => {
-                this.texts[itemId] = response.data;
-              }).catch(() => {
-                EventBus.emit(new ToastEvent('WARN', `No text found for item ${itemId}!`));
-              });
-            }
-          });
-        }
-      },
     },
   },
 

@@ -13,7 +13,7 @@
         {{ itemId }}
       </div>
       <div
-        v-if="hasItemText"
+        v-if="hasItemText && showItem"
         class="text-muted fs-fn p-1 rounded border border-secondary"
         v-html="itemHtmlText" />
     </td>
@@ -85,6 +85,8 @@ import ChoiceLabel from '@/components/annotations/resolve/ChoiceLabel.vue';
 import MultiLabel from '@/components/annotations/resolve/MultiLabel.vue';
 import StringLabel from '@/components/annotations/resolve/StringLabel.vue';
 import type { AnyItem } from '@/types/items';
+import { API } from '@/plugins/api';
+import { currentProjectStore } from '@/stores';
 
 type LookupMatrixRow = Record<string, { users: AnnotationModel[], bot: BotAnnotationModel | undefined }>;
 type LabelLookupValue = {
@@ -134,6 +136,7 @@ export default defineComponent({
   data() {
     return {
       item: null as AnyItem | null,
+      showItem: false,
     };
   },
   methods: {
@@ -182,6 +185,23 @@ export default defineComponent({
     },
     hasItemText(): boolean {
       return this.item && this.item.text;
+    },
+  },
+  watch: {
+    showText(newValue: boolean) {
+      this.showItem = newValue;
+    },
+    showItem(newValue: boolean) {
+      if (newValue && !this.item) {
+        API.core.project.getDetailForItemApiProjectItemsDetailItemIdGet({
+          xProjectId: currentProjectStore.projectId,
+          itemId: this.itemId,
+        }).then((response) => {
+          this.item = response.data;
+        }).catch(() => {
+          // ignore
+        });
+      }
     },
   },
 });
