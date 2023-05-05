@@ -1,10 +1,14 @@
 <template>
   <div v-if="botAnnotation !== undefined">
-
-    <closable-pill v-for="tag in botAnnotation.multi_int" :key="tag" class="me-1" @clicked-x="removeLabel(tag)">
-      {{ tag }}
-    </closable-pill>
-
+    <div class="flex-wrap">
+      <closable-pill
+        v-for="tag in botAnnotation.multi_int"
+        :key="tag"
+        class="me-1 mb-1"
+        @clicked-x="removeLabel(tag)">
+        {{ tag }}
+      </closable-pill>
+    </div>
     <div class="dropdown ps-2 d-inline-block">
       <span
         class="border text-light p-1 border-dark border-2 rounded-3"
