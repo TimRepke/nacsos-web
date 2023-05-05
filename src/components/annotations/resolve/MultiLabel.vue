@@ -178,7 +178,7 @@ export default defineComponent({
           if (!anno.multi_int) return undefined;
           return anno.multi_int.map((mi): [UserModel, number] => [this.users[anno.user_id] as UserModel, mi as number]);
         })
-        .filter((entry) => entry !== undefined) as [UserModel, number][];
+        .filter((entry: [UserModel, number] | undefined) => entry !== undefined) as [UserModel, number][];
 
       return entries.reduce((accu: Record<number, UserModel[]>, entry: [UserModel, number]) => {
         const [user, choice] = entry;
