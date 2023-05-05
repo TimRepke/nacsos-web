@@ -2,7 +2,7 @@
   <div v-if="userAnnotations !== undefined">
 
     <!-- User Annotations -->
-    <span v-for="annotation in userAnnotations" :key="annotation.annotation_id">
+    <span v-for="annotation in userAnnotationsSorted" :key="annotation.annotation_id">
       <InlineToolTip :info="getPrettyIntLabelInfo(annotation)">
         <span
           class="border text-light p-1 ps-2 pe-2"
@@ -160,6 +160,12 @@ export default defineComponent({
       const { choices } = this.info;
       if (!choices) return {};
       return Object.fromEntries(choices.map((choice: AnnotationSchemeLabelChoiceFlat) => [choice.value, choice]));
+    },
+    userAnnotationsSorted(): AnnotationModel[] {
+      return this.userAnnotations?.toSorted(
+        // eslint-disable-next-line no-nested-ternary
+        (a1: AnnotationModel, a2: AnnotationModel) => ((a1.user_id < a2.user_id) ? -1 : (a1.user_id > a2.user_id) ? 1 : 0),
+      );
     },
   },
 });

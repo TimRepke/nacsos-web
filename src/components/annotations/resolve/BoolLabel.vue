@@ -1,6 +1,6 @@
 <template>
   <div>
-    <span v-for="annotation in userAnnotations" :key="annotation.annotation_id">
+    <span v-for="annotation in userAnnotationsSorted" :key="annotation.annotation_id">
       <InlineToolTip :info="getPrettyUsername(annotation.user_id)">
         <font-awesome-icon
           :icon="['fas', annotation2icon(annotation.value_bool)]"
@@ -107,7 +107,12 @@ export default defineComponent({
     },
   },
   computed: {
-    // pass
+    userAnnotationsSorted(): AnnotationModel[] {
+      return this.userAnnotations?.toSorted(
+        // eslint-disable-next-line no-nested-ternary
+        (a1: AnnotationModel, a2: AnnotationModel) => ((a1.user_id < a2.user_id) ? -1 : (a1.user_id > a2.user_id) ? 1 : 0),
+      );
+    },
   },
 });
 </script>
