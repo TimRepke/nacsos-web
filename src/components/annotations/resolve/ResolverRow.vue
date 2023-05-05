@@ -1,73 +1,78 @@
 <template>
-  <tr>
-    <td class="text-muted small">
-      {{ rowIdx }}
-    </td>
-    <td>
-      <div
-        class="text-muted font-monospace fs-fn text-break me-2 d-inline-block"
-        style="width: 20ch;"
-        role="button"
-        tabindex="-1"
-        @click="$emit('request-focus-item', itemId)">
-        {{ itemId }}
-      </div>
-      <div
-        v-if="hasItemText && showItem"
-        class="text-muted fs-fn p-1 rounded border border-secondary"
-        v-html="itemHtmlText" />
-    </td>
-    <td
-      v-for="(labelInfo, strLabel) in labelLookup"
-      :key="strLabel"
-      class="text-end"
-      :class="{ 'bg-warning': !isValid(labelInfo, itemId, strLabel) }">
+  <tbody>
+    <tr>
+      <td class="text-muted small">
+        {{ rowIdx }}
+      </td>
+      <td>
+        <div
+          class="text-muted font-monospace fs-fn text-break me-2 d-inline-block"
+          style="width: 20ch;"
+          role="button"
+          tabindex="-1"
+          @click="$emit('request-focus-item', itemId)">
+          {{ itemId }}
+        </div>
+      </td>
+      <td
+        v-for="(labelInfo, strLabel) in labelLookup"
+        :key="strLabel"
+        class="text-end"
+        :class="{ 'bg-warning': !isValid(labelInfo, itemId, strLabel) }">
 
-      <template v-if="schemeLookup[labelInfo.path[0].key]?.kind === 'bool'">
-        <BoolLabel
-          class="d-flex justify-content-end"
-          :user-annotations="row[strLabel].users"
-          :bot-annotation="row[strLabel].bot"
-          :info="schemeLookup[labelInfo.path[0].key]"
-          :users="userLookup"
-          @bot-annotation-changed="$emit('bot-annotation-changed', $event)" />
-      </template>
+        <template v-if="schemeLookup[labelInfo.path[0].key]?.kind === 'bool'">
+          <BoolLabel
+            class="d-flex justify-content-end"
+            :user-annotations="row[strLabel].users"
+            :bot-annotation="row[strLabel].bot"
+            :info="schemeLookup[labelInfo.path[0].key]"
+            :users="userLookup"
+            @bot-annotation-changed="$emit('bot-annotation-changed', $event)" />
+        </template>
 
-      <template v-else-if="schemeLookup[labelInfo.path[0].key]?.kind === 'single'">
-        <ChoiceLabel
-          class="d-flex justify-content-end"
-          :user-annotations="row[strLabel].users"
-          :bot-annotation="row[strLabel].bot"
-          :info="schemeLookup[labelInfo.path[0].key]"
-          :users="userLookup"
-          @bot-annotation-changed="$emit('bot-annotation-changed', $event)" />
-      </template>
+        <template v-else-if="schemeLookup[labelInfo.path[0].key]?.kind === 'single'">
+          <ChoiceLabel
+            class="d-flex justify-content-end"
+            :user-annotations="row[strLabel].users"
+            :bot-annotation="row[strLabel].bot"
+            :info="schemeLookup[labelInfo.path[0].key]"
+            :users="userLookup"
+            @bot-annotation-changed="$emit('bot-annotation-changed', $event)" />
+        </template>
 
-      <template v-else-if="schemeLookup[labelInfo.path[0].key]?.kind === 'multi'">
-        <MultiLabel
-          class="d-flex justify-content-end"
-          :user-annotations="row[strLabel].users"
-          :bot-annotation="row[strLabel].bot"
-          :info="schemeLookup[labelInfo.path[0].key]"
-          :users="selectedUserLookup"
-          @bot-annotation-changed="$emit('bot-annotation-changed', $event)" />
-      </template>
+        <template v-else-if="schemeLookup[labelInfo.path[0].key]?.kind === 'multi'">
+          <MultiLabel
+            class="d-flex justify-content-end"
+            :user-annotations="row[strLabel].users"
+            :bot-annotation="row[strLabel].bot"
+            :info="schemeLookup[labelInfo.path[0].key]"
+            :users="selectedUserLookup"
+            @bot-annotation-changed="$emit('bot-annotation-changed', $event)" />
+        </template>
 
-      <template v-else-if="schemeLookup[labelInfo.path[0].key]?.kind === 'str'">
-        <StringLabel
-          class="d-flex justify-content-end"
-          :user-annotations="row[strLabel].users"
-          :bot-annotation="row[strLabel].bot"
-          :info="schemeLookup[labelInfo.path[0].key]"
-          :users="userLookup"
-          @bot-annotation-changed="$emit('bot-annotation-changed', $event)" />
-      </template>
+        <template v-else-if="schemeLookup[labelInfo.path[0].key]?.kind === 'str'">
+          <StringLabel
+            class="d-flex justify-content-end"
+            :user-annotations="row[strLabel].users"
+            :bot-annotation="row[strLabel].bot"
+            :info="schemeLookup[labelInfo.path[0].key]"
+            :users="userLookup"
+            @bot-annotation-changed="$emit('bot-annotation-changed', $event)" />
+        </template>
 
-      <template v-else>
-        Unhandled "{{ schemeLookup[labelInfo.path[0].key]?.kind }}"
-      </template>
-    </td>
-  </tr>
+        <template v-else>
+          Unhandled "{{ schemeLookup[labelInfo.path[0].key]?.kind }}"
+        </template>
+      </td>
+    </tr>
+    <tr v-if="hasItemText && showItem">
+      <td colspan="1000">
+        <div
+          class="text-muted fs-fn p-1 rounded border border-secondary col-md-7"
+          v-html="itemHtmlText" />
+      </td>
+    </tr>
+  </tbody>
 </template>
 
 <script lang="ts">
@@ -194,7 +199,7 @@ export default defineComponent({
     showItem(newValue: boolean) {
       if (newValue && !this.item) {
         API.core.project.getDetailForItemApiProjectItemsDetailItemIdGet({
-          xProjectId: currentProjectStore.projectId,
+          xProjectId: currentProjectStore.projectId as string,
           itemId: this.itemId,
         }).then((response) => {
           this.item = response.data;

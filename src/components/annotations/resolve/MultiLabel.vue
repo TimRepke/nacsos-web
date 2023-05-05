@@ -173,21 +173,27 @@ export default defineComponent({
     choiceUsers(): Record<number, UserModel[]> {
       const annos = this.userAnnotations;
       if (!annos || !this.users) return {};
+      const entries = annos
+        .flatMap((anno: AnnotationModel) => {
+          if (!anno.multi_int) return undefined;
+          return anno.multi_int.map((mi): [UserModel, number] => [this.users[anno.user_id] as UserModel, mi as number]);
+        })
+        .filter((entry) => entry !== undefined) as [UserModel, number][];
 
-      return annos
-        .flatMap((anno: AnnotationModel) => anno.multi_int.map((mi) => [this.users[anno.user_id], mi]))
-        .reduce((accu: Record<number, UserModel[]>, entry: [UserModel, number]) => {
-          const [user, choice] = entry;
-          if (!accu[choice]) accu[choice] = [];
-          accu[choice].push(user);
-          return accu;
-        }, {});
+      return entries.reduce((accu: Record<number, UserModel[]>, entry: [UserModel, number]) => {
+        const [user, choice] = entry;
+        // eslint-disable-next-line no-param-reassign
+        if (!accu[choice]) accu[choice] = [];
+        accu[choice].push(user);
+        return accu;
+      }, {});
     },
     choiceInfo(): Record<number, string> {
+      const userEntries = Object.entries(this.choiceUsers) as unknown as Array<[number, UserModel[]]>;
       return Object.fromEntries(
-        Object.entries(this.choiceUsers).map((entry: [number, UserModel[]]) => {
-          const [choice, users] = entry;
-          const usernames = users.map((user) => user.username).join(', ');
+        userEntries.map((entry: [number, UserModel[]]) => {
+          const [choice, entryUsers] = entry;
+          const usernames = entryUsers.map((user) => user.username).join(', ');
           const choiceName = this.choiceLookup[choice].name;
           return [choice, `${usernames}: "${choiceName}"`];
         }),
@@ -198,14 +204,15 @@ export default defineComponent({
       const multiInt = this.botAnnotation?.multi_int;
       const annos = this.userAnnotations;
       if (!annos || !multiInt) return {};
+      const userEntries = Object.entries(this.choiceUsers) as unknown as Array<[number, UserModel[]]>;
       const counters: Record<number, number> = Object.fromEntries(
-        Object.entries(this.choiceUsers).map((entry) => [entry[0], entry[1].length]),
+        userEntries.map((entry: [number, UserModel[]]) => [entry[0], entry[1].length]),
       );
 
       if (!counters) return {};
 
       return Object.fromEntries(
-        multiInt.map((choice) => {
+        multiInt.map((choice: number) => {
           const count = counters[choice];
           if (!count) return [choice, Agreement.NOVEL]; // undefined, 0, null
           if (numUsers === 1) return [choice, Agreement.FULL];

@@ -273,22 +273,20 @@
               </th>
             </tr>
           </thead>
-          <tbody>
-            <ResolverRow
-              v-for="(itemId, run) in Object.keys(collection.annotations)"
-              :key="itemId"
-              v-show="itemIdSearch === '' || itemId.indexOf(itemIdSearch) >= 0"
-              :row-idx="run"
-              :item-id="itemId"
-              :row="matrix[itemId]"
-              :label-lookup="labels"
-              :scheme-lookup="schemeLookup"
-              :user-lookup="userLookup"
-              :selected-user-lookup="selectedUserLookup"
-              :show-text="showText"
-              @bot-annotation-changed="handleChangedBotAnnotation"
-              @request-focus-item="(val) => focusItem = val" />
-          </tbody>
+          <ResolverRow
+            v-for="(itemId, run) in Object.keys(collection.annotations)"
+            :key="itemId"
+            v-show="itemIdSearch === '' || itemId.indexOf(itemIdSearch) >= 0"
+            :row-idx="run"
+            :item-id="itemId"
+            :row="matrix[itemId]"
+            :label-lookup="labels"
+            :scheme-lookup="schemeLookup"
+            :user-lookup="userLookup"
+            :selected-user-lookup="selectedUserLookup"
+            :show-text="showText"
+            @bot-annotation-changed="handleChangedBotAnnotation"
+            @request-focus-item="(val) => focusItem = val" />
         </table>
       </div>
     </div>
