@@ -327,7 +327,7 @@
                     :user-annotations="matrix[itemId][strLabel].users"
                     :bot-annotation="matrix[itemId][strLabel].bot"
                     :info="schemeLookup[labelInfo.path[0].key]"
-                    :users="userLookup"
+                    :users="selectedUserLookup"
                     @bot-annotation-changed="handleChangedBotAnnotation" />
                 </template>
 
@@ -686,6 +686,16 @@ export default defineComponent({
         return {};
       }
       return Object.fromEntries(this.annotators.map((user: UserModel) => [user.user_id, user]));
+    },
+    selectedUserLookup(): Record<string, UserModel> {
+      if (!this.annotators) {
+        return {};
+      }
+      return Object.fromEntries(
+        this.annotators
+          .map((user: UserModel) => [user.user_id, user])
+          .filter((entry: [string, UserModel]) => (this.filters.user_id ?? []).indexOf(entry[0]) >= 0),
+      );
     },
     labels(): LabelLookup {
       if (!this.collection || !this.collection.labels || Object.keys(this.schemeLookup).length === 0) {

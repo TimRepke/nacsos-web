@@ -27,10 +27,16 @@ export default defineComponent({
       type: Boolean,
       default: true,
     },
+    bgOverride: {
+      type: Boolean,
+      default: false,
+      required: false,
+    },
   },
   computed: {
-    background(): string {
-      return `text-bg-${this.colour}`;
+    background(): string | undefined {
+      if (this.bgOverride !== undefined) return `text-bg-${this.colour}`;
+      return undefined;
     },
   },
 });
