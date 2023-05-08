@@ -2,7 +2,7 @@
   <div v-if="botAnnotation !== undefined">
     <div class="flex-wrap">
       <InlineToolTip
-        v-for="tag in botAnnotation.multi_int"
+        v-for="tag in botAnnotation.multi_int.toSorted()"
         :key="tag"
         :info="choiceInfo[tag]">
         <closable-pill

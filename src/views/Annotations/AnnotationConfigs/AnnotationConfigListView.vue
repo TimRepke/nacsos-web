@@ -27,16 +27,16 @@
             <font-awesome-icon :icon="['fas', 'trash-can']" />
           </InlineToolTip>
         </a>
-        <a
+        <router-link
+          :to="{ name: 'project-dataset-export' }"
           role="button"
           class="link-secondary me-1"
           tabindex="0"
-          aria-label="Export annotations"
-          @click="exportData(scheme)">
+          aria-label="Export annotations">
           <InlineToolTip info="Export data">
             <font-awesome-icon :icon="['fas', 'file-export']" />
           </InlineToolTip>
-        </a>
+        </router-link>
         <ul>
           <li
             v-for="scope in (scopesLookup[scheme.annotation_scheme_id] || [])"
@@ -137,11 +137,6 @@ export default defineComponent({
       } catch (e) {
         EventBus.emit(new ToastEvent('ERROR', 'Failed to copy or refresh data, try reloading the page.'));
       }
-    },
-    exportData(scheme: AnnotationSchemeModel) {
-      // TODO
-      console.log(scheme);
-      EventBus.emit(new ToastEvent('WARN', 'Not implemented yet, sorry.'));
     },
     removeScheme(scheme: AnnotationSchemeModel) {
       EventBus.emit(new ConfirmationRequestEvent(
