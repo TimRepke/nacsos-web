@@ -25,6 +25,10 @@ export const $ProjectModel = {
     description: {
       type: 'string',
     },
+    time_created: {
+      type: 'string',
+      format: 'date-time',
+    },
     type: {
       type: 'any-of',
       contains: [{

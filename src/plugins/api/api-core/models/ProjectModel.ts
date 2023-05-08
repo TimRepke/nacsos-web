@@ -16,6 +16,7 @@ export type ProjectModel = {
   project_id?: string;
   name: string;
   description?: string;
+  time_created?: string;
   type: ('generic' | 'twitter' | 'academic' | 'patents' | ItemType);
   setting_motivational_quotes?: boolean;
 };

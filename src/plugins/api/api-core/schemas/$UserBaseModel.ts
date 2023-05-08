@@ -34,5 +34,13 @@ export const $UserBaseModel = {
     is_active: {
       type: 'boolean',
     },
+    time_created: {
+      type: 'string',
+      format: 'date-time',
+    },
+    time_updated: {
+      type: 'string',
+      format: 'date-time',
+    },
   },
 } as const;
