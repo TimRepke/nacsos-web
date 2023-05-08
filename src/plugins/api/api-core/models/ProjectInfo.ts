@@ -3,6 +3,7 @@
 /* eslint-disable */
 
 import type { ItemType } from './ItemType';
+import type { UserBaseModel } from './UserBaseModel';
 
 /**
  * Project is the basic structural and conceptual place around which all functionality evolves.
@@ -12,12 +13,13 @@ import type { ItemType } from './ItemType';
  * they way they are augmented by annotations and analysis outcomes is always constrained to the scope
  * of a Project.
  */
-export type ProjectModel = {
+export type ProjectInfo = {
   project_id?: string;
   name: string;
   description?: string;
   time_created?: string;
   type: ('generic' | 'twitter' | 'academic' | 'patents' | ItemType);
   setting_motivational_quotes?: boolean;
+  owners: Array<UserBaseModel>;
 };
 

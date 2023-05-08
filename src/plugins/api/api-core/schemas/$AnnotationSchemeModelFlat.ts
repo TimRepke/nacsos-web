@@ -29,6 +29,14 @@ export const $AnnotationSchemeModelFlat = {
     description: {
       type: 'string',
     },
+    time_created: {
+      type: 'string',
+      format: 'date-time',
+    },
+    time_updated: {
+      type: 'string',
+      format: 'date-time',
+    },
     labels: {
       type: 'array',
       contains: {

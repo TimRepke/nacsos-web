@@ -10,7 +10,19 @@ export const $AcademicAuthorModel = {
     surname_initials: {
       type: 'string',
     },
+    email: {
+      type: 'string',
+    },
     orcid: {
+      type: 'string',
+    },
+    scopus_id: {
+      type: 'string',
+    },
+    openalex_id: {
+      type: 'string',
+    },
+    s2_id: {
       type: 'string',
     },
     affiliations: {

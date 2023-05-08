@@ -1,6 +1,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+import type { ProjectInfo } from '../models/ProjectInfo';
 import type { ProjectModel } from '../models/ProjectModel';
 
 import type { CancelablePromise } from '@/plugins/api/core/CancelablePromise';
@@ -19,10 +20,10 @@ export class ProjectsService {
    * For SuperUsers, this returns all projects on the platform.
    *
    * :return: List of projects
-   * @returns ProjectModel Successful Response
+   * @returns ProjectInfo Successful Response
    * @throws ApiError
    */
-  public getAllProjectsApiProjectsListGet(options?: Partial<ApiRequestOptions>): CancelablePromise<Array<ProjectModel>> {
+  public getAllProjectsApiProjectsListGet(options?: Partial<ApiRequestOptions>): CancelablePromise<Array<ProjectInfo>> {
     return this.httpRequest.request({
       method: 'GET',
       url: '/api/projects/list',

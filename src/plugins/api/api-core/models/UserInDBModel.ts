@@ -15,6 +15,8 @@ export type UserInDBModel = {
   affiliation?: string;
   is_superuser?: boolean;
   is_active?: boolean;
+  time_created?: string;
+  time_updated?: string;
   password: string;
 };
 

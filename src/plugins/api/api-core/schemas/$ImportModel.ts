@@ -71,6 +71,8 @@ export const $ImportModel = {
         type: 'ImportConfigJSONL',
       }, {
         type: 'ImportConfigWoS',
+      }, {
+        type: 'ImportConfigScopus',
       }],
     },
   },

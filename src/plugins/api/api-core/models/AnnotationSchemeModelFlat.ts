@@ -12,6 +12,8 @@ export type AnnotationSchemeModelFlat = {
   project_id?: string;
   name: string;
   description?: string;
+  time_created?: string;
+  time_updated?: string;
   labels: Array<FlattenedAnnotationSchemeLabel>;
 };
 

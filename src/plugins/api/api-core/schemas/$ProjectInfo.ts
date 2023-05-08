@@ -1,7 +1,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-export const $ProjectModel = {
+export const $ProjectInfo = {
   description: `Project is the basic structural and conceptual place around which all functionality evolves.
   It is essentially a container for a logically connected set of analyses, e.g. all work for a paper.
 
@@ -40,6 +40,13 @@ export const $ProjectModel = {
     },
     setting_motivational_quotes: {
       type: 'boolean',
+    },
+    owners: {
+      type: 'array',
+      contains: {
+        type: 'UserBaseModel',
+      },
+      isRequired: true,
     },
   },
 } as const;

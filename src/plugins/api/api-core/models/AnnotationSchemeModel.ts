@@ -20,6 +20,8 @@ export type AnnotationSchemeModel = {
   project_id?: string;
   name: string;
   description?: string;
+  time_created?: string;
+  time_updated?: string;
   labels: Array<AnnotationSchemeLabel>;
 };
 
