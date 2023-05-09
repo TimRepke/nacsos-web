@@ -19,7 +19,7 @@
       </div>
     </div>
     <div class="row mb-2">
-      <div class="col-md-7">
+      <div class="col">
         <table class="table table-hover">
           <thead>
             <tr>
@@ -112,7 +112,7 @@ export default defineComponent({
         name: Sort.sort,
         owner: Sort.sort,
         assi: Sort.sort,
-        date: Sort['sort-up'],
+        date: Sort['sort-down'],
       } as Sorting,
       projectTypes: ItemType,
     };
