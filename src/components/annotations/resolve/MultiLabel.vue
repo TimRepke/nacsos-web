@@ -33,12 +33,12 @@
         </li>
       </ul>
     </div>
-
   </div>
 </template>
 
 <script lang="ts">
 
+import 'core-js/modules/es.array.to-sorted';
 import type {
   AnnotationModel,
   AnnotationSchemeLabelChoiceFlat,

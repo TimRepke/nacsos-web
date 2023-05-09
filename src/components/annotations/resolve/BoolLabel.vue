@@ -32,6 +32,7 @@
 </template>
 
 <script lang="ts">
+import 'core-js/modules/es.array.to-sorted';
 import type {
   AnnotationModel,
   BotAnnotationModel,
@@ -108,7 +109,8 @@ export default defineComponent({
   },
   computed: {
     userAnnotationsSorted(): AnnotationModel[] {
-      return this.userAnnotations?.toSorted(
+      if (!this.userAnnotations) return [];
+      return this.userAnnotations.toSorted(
         // eslint-disable-next-line no-nested-ternary
         (a1: AnnotationModel, a2: AnnotationModel) => ((a1.user_id < a2.user_id) ? -1 : (a1.user_id > a2.user_id) ? 1 : 0),
       );

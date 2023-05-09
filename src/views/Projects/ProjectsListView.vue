@@ -77,6 +77,8 @@
 </template>
 
 <script lang="ts">
+
+import 'core-js/modules/es.array.to-sorted';
 import { EventBus } from '@/plugins/events';
 import { CurrentProjectSelectedEvent, CurrentProjectSetEvent } from '@/plugins/events/events/projects';
 import type { ProjectInfo } from '@/plugins/api/api-core';

@@ -53,6 +53,7 @@
 
 <script lang="ts">
 
+import 'core-js/modules/es.array.to-sorted';
 import type {
   AnnotationModel,
   AnnotationSchemeLabelChoiceFlat,
@@ -162,7 +163,8 @@ export default defineComponent({
       return Object.fromEntries(choices.map((choice: AnnotationSchemeLabelChoiceFlat) => [choice.value, choice]));
     },
     userAnnotationsSorted(): AnnotationModel[] {
-      return this.userAnnotations?.toSorted(
+      if (!this.userAnnotations) return [];
+      return this.userAnnotations.toSorted(
         // eslint-disable-next-line no-nested-ternary
         (a1: AnnotationModel, a2: AnnotationModel) => ((a1.user_id < a2.user_id) ? -1 : (a1.user_id > a2.user_id) ? 1 : 0),
       );
