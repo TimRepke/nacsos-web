@@ -19,7 +19,7 @@
       </div>
     </div>
     <div class="row mb-2">
-      <div class="col-md-7">
+      <div class="col">
         <table class="table table-hover">
           <thead>
             <tr>
@@ -77,6 +77,8 @@
 </template>
 
 <script lang="ts">
+
+import 'core-js/modules/es.array.to-sorted';
 import { EventBus } from '@/plugins/events';
 import { CurrentProjectSelectedEvent, CurrentProjectSetEvent } from '@/plugins/events/events/projects';
 import type { ProjectInfo } from '@/plugins/api/api-core';
@@ -112,7 +114,7 @@ export default defineComponent({
         name: Sort.sort,
         owner: Sort.sort,
         assi: Sort.sort,
-        date: Sort['sort-up'],
+        date: Sort['sort-down'],
       } as Sorting,
       projectTypes: ItemType,
     };

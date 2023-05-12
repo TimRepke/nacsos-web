@@ -38,7 +38,7 @@ export const $BotAnnotationMetaDataBaseModel = {
       type: 'string',
       format: 'date-time',
     },
-    annotation_scope_id: {
+    assignment_scope_id: {
       type: 'any-of',
       contains: [{
         type: 'string',
