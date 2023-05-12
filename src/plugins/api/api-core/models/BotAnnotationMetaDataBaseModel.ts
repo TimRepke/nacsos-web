@@ -11,7 +11,7 @@ export type BotAnnotationMetaDataBaseModel = {
   project_id: string;
   time_created?: string;
   time_updated?: string;
-  annotation_scope_id?: string;
+  assignment_scope_id?: string;
   annotation_scheme_id?: string;
 };
 
