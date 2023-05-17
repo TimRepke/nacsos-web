@@ -15,7 +15,7 @@ npm install
 ```
 
 ### Update API clients  
-When changes were made to the API(s), the respective client(s) need to be adapted via
+When changes were made to the API(s), the respective client(s) need to be adapted  via
 ```
 # update code in src/plugins/api/api-core for NACSOS Core FastAPI endpoint
 npm run api-core
