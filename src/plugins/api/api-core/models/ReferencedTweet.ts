@@ -3,7 +3,7 @@
 /* eslint-disable */
 
 export type ReferencedTweet = {
-  id: string;
+  id: (string | number);
   type: ReferencedTweet.type;
 };
 

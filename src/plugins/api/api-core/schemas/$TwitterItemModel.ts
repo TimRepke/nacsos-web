@@ -2,10 +2,12 @@
 /* tslint:disable */
 /* eslint-disable */
 export const $TwitterItemModel = {
-  description: `Corresponds to db.models.items.TwitterItem
+  description: `
+  Corresponds to db.models.items.TwitterItem
 
   For more in-depth documentation, please refer to:
-  https://developer.twitter.com/en/docs/twitter-api/data-dictionary/object-model/tweet`,
+  https://developer.twitter.com/en/docs/twitter-api/data-dictionary/object-model/tweet
+  `,
   properties: {
     item_id: {
       type: 'any-of',
@@ -14,6 +16,8 @@ export const $TwitterItemModel = {
       }, {
         type: 'string',
         format: 'uuid',
+      }, {
+        type: 'null',
       }],
     },
     project_id: {
@@ -23,6 +27,8 @@ export const $TwitterItemModel = {
       }, {
         type: 'string',
         format: 'uuid',
+      }, {
+        type: 'null',
       }],
     },
     type: {
@@ -32,13 +38,28 @@ export const $TwitterItemModel = {
       }],
     },
     text: {
-      type: 'string',
+      type: 'any-of',
+      contains: [{
+        type: 'string',
+      }, {
+        type: 'null',
+      }],
     },
     twitter_id: {
-      type: 'string',
+      type: 'any-of',
+      contains: [{
+        type: 'string',
+      }, {
+        type: 'null',
+      }],
     },
     twitter_author_id: {
-      type: 'string',
+      type: 'any-of',
+      contains: [{
+        type: 'string',
+      }, {
+        type: 'null',
+      }],
     },
     created_at: {
       type: 'string',
@@ -46,52 +67,102 @@ export const $TwitterItemModel = {
       format: 'date-time',
     },
     language: {
-      type: 'string',
+      type: 'any-of',
+      contains: [{
+        type: 'string',
+      }, {
+        type: 'null',
+      }],
     },
     conversation_id: {
-      type: 'string',
+      type: 'any-of',
+      contains: [{
+        type: 'string',
+      }, {
+        type: 'null',
+      }],
     },
     referenced_tweets: {
-      type: 'array',
-      contains: {
-        type: 'ReferencedTweet',
-      },
+      type: 'any-of',
+      contains: [{
+        type: 'array',
+        contains: {
+          type: 'ReferencedTweet',
+        },
+      }, {
+        type: 'null',
+      }],
     },
     latitude: {
-      type: 'number',
+      type: 'any-of',
+      contains: [{
+        type: 'number',
+      }, {
+        type: 'null',
+      }],
     },
     longitude: {
-      type: 'number',
+      type: 'any-of',
+      contains: [{
+        type: 'number',
+      }, {
+        type: 'null',
+      }],
     },
     hashtags: {
-      type: 'array',
-      contains: {
-        type: 'Hashtag',
-      },
+      type: 'any-of',
+      contains: [{
+        type: 'array',
+        contains: {
+          type: 'Hashtag',
+        },
+      }, {
+        type: 'null',
+      }],
     },
     mentions: {
-      type: 'array',
-      contains: {
-        type: 'Mention',
-      },
+      type: 'any-of',
+      contains: [{
+        type: 'array',
+        contains: {
+          type: 'Mention',
+        },
+      }, {
+        type: 'null',
+      }],
     },
     urls: {
-      type: 'array',
-      contains: {
-        type: 'URL',
-      },
+      type: 'any-of',
+      contains: [{
+        type: 'array',
+        contains: {
+          type: 'URL',
+        },
+      }, {
+        type: 'null',
+      }],
     },
     cashtags: {
-      type: 'array',
-      contains: {
-        type: 'Cashtag',
-      },
+      type: 'any-of',
+      contains: [{
+        type: 'array',
+        contains: {
+          type: 'Cashtag',
+        },
+      }, {
+        type: 'null',
+      }],
     },
     context_annotations: {
-      type: 'array',
-      contains: {
-        type: 'ContextAnnotation',
-      },
+      type: 'any-of',
+      contains: [{
+        type: 'array',
+        contains: {
+          type: 'ContextAnnotation',
+        },
+      }, {
+        type: 'null',
+      }],
     },
     retweet_count: {
       type: 'number',
@@ -110,7 +181,12 @@ export const $TwitterItemModel = {
       isRequired: true,
     },
     user: {
-      type: 'TwitterUserModel',
+      type: 'any-of',
+      contains: [{
+        type: 'TwitterUserModel',
+      }, {
+        type: 'null',
+      }],
     },
   },
 } as const;

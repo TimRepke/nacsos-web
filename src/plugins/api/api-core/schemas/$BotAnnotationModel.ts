@@ -10,6 +10,8 @@ export const $BotAnnotationModel = {
       }, {
         type: 'string',
         format: 'uuid',
+      }, {
+        type: 'null',
       }],
     },
     bot_annotation_metadata_id: {
@@ -19,15 +21,27 @@ export const $BotAnnotationModel = {
       }, {
         type: 'string',
         format: 'uuid',
+      }, {
+        type: 'null',
       }],
     },
     time_created: {
-      type: 'string',
-      format: 'date-time',
+      type: 'any-of',
+      contains: [{
+        type: 'string',
+        format: 'date-time',
+      }, {
+        type: 'null',
+      }],
     },
     time_updated: {
-      type: 'string',
-      format: 'date-time',
+      type: 'any-of',
+      contains: [{
+        type: 'string',
+        format: 'date-time',
+      }, {
+        type: 'null',
+      }],
     },
     item_id: {
       type: 'any-of',
@@ -46,34 +60,71 @@ export const $BotAnnotationModel = {
       }, {
         type: 'string',
         format: 'uuid',
+      }, {
+        type: 'null',
       }],
     },
     key: {
-      type: 'string',
+      type: 'any-of',
+      contains: [{
+        type: 'string',
+      }, {
+        type: 'null',
+      }],
     },
     repeat: {
       type: 'number',
     },
     value_bool: {
-      type: 'boolean',
+      type: 'any-of',
+      contains: [{
+        type: 'boolean',
+      }, {
+        type: 'null',
+      }],
     },
     value_int: {
-      type: 'number',
+      type: 'any-of',
+      contains: [{
+        type: 'number',
+      }, {
+        type: 'null',
+      }],
     },
     value_float: {
-      type: 'number',
+      type: 'any-of',
+      contains: [{
+        type: 'number',
+      }, {
+        type: 'null',
+      }],
     },
     value_str: {
-      type: 'string',
+      type: 'any-of',
+      contains: [{
+        type: 'string',
+      }, {
+        type: 'null',
+      }],
     },
     multi_int: {
-      type: 'array',
-      contains: {
-        type: 'number',
-      },
+      type: 'any-of',
+      contains: [{
+        type: 'array',
+        contains: {
+          type: 'number',
+        },
+      }, {
+        type: 'null',
+      }],
     },
     confidence: {
-      type: 'number',
+      type: 'any-of',
+      contains: [{
+        type: 'number',
+      }, {
+        type: 'null',
+      }],
     },
   },
 } as const;

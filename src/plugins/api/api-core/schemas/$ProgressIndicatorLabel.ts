@@ -8,10 +8,20 @@ export const $ProgressIndicatorLabel = {
       isRequired: true,
     },
     value_int: {
-      type: 'number',
+      type: 'any-of',
+      contains: [{
+        type: 'number',
+      }, {
+        type: 'null',
+      }],
     },
     value_bool: {
-      type: 'boolean',
+      type: 'any-of',
+      contains: [{
+        type: 'boolean',
+      }, {
+        type: 'null',
+      }],
     },
   },
 } as const;

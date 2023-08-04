@@ -2,7 +2,8 @@
 /* tslint:disable */
 /* eslint-disable */
 export const $AnnotationSchemeModel = {
-  description: `Corresponds to db.models.annotations.AnnotationScheme
+  description: `
+  Corresponds to db.models.annotations.AnnotationScheme
 
   AnnotationScheme defines the annotation scheme for a particular project.
   Each project may have multiple AnnotationSchemes,
@@ -10,7 +11,8 @@ export const $AnnotationSchemeModel = {
   the user would have to create a new copy of that scheme for a different project.
 
   The actual annotation scheme is defined as a list of labels (see schemas.annotations.AnnotationSchemeLabel).
-  The other fields pose as meta-data.`,
+  The other fields pose as meta-data.
+  `,
   properties: {
     annotation_scheme_id: {
       type: 'any-of',
@@ -19,6 +21,8 @@ export const $AnnotationSchemeModel = {
       }, {
         type: 'string',
         format: 'uuid',
+      }, {
+        type: 'null',
       }],
     },
     project_id: {
@@ -28,6 +32,8 @@ export const $AnnotationSchemeModel = {
       }, {
         type: 'string',
         format: 'uuid',
+      }, {
+        type: 'null',
       }],
     },
     name: {
@@ -35,15 +41,30 @@ export const $AnnotationSchemeModel = {
       isRequired: true,
     },
     description: {
-      type: 'string',
+      type: 'any-of',
+      contains: [{
+        type: 'string',
+      }, {
+        type: 'null',
+      }],
     },
     time_created: {
-      type: 'string',
-      format: 'date-time',
+      type: 'any-of',
+      contains: [{
+        type: 'string',
+        format: 'date-time',
+      }, {
+        type: 'null',
+      }],
     },
     time_updated: {
-      type: 'string',
-      format: 'date-time',
+      type: 'any-of',
+      contains: [{
+        type: 'string',
+        format: 'date-time',
+      }, {
+        type: 'null',
+      }],
     },
     labels: {
       type: 'array',

@@ -2,7 +2,8 @@
 /* tslint:disable */
 /* eslint-disable */
 export const $AnnotationFilters = {
-  description: `Filter rules for fetching all annotations that match these conditions
+  description: `
+  Filter rules for fetching all annotations that match these conditions
   It is up to the user of this function to make sure to provide sensible filters!
   All filters are conjunctive (connected with "AND"); if None, they are not included
 
@@ -12,7 +13,8 @@ export const $AnnotationFilters = {
   :param scope_id: if not None: annotation has to be part of this assignment scope
   :param user_id: if not None: annotation has to be by this user
   :param key: if not None: annotation has to be for this AnnotationSchemeLabel.key (or list/tuple of keys)
-  :param repeat: if not None: annotation has to be primary/secondary/...`,
+  :param repeat: if not None: annotation has to be primary/secondary/...
+  `,
   properties: {
     scheme_id: {
       type: 'string',
@@ -27,6 +29,8 @@ export const $AnnotationFilters = {
         contains: {
           type: 'string',
         },
+      }, {
+        type: 'null',
       }],
     },
     user_id: {
@@ -38,6 +42,8 @@ export const $AnnotationFilters = {
         contains: {
           type: 'string',
         },
+      }, {
+        type: 'null',
       }],
     },
     key: {
@@ -49,6 +55,8 @@ export const $AnnotationFilters = {
         contains: {
           type: 'string',
         },
+      }, {
+        type: 'null',
       }],
     },
     repeat: {
@@ -60,6 +68,8 @@ export const $AnnotationFilters = {
         contains: {
           type: 'number',
         },
+      }, {
+        type: 'null',
       }],
     },
   },

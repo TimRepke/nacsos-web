@@ -12,7 +12,12 @@ export const $AnnotationSchemeLabel = {
       isRequired: true,
     },
     hint: {
-      type: 'string',
+      type: 'any-of',
+      contains: [{
+        type: 'string',
+      }, {
+        type: 'null',
+      }],
     },
     max_repeat: {
       type: 'number',
@@ -27,13 +32,23 @@ export const $AnnotationSchemeLabel = {
       type: 'Enum',
     },
     choices: {
-      type: 'array',
-      contains: {
-        type: 'AnnotationSchemeLabelChoice',
-      },
+      type: 'any-of',
+      contains: [{
+        type: 'array',
+        contains: {
+          type: 'AnnotationSchemeLabelChoice',
+        },
+      }, {
+        type: 'null',
+      }],
     },
     annotation: {
-      type: 'AnnotationModel',
+      type: 'any-of',
+      contains: [{
+        type: 'AnnotationModel',
+      }, {
+        type: 'null',
+      }],
     },
   },
 } as const;

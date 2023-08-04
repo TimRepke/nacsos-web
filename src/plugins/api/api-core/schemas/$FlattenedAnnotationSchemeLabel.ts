@@ -8,7 +8,12 @@ export const $FlattenedAnnotationSchemeLabel = {
       isRequired: true,
     },
     hint: {
-      type: 'string',
+      type: 'any-of',
+      contains: [{
+        type: 'string',
+      }, {
+        type: 'null',
+      }],
     },
     key: {
       type: 'string',
@@ -31,16 +36,31 @@ export const $FlattenedAnnotationSchemeLabel = {
       isRequired: true,
     },
     choices: {
-      type: 'array',
-      contains: {
-        type: 'AnnotationSchemeLabelChoiceFlat',
-      },
+      type: 'any-of',
+      contains: [{
+        type: 'array',
+        contains: {
+          type: 'AnnotationSchemeLabelChoiceFlat',
+        },
+      }, {
+        type: 'null',
+      }],
     },
     parent_label: {
-      type: 'string',
+      type: 'any-of',
+      contains: [{
+        type: 'string',
+      }, {
+        type: 'null',
+      }],
     },
     parent_choice: {
-      type: 'number',
+      type: 'any-of',
+      contains: [{
+        type: 'number',
+      }, {
+        type: 'null',
+      }],
     },
   },
 } as const;

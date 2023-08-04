@@ -18,16 +18,31 @@ export const $AuthTokenModel = {
       isRequired: true,
     },
     time_created: {
-      type: 'string',
-      format: 'date-time',
+      type: 'any-of',
+      contains: [{
+        type: 'string',
+        format: 'date-time',
+      }, {
+        type: 'null',
+      }],
     },
     time_updated: {
-      type: 'string',
-      format: 'date-time',
+      type: 'any-of',
+      contains: [{
+        type: 'string',
+        format: 'date-time',
+      }, {
+        type: 'null',
+      }],
     },
     valid_till: {
-      type: 'string',
-      format: 'date-time',
+      type: 'any-of',
+      contains: [{
+        type: 'string',
+        format: 'date-time',
+      }, {
+        type: 'null',
+      }],
     },
   },
 } as const;

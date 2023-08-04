@@ -32,13 +32,18 @@ export const $ProgressIndicator = {
       isRequired: true,
     },
     labels: {
-      type: 'dictionary',
-      contains: {
-        type: 'array',
+      type: 'any-of',
+      contains: [{
+        type: 'dictionary',
         contains: {
-          type: 'ProgressIndicatorLabel',
+          type: 'array',
+          contains: {
+            type: 'ProgressIndicatorLabel',
+          },
         },
-      },
+      }, {
+        type: 'null',
+      }],
     },
   },
 } as const;

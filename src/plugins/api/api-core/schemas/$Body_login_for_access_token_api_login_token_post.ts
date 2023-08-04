@@ -4,8 +4,13 @@
 export const $Body_login_for_access_token_api_login_token_post = {
   properties: {
     grant_type: {
-      type: 'string',
-      pattern: 'password',
+      type: 'any-of',
+      contains: [{
+        type: 'string',
+        pattern: 'password',
+      }, {
+        type: 'null',
+      }],
     },
     username: {
       type: 'string',
@@ -19,10 +24,20 @@ export const $Body_login_for_access_token_api_login_token_post = {
       type: 'string',
     },
     client_id: {
-      type: 'string',
+      type: 'any-of',
+      contains: [{
+        type: 'string',
+      }, {
+        type: 'null',
+      }],
     },
     client_secret: {
-      type: 'string',
+      type: 'any-of',
+      contains: [{
+        type: 'string',
+      }, {
+        type: 'null',
+      }],
     },
   },
 } as const;

@@ -14,7 +14,7 @@ export class HighlightersService {
 
   /**
    * Get Scope Highlighters
-   * @returns HighlighterModel Successful Response
+   * @returns any Successful Response
    * @throws ApiError
    */
   public getScopeHighlightersApiHighlightersScopeAssignmentScopeIdGet({
@@ -23,7 +23,7 @@ export class HighlightersService {
   }: {
     assignmentScopeId: string,
     xProjectId: string,
-  }, options?: Partial<ApiRequestOptions>): CancelablePromise<Array<HighlighterModel>> {
+  }, options?: Partial<ApiRequestOptions>): CancelablePromise<(Array<HighlighterModel> | null)> {
     return this.httpRequest.request({
       method: 'GET',
       url: '/api/highlighters/scope/{assignment_scope_id}',
@@ -92,7 +92,7 @@ export class HighlightersService {
 
   /**
    * Get Highlighter
-   * @returns HighlighterModel Successful Response
+   * @returns any Successful Response
    * @throws ApiError
    */
   public getHighlighterApiHighlightersHighlighterIdGet({
@@ -101,7 +101,7 @@ export class HighlightersService {
   }: {
     highlighterId: string,
     xProjectId: string,
-  }, options?: Partial<ApiRequestOptions>): CancelablePromise<HighlighterModel> {
+  }, options?: Partial<ApiRequestOptions>): CancelablePromise<(HighlighterModel | null)> {
     return this.httpRequest.request({
       method: 'GET',
       url: '/api/highlighters/{highlighter_id}',

@@ -8,16 +8,36 @@ export const $ImportConfigTwitter = {
       isRequired: true,
     },
     max_results: {
-      type: 'number',
+      type: 'any-of',
+      contains: [{
+        type: 'number',
+      }, {
+        type: 'null',
+      }],
     },
     next_token: {
-      type: 'string',
+      type: 'any-of',
+      contains: [{
+        type: 'string',
+      }, {
+        type: 'null',
+      }],
     },
     since_id: {
-      type: 'string',
+      type: 'any-of',
+      contains: [{
+        type: 'string',
+      }, {
+        type: 'null',
+      }],
     },
     until_id: {
-      type: 'string',
+      type: 'any-of',
+      contains: [{
+        type: 'string',
+      }, {
+        type: 'null',
+      }],
     },
     sort_order: {
       type: 'Enum',
@@ -29,6 +49,8 @@ export const $ImportConfigTwitter = {
       }, {
         type: 'string',
         format: 'date-time',
+      }, {
+        type: 'null',
       }],
     },
     end_time: {
@@ -38,6 +60,8 @@ export const $ImportConfigTwitter = {
       }, {
         type: 'string',
         format: 'date-time',
+      }, {
+        type: 'null',
       }],
     },
   },

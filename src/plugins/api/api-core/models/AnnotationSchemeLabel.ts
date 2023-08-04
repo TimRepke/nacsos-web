@@ -8,13 +8,13 @@ import type { AnnotationSchemeLabelChoice } from './AnnotationSchemeLabelChoice'
 export type AnnotationSchemeLabel = {
   name: string;
   key: string;
-  hint?: string;
+  hint?: (string | null);
   max_repeat?: number;
   required?: boolean;
   dropdown?: boolean;
   kind?: AnnotationSchemeLabel.kind;
-  choices?: Array<AnnotationSchemeLabelChoice>;
-  annotation?: AnnotationModel;
+  choices?: (Array<AnnotationSchemeLabelChoice> | null);
+  annotation?: (AnnotationModel | null);
 };
 
 export namespace AnnotationSchemeLabel {

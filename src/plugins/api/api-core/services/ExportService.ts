@@ -30,12 +30,12 @@ export class ExportService {
   }: {
     xProjectId: string,
     requestBody: Array<LabelOptions>,
-    botAnnotationMetadataIds?: Array<string>,
-    assignmentScopeIds?: Array<string>,
-    userIds?: Array<string>,
+    botAnnotationMetadataIds?: (Array<string> | null),
+    assignmentScopeIds?: (Array<string> | null),
+    userIds?: (Array<string> | null),
     ignoreHierarchy?: boolean,
     ignoreOrder?: boolean,
-    itemFields?: Array<string>,
+    itemFields?: (Array<string> | null),
   }, options?: Partial<ApiRequestOptions>): CancelablePromise<string> {
     return this.httpRequest.request({
       method: 'POST',

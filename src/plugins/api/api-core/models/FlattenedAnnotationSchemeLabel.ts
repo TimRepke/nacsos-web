@@ -6,15 +6,15 @@ import type { AnnotationSchemeLabelChoiceFlat } from './AnnotationSchemeLabelCho
 
 export type FlattenedAnnotationSchemeLabel = {
   name: string;
-  hint?: string;
+  hint?: (string | null);
   key: string;
   required: boolean;
   max_repeat: number;
   implicit_max_repeat: number;
   kind: FlattenedAnnotationSchemeLabel.kind;
-  choices?: Array<AnnotationSchemeLabelChoiceFlat>;
-  parent_label?: string;
-  parent_choice?: number;
+  choices?: (Array<AnnotationSchemeLabelChoiceFlat> | null);
+  parent_label?: (string | null);
+  parent_choice?: (number | null);
 };
 
 export namespace FlattenedAnnotationSchemeLabel {

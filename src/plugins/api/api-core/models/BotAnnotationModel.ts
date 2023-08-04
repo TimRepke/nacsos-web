@@ -3,19 +3,19 @@
 /* eslint-disable */
 
 export type BotAnnotationModel = {
-  bot_annotation_id?: string;
-  bot_annotation_metadata_id?: string;
-  time_created?: string;
-  time_updated?: string;
+  bot_annotation_id?: (string | null);
+  bot_annotation_metadata_id?: (string | null);
+  time_created?: (string | null);
+  time_updated?: (string | null);
   item_id: string;
-  parent?: string;
-  key?: string;
+  parent?: (string | null);
+  key?: (string | null);
   repeat?: number;
-  value_bool?: boolean;
-  value_int?: number;
-  value_float?: number;
-  value_str?: string;
-  multi_int?: Array<number>;
-  confidence?: number;
+  value_bool?: (boolean | null);
+  value_int?: (number | null);
+  value_float?: (number | null);
+  value_str?: (string | null);
+  multi_int?: (Array<number> | null);
+  confidence?: (number | null);
 };
 

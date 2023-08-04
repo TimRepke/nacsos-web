@@ -141,7 +141,8 @@ import AnnotationLabels from '@/components/annotations/AnnotationLabels.vue';
 import { EventBus } from '@/plugins/events';
 import { ToastEvent } from '@/plugins/events/events/toast';
 import type {
-  AnnotationItem, AnnotationSchemeLabelChoice,
+  AnnotationItem,
+  AnnotationSchemeLabelChoice,
   AnnotationSchemeModel,
   AssignmentModel,
   AssignmentScopeModel,

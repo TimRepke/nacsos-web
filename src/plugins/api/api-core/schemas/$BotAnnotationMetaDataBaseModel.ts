@@ -10,6 +10,8 @@ export const $BotAnnotationMetaDataBaseModel = {
       }, {
         type: 'string',
         format: 'uuid',
+      }, {
+        type: 'null',
       }],
     },
     name: {
@@ -31,12 +33,22 @@ export const $BotAnnotationMetaDataBaseModel = {
       isRequired: true,
     },
     time_created: {
-      type: 'string',
-      format: 'date-time',
+      type: 'any-of',
+      contains: [{
+        type: 'string',
+        format: 'date-time',
+      }, {
+        type: 'null',
+      }],
     },
     time_updated: {
-      type: 'string',
-      format: 'date-time',
+      type: 'any-of',
+      contains: [{
+        type: 'string',
+        format: 'date-time',
+      }, {
+        type: 'null',
+      }],
     },
     assignment_scope_id: {
       type: 'any-of',
@@ -45,6 +57,8 @@ export const $BotAnnotationMetaDataBaseModel = {
       }, {
         type: 'string',
         format: 'uuid',
+      }, {
+        type: 'null',
       }],
     },
     annotation_scheme_id: {
@@ -54,6 +68,8 @@ export const $BotAnnotationMetaDataBaseModel = {
       }, {
         type: 'string',
         format: 'uuid',
+      }, {
+        type: 'null',
       }],
     },
   },

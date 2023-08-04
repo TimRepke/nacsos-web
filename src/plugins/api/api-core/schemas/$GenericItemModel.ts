@@ -2,7 +2,9 @@
 /* tslint:disable */
 /* eslint-disable */
 export const $GenericItemModel = {
-  description: `Corresponds to db.models.items.generic.GenericItem`,
+  description: `
+  Corresponds to db.models.items.generic.GenericItem
+  `,
   properties: {
     item_id: {
       type: 'any-of',
@@ -11,6 +13,8 @@ export const $GenericItemModel = {
       }, {
         type: 'string',
         format: 'uuid',
+      }, {
+        type: 'null',
       }],
     },
     project_id: {
@@ -20,6 +24,8 @@ export const $GenericItemModel = {
       }, {
         type: 'string',
         format: 'uuid',
+      }, {
+        type: 'null',
       }],
     },
     type: {
@@ -29,7 +35,12 @@ export const $GenericItemModel = {
       }],
     },
     text: {
-      type: 'string',
+      type: 'any-of',
+      contains: [{
+        type: 'string',
+      }, {
+        type: 'null',
+      }],
     },
     meta: {
       properties: {

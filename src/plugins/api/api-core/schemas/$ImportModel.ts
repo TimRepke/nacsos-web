@@ -10,6 +10,8 @@ export const $ImportModel = {
         format: 'uuid',
       }, {
         type: 'string',
+      }, {
+        type: 'null',
       }],
     },
     user_id: {
@@ -19,6 +21,8 @@ export const $ImportModel = {
         format: 'uuid',
       }, {
         type: 'string',
+      }, {
+        type: 'null',
       }],
     },
     project_id: {
@@ -32,7 +36,12 @@ export const $ImportModel = {
       isRequired: true,
     },
     pipeline_task_id: {
-      type: 'string',
+      type: 'any-of',
+      contains: [{
+        type: 'string',
+      }, {
+        type: 'null',
+      }],
     },
     name: {
       type: 'string',
@@ -52,16 +61,31 @@ export const $ImportModel = {
       isRequired: true,
     },
     time_created: {
-      type: 'string',
-      format: 'date-time',
+      type: 'any-of',
+      contains: [{
+        type: 'string',
+        format: 'date-time',
+      }, {
+        type: 'null',
+      }],
     },
     time_started: {
-      type: 'string',
-      format: 'date-time',
+      type: 'any-of',
+      contains: [{
+        type: 'string',
+        format: 'date-time',
+      }, {
+        type: 'null',
+      }],
     },
     time_finished: {
-      type: 'string',
-      format: 'date-time',
+      type: 'any-of',
+      contains: [{
+        type: 'string',
+        format: 'date-time',
+      }, {
+        type: 'null',
+      }],
     },
     config: {
       type: 'any-of',
@@ -73,6 +97,8 @@ export const $ImportModel = {
         type: 'ImportConfigWoS',
       }, {
         type: 'ImportConfigScopus',
+      }, {
+        type: 'null',
       }],
     },
   },

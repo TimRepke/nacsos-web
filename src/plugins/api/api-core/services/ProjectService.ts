@@ -298,7 +298,7 @@ export class ProjectService {
   }: {
     itemId: string,
     xProjectId: string,
-    itemType?: 'generic' | 'twitter' | 'academic' | 'patents',
+    itemType?: ('generic' | 'twitter' | 'academic' | 'patents' | null),
   }, options?: Partial<ApiRequestOptions>): CancelablePromise<(TwitterItemModel | AcademicItemModel | GenericItemModel)> {
     return this.httpRequest.request({
       method: 'GET',
@@ -382,7 +382,7 @@ export class ProjectService {
   }: {
     xProjectId: string,
     requestBody: TwitterItemModel,
-    importId?: string,
+    importId?: (string | null),
   }, options?: Partial<ApiRequestOptions>): CancelablePromise<any> {
     return this.httpRequest.request({
       method: 'POST',

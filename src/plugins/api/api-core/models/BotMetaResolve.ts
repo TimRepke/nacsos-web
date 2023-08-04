@@ -10,7 +10,7 @@ export type BotMetaResolve = {
   filters: AnnotationFilters;
   ignore_hierarchy: boolean;
   ignore_repeat: boolean;
-  trust?: Record<string, number>;
+  trust?: (Record<string, number> | null);
   collection: AnnotationCollectionDB;
 };
 

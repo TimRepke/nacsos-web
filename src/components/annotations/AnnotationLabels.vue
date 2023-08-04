@@ -329,8 +329,8 @@ export default defineComponent({
       });
     },
     val2choice(label: AnnotationSchemeLabel): number | undefined {
-      const value: number | undefined = label.annotation?.value_int;
-      if (value !== undefined) {
+      const value: number | null | undefined = label.annotation?.value_int;
+      if (value !== undefined && value !== null) {
         return label.choices?.findIndex((choice) => choice.value === value);
       }
       return undefined;

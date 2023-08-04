@@ -14,6 +14,7 @@ import { ImportsService } from './services/ImportsService';
 import { OauthService } from './services/OauthService';
 import { ProjectService } from './services/ProjectService';
 import { ProjectsService } from './services/ProjectsService';
+import { SearchService } from './services/SearchService';
 import { StatsService } from './services/StatsService';
 import { UsersService } from './services/UsersService';
 
@@ -30,6 +31,7 @@ export class CoreClient {
   public readonly oauth: OauthService;
   public readonly project: ProjectService;
   public readonly projects: ProjectsService;
+  public readonly search: SearchService;
   public readonly stats: StatsService;
   public readonly users: UsersService;
 
@@ -37,7 +39,7 @@ export class CoreClient {
 
   constructor(config?: Partial<OpenAPIConfig>, HttpRequest: HttpRequestConstructor = AxiosHttpRequest) {
     this.request = new HttpRequest({
-      BASE: config?.BASE ?? '/nacsos-core',
+      BASE: config?.BASE ?? '',
       VERSION: config?.VERSION ?? '0.1.0',
       WITH_CREDENTIALS: config?.WITH_CREDENTIALS ?? false,
       CREDENTIALS: config?.CREDENTIALS ?? 'include',
@@ -57,6 +59,7 @@ export class CoreClient {
     this.oauth = new OauthService(this.request);
     this.project = new ProjectService(this.request);
     this.projects = new ProjectsService(this.request);
+    this.search = new SearchService(this.request);
     this.stats = new StatsService(this.request);
     this.users = new UsersService(this.request);
   }
