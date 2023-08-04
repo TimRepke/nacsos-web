@@ -19,6 +19,8 @@ export const $AssignmentScopeRandomWithExclusionConfig = {
           type: 'string',
           format: 'uuid',
         },
+      }, {
+        type: 'null',
       }],
     },
     num_items: {

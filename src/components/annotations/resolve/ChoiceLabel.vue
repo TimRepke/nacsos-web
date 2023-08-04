@@ -146,7 +146,7 @@ export default defineComponent({
       } else {
         ret += '??';
       }
-      if (value_int !== undefined && this.choiceLookup[value_int]) {
+      if (value_int !== undefined && value_int !== null && this.choiceLookup[value_int]) {
         ret += `: ${this.choiceLookup[value_int].name}`;
       }
       return ret;

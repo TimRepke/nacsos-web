@@ -6,8 +6,8 @@ import type { AnnotationSchemeLabel } from './AnnotationSchemeLabel';
 
 export type AnnotationSchemeLabelChoice = {
   name: string;
-  hint?: string;
+  hint?: (string | null);
   value: number;
-  children?: Array<AnnotationSchemeLabel>;
+  children?: (Array<AnnotationSchemeLabel> | null);
 };
 

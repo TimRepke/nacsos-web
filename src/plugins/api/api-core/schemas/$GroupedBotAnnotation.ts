@@ -2,17 +2,7 @@
 /* tslint:disable */
 /* eslint-disable */
 export const $GroupedBotAnnotation = {
-  properties: {
-    path: {
-      type: 'array',
-      contains: {
-        type: 'Label',
-      },
-      isRequired: true,
-    },
-    annotation: {
-      type: 'BotAnnotationModel',
-      isRequired: true,
-    },
-  },
+  type: 'any[]',
+  maxItems: 2,
+  minItems: 2,
 } as const;

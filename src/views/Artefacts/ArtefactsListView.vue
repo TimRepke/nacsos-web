@@ -179,7 +179,8 @@ export default defineComponent({
         xProjectId: currentProjectStore.projectId as string,
       };
       if (this.searchByUser) {
-        searchObj.userId = currentUserStore.user?.user_id;
+        const userId = currentUserStore.user?.user_id;
+        searchObj.userId = (userId === null || userId === undefined) ? undefined : userId;
       }
       // TODO add the other search params
       return searchObj;

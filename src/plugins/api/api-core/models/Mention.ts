@@ -6,6 +6,6 @@ export type Mention = {
   start: number;
   end: number;
   username: string;
-  user_id: string;
+  user_id: (string | number);
 };
 

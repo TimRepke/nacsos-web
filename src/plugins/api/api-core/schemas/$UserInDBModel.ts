@@ -2,9 +2,6 @@
 /* tslint:disable */
 /* eslint-disable */
 export const $UserInDBModel = {
-  description: `User represents a person.
-  Most entries in the database will be (indirectly) linked to user accounts, so this is
-  at the core of access management and ownership.`,
   properties: {
     user_id: {
       type: 'any-of',
@@ -13,34 +10,76 @@ export const $UserInDBModel = {
       }, {
         type: 'string',
         format: 'uuid',
+      }, {
+        type: 'null',
       }],
     },
     username: {
-      type: 'string',
+      type: 'any-of',
+      contains: [{
+        type: 'string',
+      }, {
+        type: 'null',
+      }],
     },
     email: {
-      type: 'string',
-      format: 'email',
+      type: 'any-of',
+      contains: [{
+        type: 'string',
+        format: 'email',
+      }, {
+        type: 'null',
+      }],
     },
     full_name: {
-      type: 'string',
+      type: 'any-of',
+      contains: [{
+        type: 'string',
+      }, {
+        type: 'null',
+      }],
     },
     affiliation: {
-      type: 'string',
+      type: 'any-of',
+      contains: [{
+        type: 'string',
+      }, {
+        type: 'null',
+      }],
     },
     is_superuser: {
-      type: 'boolean',
+      type: 'any-of',
+      contains: [{
+        type: 'boolean',
+      }, {
+        type: 'null',
+      }],
     },
     is_active: {
-      type: 'boolean',
+      type: 'any-of',
+      contains: [{
+        type: 'boolean',
+      }, {
+        type: 'null',
+      }],
     },
     time_created: {
-      type: 'string',
-      format: 'date-time',
+      type: 'any-of',
+      contains: [{
+        type: 'string',
+        format: 'date-time',
+      }, {
+        type: 'null',
+      }],
     },
     time_updated: {
-      type: 'string',
-      format: 'date-time',
+      type: 'any-of',
+      contains: [{
+        type: 'string',
+        format: 'date-time',
+      }, {
+        type: 'null',
+      }],
     },
     password: {
       type: 'string',

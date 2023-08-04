@@ -2,7 +2,9 @@
 /* tslint:disable */
 /* eslint-disable */
 export const $AcademicItemModel = {
-  description: `Corresponds to db.schema.items.academic.AcademicItem`,
+  description: `
+  Corresponds to db.schema.items.academic.AcademicItem
+  `,
   properties: {
     item_id: {
       type: 'any-of',
@@ -11,6 +13,8 @@ export const $AcademicItemModel = {
       }, {
         type: 'string',
         format: 'uuid',
+      }, {
+        type: 'null',
       }],
     },
     project_id: {
@@ -20,6 +24,8 @@ export const $AcademicItemModel = {
       }, {
         type: 'string',
         format: 'uuid',
+      }, {
+        type: 'null',
       }],
     },
     type: {
@@ -29,53 +35,128 @@ export const $AcademicItemModel = {
       }],
     },
     text: {
-      type: 'string',
+      type: 'any-of',
+      contains: [{
+        type: 'string',
+      }, {
+        type: 'null',
+      }],
     },
     doi: {
-      type: 'string',
+      type: 'any-of',
+      contains: [{
+        type: 'string',
+      }, {
+        type: 'null',
+      }],
     },
     wos_id: {
-      type: 'string',
+      type: 'any-of',
+      contains: [{
+        type: 'string',
+      }, {
+        type: 'null',
+      }],
     },
     scopus_id: {
-      type: 'string',
+      type: 'any-of',
+      contains: [{
+        type: 'string',
+      }, {
+        type: 'null',
+      }],
     },
     openalex_id: {
-      type: 'string',
+      type: 'any-of',
+      contains: [{
+        type: 'string',
+      }, {
+        type: 'null',
+      }],
     },
     s2_id: {
-      type: 'string',
+      type: 'any-of',
+      contains: [{
+        type: 'string',
+      }, {
+        type: 'null',
+      }],
     },
     pubmed_id: {
-      type: 'string',
+      type: 'any-of',
+      contains: [{
+        type: 'string',
+      }, {
+        type: 'null',
+      }],
+    },
+    dimensions_id: {
+      type: 'any-of',
+      contains: [{
+        type: 'string',
+      }, {
+        type: 'null',
+      }],
     },
     title: {
-      type: 'string',
+      type: 'any-of',
+      contains: [{
+        type: 'string',
+      }, {
+        type: 'null',
+      }],
     },
     title_slug: {
-      type: 'string',
+      type: 'any-of',
+      contains: [{
+        type: 'string',
+      }, {
+        type: 'null',
+      }],
     },
     publication_year: {
-      type: 'number',
+      type: 'any-of',
+      contains: [{
+        type: 'number',
+      }, {
+        type: 'null',
+      }],
     },
     source: {
-      type: 'string',
+      type: 'any-of',
+      contains: [{
+        type: 'string',
+      }, {
+        type: 'null',
+      }],
     },
     keywords: {
-      type: 'array',
-      contains: {
-        type: 'string',
-      },
+      type: 'any-of',
+      contains: [{
+        type: 'array',
+        contains: {
+          type: 'string',
+        },
+      }, {
+        type: 'null',
+      }],
     },
     authors: {
-      type: 'array',
-      contains: {
-        type: 'AcademicAuthorModel',
-      },
+      type: 'any-of',
+      contains: [{
+        type: 'array',
+        contains: {
+          type: 'AcademicAuthorModel',
+        },
+      }, {
+        type: 'null',
+      }],
     },
     meta: {
-      properties: {
-      },
+      type: 'any-of',
+      contains: [{
+        type: 'null',
+      }],
     },
   },
 } as const;

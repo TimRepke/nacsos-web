@@ -4,7 +4,7 @@
 
 export type ProgressIndicatorLabel = {
   repeat: number;
-  value_int?: number;
-  value_bool?: boolean;
+  value_int?: (number | null);
+  value_bool?: (boolean | null);
 };
 

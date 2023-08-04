@@ -2,7 +2,9 @@
 /* tslint:disable */
 /* eslint-disable */
 export const $AnnotationSchemeModelFlat = {
-  description: `Same as AnnotationSchemeModel but with flattened structure.`,
+  description: `
+  Same as AnnotationSchemeModel but with flattened structure.
+  `,
   properties: {
     annotation_scheme_id: {
       type: 'any-of',
@@ -11,6 +13,8 @@ export const $AnnotationSchemeModelFlat = {
       }, {
         type: 'string',
         format: 'uuid',
+      }, {
+        type: 'null',
       }],
     },
     project_id: {
@@ -20,6 +24,8 @@ export const $AnnotationSchemeModelFlat = {
       }, {
         type: 'string',
         format: 'uuid',
+      }, {
+        type: 'null',
       }],
     },
     name: {
@@ -27,15 +33,30 @@ export const $AnnotationSchemeModelFlat = {
       isRequired: true,
     },
     description: {
-      type: 'string',
+      type: 'any-of',
+      contains: [{
+        type: 'string',
+      }, {
+        type: 'null',
+      }],
     },
     time_created: {
-      type: 'string',
-      format: 'date-time',
+      type: 'any-of',
+      contains: [{
+        type: 'string',
+        format: 'date-time',
+      }, {
+        type: 'null',
+      }],
     },
     time_updated: {
-      type: 'string',
-      format: 'date-time',
+      type: 'any-of',
+      contains: [{
+        type: 'string',
+        format: 'date-time',
+      }, {
+        type: 'null',
+      }],
     },
     labels: {
       type: 'array',

@@ -2,20 +2,7 @@
 /* tslint:disable */
 /* eslint-disable */
 export const $GroupedAnnotations = {
-  properties: {
-    path: {
-      type: 'array',
-      contains: {
-        type: 'Label',
-      },
-      isRequired: true,
-    },
-    annotations: {
-      type: 'array',
-      contains: {
-        type: 'AnnotationModel',
-      },
-      isRequired: true,
-    },
-  },
+  type: 'any[]',
+  maxItems: 2,
+  minItems: 2,
 } as const;

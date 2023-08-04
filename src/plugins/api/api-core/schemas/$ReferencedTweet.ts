@@ -4,7 +4,12 @@
 export const $ReferencedTweet = {
   properties: {
     id: {
-      type: 'string',
+      type: 'any-of',
+      contains: [{
+        type: 'string',
+      }, {
+        type: 'number',
+      }],
       isRequired: true,
     },
     type: {

@@ -8,25 +8,45 @@ export const $LabelOptions = {
       isRequired: true,
     },
     options_int: {
-      type: 'array',
-      contains: {
-        type: 'number',
-      },
+      type: 'any-of',
+      contains: [{
+        type: 'array',
+        contains: {
+          type: 'number',
+        },
+      }, {
+        type: 'null',
+      }],
     },
     options_bool: {
-      type: 'array',
-      contains: {
-        type: 'boolean',
-      },
+      type: 'any-of',
+      contains: [{
+        type: 'array',
+        contains: {
+          type: 'boolean',
+        },
+      }, {
+        type: 'null',
+      }],
     },
     options_multi: {
-      type: 'array',
-      contains: {
-        type: 'number',
-      },
+      type: 'any-of',
+      contains: [{
+        type: 'array',
+        contains: {
+          type: 'number',
+        },
+      }, {
+        type: 'null',
+      }],
     },
     strings: {
-      type: 'boolean',
+      type: 'any-of',
+      contains: [{
+        type: 'boolean',
+      }, {
+        type: 'null',
+      }],
     },
   },
 } as const;

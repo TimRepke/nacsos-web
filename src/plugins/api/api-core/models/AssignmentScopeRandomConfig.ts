@@ -4,7 +4,7 @@
 
 export type AssignmentScopeRandomConfig = {
   config_type?: AssignmentScopeRandomConfig.config_type;
-  users?: Array<string>;
+  users?: (Array<string> | null);
   num_items: number;
   min_assignments_per_item: number;
   max_assignments_per_item: number;

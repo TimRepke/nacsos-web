@@ -4,13 +4,13 @@
 
 export type ImportConfigTwitter = {
   query: string;
-  max_results?: number;
-  next_token?: string;
-  since_id?: string;
-  until_id?: string;
+  max_results?: (number | null);
+  next_token?: (string | null);
+  since_id?: (string | null);
+  until_id?: (string | null);
   sort_order?: ImportConfigTwitter.sort_order;
-  start_time?: string;
-  end_time?: string;
+  start_time?: (string | null);
+  end_time?: (string | null);
 };
 
 export namespace ImportConfigTwitter {

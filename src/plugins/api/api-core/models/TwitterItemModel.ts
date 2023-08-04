@@ -12,33 +12,35 @@ import type { TwitterUserModel } from './TwitterUserModel';
 import type { URL } from './URL';
 
 /**
+ *
  * Corresponds to db.models.items.TwitterItem
  *
  * For more in-depth documentation, please refer to:
  * https://developer.twitter.com/en/docs/twitter-api/data-dictionary/object-model/tweet
+ *
  */
 export type TwitterItemModel = {
-  item_id?: string;
-  project_id?: string;
+  item_id?: (string | null);
+  project_id?: (string | null);
   type?: ItemType;
-  text?: string;
-  twitter_id?: string;
-  twitter_author_id?: string;
+  text?: (string | null);
+  twitter_id?: (string | null);
+  twitter_author_id?: (string | null);
   created_at: string;
-  language?: string;
-  conversation_id?: string;
-  referenced_tweets?: Array<ReferencedTweet>;
-  latitude?: number;
-  longitude?: number;
-  hashtags?: Array<Hashtag>;
-  mentions?: Array<Mention>;
-  urls?: Array<URL>;
-  cashtags?: Array<Cashtag>;
-  context_annotations?: Array<ContextAnnotation>;
+  language?: (string | null);
+  conversation_id?: (string | null);
+  referenced_tweets?: (Array<ReferencedTweet> | null);
+  latitude?: (number | null);
+  longitude?: (number | null);
+  hashtags?: (Array<Hashtag> | null);
+  mentions?: (Array<Mention> | null);
+  urls?: (Array<URL> | null);
+  cashtags?: (Array<Cashtag> | null);
+  context_annotations?: (Array<ContextAnnotation> | null);
   retweet_count: number;
   reply_count: number;
   like_count: number;
   quote_count: number;
-  user?: TwitterUserModel;
+  user?: (TwitterUserModel | null);
 };
 

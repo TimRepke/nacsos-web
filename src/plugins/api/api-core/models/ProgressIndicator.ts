@@ -10,6 +10,6 @@ export type ProgressIndicator = {
   item_id: string;
   order: number;
   status: AssignmentStatus;
-  labels?: Record<string, Array<ProgressIndicatorLabel>>;
+  labels?: (Record<string, Array<ProgressIndicatorLabel>> | null);
 };
 

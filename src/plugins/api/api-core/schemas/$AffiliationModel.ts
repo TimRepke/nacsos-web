@@ -8,13 +8,28 @@ export const $AffiliationModel = {
       isRequired: true,
     },
     country: {
-      type: 'string',
+      type: 'any-of',
+      contains: [{
+        type: 'string',
+      }, {
+        type: 'null',
+      }],
     },
     openalex_id: {
-      type: 'string',
+      type: 'any-of',
+      contains: [{
+        type: 'string',
+      }, {
+        type: 'null',
+      }],
     },
     s2_id: {
-      type: 'string',
+      type: 'any-of',
+      contains: [{
+        type: 'string',
+      }, {
+        type: 'null',
+      }],
     },
   },
 } as const;

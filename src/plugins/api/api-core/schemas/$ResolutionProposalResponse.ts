@@ -12,11 +12,7 @@ export const $ResolutionProposalResponse = {
       contains: {
         type: 'array',
         contains: {
-          type: 'array',
-          contains: {
-            properties: {
-            },
-          },
+          type: 'GroupedBotAnnotation',
         },
       },
       isRequired: true,

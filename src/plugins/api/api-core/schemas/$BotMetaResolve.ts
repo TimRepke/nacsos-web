@@ -20,10 +20,15 @@ export const $BotMetaResolve = {
       isRequired: true,
     },
     trust: {
-      type: 'dictionary',
-      contains: {
-        type: 'number',
-      },
+      type: 'any-of',
+      contains: [{
+        type: 'dictionary',
+        contains: {
+          type: 'number',
+        },
+      }, {
+        type: 'null',
+      }],
     },
     collection: {
       type: 'AnnotationCollectionDB',

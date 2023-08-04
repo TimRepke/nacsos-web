@@ -8,17 +8,27 @@ export const $AnnotationSchemeLabelChoice = {
       isRequired: true,
     },
     hint: {
-      type: 'string',
+      type: 'any-of',
+      contains: [{
+        type: 'string',
+      }, {
+        type: 'null',
+      }],
     },
     value: {
       type: 'number',
       isRequired: true,
     },
     children: {
-      type: 'array',
-      contains: {
-        type: 'AnnotationSchemeLabel',
-      },
+      type: 'any-of',
+      contains: [{
+        type: 'array',
+        contains: {
+          type: 'AnnotationSchemeLabel',
+        },
+      }, {
+        type: 'null',
+      }],
     },
   },
 } as const;

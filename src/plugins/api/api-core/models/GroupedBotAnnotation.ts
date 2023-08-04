@@ -2,11 +2,4 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { BotAnnotationModel } from './BotAnnotationModel';
-import type { Label } from './Label';
-
-export type GroupedBotAnnotation = {
-  path: Array<Label>;
-  annotation: BotAnnotationModel;
-};
-
+export type GroupedBotAnnotation = any[];

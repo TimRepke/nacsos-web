@@ -1,28 +1,33 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-export const $Mention = {
+export const $SearchResult = {
   properties: {
-    start: {
+    query_time: {
       type: 'number',
       isRequired: true,
     },
-    end: {
+    num_found: {
       type: 'number',
       isRequired: true,
     },
-    username: {
-      type: 'string',
+    docs: {
+      type: 'array',
+      contains: {
+        type: 'AcademicItemModel',
+      },
       isRequired: true,
     },
-    user_id: {
+    histogram: {
       type: 'any-of',
       contains: [{
-        type: 'string',
+        type: 'dictionary',
+        contains: {
+          type: 'number',
+        },
       }, {
-        type: 'number',
+        type: 'null',
       }],
-      isRequired: true,
     },
   },
 } as const;

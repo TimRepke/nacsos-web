@@ -4,7 +4,7 @@
 
 export type AnnotationSchemeLabelChoiceFlat = {
   name: string;
-  hint?: string;
+  hint?: (string | null);
   value: number;
 };
 

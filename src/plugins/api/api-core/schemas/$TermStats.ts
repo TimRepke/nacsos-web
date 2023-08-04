@@ -1,21 +1,17 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-export const $AnnotationSchemeLabelChoiceFlat = {
+export const $TermStats = {
   properties: {
-    name: {
+    term: {
       type: 'string',
       isRequired: true,
     },
-    hint: {
-      type: 'any-of',
-      contains: [{
-        type: 'string',
-      }, {
-        type: 'null',
-      }],
+    df: {
+      type: 'number',
+      isRequired: true,
     },
-    value: {
+    ttf: {
       type: 'number',
       isRequired: true,
     },
