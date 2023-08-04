@@ -178,7 +178,7 @@ export default defineComponent({
     iconButton(): string[] {
       return ['fas', this.isOpen ? 'caret-left' : 'caret-right'];
     },
-    projectPermissions(): ProjectPermissionsModel {
+    projectPermissions(): ProjectPermissionsModel | {} {
       return currentProjectStore.projectPermissions || {};
     },
     currentUser(): UserModel {
