@@ -12,7 +12,7 @@ import { defineAsyncComponent, defineComponent, markRaw } from 'vue';
 type TypeMapType = { [key in ItemType]: Component };
 
 export default defineComponent({
-  name: 'GenericItem',
+  name: 'AnyItem',
   props: {
     item: {
       type: Object as PropType<AnyItem>,

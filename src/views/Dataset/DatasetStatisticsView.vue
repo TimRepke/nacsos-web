@@ -47,7 +47,7 @@
 
       <!-- Histogram over years -->
       <div class="col-md-4">
-        <div v-if="histogramYears" class="card">
+        <div v-if="histogramChart" class="card">
           <div class="card-body">
             <h5 class="card-title">
               <font-awesome-icon :icon="['fas', 'calendar-week']" class="me-2" />

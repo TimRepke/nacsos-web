@@ -8,12 +8,28 @@
             class="list-group-item list-group-item-action border-end-0"
             active-class="active">Overview
           </router-link>
+
+          <!-- IMPORT -->
           <router-link
             v-if="projectPermissions.imports_read"
             to="/project/imports"
             class="list-group-item list-group-item-action border-end-0"
-            active-class="active"> Imports
+            active-class="active"> Import
           </router-link>
+          <router-link
+            v-if="projectPermissions.imports_read && isActive('project-imports')"
+            to="/project/imports/list"
+            class="list-group-item list-group-item-action list-group-item-info border-end-0 sub-link"
+            :class="{ active: anyOf(['project-imports-list', 'project-imports-details']) }"> Imports
+          </router-link>
+          <router-link
+            v-if="projectPermissions.annotations_edit && isActive('project-imports')"
+            to="/project/imports/search"
+            class="list-group-item list-group-item-action list-group-item-info border-end-0 sub-link"
+            active-class="active"> OpenAlex Solr
+          </router-link>
+
+          <!-- DATASET -->
           <router-link
             v-if="projectPermissions.dataset_read"
             to="/project/dataset"
@@ -41,18 +57,24 @@
             :class="{ active: anyOf(['project-dataset-export']) }">
             Export
           </router-link>
+
+          <!-- ANNOTATE -->
           <router-link
             v-if="projectPermissions.annotations_read"
             to="/project/annotate"
             class="list-group-item list-group-item-action border-end-0"
             active-class="active"> Annotation
           </router-link>
+
+          <!-- ARTEFACTS -->
           <router-link
             v-if="projectPermissions.artefacts_read"
             to="/project/artefacts"
             class="list-group-item list-group-item-action border-end-0"
             active-class="active"> Artefacts
           </router-link>
+
+          <!-- PIPELINES -->
           <router-link
             v-if="projectPermissions.pipelines_read"
             to="/project/pipelines"
@@ -71,6 +93,8 @@
             class="list-group-item list-group-item-action list-group-item-info border-end-0 sub-link"
             exact-active-class="active"> Presets
           </router-link>
+
+          <!-- ASSIGNMENT/ANNOTATION -->
           <router-link
             v-if="projectPermissions.annotations_edit"
             to="/project/config/annotations"
@@ -103,6 +127,8 @@
             active-class="active">
             Highlighters
           </router-link>
+
+          <!-- PROJECT SETTINGS -->
           <router-link
             v-if="projectPermissions.owner"
             to="/project/settings"
@@ -137,14 +163,14 @@ export default defineComponent({
   name: 'SideBar',
   data(): object {
     return {
-      visible: undefined,
+      visible: null,
       windowWidth: window.innerWidth,
     };
   },
   computed: {
     isOpen(): boolean {
       // bootstrap "md" breakpoint is >=768
-      if (this.visible !== undefined) {
+      if (this.visible !== null) {
         return this.visible;
       }
       return this.windowWidth >= 768;
@@ -167,7 +193,7 @@ export default defineComponent({
       return routeNames.indexOf(this.$router.currentRoute.value.name) >= 0;
     },
     toggleVisibility(): void {
-      this.visible = (this.visible === undefined) ? false : !this.visible;
+      this.visible = (this.visible === null) ? false : !this.visible;
     },
   },
   mounted() {

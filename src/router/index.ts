@@ -80,6 +80,11 @@ const routes: Array<RouteRecordRaw> = [
         name: 'project-imports-details',
         component: () => import(/* webpackChunkName: "ImportDetailsView" */ '../views/Imports/ImportDetailsView.vue'),
       },
+      {
+        path: 'search',
+        name: 'project-imports-search',
+        component: () => import(/* webpackChunkName: "OpenAlexSearchView" */ '../views/Imports/OpenAlexSearchView.vue'),
+      },
     ],
   },
   {
