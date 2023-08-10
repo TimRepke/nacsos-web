@@ -152,7 +152,8 @@ export default defineComponent({
             pageSize: this.$route.query.pageSize || 20,
             onPageChange: this.fetchData,
             onPageSizeChange: this.fetchData,
-          }));
+          }),
+        );
         this.fetchData(this.pagination);
       })
       .catch(toastReject);

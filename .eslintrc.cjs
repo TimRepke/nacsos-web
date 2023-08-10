@@ -33,6 +33,7 @@ module.exports = {
     'class-methods-use-this': 'off',
     'prefer-promise-reject-errors': 'off',
     'vuejs-accessibility/click-events-have-key-events': 'off',
+    'vue/no-mutating-props': 'off',
     'consistent-return': ['error', {
       treatUndefinedAsUnspecified: false,
     }],
