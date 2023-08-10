@@ -13,7 +13,6 @@ export const $ProjectInfo = {
       }, {
         type: 'null',
       }],
-      isRequired: true,
     },
     name: {
       type: 'string',
@@ -26,7 +25,6 @@ export const $ProjectInfo = {
       }, {
         type: 'null',
       }],
-      isRequired: true,
     },
     time_created: {
       type: 'any-of',
@@ -36,7 +34,6 @@ export const $ProjectInfo = {
       }, {
         type: 'null',
       }],
-      isRequired: true,
     },
     type: {
       type: 'any-of',
@@ -49,7 +46,6 @@ export const $ProjectInfo = {
     },
     setting_motivational_quotes: {
       type: 'boolean',
-      isRequired: true,
     },
     owners: {
       type: 'array',

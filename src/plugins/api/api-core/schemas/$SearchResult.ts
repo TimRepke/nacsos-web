@@ -28,7 +28,6 @@ export const $SearchResult = {
       }, {
         type: 'null',
       }],
-      isRequired: true,
     },
   },
 } as const;

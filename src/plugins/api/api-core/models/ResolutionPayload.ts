@@ -2,18 +2,18 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { AnnotationCollectionDBInput } from './AnnotationCollectionDBInput';
-import type { AnnotationFiltersInput } from './AnnotationFiltersInput';
-import type { BotAnnotationModelInput } from './BotAnnotationModelInput';
+import type { AnnotationCollectionDB } from './AnnotationCollectionDB';
+import type { AnnotationFilters } from './AnnotationFilters';
+import type { BotAnnotationModel } from './BotAnnotationModel';
 
 export type ResolutionPayload = {
   name: string;
   strategy: ResolutionPayload.strategy;
-  filters: AnnotationFiltersInput;
+  filters: AnnotationFilters;
   ignore_order: boolean;
   ignore_hierarchy: boolean;
-  collection: AnnotationCollectionDBInput;
-  bot_annotations: Array<BotAnnotationModelInput>;
+  collection: AnnotationCollectionDB;
+  bot_annotations: Array<BotAnnotationModel>;
 };
 
 export namespace ResolutionPayload {

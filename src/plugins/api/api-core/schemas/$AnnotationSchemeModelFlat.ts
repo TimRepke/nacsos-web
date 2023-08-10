@@ -16,7 +16,6 @@ export const $AnnotationSchemeModelFlat = {
       }, {
         type: 'null',
       }],
-      isRequired: true,
     },
     project_id: {
       type: 'any-of',
@@ -28,7 +27,6 @@ export const $AnnotationSchemeModelFlat = {
       }, {
         type: 'null',
       }],
-      isRequired: true,
     },
     name: {
       type: 'string',
@@ -41,7 +39,6 @@ export const $AnnotationSchemeModelFlat = {
       }, {
         type: 'null',
       }],
-      isRequired: true,
     },
     time_created: {
       type: 'any-of',
@@ -51,7 +48,6 @@ export const $AnnotationSchemeModelFlat = {
       }, {
         type: 'null',
       }],
-      isRequired: true,
     },
     time_updated: {
       type: 'any-of',
@@ -61,7 +57,6 @@ export const $AnnotationSchemeModelFlat = {
       }, {
         type: 'null',
       }],
-      isRequired: true,
     },
     labels: {
       type: 'array',

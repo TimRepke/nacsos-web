@@ -14,9 +14,9 @@ export const $MakeAssignmentsRequestModel = {
     config: {
       type: 'any-of',
       contains: [{
-        type: 'AssignmentScopeRandomWithExclusionConfigInput',
+        type: 'AssignmentScopeRandomWithExclusionConfig',
       }, {
-        type: 'AssignmentScopeRandomConfigInput',
+        type: 'AssignmentScopeRandomConfig',
       }],
       isRequired: true,
     },

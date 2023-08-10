@@ -1,7 +1,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { LabelOptionsInput } from '../models/LabelOptionsInput';
+import type { LabelOptions } from '../models/LabelOptions';
 import type { ProjectBaseInfo } from '../models/ProjectBaseInfo';
 
 import type { CancelablePromise } from '@/plugins/api/core/CancelablePromise';
@@ -29,7 +29,7 @@ export class ExportService {
     itemFields,
   }: {
     xProjectId: string,
-    requestBody: Array<LabelOptionsInput>,
+    requestBody: Array<LabelOptions>,
     botAnnotationMetadataIds?: (Array<string> | null),
     assignmentScopeIds?: (Array<string> | null),
     userIds?: (Array<string> | null),

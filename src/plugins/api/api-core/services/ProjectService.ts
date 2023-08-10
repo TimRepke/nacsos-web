@@ -3,12 +3,9 @@
 /* eslint-disable */
 import type { AcademicItemModel } from '../models/AcademicItemModel';
 import type { GenericItemModel } from '../models/GenericItemModel';
-import type { ProjectModelInput } from '../models/ProjectModelInput';
-import type { ProjectModelOutput } from '../models/ProjectModelOutput';
-import type { ProjectPermissionsModelInput } from '../models/ProjectPermissionsModelInput';
-import type { ProjectPermissionsModelOutput } from '../models/ProjectPermissionsModelOutput';
-import type { TwitterItemModelInput } from '../models/TwitterItemModelInput';
-import type { TwitterItemModelOutput } from '../models/TwitterItemModelOutput';
+import type { ProjectModel } from '../models/ProjectModel';
+import type { ProjectPermissionsModel } from '../models/ProjectPermissionsModel';
+import type { TwitterItemModel } from '../models/TwitterItemModel';
 import type { UserPermission } from '../models/UserPermission';
 
 import type { CancelablePromise } from '@/plugins/api/core/CancelablePromise';
@@ -22,14 +19,14 @@ export class ProjectService {
 
   /**
    * Get Project
-   * @returns ProjectModelOutput Successful Response
+   * @returns ProjectModel Successful Response
    * @throws ApiError
    */
   public getProjectApiProjectInfoGet({
     xProjectId,
   }: {
     xProjectId: string,
-  }, options?: Partial<ApiRequestOptions>): CancelablePromise<ProjectModelOutput> {
+  }, options?: Partial<ApiRequestOptions>): CancelablePromise<ProjectModel> {
     return this.httpRequest.request({
       method: 'GET',
       url: '/api/project/info',
@@ -53,7 +50,7 @@ export class ProjectService {
     requestBody,
   }: {
     xProjectId: string,
-    requestBody: ProjectModelInput,
+    requestBody: ProjectModel,
   }, options?: Partial<ApiRequestOptions>): CancelablePromise<string> {
     return this.httpRequest.request({
       method: 'PUT',
@@ -72,14 +69,14 @@ export class ProjectService {
 
   /**
    * Get Project Permissions Current User
-   * @returns ProjectPermissionsModelOutput Successful Response
+   * @returns ProjectPermissionsModel Successful Response
    * @throws ApiError
    */
   public getProjectPermissionsCurrentUserApiProjectPermissionsMeGet({
     xProjectId,
   }: {
     xProjectId: string,
-  }, options?: Partial<ApiRequestOptions>): CancelablePromise<ProjectPermissionsModelOutput> {
+  }, options?: Partial<ApiRequestOptions>): CancelablePromise<ProjectPermissionsModel> {
     return this.httpRequest.request({
       method: 'GET',
       url: '/api/project/permissions/me',
@@ -95,7 +92,7 @@ export class ProjectService {
 
   /**
    * Get All Project Permissions
-   * @returns ProjectPermissionsModelOutput Successful Response
+   * @returns ProjectPermissionsModel Successful Response
    * @throws ApiError
    */
   public getAllProjectPermissionsApiProjectPermissionsListProjectIdGet({
@@ -104,7 +101,7 @@ export class ProjectService {
   }: {
     projectId: string,
     xProjectId: string,
-  }, options?: Partial<ApiRequestOptions>): CancelablePromise<Array<ProjectPermissionsModelOutput>> {
+  }, options?: Partial<ApiRequestOptions>): CancelablePromise<Array<ProjectPermissionsModel>> {
     return this.httpRequest.request({
       method: 'GET',
       url: '/api/project/permissions/list/{project_id}',
@@ -154,7 +151,7 @@ export class ProjectService {
     requestBody,
   }: {
     xProjectId: string,
-    requestBody: ProjectPermissionsModelInput,
+    requestBody: ProjectPermissionsModel,
   }, options?: Partial<ApiRequestOptions>): CancelablePromise<string> {
     return this.httpRequest.request({
       method: 'PUT',
@@ -201,7 +198,7 @@ export class ProjectService {
 
   /**
    * Get Project Permissions By Id
-   * @returns ProjectPermissionsModelOutput Successful Response
+   * @returns ProjectPermissionsModel Successful Response
    * @throws ApiError
    */
   public getProjectPermissionsByIdApiProjectPermissionsProjectPermissionIdGet({
@@ -210,7 +207,7 @@ export class ProjectService {
   }: {
     projectPermissionId: string,
     xProjectId: string,
-  }, options?: Partial<ApiRequestOptions>): CancelablePromise<ProjectPermissionsModelOutput> {
+  }, options?: Partial<ApiRequestOptions>): CancelablePromise<ProjectPermissionsModel> {
     return this.httpRequest.request({
       method: 'GET',
       url: '/api/project/permissions/{project_permission_id}',
@@ -238,7 +235,7 @@ export class ProjectService {
   }: {
     itemType: 'generic' | 'twitter' | 'academic' | 'patents',
     xProjectId: string,
-  }, options?: Partial<ApiRequestOptions>): CancelablePromise<(Array<TwitterItemModelOutput> | Array<AcademicItemModel> | Array<GenericItemModel>)> {
+  }, options?: Partial<ApiRequestOptions>): CancelablePromise<(Array<TwitterItemModel> | Array<AcademicItemModel> | Array<GenericItemModel>)> {
     return this.httpRequest.request({
       method: 'GET',
       url: '/api/project/items/{item_type}/list',
@@ -270,7 +267,7 @@ export class ProjectService {
     page: number,
     pageSize: number,
     xProjectId: string,
-  }, options?: Partial<ApiRequestOptions>): CancelablePromise<(Array<TwitterItemModelOutput> | Array<AcademicItemModel> | Array<GenericItemModel>)> {
+  }, options?: Partial<ApiRequestOptions>): CancelablePromise<(Array<TwitterItemModel> | Array<AcademicItemModel> | Array<GenericItemModel>)> {
     return this.httpRequest.request({
       method: 'GET',
       url: '/api/project/items/{item_type}/list/{page}/{page_size}',
@@ -302,7 +299,7 @@ export class ProjectService {
     itemId: string,
     xProjectId: string,
     itemType?: ('generic' | 'twitter' | 'academic' | 'patents' | null),
-  }, options?: Partial<ApiRequestOptions>): CancelablePromise<(TwitterItemModelOutput | AcademicItemModel | GenericItemModel)> {
+  }, options?: Partial<ApiRequestOptions>): CancelablePromise<(TwitterItemModel | AcademicItemModel | GenericItemModel)> {
     return this.httpRequest.request({
       method: 'GET',
       url: '/api/project/items/detail/{item_id}',
@@ -384,7 +381,7 @@ export class ProjectService {
     importId,
   }: {
     xProjectId: string,
-    requestBody: TwitterItemModelInput,
+    requestBody: TwitterItemModel,
     importId?: (string | null),
   }, options?: Partial<ApiRequestOptions>): CancelablePromise<any> {
     return this.httpRequest.request({

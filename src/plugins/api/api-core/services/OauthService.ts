@@ -3,7 +3,7 @@
 /* eslint-disable */
 import type { AuthTokenModel } from '../models/AuthTokenModel';
 import type { Body_login_for_access_token_api_login_token_post } from '../models/Body_login_for_access_token_api_login_token_post';
-import type { UserModelOutput } from '../models/UserModelOutput';
+import type { UserModel } from '../models/UserModel';
 
 import type { CancelablePromise } from '@/plugins/api/core/CancelablePromise';
 import type { BaseHttpRequest } from '@/plugins/api/core/BaseHttpRequest';
@@ -97,10 +97,10 @@ export class OauthService {
 
   /**
    * Read Users Me
-   * @returns UserModelOutput Successful Response
+   * @returns UserModel Successful Response
    * @throws ApiError
    */
-  public readUsersMeApiLoginMeGet(options?: Partial<ApiRequestOptions>): CancelablePromise<UserModelOutput> {
+  public readUsersMeApiLoginMeGet(options?: Partial<ApiRequestOptions>): CancelablePromise<UserModel> {
     return this.httpRequest.request({
       method: 'GET',
       url: '/api/login/me',

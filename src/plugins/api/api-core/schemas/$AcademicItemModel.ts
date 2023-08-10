@@ -16,7 +16,6 @@ export const $AcademicItemModel = {
       }, {
         type: 'null',
       }],
-      isRequired: true,
     },
     project_id: {
       type: 'any-of',
@@ -28,14 +27,12 @@ export const $AcademicItemModel = {
       }, {
         type: 'null',
       }],
-      isRequired: true,
     },
     type: {
       type: 'all-of',
       contains: [{
         type: 'ItemType',
       }],
-      isRequired: true,
     },
     text: {
       type: 'any-of',
@@ -44,7 +41,6 @@ export const $AcademicItemModel = {
       }, {
         type: 'null',
       }],
-      isRequired: true,
     },
     doi: {
       type: 'any-of',
@@ -53,7 +49,6 @@ export const $AcademicItemModel = {
       }, {
         type: 'null',
       }],
-      isRequired: true,
     },
     wos_id: {
       type: 'any-of',
@@ -62,7 +57,6 @@ export const $AcademicItemModel = {
       }, {
         type: 'null',
       }],
-      isRequired: true,
     },
     scopus_id: {
       type: 'any-of',
@@ -71,7 +65,6 @@ export const $AcademicItemModel = {
       }, {
         type: 'null',
       }],
-      isRequired: true,
     },
     openalex_id: {
       type: 'any-of',
@@ -80,7 +73,6 @@ export const $AcademicItemModel = {
       }, {
         type: 'null',
       }],
-      isRequired: true,
     },
     s2_id: {
       type: 'any-of',
@@ -89,7 +81,6 @@ export const $AcademicItemModel = {
       }, {
         type: 'null',
       }],
-      isRequired: true,
     },
     pubmed_id: {
       type: 'any-of',
@@ -98,7 +89,6 @@ export const $AcademicItemModel = {
       }, {
         type: 'null',
       }],
-      isRequired: true,
     },
     dimensions_id: {
       type: 'any-of',
@@ -107,7 +97,6 @@ export const $AcademicItemModel = {
       }, {
         type: 'null',
       }],
-      isRequired: true,
     },
     title: {
       type: 'any-of',
@@ -116,7 +105,6 @@ export const $AcademicItemModel = {
       }, {
         type: 'null',
       }],
-      isRequired: true,
     },
     title_slug: {
       type: 'any-of',
@@ -125,7 +113,6 @@ export const $AcademicItemModel = {
       }, {
         type: 'null',
       }],
-      isRequired: true,
     },
     publication_year: {
       type: 'any-of',
@@ -134,7 +121,6 @@ export const $AcademicItemModel = {
       }, {
         type: 'null',
       }],
-      isRequired: true,
     },
     source: {
       type: 'any-of',
@@ -143,7 +129,6 @@ export const $AcademicItemModel = {
       }, {
         type: 'null',
       }],
-      isRequired: true,
     },
     keywords: {
       type: 'any-of',
@@ -155,7 +140,6 @@ export const $AcademicItemModel = {
       }, {
         type: 'null',
       }],
-      isRequired: true,
     },
     authors: {
       type: 'any-of',
@@ -167,14 +151,12 @@ export const $AcademicItemModel = {
       }, {
         type: 'null',
       }],
-      isRequired: true,
     },
     meta: {
       type: 'any-of',
       contains: [{
         type: 'null',
       }],
-      isRequired: true,
     },
   },
 } as const;

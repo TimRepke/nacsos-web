@@ -25,7 +25,6 @@ export const $AuthTokenModel = {
       }, {
         type: 'null',
       }],
-      isRequired: true,
     },
     time_updated: {
       type: 'any-of',
@@ -35,7 +34,6 @@ export const $AuthTokenModel = {
       }, {
         type: 'null',
       }],
-      isRequired: true,
     },
     valid_till: {
       type: 'any-of',
@@ -45,7 +43,6 @@ export const $AuthTokenModel = {
       }, {
         type: 'null',
       }],
-      isRequired: true,
     },
   },
 } as const;
