@@ -44,6 +44,7 @@ export const $ProgressIndicator = {
       }, {
         type: 'null',
       }],
+      isRequired: true,
     },
   },
 } as const;

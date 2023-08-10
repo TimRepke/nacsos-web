@@ -13,6 +13,7 @@ export const $BotAnnotationMetaDataBaseModel = {
       }, {
         type: 'null',
       }],
+      isRequired: true,
     },
     name: {
       type: 'string',
@@ -40,6 +41,7 @@ export const $BotAnnotationMetaDataBaseModel = {
       }, {
         type: 'null',
       }],
+      isRequired: true,
     },
     time_updated: {
       type: 'any-of',
@@ -49,6 +51,7 @@ export const $BotAnnotationMetaDataBaseModel = {
       }, {
         type: 'null',
       }],
+      isRequired: true,
     },
     assignment_scope_id: {
       type: 'any-of',
@@ -60,6 +63,7 @@ export const $BotAnnotationMetaDataBaseModel = {
       }, {
         type: 'null',
       }],
+      isRequired: true,
     },
     annotation_scheme_id: {
       type: 'any-of',
@@ -71,6 +75,7 @@ export const $BotAnnotationMetaDataBaseModel = {
       }, {
         type: 'null',
       }],
+      isRequired: true,
     },
   },
 } as const;

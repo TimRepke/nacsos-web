@@ -2,7 +2,7 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { ProjectInfo } from '../models/ProjectInfo';
-import type { ProjectModel } from '../models/ProjectModel';
+import type { ProjectModelInput } from '../models/ProjectModelInput';
 
 import type { CancelablePromise } from '@/plugins/api/core/CancelablePromise';
 import type { BaseHttpRequest } from '@/plugins/api/core/BaseHttpRequest';
@@ -39,7 +39,7 @@ export class ProjectsService {
   public createProjectApiProjectsCreatePut({
     requestBody,
   }: {
-    requestBody: ProjectModel,
+    requestBody: ProjectModelInput,
   }, options?: Partial<ApiRequestOptions>): CancelablePromise<string> {
     return this.httpRequest.request({
       method: 'PUT',

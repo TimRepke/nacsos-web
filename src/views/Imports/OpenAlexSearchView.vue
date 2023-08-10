@@ -23,6 +23,13 @@
               <div class="row">
                 <div class="col text-end">
                   <textarea v-model="query" class="form-control" aria-label="Query" rows="3" />
+                  <span
+                    role="button"
+                    tabindex="-1"
+                    class="link-secondary me-2"
+                    @click="showTokenExpandModal = true">
+                    <font-awesome-icon :icon="['fas', 'arrow-down-a-z']" />Tokens
+                  </span>
                   <a
                     href="https://apsis.mcc-berlin.net/nacsos-docs/user/import/openalex/"
                     target="_blank"
@@ -159,12 +166,77 @@
         </template>
       </div>
     </div>
+
+    <div v-if="showTokenExpandModal">
+      <div class="modal fade show d-block" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">Token Wildcard Expansion</h5>
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+                @click="showTokenExpandModal = false" />
+            </div>
+            <div class="modal-body text-start ps-4 pe-4">
+              <div class="row mb-3 g-2 text-muted">
+                <p>
+                  Wildcards (e.g. <code>clim*</code>) are very bad for query performance and add a lot of uncertainty.
+                  It is much better to explicitly expand those (e.g. <code>(climate OR climatic)</code>) and
+                  in the process exclude false-positives like <code>climb, climax, ...</code><br />
+                  Results include term frequency (ttf) and document frequency (df).
+                </p>
+                <!--<p>
+                  Use this token prefix search to find possible matches.
+                  Do not include the <code>*</code> and note, that this can only be used for prefixes,
+                  not infixes (e.g. <code>cli*te</code>), postfixes (<code>*flux</code>), or n-grams.
+                </p>-->
+              </div>
+              <div class="row mb-3 g-2">
+                <div class="input-group mb-3">
+                  <input
+                    type="text"
+                    v-model="tokenSearchPrefix"
+                    class="form-control"
+                    placeholder="Prefix without the *"
+                    aria-label="Prefix without the *">
+                  <button
+                    class="btn btn-outline-secondary"
+                    type="button"
+                    id="button-token-search"
+                    @click="expandTokens">
+                    <font-awesome-icon :icon="['fas', 'magnifying-glass']" />
+                  </button>
+                </div>
+              </div>
+
+              <div class="row mb-3 g-2">
+                <div v-for="token in tokenSearchResult" :key="token.term" class="col-4">
+                  <code>{{ token.term }}</code>
+                  <span
+                    class="text-muted small"
+                    style="white-space: nowrap;">
+                    ({{ token.ttf.toLocaleString('en') }} | {{ token.df.toLocaleString('en') }})
+                  </span>
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-success" @click="showTokenExpandModal = false">Done.</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-backdrop fade show" />
+    </div>
   </div>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import type { AcademicItemModel } from '@/plugins/api/api-core';
+import type { AcademicItemModel, TermStats } from '@/plugins/api/api-core';
 import { currentProjectStore } from '@/stores';
 import { EventBus } from '@/plugins/events';
 import { ToastEvent } from '@/plugins/events/events/toast';
@@ -212,6 +284,10 @@ export default defineComponent({
       qTime: null as number | null,
       nDocs: null as number | null,
       results: null as Array<AcademicItemModel> | null,
+      showTokenExpandModal: false,
+      tokenSearchPrefix: '',
+      tokenSearchLimit: 300,
+      tokenSearchResult: [] as Array<TermStats>,
     };
   },
   async mounted() {
@@ -226,7 +302,7 @@ export default defineComponent({
       }
     },
     runSearch() {
-      API.core.search.searchOpenalexApiSearchOpenalexGet({
+      API.core.search.searchOpenalexApiSearchOpenalexSelectGet({
         query: this.query,
         xProjectId: currentProjectStore.projectId as string,
         limit: this.limit,
@@ -248,6 +324,22 @@ export default defineComponent({
         .catch(() => {
           EventBus.emit(new ToastEvent('ERROR', 'Query failed. Retry or fix your query.'));
           this.results = null;
+        });
+    },
+    expandTokens() {
+      API.core.search.termExpansionApiSearchOpenalexTermsGet({
+        xProjectId: currentProjectStore.projectId as string,
+        termPrefix: this.tokenSearchPrefix,
+        limit: this.tokenSearchLimit,
+      })
+        .then((response) => {
+          const { data } = response;
+
+          this.tokenSearchResult = data;
+        })
+        .catch(() => {
+          EventBus.emit(new ToastEvent('ERROR', 'Query failed. Retry or fix your query.'));
+          this.tokenSearchResult = [];
         });
     },
   },

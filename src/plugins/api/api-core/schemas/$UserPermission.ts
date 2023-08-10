@@ -13,6 +13,7 @@ export const $UserPermission = {
       }, {
         type: 'null',
       }],
+      isRequired: true,
     },
     project_id: {
       type: 'any-of',
@@ -36,45 +37,59 @@ export const $UserPermission = {
     },
     owner: {
       type: 'boolean',
+      isRequired: true,
     },
     dataset_read: {
       type: 'boolean',
+      isRequired: true,
     },
     dataset_edit: {
       type: 'boolean',
+      isRequired: true,
     },
     imports_read: {
       type: 'boolean',
+      isRequired: true,
     },
     imports_edit: {
       type: 'boolean',
+      isRequired: true,
     },
     annotations_read: {
       type: 'boolean',
+      isRequired: true,
     },
     annotations_edit: {
       type: 'boolean',
+      isRequired: true,
     },
     pipelines_read: {
       type: 'boolean',
+      isRequired: true,
     },
     pipelines_edit: {
       type: 'boolean',
+      isRequired: true,
     },
     artefacts_read: {
       type: 'boolean',
+      isRequired: true,
     },
     artefacts_edit: {
       type: 'boolean',
+      isRequired: true,
     },
     search_dimensions: {
       type: 'boolean',
+      isRequired: true,
     },
     search_oa: {
       type: 'boolean',
+      isRequired: true,
     },
     import_limit_oa: {
       type: 'number',
+      isRequired: true,
     },
     user: {
       type: 'UserBaseModel',

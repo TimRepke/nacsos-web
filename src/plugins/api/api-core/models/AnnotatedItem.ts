@@ -2,11 +2,11 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { AnnotationSchemeModel } from './AnnotationSchemeModel';
-import type { AssignmentModel } from './AssignmentModel';
+import type { AnnotationSchemeModelInput } from './AnnotationSchemeModelInput';
+import type { AssignmentModelInput } from './AssignmentModelInput';
 
 export type AnnotatedItem = {
-  scheme: AnnotationSchemeModel;
-  assignment: AssignmentModel;
+  scheme: AnnotationSchemeModelInput;
+  assignment: AssignmentModelInput;
 };
 

@@ -4,21 +4,21 @@
 export const $AnnotationItem = {
   properties: {
     scheme: {
-      type: 'AnnotationSchemeModel',
+      type: 'AnnotationSchemeModelOutput',
       isRequired: true,
     },
     assignment: {
-      type: 'AssignmentModel',
+      type: 'AssignmentModelOutput',
       isRequired: true,
     },
     scope: {
-      type: 'AssignmentScopeModel',
+      type: 'AssignmentScopeModelOutput',
       isRequired: true,
     },
     item: {
       type: 'any-of',
       contains: [{
-        type: 'TwitterItemModel',
+        type: 'TwitterItemModelOutput',
       }, {
         type: 'AcademicItemModel',
       }, {

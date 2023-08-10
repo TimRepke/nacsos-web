@@ -8,7 +8,7 @@ export const $BotMetaResolve = {
       isRequired: true,
     },
     filters: {
-      type: 'AnnotationFilters',
+      type: 'AnnotationFiltersOutput',
       isRequired: true,
     },
     ignore_hierarchy: {
@@ -29,9 +29,10 @@ export const $BotMetaResolve = {
       }, {
         type: 'null',
       }],
+      isRequired: true,
     },
     collection: {
-      type: 'AnnotationCollectionDB',
+      type: 'AnnotationCollectionDBOutput',
       isRequired: true,
     },
   },

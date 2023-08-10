@@ -1,6 +1,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+import type { QueryResult } from '../models/QueryResult';
 import type { SearchResult } from '../models/SearchResult';
 import type { TermStats } from '../models/TermStats';
 
@@ -18,12 +19,12 @@ export class SearchService {
    * @returns SearchResult Successful Response
    * @throws ApiError
    */
-  public searchOpenalexApiSearchOpenalexGet({
+  public searchOpenalexApiSearchOpenalexSelectGet({
     query,
     xProjectId,
     limit = 20,
     offset,
-    defType = 'none',
+    defType = 'lucene',
     field = 'title_abstract',
     histogram = false,
     op = 'AND',
@@ -34,7 +35,7 @@ export class SearchService {
     xProjectId: string,
     limit?: number,
     offset?: number,
-    defType?: 'edismax' | 'lucene' | 'dismax' | 'none',
+    defType?: 'edismax' | 'lucene' | 'dismax',
     field?: 'title' | 'abstract' | 'title_abstract',
     histogram?: boolean,
     op?: 'OR' | 'AND',
@@ -43,7 +44,7 @@ export class SearchService {
   }, options?: Partial<ApiRequestOptions>): CancelablePromise<SearchResult> {
     return this.httpRequest.request({
       method: 'GET',
-      url: '/api/search/openalex',
+      url: '/api/search/openalex/select',
       headers: {
         'x-project-id': xProjectId,
       },
@@ -70,7 +71,7 @@ export class SearchService {
    * @returns TermStats Successful Response
    * @throws ApiError
    */
-  public termExpansionApiSearchTermsPost({
+  public termExpansionApiSearchOpenalexTermsGet({
     termPrefix,
     xProjectId,
     limit = 20,
@@ -80,13 +81,57 @@ export class SearchService {
     limit?: number,
   }, options?: Partial<ApiRequestOptions>): CancelablePromise<Array<TermStats>> {
     return this.httpRequest.request({
-      method: 'POST',
-      url: '/api/search/terms',
+      method: 'GET',
+      url: '/api/search/openalex/terms',
       headers: {
         'x-project-id': xProjectId,
       },
       query: {
         'term_prefix': termPrefix,
+        'limit': limit,
+      },
+      errors: {
+        422: `Validation Error`,
+      },
+      ...options,
+    });
+  }
+
+  /**
+   * Nql Grammar
+   * @returns string Successful Response
+   * @throws ApiError
+   */
+  public nqlGrammarApiSearchNqlGrammarGet(options?: Partial<ApiRequestOptions>): CancelablePromise<string> {
+    return this.httpRequest.request({
+      method: 'GET',
+      url: '/api/search/nql/grammar',
+      ...options,
+    });
+  }
+
+  /**
+   * Nql Query
+   * @returns QueryResult Successful Response
+   * @throws ApiError
+   */
+  public nqlQueryApiSearchNqlQueryGet({
+    query,
+    xProjectId,
+    limit = 20,
+  }: {
+    query: string,
+    xProjectId: string,
+    limit?: number,
+  }, options?: Partial<ApiRequestOptions>): CancelablePromise<QueryResult> {
+    return this.httpRequest.request({
+      method: 'GET',
+      url: '/api/search/nql/query',
+      headers: {
+        'x-project-id': xProjectId,
+      },
+      query: {
+        'query': query,
         'limit': limit,
       },
       errors: {

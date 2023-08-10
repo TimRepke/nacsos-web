@@ -4,8 +4,8 @@
 
 export type AffiliationModel = {
   name: string;
-  country?: (string | null);
-  openalex_id?: (string | null);
-  s2_id?: (string | null);
+  country: (string | null);
+  openalex_id: (string | null);
+  s2_id: (string | null);
 };
 

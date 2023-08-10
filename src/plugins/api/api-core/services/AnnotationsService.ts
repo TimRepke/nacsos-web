@@ -3,21 +3,23 @@
 /* eslint-disable */
 import type { AnnotatedItem } from '../models/AnnotatedItem';
 import type { AnnotationItem } from '../models/AnnotationItem';
-import type { AnnotationSchemeModel } from '../models/AnnotationSchemeModel';
 import type { AnnotationSchemeModelFlat } from '../models/AnnotationSchemeModelFlat';
+import type { AnnotationSchemeModelInput } from '../models/AnnotationSchemeModelInput';
+import type { AnnotationSchemeModelOutput } from '../models/AnnotationSchemeModelOutput';
 import type { AssignmentCounts } from '../models/AssignmentCounts';
-import type { AssignmentModel } from '../models/AssignmentModel';
-import type { AssignmentScopeModel } from '../models/AssignmentScopeModel';
+import type { AssignmentModelOutput } from '../models/AssignmentModelOutput';
+import type { AssignmentScopeModelInput } from '../models/AssignmentScopeModelInput';
+import type { AssignmentScopeModelOutput } from '../models/AssignmentScopeModelOutput';
 import type { AssignmentStatus } from '../models/AssignmentStatus';
 import type { BotAnnotationMetaDataBaseModel } from '../models/BotAnnotationMetaDataBaseModel';
-import type { BotAnnotationModel } from '../models/BotAnnotationModel';
+import type { BotAnnotationModelInput } from '../models/BotAnnotationModelInput';
 import type { ItemWithCount } from '../models/ItemWithCount';
 import type { MakeAssignmentsRequestModel } from '../models/MakeAssignmentsRequestModel';
 import type { ProgressIndicator } from '../models/ProgressIndicator';
 import type { ResolutionPayload } from '../models/ResolutionPayload';
 import type { ResolutionProposalResponse } from '../models/ResolutionProposalResponse';
 import type { SavedResolutionResponse } from '../models/SavedResolutionResponse';
-import type { UserModel } from '../models/UserModel';
+import type { UserModelOutput } from '../models/UserModelOutput';
 import type { UserProjectAssignmentScope } from '../models/UserProjectAssignmentScope';
 
 import type { CancelablePromise } from '@/plugins/api/core/CancelablePromise';
@@ -48,7 +50,7 @@ export class AnnotationsService {
     annotationSchemeId: string,
     xProjectId: string,
     flat?: boolean,
-  }, options?: Partial<ApiRequestOptions>): CancelablePromise<(AnnotationSchemeModelFlat | AnnotationSchemeModel)> {
+  }, options?: Partial<ApiRequestOptions>): CancelablePromise<(AnnotationSchemeModelFlat | AnnotationSchemeModelOutput)> {
     return this.httpRequest.request({
       method: 'GET',
       url: '/api/annotations/schemes/definition/{annotation_scheme_id}',
@@ -78,7 +80,7 @@ export class AnnotationsService {
     requestBody,
   }: {
     xProjectId: string,
-    requestBody: AnnotationSchemeModel,
+    requestBody: AnnotationSchemeModelInput,
   }, options?: Partial<ApiRequestOptions>): CancelablePromise<string> {
     return this.httpRequest.request({
       method: 'PUT',
@@ -130,7 +132,7 @@ export class AnnotationsService {
    * :param project_id: database id of the project
    * :param permissions:
    * :return: list of annotation schemes
-   * @returns AnnotationSchemeModel Successful Response
+   * @returns AnnotationSchemeModelOutput Successful Response
    * @throws ApiError
    */
   public getSchemeDefinitionsForProjectApiAnnotationsSchemesListProjectIdGet({
@@ -139,7 +141,7 @@ export class AnnotationsService {
   }: {
     projectId: string,
     xProjectId: string,
-  }, options?: Partial<ApiRequestOptions>): CancelablePromise<Array<AnnotationSchemeModel>> {
+  }, options?: Partial<ApiRequestOptions>): CancelablePromise<Array<AnnotationSchemeModelOutput>> {
     return this.httpRequest.request({
       method: 'GET',
       url: '/api/annotations/schemes/list/{project_id}',
@@ -273,14 +275,14 @@ export class AnnotationsService {
 
   /**
    * Get Assignment Scopes For Project
-   * @returns AssignmentScopeModel Successful Response
+   * @returns AssignmentScopeModelOutput Successful Response
    * @throws ApiError
    */
   public getAssignmentScopesForProjectApiAnnotationsAnnotateScopesGet({
     xProjectId,
   }: {
     xProjectId: string,
-  }, options?: Partial<ApiRequestOptions>): CancelablePromise<Array<AssignmentScopeModel>> {
+  }, options?: Partial<ApiRequestOptions>): CancelablePromise<Array<AssignmentScopeModelOutput>> {
     return this.httpRequest.request({
       method: 'GET',
       url: '/api/annotations/annotate/scopes/',
@@ -296,7 +298,7 @@ export class AnnotationsService {
 
   /**
    * Get Assignment Scope
-   * @returns AssignmentScopeModel Successful Response
+   * @returns AssignmentScopeModelOutput Successful Response
    * @throws ApiError
    */
   public getAssignmentScopeApiAnnotationsAnnotateScopeAssignmentScopeIdGet({
@@ -305,7 +307,7 @@ export class AnnotationsService {
   }: {
     assignmentScopeId: string,
     xProjectId: string,
-  }, options?: Partial<ApiRequestOptions>): CancelablePromise<AssignmentScopeModel> {
+  }, options?: Partial<ApiRequestOptions>): CancelablePromise<AssignmentScopeModelOutput> {
     return this.httpRequest.request({
       method: 'GET',
       url: '/api/annotations/annotate/scope/{assignment_scope_id}',
@@ -360,7 +362,7 @@ export class AnnotationsService {
     requestBody,
   }: {
     xProjectId: string,
-    requestBody: AssignmentScopeModel,
+    requestBody: AssignmentScopeModelInput,
   }, options?: Partial<ApiRequestOptions>): CancelablePromise<string> {
     return this.httpRequest.request({
       method: 'PUT',
@@ -407,7 +409,7 @@ export class AnnotationsService {
 
   /**
    * Get Assignments
-   * @returns AssignmentModel Successful Response
+   * @returns AssignmentModelOutput Successful Response
    * @throws ApiError
    */
   public getAssignmentsApiAnnotationsAnnotateAssignmentsAssignmentScopeIdGet({
@@ -416,7 +418,7 @@ export class AnnotationsService {
   }: {
     assignmentScopeId: string,
     xProjectId: string,
-  }, options?: Partial<ApiRequestOptions>): CancelablePromise<Array<AssignmentModel>> {
+  }, options?: Partial<ApiRequestOptions>): CancelablePromise<Array<AssignmentModelOutput>> {
     return this.httpRequest.request({
       method: 'GET',
       url: '/api/annotations/annotate/assignments/{assignment_scope_id}',
@@ -463,7 +465,7 @@ export class AnnotationsService {
 
   /**
    * Get Assignments For Scope
-   * @returns AssignmentModel Successful Response
+   * @returns AssignmentModelOutput Successful Response
    * @throws ApiError
    */
   public getAssignmentsForScopeApiAnnotationsAnnotateAssignmentsScopeAssignmentScopeIdGet({
@@ -472,7 +474,7 @@ export class AnnotationsService {
   }: {
     assignmentScopeId: string,
     xProjectId: string,
-  }, options?: Partial<ApiRequestOptions>): CancelablePromise<Array<AssignmentModel>> {
+  }, options?: Partial<ApiRequestOptions>): CancelablePromise<Array<AssignmentModelOutput>> {
     return this.httpRequest.request({
       method: 'GET',
       url: '/api/annotations/annotate/assignments/scope/{assignment_scope_id}',
@@ -491,7 +493,7 @@ export class AnnotationsService {
 
   /**
    * Get Annotations
-   * @returns AssignmentModel Successful Response
+   * @returns AssignmentModelOutput Successful Response
    * @throws ApiError
    */
   public getAnnotationsApiAnnotationsAnnotateAnnotationsAssignmentScopeIdGet({
@@ -500,7 +502,7 @@ export class AnnotationsService {
   }: {
     assignmentScopeId: string,
     xProjectId: string,
-  }, options?: Partial<ApiRequestOptions>): CancelablePromise<Array<AssignmentModel>> {
+  }, options?: Partial<ApiRequestOptions>): CancelablePromise<Array<AssignmentModelOutput>> {
     return this.httpRequest.request({
       method: 'GET',
       url: '/api/annotations/annotate/annotations/{assignment_scope_id}',
@@ -569,7 +571,7 @@ export class AnnotationsService {
 
   /**
    * Make Assignments
-   * @returns AssignmentModel Successful Response
+   * @returns AssignmentModelOutput Successful Response
    * @throws ApiError
    */
   public makeAssignmentsApiAnnotationsConfigAssignmentsPost({
@@ -578,7 +580,7 @@ export class AnnotationsService {
   }: {
     xProjectId: string,
     requestBody: MakeAssignmentsRequestModel,
-  }, options?: Partial<ApiRequestOptions>): CancelablePromise<Array<AssignmentModel>> {
+  }, options?: Partial<ApiRequestOptions>): CancelablePromise<Array<AssignmentModelOutput>> {
     return this.httpRequest.request({
       method: 'POST',
       url: '/api/annotations/config/assignments/',
@@ -596,7 +598,7 @@ export class AnnotationsService {
 
   /**
    * Get Assignment Scopes For Scheme
-   * @returns AssignmentScopeModel Successful Response
+   * @returns AssignmentScopeModelOutput Successful Response
    * @throws ApiError
    */
   public getAssignmentScopesForSchemeApiAnnotationsConfigScopesSchemeIdGet({
@@ -605,7 +607,7 @@ export class AnnotationsService {
   }: {
     schemeId: string,
     xProjectId: string,
-  }, options?: Partial<ApiRequestOptions>): CancelablePromise<Array<AssignmentScopeModel>> {
+  }, options?: Partial<ApiRequestOptions>): CancelablePromise<Array<AssignmentScopeModelOutput>> {
     return this.httpRequest.request({
       method: 'GET',
       url: '/api/annotations/config/scopes/{scheme_id}',
@@ -624,7 +626,7 @@ export class AnnotationsService {
 
   /**
    * Get Annotators For Scheme
-   * @returns UserModel Successful Response
+   * @returns UserModelOutput Successful Response
    * @throws ApiError
    */
   public getAnnotatorsForSchemeApiAnnotationsConfigAnnotatorsSchemeIdGet({
@@ -633,7 +635,7 @@ export class AnnotationsService {
   }: {
     schemeId: string,
     xProjectId: string,
-  }, options?: Partial<ApiRequestOptions>): CancelablePromise<Array<UserModel>> {
+  }, options?: Partial<ApiRequestOptions>): CancelablePromise<Array<UserModelOutput>> {
     return this.httpRequest.request({
       method: 'GET',
       url: '/api/annotations/config/annotators/{scheme_id}',
@@ -756,7 +758,7 @@ export class AnnotationsService {
     botAnnotationMetadataId: string,
     name: string,
     xProjectId: string,
-    requestBody: Array<BotAnnotationModel>,
+    requestBody: Array<BotAnnotationModelInput>,
   }, options?: Partial<ApiRequestOptions>): CancelablePromise<any> {
     return this.httpRequest.request({
       method: 'PUT',

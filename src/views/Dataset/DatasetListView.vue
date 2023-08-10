@@ -6,52 +6,23 @@
         <div class="row m-2">
           <h3>Search options</h3>
         </div>
-        <div class="row m-2 mt-0">
-          TODO: Tiny stats of dataset size and applied filters
-          <p>
-            <ClosablePill class="m-1">contains:Search term</ClosablePill>
-            <ClosablePill colour="info" class="m-1">year: 2010-2013</ClosablePill>
-            <ClosablePill colour="warning" class="m-1">query: "import 32"</ClosablePill>
-            <ClosablePill colour="info" class="m-1">year: 2015-2018</ClosablePill>
-          </p>
+        <div class="row m-2 mt-0 small text-muted">
+          Number of documents:
+          <template v-if="queryNumItems !== null">
+            {{ queryNumItems.toLocaleString('en') }} /
+          </template>
+          {{ totalNumItems.toLocaleString('en') }}
         </div>
         <div class="row m-2 mt-0">
-          <div class="input-group p-0">
-            <input
-              id="search"
-              class="form-control"
-              aria-label="Fulltext search"
-              placeholder="Search..."
-              type="text"
-              style="padding-right: 3rem !important;">
-            <i class="btn btn-outline-secondary">
-              <font-awesome-icon icon="magnifying-glass-plus" />
-            </i>
+          <n-q-l-box v-model:query="query" />
+        </div>
+        <div class="row m-2 mt-0">
+          <div class="col">
+            <button type="button" @click="runQuery" class="btn btn-outline-primary">Query</button>
           </div>
-        </div>
-        <div class="row m-2 mt-0">
-          TODO: Search by import (aka query)
-        </div>
-        <div class="row m-2 mt-0">
-          TODO: Search by assignment scopes
-        </div>
-        <div class="row m-2 mt-0">
-          TODO: Search by user assignments
-        </div>
-        <div class="row m-2 mt-0">
-          TODO: Search by user annotations
-        </div>
-        <div class="row m-2 mt-0">
-          TODO: Search by import (aka query)
-        </div>
-        <div class="row m-2 mt-0">
-          TODO: Overlap with other project
-        </div>
-        <div class="row m-2 mt-0">
-          TODO: Search by year (maybe with little histogram?)
-        </div>
-        <div class="row m-2 mt-0">
-          TODO: Search author of paper / user for tweet
+          <div class="col">
+            <button type="button" @click="resetQuery" class="btn btn-outline-danger">Reset</button>
+          </div>
         </div>
       </div>
 
@@ -148,21 +119,23 @@ import { currentProjectStore } from '@/stores';
 import AnyItemComponent from '@/components/items/AnyItem.vue';
 import { useOffsetPagination } from '@vueuse/core';
 import type { UseOffsetPaginationReturn } from '@vueuse/core';
-import ClosablePill from '@/components/ClosablePill.vue';
 import { defineComponent, reactive } from 'vue';
 import type { AnyItem } from '@/types/items.d';
 import { API, toastReject } from '@/plugins/api';
+import NQLBox from '@/components/NQLBox.vue';
 
 export default defineComponent({
   name: 'ProjectDataView',
-  components: { ClosablePill, AnyItemComponent },
+  components: { NQLBox, AnyItemComponent },
   data() {
     return {
+      query: '',
       projectType: currentProjectStore.project?.type,
       itemList: [] as AnyItem[],
       showSearchBar: true,
       navPagesWindowSize: 3,
       totalNumItems: 0,
+      queryNumItems: null as number | null,
       pagination: reactive(useOffsetPagination({ total: 0 })),
     };
   },
@@ -172,13 +145,14 @@ export default defineComponent({
     })
       .then((response) => {
         this.totalNumItems = response.data;
-        this.pagination = reactive(useOffsetPagination({
-          total: this.totalNumItems,
-          page: this.$route.query.page || 1,
-          pageSize: this.$route.query.pageSize || 20,
-          onPageChange: this.fetchData,
-          onPageSizeChange: this.fetchData,
-        }));
+        this.pagination = reactive(
+          useOffsetPagination({
+            total: this.totalNumItems,
+            page: this.$route.query.page || 1,
+            pageSize: this.$route.query.pageSize || 20,
+            onPageChange: this.fetchData,
+            onPageSizeChange: this.fetchData,
+          }));
         this.fetchData(this.pagination);
       })
       .catch(toastReject);
@@ -196,6 +170,24 @@ export default defineComponent({
           this.$router.push({ query: { page: currentPage, pageSize: currentPageSize } });
         })
         .catch(toastReject);
+    },
+    runQuery(): void {
+      API.core.search.nqlQueryApiSearchNqlQueryGet({
+        xProjectId: currentProjectStore.projectId as string,
+        query: this.query,
+        limit: 20,
+      })
+        .then((response) => {
+          const { data } = response;
+          this.itemList = data.docs;
+          this.queryNumItems = data.n_docs;
+        })
+        .catch(toastReject);
+    },
+    resetQuery(): void {
+      this.fetchData(this.pagination);
+      this.query = '';
+      this.queryNumItems = null;
     },
   },
   computed: {

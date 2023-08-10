@@ -12,7 +12,7 @@ export const $ResolutionPayload = {
       isRequired: true,
     },
     filters: {
-      type: 'AnnotationFilters',
+      type: 'AnnotationFiltersInput',
       isRequired: true,
     },
     ignore_order: {
@@ -24,13 +24,13 @@ export const $ResolutionPayload = {
       isRequired: true,
     },
     collection: {
-      type: 'AnnotationCollectionDB',
+      type: 'AnnotationCollectionDBInput',
       isRequired: true,
     },
     bot_annotations: {
       type: 'array',
       contains: {
-        type: 'BotAnnotationModel',
+        type: 'BotAnnotationModelInput',
       },
       isRequired: true,
     },
