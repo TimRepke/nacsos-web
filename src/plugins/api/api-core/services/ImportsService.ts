@@ -1,8 +1,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { ImportModelInput } from '../models/ImportModelInput';
-import type { ImportModelOutput } from '../models/ImportModelOutput';
+import type { ImportModel } from '../models/ImportModel';
 
 import type { CancelablePromise } from '@/plugins/api/core/CancelablePromise';
 import type { BaseHttpRequest } from '@/plugins/api/core/BaseHttpRequest';
@@ -15,14 +14,14 @@ export class ImportsService {
 
   /**
    * Get All Imports For Project
-   * @returns ImportModelOutput Successful Response
+   * @returns ImportModel Successful Response
    * @throws ApiError
    */
   public getAllImportsForProjectApiImportsListGet({
     xProjectId,
   }: {
     xProjectId: string,
-  }, options?: Partial<ApiRequestOptions>): CancelablePromise<Array<ImportModelOutput>> {
+  }, options?: Partial<ApiRequestOptions>): CancelablePromise<Array<ImportModel>> {
     return this.httpRequest.request({
       method: 'GET',
       url: '/api/imports/list',
@@ -38,7 +37,7 @@ export class ImportsService {
 
   /**
    * Get Import Details
-   * @returns ImportModelOutput Successful Response
+   * @returns ImportModel Successful Response
    * @throws ApiError
    */
   public getImportDetailsApiImportsImportImportIdGet({
@@ -47,7 +46,7 @@ export class ImportsService {
   }: {
     importId: string,
     xProjectId: string,
-  }, options?: Partial<ApiRequestOptions>): CancelablePromise<ImportModelOutput> {
+  }, options?: Partial<ApiRequestOptions>): CancelablePromise<ImportModel> {
     return this.httpRequest.request({
       method: 'GET',
       url: '/api/imports/import/{import_id}',
@@ -130,7 +129,7 @@ export class ImportsService {
     requestBody,
   }: {
     xProjectId: string,
-    requestBody: ImportModelInput,
+    requestBody: ImportModel,
   }, options?: Partial<ApiRequestOptions>): CancelablePromise<string> {
     return this.httpRequest.request({
       method: 'PUT',

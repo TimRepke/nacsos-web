@@ -22,7 +22,7 @@ export const $AnnotationCollection = {
       contains: {
         type: 'array',
         contains: {
-          type: 'GroupedAnnotationsOutput',
+          type: 'GroupedAnnotations',
         },
       },
       isRequired: true,
@@ -30,7 +30,7 @@ export const $AnnotationCollection = {
     annotators: {
       type: 'array',
       contains: {
-        type: 'UserModelOutput',
+        type: 'UserModel',
       },
       isRequired: true,
     },

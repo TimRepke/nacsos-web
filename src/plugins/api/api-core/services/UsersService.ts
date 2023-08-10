@@ -3,8 +3,7 @@
 /* eslint-disable */
 import type { UserBaseModel } from '../models/UserBaseModel';
 import type { UserInDBModel } from '../models/UserInDBModel';
-import type { UserModelInput } from '../models/UserModelInput';
-import type { UserModelOutput } from '../models/UserModelOutput';
+import type { UserModel } from '../models/UserModel';
 
 import type { CancelablePromise } from '@/plugins/api/core/CancelablePromise';
 import type { BaseHttpRequest } from '@/plugins/api/core/BaseHttpRequest';
@@ -58,7 +57,7 @@ export class UsersService {
 
   /**
    * Get User By Id
-   * @returns UserModelOutput Successful Response
+   * @returns UserModel Successful Response
    * @throws ApiError
    */
   public getUserByIdApiUsersDetailsUserIdGet({
@@ -67,7 +66,7 @@ export class UsersService {
   }: {
     userId: string,
     xProjectId: string,
-  }, options?: Partial<ApiRequestOptions>): CancelablePromise<UserModelOutput> {
+  }, options?: Partial<ApiRequestOptions>): CancelablePromise<UserModel> {
     return this.httpRequest.request({
       method: 'GET',
       url: '/api/users/details/{user_id}',
@@ -86,7 +85,7 @@ export class UsersService {
 
   /**
    * Get Users By Ids
-   * @returns UserModelOutput Successful Response
+   * @returns UserModel Successful Response
    * @throws ApiError
    */
   public getUsersByIdsApiUsersDetailsGet({
@@ -95,7 +94,7 @@ export class UsersService {
   }: {
     userId: Array<string>,
     xProjectId: string,
-  }, options?: Partial<ApiRequestOptions>): CancelablePromise<Array<UserModelOutput>> {
+  }, options?: Partial<ApiRequestOptions>): CancelablePromise<Array<UserModel>> {
     return this.httpRequest.request({
       method: 'GET',
       url: '/api/users/details',
@@ -120,7 +119,7 @@ export class UsersService {
   public saveUserApiUsersDetailsPut({
     requestBody,
   }: {
-    requestBody: (UserInDBModel | UserModelInput),
+    requestBody: (UserInDBModel | UserModel),
   }, options?: Partial<ApiRequestOptions>): CancelablePromise<string> {
     return this.httpRequest.request({
       method: 'PUT',
@@ -142,7 +141,7 @@ export class UsersService {
   public saveUserSelfApiUsersMyDetailsPut({
     requestBody,
   }: {
-    requestBody: (UserInDBModel | UserModelInput),
+    requestBody: (UserInDBModel | UserModel),
   }, options?: Partial<ApiRequestOptions>): CancelablePromise<string> {
     return this.httpRequest.request({
       method: 'PUT',

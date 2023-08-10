@@ -14,7 +14,6 @@ export const $ProgressIndicatorLabel = {
       }, {
         type: 'null',
       }],
-      isRequired: true,
     },
     value_bool: {
       type: 'any-of',
@@ -23,7 +22,6 @@ export const $ProgressIndicatorLabel = {
       }, {
         type: 'null',
       }],
-      isRequired: true,
     },
   },
 } as const;

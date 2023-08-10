@@ -8,6 +8,6 @@ export type SearchResult = {
   query_time: number;
   num_found: number;
   docs: Array<AcademicItemModel>;
-  histogram: (Record<string, number> | null);
+  histogram?: (Record<string, number> | null);
 };
 

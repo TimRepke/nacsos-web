@@ -10,10 +10,10 @@ import type { ItemType } from './ItemType';
  *
  */
 export type GenericItemModel = {
-  item_id: (string | null);
-  project_id: (string | null);
-  type: ItemType;
-  text: (string | null);
+  item_id?: (string | null);
+  project_id?: (string | null);
+  type?: ItemType;
+  text?: (string | null);
   meta: any;
 };
 

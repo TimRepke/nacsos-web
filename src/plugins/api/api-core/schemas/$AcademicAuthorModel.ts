@@ -14,7 +14,6 @@ export const $AcademicAuthorModel = {
       }, {
         type: 'null',
       }],
-      isRequired: true,
     },
     email: {
       type: 'any-of',
@@ -23,7 +22,6 @@ export const $AcademicAuthorModel = {
       }, {
         type: 'null',
       }],
-      isRequired: true,
     },
     orcid: {
       type: 'any-of',
@@ -32,7 +30,6 @@ export const $AcademicAuthorModel = {
       }, {
         type: 'null',
       }],
-      isRequired: true,
     },
     scopus_id: {
       type: 'any-of',
@@ -41,7 +38,6 @@ export const $AcademicAuthorModel = {
       }, {
         type: 'null',
       }],
-      isRequired: true,
     },
     openalex_id: {
       type: 'any-of',
@@ -50,7 +46,6 @@ export const $AcademicAuthorModel = {
       }, {
         type: 'null',
       }],
-      isRequired: true,
     },
     s2_id: {
       type: 'any-of',
@@ -59,7 +54,6 @@ export const $AcademicAuthorModel = {
       }, {
         type: 'null',
       }],
-      isRequired: true,
     },
     affiliations: {
       type: 'any-of',
@@ -71,7 +65,6 @@ export const $AcademicAuthorModel = {
       }, {
         type: 'null',
       }],
-      isRequired: true,
     },
   },
 } as const;

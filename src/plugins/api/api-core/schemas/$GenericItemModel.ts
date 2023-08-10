@@ -16,7 +16,6 @@ export const $GenericItemModel = {
       }, {
         type: 'null',
       }],
-      isRequired: true,
     },
     project_id: {
       type: 'any-of',
@@ -28,14 +27,12 @@ export const $GenericItemModel = {
       }, {
         type: 'null',
       }],
-      isRequired: true,
     },
     type: {
       type: 'all-of',
       contains: [{
         type: 'ItemType',
       }],
-      isRequired: true,
     },
     text: {
       type: 'any-of',
@@ -44,7 +41,6 @@ export const $GenericItemModel = {
       }, {
         type: 'null',
       }],
-      isRequired: true,
     },
     meta: {
       properties: {
