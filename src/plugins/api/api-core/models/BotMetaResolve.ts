@@ -2,16 +2,16 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { AnnotationCollectionDB } from './AnnotationCollectionDB';
-import type { AnnotationFilters } from './AnnotationFilters';
+import type { AnnotationCollectionDBOutput } from './AnnotationCollectionDBOutput';
+import type { AnnotationFiltersOutput } from './AnnotationFiltersOutput';
 
 export type BotMetaResolve = {
   algorithm: BotMetaResolve.algorithm;
-  filters: AnnotationFilters;
+  filters: AnnotationFiltersOutput;
   ignore_hierarchy: boolean;
   ignore_repeat: boolean;
-  trust?: (Record<string, number> | null);
-  collection: AnnotationCollectionDB;
+  trust: (Record<string, number> | null);
+  collection: AnnotationCollectionDBOutput;
 };
 
 export namespace BotMetaResolve {

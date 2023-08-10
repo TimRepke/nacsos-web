@@ -1,7 +1,8 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { HighlighterModel } from '../models/HighlighterModel';
+import type { HighlighterModelInput } from '../models/HighlighterModelInput';
+import type { HighlighterModelOutput } from '../models/HighlighterModelOutput';
 
 import type { CancelablePromise } from '@/plugins/api/core/CancelablePromise';
 import type { BaseHttpRequest } from '@/plugins/api/core/BaseHttpRequest';
@@ -23,7 +24,7 @@ export class HighlightersService {
   }: {
     assignmentScopeId: string,
     xProjectId: string,
-  }, options?: Partial<ApiRequestOptions>): CancelablePromise<(Array<HighlighterModel> | null)> {
+  }, options?: Partial<ApiRequestOptions>): CancelablePromise<(Array<HighlighterModelOutput> | null)> {
     return this.httpRequest.request({
       method: 'GET',
       url: '/api/highlighters/scope/{assignment_scope_id}',
@@ -42,14 +43,14 @@ export class HighlightersService {
 
   /**
    * Get Project Highlighters
-   * @returns HighlighterModel Successful Response
+   * @returns HighlighterModelOutput Successful Response
    * @throws ApiError
    */
   public getProjectHighlightersApiHighlightersProjectGet({
     xProjectId,
   }: {
     xProjectId: string,
-  }, options?: Partial<ApiRequestOptions>): CancelablePromise<Array<HighlighterModel>> {
+  }, options?: Partial<ApiRequestOptions>): CancelablePromise<Array<HighlighterModelOutput>> {
     return this.httpRequest.request({
       method: 'GET',
       url: '/api/highlighters/project',
@@ -73,7 +74,7 @@ export class HighlightersService {
     requestBody,
   }: {
     xProjectId: string,
-    requestBody: HighlighterModel,
+    requestBody: HighlighterModelInput,
   }, options?: Partial<ApiRequestOptions>): CancelablePromise<string> {
     return this.httpRequest.request({
       method: 'PUT',
@@ -101,7 +102,7 @@ export class HighlightersService {
   }: {
     highlighterId: string,
     xProjectId: string,
-  }, options?: Partial<ApiRequestOptions>): CancelablePromise<(HighlighterModel | null)> {
+  }, options?: Partial<ApiRequestOptions>): CancelablePromise<(HighlighterModelOutput | null)> {
     return this.httpRequest.request({
       method: 'GET',
       url: '/api/highlighters/{highlighter_id}',

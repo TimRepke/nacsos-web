@@ -14,6 +14,7 @@ export const $FlattenedAnnotationSchemeLabel = {
       }, {
         type: 'null',
       }],
+      isRequired: true,
     },
     key: {
       type: 'string',
@@ -45,6 +46,7 @@ export const $FlattenedAnnotationSchemeLabel = {
       }, {
         type: 'null',
       }],
+      isRequired: true,
     },
     parent_label: {
       type: 'any-of',
@@ -53,6 +55,7 @@ export const $FlattenedAnnotationSchemeLabel = {
       }, {
         type: 'null',
       }],
+      isRequired: true,
     },
     parent_choice: {
       type: 'any-of',
@@ -61,6 +64,7 @@ export const $FlattenedAnnotationSchemeLabel = {
       }, {
         type: 'null',
       }],
+      isRequired: true,
     },
   },
 } as const;

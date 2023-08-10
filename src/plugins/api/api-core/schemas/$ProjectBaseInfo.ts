@@ -27,7 +27,7 @@ export const $ProjectBaseInfo = {
     labels: {
       type: 'dictionary',
       contains: {
-        type: 'LabelOptions',
+        type: 'LabelOptionsOutput',
       },
       isRequired: true,
     },

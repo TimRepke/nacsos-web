@@ -4,11 +4,11 @@
 export const $AnnotatedItem = {
   properties: {
     scheme: {
-      type: 'AnnotationSchemeModel',
+      type: 'AnnotationSchemeModelInput',
       isRequired: true,
     },
     assignment: {
-      type: 'AssignmentModel',
+      type: 'AssignmentModelInput',
       isRequired: true,
     },
   },

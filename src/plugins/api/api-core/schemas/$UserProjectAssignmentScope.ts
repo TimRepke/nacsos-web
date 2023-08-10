@@ -4,7 +4,7 @@
 export const $UserProjectAssignmentScope = {
   properties: {
     scope: {
-      type: 'AssignmentScopeModel',
+      type: 'AssignmentScopeModelOutput',
       isRequired: true,
     },
     scheme_name: {

@@ -3,16 +3,16 @@
 /* eslint-disable */
 
 import type { AcademicItemModel } from './AcademicItemModel';
-import type { AnnotationSchemeModel } from './AnnotationSchemeModel';
-import type { AssignmentModel } from './AssignmentModel';
-import type { AssignmentScopeModel } from './AssignmentScopeModel';
+import type { AnnotationSchemeModelOutput } from './AnnotationSchemeModelOutput';
+import type { AssignmentModelOutput } from './AssignmentModelOutput';
+import type { AssignmentScopeModelOutput } from './AssignmentScopeModelOutput';
 import type { GenericItemModel } from './GenericItemModel';
-import type { TwitterItemModel } from './TwitterItemModel';
+import type { TwitterItemModelOutput } from './TwitterItemModelOutput';
 
 export type AnnotationItem = {
-  scheme: AnnotationSchemeModel;
-  assignment: AssignmentModel;
-  scope: AssignmentScopeModel;
-  item: (TwitterItemModel | AcademicItemModel | GenericItemModel);
+  scheme: AnnotationSchemeModelOutput;
+  assignment: AssignmentModelOutput;
+  scope: AssignmentScopeModelOutput;
+  item: (TwitterItemModelOutput | AcademicItemModel | GenericItemModel);
 };
 

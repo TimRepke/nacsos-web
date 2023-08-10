@@ -14,6 +14,7 @@ export const $AnnotationSchemeLabelChoiceFlat = {
       }, {
         type: 'null',
       }],
+      isRequired: true,
     },
     value: {
       type: 'number',

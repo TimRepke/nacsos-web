@@ -1,6 +1,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+import type { QueryResult } from '../models/QueryResult';
 import type { SearchResult } from '../models/SearchResult';
 import type { TermStats } from '../models/TermStats';
 
@@ -87,6 +88,50 @@ export class SearchService {
       },
       query: {
         'term_prefix': termPrefix,
+        'limit': limit,
+      },
+      errors: {
+        422: `Validation Error`,
+      },
+      ...options,
+    });
+  }
+
+  /**
+   * Nql Grammar
+   * @returns string Successful Response
+   * @throws ApiError
+   */
+  public nqlGrammarApiSearchNqlGrammarGet(options?: Partial<ApiRequestOptions>): CancelablePromise<string> {
+    return this.httpRequest.request({
+      method: 'GET',
+      url: '/api/search/nql/grammar',
+      ...options,
+    });
+  }
+
+  /**
+   * Nql Query
+   * @returns QueryResult Successful Response
+   * @throws ApiError
+   */
+  public nqlQueryApiSearchNqlQueryGet({
+    query,
+    xProjectId,
+    limit = 20,
+  }: {
+    query: string,
+    xProjectId: string,
+    limit?: number,
+  }, options?: Partial<ApiRequestOptions>): CancelablePromise<QueryResult> {
+    return this.httpRequest.request({
+      method: 'GET',
+      url: '/api/search/nql/query',
+      headers: {
+        'x-project-id': xProjectId,
+      },
+      query: {
+        'query': query,
         'limit': limit,
       },
       errors: {

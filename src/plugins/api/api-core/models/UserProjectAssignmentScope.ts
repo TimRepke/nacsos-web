@@ -2,10 +2,10 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { AssignmentScopeModel } from './AssignmentScopeModel';
+import type { AssignmentScopeModelOutput } from './AssignmentScopeModelOutput';
 
 export type UserProjectAssignmentScope = {
-  scope: AssignmentScopeModel;
+  scope: AssignmentScopeModelOutput;
   scheme_name: string;
   scheme_description: string;
   num_assignments: number;
