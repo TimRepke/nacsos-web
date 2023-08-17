@@ -197,10 +197,10 @@
 </template>
 
 <script lang="ts">
+import { defineComponent } from 'vue';
 import type { PropType } from 'vue';
 import ToolTip from '@/components/ToolTip.vue';
 import { AnnotationSchemeLabel } from '@/plugins/api/api-core';
-import { defineComponent } from 'vue';
 
 type KeyedAnnotationSchemeLabel = AnnotationSchemeLabel & { tmpKey?: string };
 

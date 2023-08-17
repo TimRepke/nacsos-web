@@ -11,7 +11,12 @@ export const $KWARG = {
       isRequired: true,
     },
     optional: {
-      type: 'boolean',
+      type: 'any-of',
+      contains: [{
+        type: 'boolean',
+      }, {
+        type: 'null',
+      }],
     },
     default: {
       type: 'any-of',
@@ -23,28 +28,50 @@ export const $KWARG = {
         type: 'boolean',
       }, {
         type: 'string',
+      }, {
+        type: 'null',
       }],
     },
     artefact: {
-      type: 'SerializedArtefact',
+      type: 'any-of',
+      contains: [{
+        type: 'SerializedArtefact',
+      }, {
+        type: 'null',
+      }],
     },
     params: {
-      type: 'dictionary',
-      contains: {
-        type: 'KWARG',
-      },
+      type: 'any-of',
+      contains: [{
+        type: 'dictionary',
+        contains: {
+          type: 'KWARG',
+        },
+      }, {
+        type: 'null',
+      }],
     },
     options: {
-      type: 'array',
-      contains: {
-        type: 'string',
-      },
+      type: 'any-of',
+      contains: [{
+        type: 'array',
+        contains: {
+          type: 'string',
+        },
+      }, {
+        type: 'null',
+      }],
     },
     generics: {
-      type: 'array',
-      contains: {
-        type: 'string',
-      },
+      type: 'any-of',
+      contains: [{
+        type: 'array',
+        contains: {
+          type: 'string',
+        },
+      }, {
+        type: 'null',
+      }],
     },
   },
 } as const;

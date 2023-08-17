@@ -40,13 +40,12 @@
 </template>
 
 <script lang="ts">
-
+import { defineComponent } from 'vue';
 import type { AnyItem } from '@/types/items';
 import { API } from '@/plugins/api';
 import { currentProjectStore } from '@/stores';
 import type { CancelablePromise } from '@/plugins/api/core/CancelablePromise';
 import AnyItemComponent from '@/components/items/AnyItem.vue';
-import { defineComponent } from 'vue';
 
 type ItemModalData = {
   itemInfo: AnyItem | undefined,

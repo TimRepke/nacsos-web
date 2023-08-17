@@ -4,7 +4,7 @@
 export { PipelinesClient } from './PipelinesClient';
 
 
-export type { Artefact } from './models/Artefact';
+export type { Artefact_Any_ } from './models/Artefact_Any_';
 export type { Body_upload_file_api_artefacts_files_upload_post } from './models/Body_upload_file_api_artefacts_files_upload_post';
 export type { Body_upload_files_api_artefacts_files_upload_many_post } from './models/Body_upload_files_api_artefacts_files_upload_many_post';
 export { CPULoadClassification } from './models/CPULoadClassification';
@@ -21,7 +21,7 @@ export type { TaskModel } from './models/TaskModel';
 export { TaskStatus } from './models/TaskStatus';
 export type { ValidationError } from './models/ValidationError';
 
-export { $Artefact } from './schemas/$Artefact';
+export { $Artefact_Any_ } from './schemas/$Artefact_Any_';
 export { $Body_upload_file_api_artefacts_files_upload_post } from './schemas/$Body_upload_file_api_artefacts_files_upload_post';
 export { $Body_upload_files_api_artefacts_files_upload_many_post } from './schemas/$Body_upload_files_api_artefacts_files_upload_many_post';
 export { $CPULoadClassification } from './schemas/$CPULoadClassification';

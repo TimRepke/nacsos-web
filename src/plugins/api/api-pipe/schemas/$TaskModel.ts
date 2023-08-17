@@ -10,11 +10,49 @@ export const $TaskModel = {
       }, {
         type: 'string',
         format: 'uuid',
+      }, {
+        type: 'null',
       }],
     },
     function_name: {
       type: 'string',
       isRequired: true,
+    },
+    user_id: {
+      type: 'any-of',
+      contains: [{
+        type: 'string',
+      }, {
+        type: 'string',
+        format: 'uuid',
+      }, {
+        type: 'null',
+      }],
+    },
+    project_id: {
+      type: 'any-of',
+      contains: [{
+        type: 'string',
+      }, {
+        type: 'string',
+        format: 'uuid',
+      }, {
+        type: 'null',
+      }],
+    },
+    comment: {
+      type: 'any-of',
+      contains: [{
+        type: 'string',
+      }, {
+        type: 'null',
+      }],
+    },
+    location: {
+      type: 'all-of',
+      contains: [{
+        type: 'ExecutionLocation',
+      }],
     },
     params: {
       type: 'any-of',
@@ -34,33 +72,8 @@ export const $TaskModel = {
         },
       }, {
         type: 'string',
-      }],
-    },
-    user_id: {
-      type: 'any-of',
-      contains: [{
-        type: 'string',
       }, {
-        type: 'string',
-        format: 'uuid',
-      }],
-    },
-    project_id: {
-      type: 'any-of',
-      contains: [{
-        type: 'string',
-      }, {
-        type: 'string',
-        format: 'uuid',
-      }],
-    },
-    comment: {
-      type: 'string',
-    },
-    location: {
-      type: 'all-of',
-      contains: [{
-        type: 'ExecutionLocation',
+        type: 'null',
       }],
     },
     fingerprint: {
@@ -68,22 +81,47 @@ export const $TaskModel = {
       isRequired: true,
     },
     time_created: {
-      type: 'string',
-      format: 'date-time',
+      type: 'any-of',
+      contains: [{
+        type: 'string',
+        format: 'date-time',
+      }, {
+        type: 'null',
+      }],
     },
     time_started: {
-      type: 'string',
-      format: 'date-time',
+      type: 'any-of',
+      contains: [{
+        type: 'string',
+        format: 'date-time',
+      }, {
+        type: 'null',
+      }],
     },
     time_finished: {
-      type: 'string',
-      format: 'date-time',
+      type: 'any-of',
+      contains: [{
+        type: 'string',
+        format: 'date-time',
+      }, {
+        type: 'null',
+      }],
     },
     est_runtime: {
-      type: 'number',
+      type: 'any-of',
+      contains: [{
+        type: 'number',
+      }, {
+        type: 'null',
+      }],
     },
     est_memory: {
-      type: 'number',
+      type: 'any-of',
+      contains: [{
+        type: 'number',
+      }, {
+        type: 'null',
+      }],
     },
     est_cpu_load: {
       type: 'all-of',
@@ -92,8 +130,13 @@ export const $TaskModel = {
       }],
     },
     rec_expunge: {
-      type: 'string',
-      format: 'date-time',
+      type: 'any-of',
+      contains: [{
+        type: 'string',
+        format: 'date-time',
+      }, {
+        type: 'null',
+      }],
     },
     dependencies: {
       type: 'any-of',
@@ -108,6 +151,8 @@ export const $TaskModel = {
           type: 'string',
           format: 'uuid',
         },
+      }, {
+        type: 'null',
       }],
     },
     status: {

@@ -6,11 +6,11 @@ import type { SerializedArtefact } from './SerializedArtefact';
 
 export type KWARG = {
   dtype: Array<string>;
-  optional?: boolean;
-  default?: (number | boolean | string);
-  artefact?: SerializedArtefact;
-  params?: Record<string, KWARG>;
-  options?: Array<string>;
-  generics?: Array<string>;
+  optional?: (boolean | null);
+  default?: (number | boolean | string | null);
+  artefact?: (SerializedArtefact | null);
+  params?: (Record<string, KWARG> | null);
+  options?: (Array<string> | null);
+  generics?: (Array<string> | null);
 };
 

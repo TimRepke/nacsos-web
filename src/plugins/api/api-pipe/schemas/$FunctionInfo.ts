@@ -29,7 +29,7 @@ export const $FunctionInfo = {
     artefacts: {
       type: 'dictionary',
       contains: {
-        type: 'Artefact',
+        type: 'Artefact_Any_',
       },
       isRequired: true,
     },
@@ -42,10 +42,15 @@ export const $FunctionInfo = {
       isRequired: true,
     },
     tags: {
-      type: 'array',
-      contains: {
-        type: 'string',
-      },
+      type: 'any-of',
+      contains: [{
+        type: 'array',
+        contains: {
+          type: 'string',
+        },
+      }, {
+        type: 'null',
+      }],
     },
     est_cpu_load: {
       type: 'all-of',
@@ -54,7 +59,12 @@ export const $FunctionInfo = {
       }],
     },
     recommended_lifetime: {
-      type: 'number',
+      type: 'any-of',
+      contains: [{
+        type: 'number',
+      }, {
+        type: 'null',
+      }],
     },
   },
 } as const;

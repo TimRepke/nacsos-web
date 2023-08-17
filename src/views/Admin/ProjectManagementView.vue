@@ -72,16 +72,16 @@
 </template>
 
 <script lang="ts">
+import { defineComponent } from 'vue';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { API } from '@/plugins/api';
 import { EventBus } from '@/plugins/events';
 import { ToastEvent } from '@/plugins/events/events/toast';
 import type { ProjectModel } from '@/plugins/api/api-core';
 import { ItemType } from '@/plugins/api/api-core';
 import ProjectTypeIcon from '@/components/ProjectTypeIcon.vue';
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { CurrentProjectSelectedEvent, CurrentProjectSetEvent } from '@/plugins/events/events/projects';
 import { ConfirmationRequestEvent } from '@/plugins/events/events/confirmation';
-import { defineComponent } from 'vue';
 
 type ProjectModelExt = ProjectModel & { isNew?: boolean };
 

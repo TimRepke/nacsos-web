@@ -87,17 +87,17 @@
 </template>
 
 <script lang="ts">
+import { defineComponent } from 'vue';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import type { ProjectModel, UserBaseModel, UserPermission } from '@/plugins/api/api-core';
 import { currentProjectStore } from '@/stores';
 import { API } from '@/plugins/api';
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { EventBus } from '@/plugins/events';
 import { ToastEvent } from '@/plugins/events/events/toast';
 import PermissionSettingsCard from '@/components/users/PermissionSettingsCard.vue';
 import UserSearchBox from '@/components/users/UserSearchBox.vue';
 import type { Permissions } from '@/types/permissions';
 import { PermissionPresets } from '@/types/permissions';
-import { defineComponent } from 'vue';
 
 type SettingsData = {
   project: ProjectModel | undefined;

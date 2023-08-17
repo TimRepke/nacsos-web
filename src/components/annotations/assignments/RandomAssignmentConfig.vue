@@ -62,9 +62,9 @@
 </template>
 
 <script lang="ts">
-import type { AssignmentScopeRandomConfig } from '@/plugins/api/api-core';
 import { defineComponent } from 'vue';
 import type { PropType } from 'vue';
+import type { AssignmentScopeRandomConfig } from '@/plugins/api/api-core';
 
 export default defineComponent({
   name: 'RandomAssignmentConfig',

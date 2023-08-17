@@ -38,10 +38,10 @@
 </template>
 
 <script lang="ts">
+import { defineComponent } from 'vue';
+import { marked } from 'marked';
 import { ConfirmationRequestEvent } from '@/plugins/events/events/confirmation';
 import type { ConfirmationResponse } from '@/plugins/events/events/confirmation';
-import { marked } from 'marked';
-import { defineComponent } from 'vue';
 
 export default defineComponent({
   name: 'ConfirmationModal',

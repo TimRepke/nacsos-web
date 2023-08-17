@@ -10,9 +10,9 @@
 </template>
 
 <script lang="ts">
+import { defineComponent } from 'vue';
 import { currentProjectStore } from '@/stores';
 import type { ProjectPermissionsModel } from '@/plugins/api/api-core';
-import { defineComponent } from 'vue';
 
 export default defineComponent({
   name: 'PipelinesContainer',

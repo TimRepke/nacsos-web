@@ -54,13 +54,13 @@
 </template>
 
 <script lang="ts">
+import { defineComponent } from 'vue';
 import type { ImportModel } from '@/plugins/api/api-core';
 import InlineToolTip from '@/components/InlineToolTip.vue';
 import { EventBus } from '@/plugins/events';
 import { ToastEvent } from '@/plugins/events/events/toast';
 import { currentProjectStore } from '@/stores';
 import { API, toastReject } from '@/plugins/api';
-import { defineComponent } from 'vue';
 import { ConfirmationRequestEvent } from '@/plugins/events/events/confirmation';
 
 export default defineComponent({

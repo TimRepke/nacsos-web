@@ -10,9 +10,9 @@
 </template>
 
 <script lang="ts">
+import { defineComponent } from 'vue';
 import { currentUserStore } from '@/stores';
 import type { UserModel } from '@/plugins/api/api-core';
-import { defineComponent } from 'vue';
 
 type AdminContainerData = {
   user: UserModel,

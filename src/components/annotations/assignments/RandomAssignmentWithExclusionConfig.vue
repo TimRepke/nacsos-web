@@ -85,9 +85,9 @@
 </template>
 
 <script lang="ts">
-import type { AssignmentScopeModel, AssignmentScopeRandomWithExclusionConfig } from '@/plugins/api/api-core';
 import { defineComponent } from 'vue';
 import type { PropType } from 'vue';
+import type { AssignmentScopeModel, AssignmentScopeRandomWithExclusionConfig } from '@/plugins/api/api-core';
 import { API } from '@/plugins/api';
 import { currentProjectStore } from '@/stores';
 

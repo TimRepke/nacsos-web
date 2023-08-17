@@ -34,7 +34,11 @@
                 :class="{ current: assignmentLI.assignmentId === assignment.assignment_id }"
                 type="button"
                 :style="{ 'background-color': assignmentLI.colour }"
-                @click="saveAndGoto(assignmentLI.assignmentId)" />
+                @click="saveAndGoto(assignmentLI.assignmentId)">
+                <div class="rounded-circle border border-secondary p-1 bg-light">
+                  {{ assignmentLI.order }}
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -43,7 +47,9 @@
         </div>
       </div>
 
-      <div class="col border-start p-2 overflow-auto h-md-100 position-relative border-top border-md-top" :class="sidebarWidthClass">
+      <div
+        class="col border-start p-2 overflow-auto h-md-100 position-relative border-top border-md-top"
+        :class="sidebarWidthClass">
         <div
           class="position-fixed bottom-0 border border-end-0 rounded-start text-muted text-center"
           style="margin-left: -1.325rem; width: 0.75rem; font-size: 0.75rem;"
@@ -135,6 +141,8 @@
 </template>
 
 <script lang="ts">
+import { defineComponent } from 'vue';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { marked } from 'marked';
 import AnyItemComponent from '@/components/items/AnyItem.vue';
 import AnnotationLabels from '@/components/annotations/AnnotationLabels.vue';
@@ -154,8 +162,6 @@ import type { AnyItem } from '@/types/items.d';
 import { API, ignore } from '@/plugins/api';
 import { currentProjectStore, interfaceSettingsStore } from '@/stores';
 import type { InterfaceSettingsStoreType } from '@/stores/InterfaceSettingsStore';
-import { defineComponent } from 'vue';
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 
 const motivationalQuotes = [
   // https://www.howmuchisthefish.de/
@@ -207,6 +213,7 @@ type AssignmentIndicator = {
   status: AssignmentStatus;
   inHighlight: boolean;
   colour: string;
+  order: number;
 };
 
 export default defineComponent({
@@ -429,6 +436,7 @@ export default defineComponent({
           itemId: assignment.item_id,
           status: assignment.status,
           colour: this.indicatorLabelColourMapper(assignment),
+          order: assignment.order,
         }));
       }
       return null;
@@ -563,12 +571,12 @@ export default defineComponent({
   }
 
   .border-md-top {
-    border-top:none !important;
+    border-top: none !important;
   }
 }
 
 .assignments {
-  overflow: hidden;
+  /* overflow: hidden;*/
   display: flex;
   flex-wrap: wrap;
 }
@@ -580,6 +588,27 @@ export default defineComponent({
   height: 0.8rem;
   margin: 0.05rem;
   border: .1rem solid gray;
+  position: relative;
+}
+
+.assignments-step > div {
+  position: absolute;
+  left: -0.7em;
+  z-index: -1;
+  display: block;
+  margin: 0;
+  text-decoration: none;
+  text-align: center;
+  -webkit-transition: .2s ease-in-out;
+  transition: .2s ease-in-out;
+  opacity: 0;
+  top: 5em;
+}
+
+.assignments-step:hover > div {
+  top: 0.6em;
+  opacity: 1;
+  z-index: 1000;
 }
 
 .assignments-step.current {

@@ -186,9 +186,10 @@
 </template>
 
 <script lang="ts">
+import { defineComponent } from 'vue';
+import { marked } from 'marked';
 import { EventBus } from '@/plugins/events';
 import { ToastEvent } from '@/plugins/events/events/toast';
-import { marked } from 'marked';
 import NestedExpandableComponent from '@/components/pipelines/NestedExpandableComponent.vue';
 import TaskConfigComponent from '@/components/pipelines/TaskConfig.vue';
 import { ConfirmationRequestEvent } from '@/plugins/events/events/confirmation';
@@ -196,7 +197,6 @@ import { currentProjectStore, currentUserStore } from '@/stores';
 import { API, toastReject } from '@/plugins/api';
 import type { FunctionInfo, SerializedArtefact, TaskModel, SerializedArtefactReference } from '@/plugins/api/api-pipe';
 import type { ArtefactCallback, TaskConfig, NestedLibrary } from '@/types/pipelines.d';
-import { defineComponent } from 'vue';
 
 export default defineComponent({
   name: 'PipelinesSetupView',

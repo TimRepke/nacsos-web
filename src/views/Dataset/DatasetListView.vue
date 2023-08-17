@@ -115,11 +115,11 @@
 </template>
 
 <script lang="ts">
-import { currentProjectStore } from '@/stores';
-import AnyItemComponent from '@/components/items/AnyItem.vue';
+import { defineComponent, reactive } from 'vue';
 import { useOffsetPagination } from '@vueuse/core';
 import type { UseOffsetPaginationReturn } from '@vueuse/core';
-import { defineComponent, reactive } from 'vue';
+import { currentProjectStore } from '@/stores';
+import AnyItemComponent from '@/components/items/AnyItem.vue';
 import type { AnyItem } from '@/types/items.d';
 import { API, toastReject } from '@/plugins/api';
 import NQLBox from '@/components/NQLBox.vue';

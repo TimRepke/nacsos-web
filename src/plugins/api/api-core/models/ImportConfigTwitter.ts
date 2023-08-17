@@ -3,6 +3,7 @@
 /* eslint-disable */
 
 export type ImportConfigTwitter = {
+  func_name: any;
   query: string;
   max_results?: (number | null);
   next_token?: (string | null);
@@ -11,6 +12,10 @@ export type ImportConfigTwitter = {
   sort_order?: ImportConfigTwitter.sort_order;
   start_time?: (string | null);
   end_time?: (string | null);
+  bearer_token: string;
+  results_per_response?: number;
+  max_requests?: number;
+  max_tweets?: number;
 };
 
 export namespace ImportConfigTwitter {

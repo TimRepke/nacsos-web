@@ -52,12 +52,7 @@ export const $ImportModel = {
       isRequired: true,
     },
     type: {
-      type: 'any-of',
-      contains: [{
-        type: 'Enum',
-      }, {
-        type: 'ImportType',
-      }],
+      type: 'string',
       isRequired: true,
     },
     time_created: {
@@ -90,13 +85,24 @@ export const $ImportModel = {
     config: {
       type: 'any-of',
       contains: [{
-        type: 'ImportConfigTwitter',
-      }, {
-        type: 'ImportConfigJSONL',
-      }, {
-        type: 'ImportConfigWoS',
-      }, {
-        type: 'ImportConfigScopus',
+        type: 'one-of',
+        contains: [{
+          type: 'TwitterDBFileImport',
+        }, {
+          type: 'TwitterAPIFileImport',
+        }, {
+          type: 'ImportConfigTwitter',
+        }, {
+          type: 'OpenAlexImport',
+        }, {
+          type: 'WOSImport',
+        }, {
+          type: 'OpenAlexItemImport',
+        }, {
+          type: 'AcademicItemImport',
+        }, {
+          type: 'ScopusCSVImport',
+        }],
       }, {
         type: 'null',
       }],

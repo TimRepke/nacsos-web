@@ -77,15 +77,14 @@
 </template>
 
 <script lang="ts">
-
+import { defineComponent } from 'vue';
+import { marked } from 'marked';
 import 'core-js/modules/es.array.to-sorted';
 import { EventBus } from '@/plugins/events';
 import { CurrentProjectSelectedEvent, CurrentProjectSetEvent } from '@/plugins/events/events/projects';
 import type { ProjectInfo } from '@/plugins/api/api-core';
 import { API, toastReject } from '@/plugins/api';
-import { defineComponent } from 'vue';
 import { ItemType } from '@/plugins/api/api-core';
-import { marked } from 'marked';
 import ProjectTypeIcon from '@/components/ProjectTypeIcon.vue';
 
 enum Sort {

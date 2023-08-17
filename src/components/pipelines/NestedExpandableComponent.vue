@@ -37,10 +37,10 @@
 </template>
 
 <script lang="ts">
+import { defineComponent } from 'vue';
 import type { PropType } from 'vue';
 import type { NestedLibrary } from '@/types/pipelines.d';
 import type { FunctionInfo } from '@/plugins/api/api-pipe';
-import { defineComponent } from 'vue';
 
 export default defineComponent({
   name: 'NestedExpandableComponent',

@@ -64,12 +64,12 @@
 </template>
 
 <script lang="ts">
+import { defineComponent, ref } from 'vue';
 import { marked } from 'marked';
 import { EventBus } from '@/plugins/events';
 import { ToastEvent } from '@/plugins/events/events/toast';
 import { ConfirmationRequestEvent } from '@/plugins/events/events/confirmation';
 import { currentProjectStore } from '@/stores';
-import { defineComponent, ref } from 'vue';
 import AnnotationSchemeLabelsEditor from '@/components/annotations/AnnotationSchemeLabelsEditor.vue';
 import type { AnnotationSchemeModel } from '@/plugins/api/api-core';
 import { API } from '@/plugins/api';

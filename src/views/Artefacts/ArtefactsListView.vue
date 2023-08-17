@@ -77,13 +77,13 @@
 </template>
 
 <script lang="ts">
+import { defineComponent } from 'vue';
 import { marked } from 'marked';
 import type { TaskModel, FunctionInfo, FileOnDisk, QueueService } from '@/plugins/api/api-pipe';
 import { EventBus } from '@/plugins/events';
 import { ToastEvent } from '@/plugins/events/events/toast';
 import { API } from '@/plugins/api';
 import { currentProjectStore, currentUserStore } from '@/stores';
-import { defineComponent } from 'vue';
 
 type SearchParams = Parameters<QueueService['searchTasksApiQueueSearchGet']>[0];
 

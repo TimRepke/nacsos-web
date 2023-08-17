@@ -54,6 +54,7 @@
 </template>
 
 <script lang="ts">
+import { defineComponent } from 'vue';
 import { currentProjectStore } from '@/stores';
 import { EventBus } from '@/plugins/events';
 import InlineToolTip from '@/components/InlineToolTip.vue';
@@ -61,7 +62,6 @@ import { ToastEvent } from '@/plugins/events/events/toast';
 import type { ApiResponseReject } from '@/plugins/api';
 import type { BotAnnotationMetaDataBaseModel } from '@/plugins/api/api-core';
 import { ConfirmationRequestEvent } from '@/plugins/events/events/confirmation';
-import { defineComponent } from 'vue';
 import { API } from '@/plugins/api';
 
 type DataModel = {

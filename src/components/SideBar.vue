@@ -154,10 +154,10 @@
 </template>
 
 <script lang="ts">
+import { defineComponent } from 'vue';
+import type { RouteLocationMatched } from 'vue-router';
 import { currentProjectStore, currentUserStore } from '@/stores';
 import type { ProjectPermissionsModel, UserModel } from '@/plugins/api/api-core';
-import type { RouteLocationMatched } from 'vue-router';
-import { defineComponent } from 'vue';
 
 export default defineComponent({
   name: 'SideBar',

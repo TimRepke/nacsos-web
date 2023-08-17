@@ -190,12 +190,12 @@
 </template>
 
 <script lang="ts">
+import { defineComponent } from 'vue';
 import type { PropType } from 'vue';
 import useVuelidate from '@vuelidate/core';
 import type { BaseValidation, ValidationRule } from '@vuelidate/core';
 import { required, between, alphaNum, integer } from '@vuelidate/validators';
 import type { ImportConfigTwitter } from '@/plugins/api/api-core';
-import { defineComponent } from 'vue';
 
 const isValidISO8601: ValidationRule = {
   $validator(value: string): boolean {

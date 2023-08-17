@@ -68,11 +68,11 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
+import { Bar } from 'vue-chartjs';
+import { Chart as ChartJS, Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale } from 'chart.js';
 import { API, ignore } from '@/plugins/api';
 import { currentProjectStore } from '@/stores';
 import type { BasicProjectStats, HistogramEntry, RankEntry } from '@/plugins/api/api-core';
-import { Bar } from 'vue-chartjs';
-import { Chart as ChartJS, Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale } from 'chart.js';
 
 ChartJS.register(Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale);
 
