@@ -5,9 +5,9 @@
 </template>
 
 <script lang="ts">
+import { defineComponent } from 'vue';
 import type { PropType } from 'vue';
 import InlineToolTip from '@/components/InlineToolTip.vue';
-import { defineComponent } from 'vue';
 
 type ProjectType =
   'generic'

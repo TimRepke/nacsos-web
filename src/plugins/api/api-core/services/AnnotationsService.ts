@@ -7,13 +7,13 @@ import type { AnnotationSchemeModel } from '../models/AnnotationSchemeModel';
 import type { AnnotationSchemeModelFlat } from '../models/AnnotationSchemeModelFlat';
 import type { AssignmentCounts } from '../models/AssignmentCounts';
 import type { AssignmentModel } from '../models/AssignmentModel';
+import type { AssignmentScopeEntry } from '../models/AssignmentScopeEntry';
 import type { AssignmentScopeModel } from '../models/AssignmentScopeModel';
 import type { AssignmentStatus } from '../models/AssignmentStatus';
 import type { BotAnnotationMetaDataBaseModel } from '../models/BotAnnotationMetaDataBaseModel';
 import type { BotAnnotationModel } from '../models/BotAnnotationModel';
 import type { ItemWithCount } from '../models/ItemWithCount';
 import type { MakeAssignmentsRequestModel } from '../models/MakeAssignmentsRequestModel';
-import type { ProgressIndicator } from '../models/ProgressIndicator';
 import type { ResolutionPayload } from '../models/ResolutionPayload';
 import type { ResolutionProposalResponse } from '../models/ResolutionProposalResponse';
 import type { SavedResolutionResponse } from '../models/SavedResolutionResponse';
@@ -434,17 +434,17 @@ export class AnnotationsService {
   }
 
   /**
-   * Get Assignment Indicators For Scope For User
-   * @returns ProgressIndicator Successful Response
+   * Get Assignment Indicators For Scope
+   * @returns AssignmentScopeEntry Successful Response
    * @throws ApiError
    */
-  public getAssignmentIndicatorsForScopeForUserApiAnnotationsAnnotateAssignmentProgressAssignmentScopeIdGet({
+  public getAssignmentIndicatorsForScopeApiAnnotationsAnnotateAssignmentProgressAssignmentScopeIdGet({
     assignmentScopeId,
     xProjectId,
   }: {
     assignmentScopeId: string,
     xProjectId: string,
-  }, options?: Partial<ApiRequestOptions>): CancelablePromise<Array<ProgressIndicator>> {
+  }, options?: Partial<ApiRequestOptions>): CancelablePromise<Array<AssignmentScopeEntry>> {
     return this.httpRequest.request({
       method: 'GET',
       url: '/api/annotations/annotate/assignment/progress/{assignment_scope_id}',

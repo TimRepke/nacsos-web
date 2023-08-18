@@ -1,6 +1,6 @@
 import type { App } from 'vue';
-import { isFunctionInfo, isArtefactOrSerializedArtefact, type2str } from '@/util/typeChecks';
 import type { RouteLocationNormalized, RouteRecordNormalized } from 'vue-router';
+import { isFunctionInfo, isArtefactOrSerializedArtefact, type2str } from '@/util/typeChecks';
 // inspired by https://github.com/jashkenas/underscore/blob/master/modules/_shallowProperty.js
 // Internal helper to generate a function to obtain property `key` from `obj`.
 export function shallowProperty<T>(key: string) {

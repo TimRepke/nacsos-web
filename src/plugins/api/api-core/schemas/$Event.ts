@@ -10,9 +10,9 @@ export const $Event = {
     payload: {
       type: 'any-of',
       contains: [{
-        type: 'ExampleEvent',
-      }, {
         type: 'ExampleSubEvent',
+      }, {
+        type: 'ExampleEvent',
       }],
       isRequired: true,
     },

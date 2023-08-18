@@ -71,10 +71,10 @@
 
 <script lang="ts">
 
+import { defineComponent } from 'vue';
 import { currentUserStore } from '@/stores';
 import { EventBus } from '@/plugins/events';
 import { LoggedOutEvent, LogoutSuccessEvent } from '@/plugins/events/events/auth';
-import { defineComponent } from 'vue';
 
 export default defineComponent({
   name: 'TopBar',

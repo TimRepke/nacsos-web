@@ -52,7 +52,8 @@
 </template>
 
 <script lang="ts">
-
+import { defineComponent } from 'vue';
+import type { PropType } from 'vue';
 import 'core-js/modules/es.array.to-sorted';
 import type {
   AnnotationModel,
@@ -62,11 +63,9 @@ import type {
   UserModel,
 } from '@/plugins/api/api-core';
 import InlineToolTip from '@/components/InlineToolTip.vue';
-import type { PropType } from 'vue';
 import { cmap10, cmap20 } from '@/types/colours';
 import { EventBus } from '@/plugins/events';
 import { ToastEvent } from '@/plugins/events/events/toast';
-import { defineComponent } from 'vue';
 
 function hasValue(model: AnnotationModel | BotAnnotationModel | undefined | null):
   model is (AnnotationModel | BotAnnotationModel) & { value_int: number } {

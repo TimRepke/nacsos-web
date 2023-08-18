@@ -115,6 +115,7 @@
 </template>
 
 <script lang="ts">
+import { defineComponent } from 'vue';
 import type { PropType } from 'vue';
 import type {
   ArtefactCallback,
@@ -124,7 +125,6 @@ import { isArtefactOrSerializedArtefact, isFunctionInfo } from '@/util/typeCheck
 import { currentProjectStore, currentUserStore } from '@/stores';
 import InlineToolTip from '@/components/InlineToolTip.vue';
 import type { FunctionInfo, SerializedArtefact, KWARG } from '@/plugins/api/api-pipe';
-import { defineComponent } from 'vue';
 
 export default defineComponent({
   name: 'TaskConfig',

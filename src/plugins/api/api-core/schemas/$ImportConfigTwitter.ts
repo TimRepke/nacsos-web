@@ -3,6 +3,11 @@
 /* eslint-disable */
 export const $ImportConfigTwitter = {
   properties: {
+    func_name: {
+      properties: {
+      },
+      isRequired: true,
+    },
     query: {
       type: 'string',
       isRequired: true,
@@ -63,6 +68,19 @@ export const $ImportConfigTwitter = {
       }, {
         type: 'null',
       }],
+    },
+    bearer_token: {
+      type: 'string',
+      isRequired: true,
+    },
+    results_per_response: {
+      type: 'number',
+    },
+    max_requests: {
+      type: 'number',
+    },
+    max_tweets: {
+      type: 'number',
     },
   },
 } as const;

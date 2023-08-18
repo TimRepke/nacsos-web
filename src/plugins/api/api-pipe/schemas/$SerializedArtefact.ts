@@ -2,6 +2,10 @@
 /* tslint:disable */
 /* eslint-disable */
 export const $SerializedArtefact = {
+  description: `
+  The SerializedArtefact is the interface definition on how references to artefacts
+  are communicated. It is essentially just a proxy for \`Artefact\`.
+  `,
   properties: {
     serializer: {
       type: 'string',
@@ -12,7 +16,12 @@ export const $SerializedArtefact = {
       isRequired: true,
     },
     filename: {
-      type: 'string',
+      type: 'any-of',
+      contains: [{
+        type: 'string',
+      }, {
+        type: 'null',
+      }],
       isRequired: true,
     },
     filenames: {
@@ -24,6 +33,8 @@ export const $SerializedArtefact = {
         contains: {
           type: 'string',
         },
+      }, {
+        type: 'null',
       }],
       isRequired: true,
     },

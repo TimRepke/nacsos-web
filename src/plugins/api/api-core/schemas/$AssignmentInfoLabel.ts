@@ -1,7 +1,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-export const $ProgressIndicatorLabel = {
+export const $AssignmentInfoLabel = {
   properties: {
     repeat: {
       type: 'number',
@@ -19,6 +19,17 @@ export const $ProgressIndicatorLabel = {
       type: 'any-of',
       contains: [{
         type: 'boolean',
+      }, {
+        type: 'null',
+      }],
+    },
+    multi_ind: {
+      type: 'any-of',
+      contains: [{
+        type: 'array',
+        contains: {
+          type: 'number',
+        },
       }, {
         type: 'null',
       }],

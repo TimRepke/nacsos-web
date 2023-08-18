@@ -127,7 +127,7 @@
             <option value="random_exclusion">Random assignment with scope exclusion</option>
           </select>
         </div>
-        <div class="mb-2">
+        <div class="mb-2" v-if="assignmentScope">
           <RandomAssignmentConfig
             v-if="strategyConfigType === 'random'"
             :existing-config="assignmentScope.config"
@@ -167,7 +167,7 @@
           done: <span class="bg-success bg-opacity-50 p-1">{{ assignmentCounts.num_full }}</span>)
         </div>
         <template v-if="statsLoaded">
-          <AssignmentsVisualiser :assignments="assignments" />
+          <AssignmentsVisualiser :assignment-entries="assignments" />
         </template>
         <div class="mt-2 ms-2 text-warning">
           TODO: for each user, show num assignments and progress<br />
@@ -187,15 +187,14 @@ import AssignmentsVisualiser from '@/components/annotations/assignments/Assignme
 import RandomAssignmentConfig from '@/components/annotations/assignments/RandomAssignmentConfig.vue';
 import RandomAssignmentWithExclusionConfig
   from '@/components/annotations/assignments/RandomAssignmentWithExclusionConfig.vue';
-
 import { EventBus } from '@/plugins/events';
 import { ToastEvent } from '@/plugins/events/events/toast';
 import { ConfirmationRequestEvent } from '@/plugins/events/events/confirmation';
-import { API } from '@/plugins/api';
+import { API, toastReject } from '@/plugins/api';
 import type { ApiResponseReject } from '@/plugins/api';
 import type {
   AssignmentCounts,
-  AssignmentModel,
+  AssignmentScopeEntry,
   AssignmentScopeModel,
   AssignmentScopeRandomConfig,
   HighlighterModel,
@@ -218,7 +217,7 @@ type AssignmentScopeConfigData = {
   isNewScope: boolean;
   // holds the assignment counts (or undefined if none exist)
   assignmentCounts?: AssignmentCounts;
-  assignments: AssignmentModel[];
+  assignments: AssignmentScopeEntry[];
   assignmentScope: Partial<AssignmentScopeModel>;
   projectHighlighters: Partial<HighlighterModel>[];
 };
@@ -240,7 +239,7 @@ export default defineComponent({
       // indicates whether this is (or will be) a newly created scope
       isNewScope: !scopeId && !!annotationSchemeId,
       // holds the assignment counts (or undefined if none exist)
-      assignmentCounts: undefined,
+      assignmentCounts: undefined as undefined | AssignmentCounts,
       assignments: [],
       assignmentScope: {
         assignment_scope_id: undefined,
@@ -401,12 +400,13 @@ export default defineComponent({
           .then((result) => { this.assignmentCounts = result.data; })
           .catch(() => { EventBus.emit(new ToastEvent('ERROR', 'Failed to load assignment counts.')); });
 
-        API.core.annotations.getAssignmentsForScopeApiAnnotationsAnnotateAssignmentsScopeAssignmentScopeIdGet({
+        API.core.annotations.getAssignmentIndicatorsForScopeApiAnnotationsAnnotateAssignmentProgressAssignmentScopeIdGet({
           xProjectId: currentProjectStore.projectId as string,
           assignmentScopeId: this.assignmentScope.assignment_scope_id,
         })
-          .then((result) => { this.assignments = result.data; })
-          .catch(() => { EventBus.emit(new ToastEvent('ERROR', 'Failed to load assignments.')); });
+          .then(async (response) => {
+            this.assignments = response.data;
+          }).catch(toastReject);
       }
     },
     async loadListOfUsers() {

@@ -54,11 +54,11 @@
 
 <script lang='ts'>
 /* eslint no-param-reassign: "off" */
+import { defineComponent } from 'vue';
 import { ToastEvent } from '@/plugins/events/events/toast';
 import { EventBus } from '@/plugins/events';
 import InlineToolTip from '@/components/InlineToolTip.vue';
 import { API } from '@/plugins/api';
-import { defineComponent } from 'vue';
 import { currentProjectStore } from '@/stores';
 
 type UploadStatus = 'PENDING' | 'UPLOADING' | 'SUCCESS' | 'FAILED';

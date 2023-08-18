@@ -48,10 +48,10 @@
 </template>
 
 <script lang="ts">
+import { defineComponent } from 'vue';
 import NacsosLogo from '@/components/NacsosLogo.vue';
 import { EventBus } from '@/plugins/events';
 import { AuthFailedEvent, UserLoginEvent, LoginSuccessEvent } from '@/plugins/events/events/auth';
-import { defineComponent } from 'vue';
 
 export default defineComponent({
   name: 'LoginView',

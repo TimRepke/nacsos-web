@@ -29,10 +29,10 @@
 </template>
 
 <script lang="ts">
-import { ToastEvent } from '@/plugins/events/events/toast';
-import type { ToastType } from '@/plugins/events/events/toast';
 import { marked } from 'marked';
 import { defineComponent } from 'vue';
+import { ToastEvent } from '@/plugins/events/events/toast';
+import type { ToastType } from '@/plugins/events/events/toast';
 
 interface Toast {
   key: number;

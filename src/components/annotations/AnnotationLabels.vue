@@ -185,13 +185,12 @@
 
 <script lang="ts">
 /* eslint no-param-reassign: "off" */
-
+import { defineComponent } from 'vue';
 import type { PropType } from 'vue';
 import InlineToolTip from '@/components/InlineToolTip.vue';
 import SearchableSelect from '@/components/SearchableSelect.vue';
 import type { AssignmentModel, AnnotationModel, AnnotationSchemeLabelChoice } from '@/plugins/api/api-core';
 import { AnnotationSchemeLabel } from '@/plugins/api/api-core';
-import { defineComponent } from 'vue';
 import ClosablePill from '@/components/ClosablePill.vue';
 
 type SubLabels = { labels: AnnotationSchemeLabel[]; key: number; };

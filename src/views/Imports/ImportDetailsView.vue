@@ -36,9 +36,9 @@
     <div class="row pb-2 mb-2 border-bottom g-0" v-if="!importDetails.config || !importStarted">
       <div class="col">
         <h4>Select import type</h4>
-        <select v-model="importDetails.type" aria-label="Import Config Option">
+        <select v-model="importDetails.type" aria-label="Import Config Option" :disabled="importStarted">
           <option disabled :value="undefined">Select import type</option>
-          <option v-for="(info, type) in compatibleImportTypes" :key="type" :value="type">{{ info[0] }}</option>
+          <option v-for="(info, type) in compatibleImportTypes" :key="type" :value="type">{{ info.name }}</option>
         </select>
       </div>
     </div>
@@ -48,6 +48,8 @@
           :is="importConfigComponent"
           :existing-config="importDetails.config"
           :editable="!importStarted"
+          :project-id="importDetails.project_id"
+          :import-id="importId"
           @config-changed="updateConfig($event)" />
         <button
           type="button"
@@ -79,7 +81,8 @@
       <div class="col">
         <button type="button" class="btn btn-outline-secondary" @click="loadImportStats">load</button>
         <ul>
-          <li v-if="importStats.numItems !== undefined"><strong>Number of items:</strong> {{ importStats.numItems }}</li>
+          <li v-if="importStats.numItems !== undefined"><strong>Number of items:</strong> {{ importStats.numItems }}
+          </li>
         </ul>
       </div>
     </div>
@@ -90,38 +93,71 @@
 </template>
 
 <script lang="ts">
+import { defineComponent } from 'vue';
 import type { Component } from 'vue';
 import { ToastEvent } from '@/plugins/events/events/toast';
 import { EventBus } from '@/plugins/events';
-import type { CompatibilityMapping, ComponentMapping } from '@/types/imports.d';
-import { ImportType, ItemType } from '@/plugins/api/api-core';
+import { ItemType } from '@/plugins/api/api-core';
 import type { ImportModel, ProjectModel, ProjectPermissionsModel } from '@/plugins/api/api-core';
 import ConfigTwitter from '@/components/imports/ConfigTwitter.vue';
-import ConfigJSONL from '@/components/imports/ConfigJSONL.vue';
 import ConfigWoS from '@/components/imports/ConfigWoS.vue';
-import ConfigRIS from '@/components/imports/ConfigRIS.vue';
+import ConfigJSONLOpenAlexWorks from '@/components/imports/ConfigJSONLOpenAlexWorks.vue';
+import ConfigJSONLAcademicItem from '@/components/imports/ConfigJSONLAcademicItem.vue';
+import ConfigJSONLTwitterAPI from '@/components/imports/ConfigJSONLTwitterAPI.vue';
+import ConfigJSONLTwitterDb from '@/components/imports/ConfigJSONLTwitterDb.vue';
+import ConfigScopus from '@/components/imports/ConfigScopus.vue';
 import { currentProjectStore, currentUserStore } from '@/stores';
 import { ConfirmationRequestEvent } from '@/plugins/events/events/confirmation';
 import { API, logReject, toastReject } from '@/plugins/api';
-import { defineComponent } from 'vue';
+import ConfigOpenAlex from '@/components/imports/ConfigOpenAlex.vue';
 
 type ImportConfig = ImportModel['config'];
 
-export const projectTypeImportTypeCompatibility: CompatibilityMapping = {
-  basic: [ImportType.CSV, ImportType.JSONL, ImportType.SCRIPT],
-  academic: [
-    ImportType.RIS, ImportType.CSV, ImportType.JSONL, ImportType.SCRIPT, ImportType.WOS, ImportType.SCOPUS,
-    ImportType.EBSCO, ImportType.JSTOR, ImportType.OVID, ImportType.POP,
-  ],
-  patents: [ImportType.CSV, ImportType.JSONL, ImportType.SCRIPT],
-  twitter: [ImportType.CSV, ImportType.JSONL, ImportType.SCRIPT, ImportType.TWITTER],
+interface ConfigOption {
+  component: Component;
+  name: string;
+}
+
+const configs: Record<string, ConfigOption> = {
+  wos: {
+    component: ConfigWoS,
+    name: 'Upload Web of Science text file(s)',
+  },
+  scopusCSV: {
+    component: ConfigScopus,
+    name: 'Upload Scopus CSV file(s)',
+  },
+  oa: {
+    component: ConfigOpenAlex,
+    name: 'Import from OpenAlex (Solr)',
+  },
+  oaFile: {
+    component: ConfigJSONLOpenAlexWorks,
+    name: 'Upload OpenAlex file',
+  },
+  academicFile: {
+    component: ConfigJSONLAcademicItem,
+    name: 'Upload JSONl file (AcademicItemModel)',
+  },
+  twitterApi: {
+    component: ConfigTwitter,
+    name: 'Twitter Search API',
+  },
+  twitterDbFile: {
+    component: ConfigJSONLTwitterDb,
+    name: 'Import JSONl file (TwitterItemModel)',
+  },
+  twitterApiFile: {
+    component: ConfigJSONLTwitterAPI,
+    name: 'Import JSONl file (API dump)',
+  },
 };
 
-const type2component: ComponentMapping = {
-  ris: ['Upload RIS file(s)', ConfigRIS],
-  wos: ['Upload Web of Science text file(s)', ConfigWoS],
-  jsonl: ['Upload JSONL file(s)', ConfigJSONL],
-  twitter: ['Twitter Search API', ConfigTwitter],
+export const projectTypeImportTypeCompatibility: { [key in ProjectModel['type']]: string[] } = {
+  academic: ['academicFile', 'oaFile', 'oa', 'scopusCSV', 'wos'],
+  twitter: ['twitterApi', 'twitterApiFile', 'twitterDbFile'],
+  generic: [],
+  patents: [],
 };
 
 type ImportDetails = {
@@ -140,7 +176,16 @@ type ImportDetails = {
 
 export default defineComponent({
   name: 'ImportDetailsView',
-  components: { ConfigRIS, ConfigJSONL, ConfigTwitter },
+  components: {
+    ConfigJSONLTwitterDb,
+    ConfigScopus,
+    ConfigWoS,
+    ConfigJSONLTwitterAPI,
+    ConfigTwitter,
+    ConfigJSONLAcademicItem,
+    ConfigJSONLOpenAlexWorks,
+    ConfigOpenAlex,
+  },
   data(): ImportDetails {
     const importId = this.$route.params.import_id;
     const userId = currentUserStore.user?.user_id;
@@ -158,23 +203,32 @@ export default defineComponent({
         name: 'New import',
         description: '',
         config: undefined,
-      } as Omit<ImportModel, 'type'> & { type?: string },
+      } as (Omit<ImportModel, 'type'> & { type?: string }),
       importStats: {
         numItems: undefined,
       },
     };
   },
   async mounted() {
-    if (this.importId) {
-      API.core.imports.getImportDetailsApiImportsImportImportIdGet({
-        importId: this.importId,
-        xProjectId: currentProjectStore.projectId as string,
-      })
-        .then((response) => { this.importDetails = response.data; })
-        .catch(toastReject);
-    }
+    this.fetchImportDetails();
   },
   methods: {
+    fetchImportDetails(onDone?: () => void) {
+      if (this.importId) {
+        API.core.imports.getImportDetailsApiImportsImportImportIdGet({
+          importId: this.importId,
+          xProjectId: currentProjectStore.projectId as string,
+        })
+          .then((response) => {
+            this.importDetails = response.data;
+            this.importStarted = !!this.importDetails.time_started;
+            if (onDone) {
+              onDone();
+            }
+          })
+          .catch(toastReject);
+      }
+    },
     updateConfig(eventPayload: ImportConfig) {
       this.importDetails.config = eventPayload;
     },
@@ -184,22 +238,7 @@ export default defineComponent({
         + 'In case the import has already started, you can not change the configuration (only the description).',
         (confirmationResponse) => {
           if (confirmationResponse === 'ACCEPT') {
-            API.core.imports.putImportDetailsApiImportsImportPut({
-              // @ts-ignore
-              requestBody: this.importDetails,
-              xProjectId: currentProjectStore.projectId as string,
-            })
-              .then((response) => {
-                EventBus.emit(new ToastEvent('SUCCESS', `Saved import settings.  \n**ID:** ${response.data}`));
-                if (this.isNewImport) {
-                  this.isNewImport = false;
-                  this.importId = response.data;
-                  this.$router.replace({ name: 'project-imports-details', params: { import_id: response.data } });
-                }
-              })
-              .catch((reason) => {
-                EventBus.emit(new ToastEvent('ERROR', `Failed to save your import settings. (${reason.error?.type})`));
-              });
+            this.saveRequest();
           } else {
             EventBus.emit(new ToastEvent('WARN', 'Did not save your import config.'));
           }
@@ -208,6 +247,42 @@ export default defineComponent({
         'OK, save!',
         'Cancel',
       ));
+    },
+    async saveRequest() {
+      API.core.imports.putImportDetailsApiImportsImportPut({
+        // @ts-ignore
+        requestBody: this.importDetails,
+        xProjectId: currentProjectStore.projectId as string,
+      })
+        .then((response) => {
+          EventBus.emit(new ToastEvent('SUCCESS', `Saved import settings.  \n**ID:** ${response.data}`));
+          if (this.isNewImport) {
+            this.isNewImport = false;
+
+            const newImportId = response.data;
+            this.importId = newImportId;
+            this.$router.replace({ name: 'project-imports-details', params: { import_id: response.data } });
+
+            // Some configs include the import_id, which we get after saving.
+            // Thus, we save it again to update the config in the database.
+            this.importDetails = {
+              project_id: currentProjectStore.projectId,
+              user_id: 'userId',
+              type: undefined,
+              name: 'New import',
+              description: '',
+              config: undefined,
+            } as (Omit<ImportModel, 'type'> & { type?: string });
+            this.fetchImportDetails(() => {
+              this.importId = undefined;
+              this.importId = newImportId;
+              this.saveRequest();
+            });
+          }
+        })
+        .catch((reason) => {
+          EventBus.emit(new ToastEvent('ERROR', `Failed to save your import settings. (${reason.error?.type})`));
+        });
     },
     triggerImport() {
       EventBus.emit(new ConfirmationRequestEvent(
@@ -222,6 +297,7 @@ export default defineComponent({
               xProjectId: currentProjectStore.projectId as string,
             })
               .then(() => {
+                this.importStarted = true;
                 EventBus.emit(new ToastEvent('SUCCESS', 'Probably submitted an import job, may now take a while.'));
               })
               .catch((reason) => {
@@ -249,19 +325,19 @@ export default defineComponent({
   computed: {
     importConfigComponent(): Component | undefined {
       if (this.importDetails.type !== undefined && this.importDetails.type in this.compatibleImportTypes) {
-        return this.compatibleImportTypes[this.importDetails.type][1];
+        return this.compatibleImportTypes[this.importDetails.type].component;
       }
       return undefined;
     },
-    compatibleImportTypes(): Record<string, [string, Component]> {
-      const projectType: ItemType = this.currentProject.type as ItemType;
+    compatibleImportTypes(): Record<string, ConfigOption> {
+      const projectType: ProjectModel['type'] = this.currentProject.type as ItemType;
       const compatibleTypes = projectTypeImportTypeCompatibility[projectType];
 
       // @ts-ignore FIXME
       return Object.fromEntries(
         compatibleTypes
-          .filter((importType: ImportType) => importType in type2component)
-          .map((importType: ImportType) => [importType, type2component[importType]]),
+          .filter((importType: string) => importType in configs)
+          .map((importType: string) => [importType, configs[importType]]),
       );
     },
   },

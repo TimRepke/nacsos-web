@@ -116,12 +116,12 @@ export class QueueService {
     orderByFields,
   }: {
     xProjectId: string,
-    functionName?: string,
-    fingerprint?: string,
-    userId?: string,
-    location?: string,
-    status?: string,
-    orderByFields?: Array<string>,
+    functionName?: (string | null),
+    fingerprint?: (string | null),
+    userId?: (string | null),
+    location?: (string | null),
+    status?: (string | null),
+    orderByFields?: (Array<string> | null),
   }, options?: Partial<ApiRequestOptions>): CancelablePromise<Array<TaskModel>> {
     return this.httpRequest.request({
       method: 'GET',
@@ -136,6 +136,62 @@ export class QueueService {
         'location': location,
         'status': status,
         'order_by_fields': orderByFields,
+      },
+      errors: {
+        422: `Validation Error`,
+      },
+      ...options,
+    });
+  }
+
+  /**
+   * Get Task
+   * @returns TaskModel Successful Response
+   * @throws ApiError
+   */
+  public getTaskApiQueueTaskTaskIdGet({
+    taskId,
+    xProjectId,
+  }: {
+    taskId: string,
+    xProjectId: string,
+  }, options?: Partial<ApiRequestOptions>): CancelablePromise<TaskModel> {
+    return this.httpRequest.request({
+      method: 'GET',
+      url: '/api/queue/task/{task_id}',
+      path: {
+        'task_id': taskId,
+      },
+      headers: {
+        'x-project-id': xProjectId,
+      },
+      errors: {
+        422: `Validation Error`,
+      },
+      ...options,
+    });
+  }
+
+  /**
+   * Delete Task
+   * @returns any Successful Response
+   * @throws ApiError
+   */
+  public deleteTaskApiQueueTaskTaskIdDelete({
+    taskId,
+    xProjectId,
+  }: {
+    taskId: string,
+    xProjectId: string,
+  }, options?: Partial<ApiRequestOptions>): CancelablePromise<any> {
+    return this.httpRequest.request({
+      method: 'DELETE',
+      url: '/api/queue/task/{task_id}',
+      path: {
+        'task_id': taskId,
+      },
+      headers: {
+        'x-project-id': xProjectId,
       },
       errors: {
         422: `Validation Error`,
@@ -202,7 +258,7 @@ export class QueueService {
 
   /**
    * Submit Bulk
-   * @returns string Successful Response
+   * @returns any Successful Response
    * @throws ApiError
    */
   public submitBulkApiQueueSubmitTasksPut({
@@ -211,7 +267,7 @@ export class QueueService {
   }: {
     xProjectId: string,
     requestBody: Array<SubmittedTask>,
-  }, options?: Partial<ApiRequestOptions>): CancelablePromise<Array<string>> {
+  }, options?: Partial<ApiRequestOptions>): CancelablePromise<Array<(string | null)>> {
     return this.httpRequest.request({
       method: 'PUT',
       url: '/api/queue/submit/tasks',
@@ -269,34 +325,6 @@ export class QueueService {
     return this.httpRequest.request({
       method: 'PUT',
       url: '/api/queue/cancel/{task_id}',
-      path: {
-        'task_id': taskId,
-      },
-      headers: {
-        'x-project-id': xProjectId,
-      },
-      errors: {
-        422: `Validation Error`,
-      },
-      ...options,
-    });
-  }
-
-  /**
-   * Delete Task
-   * @returns any Successful Response
-   * @throws ApiError
-   */
-  public deleteTaskApiQueueTaskTaskIdDelete({
-    taskId,
-    xProjectId,
-  }: {
-    taskId: string,
-    xProjectId: string,
-  }, options?: Partial<ApiRequestOptions>): CancelablePromise<any> {
-    return this.httpRequest.request({
-      method: 'DELETE',
-      url: '/api/queue/task/{task_id}',
       path: {
         'task_id': taskId,
       },

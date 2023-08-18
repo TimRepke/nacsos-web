@@ -2,11 +2,14 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { ImportConfigJSONL } from './ImportConfigJSONL';
-import type { ImportConfigScopus } from './ImportConfigScopus';
+import type { AcademicItemImport } from './AcademicItemImport';
 import type { ImportConfigTwitter } from './ImportConfigTwitter';
-import type { ImportConfigWoS } from './ImportConfigWoS';
-import type { ImportType } from './ImportType';
+import type { OpenAlexImport } from './OpenAlexImport';
+import type { OpenAlexItemImport } from './OpenAlexItemImport';
+import type { ScopusCSVImport } from './ScopusCSVImport';
+import type { TwitterAPIFileImport } from './TwitterAPIFileImport';
+import type { TwitterDBFileImport } from './TwitterDBFileImport';
+import type { WOSImport } from './WOSImport';
 
 export type ImportModel = {
   import_id?: (string | null);
@@ -15,10 +18,10 @@ export type ImportModel = {
   pipeline_task_id?: (string | null);
   name: string;
   description: string;
-  type: ('ris' | 'csv' | 'jsonl' | 'wos' | 'scopus' | 'ebsco' | 'jstor' | 'ovid' | 'pop' | 'twitter' | 'script' | ImportType);
+  type: string;
   time_created?: (string | null);
   time_started?: (string | null);
   time_finished?: (string | null);
-  config?: (ImportConfigTwitter | ImportConfigJSONL | ImportConfigWoS | ImportConfigScopus | null);
+  config?: ((TwitterDBFileImport | TwitterAPIFileImport | ImportConfigTwitter | OpenAlexImport | WOSImport | OpenAlexItemImport | AcademicItemImport | ScopusCSVImport) | null);
 };
 

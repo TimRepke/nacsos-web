@@ -77,6 +77,8 @@
 </template>
 
 <script lang="ts">
+import { defineComponent } from 'vue';
+import type { PropType } from 'vue';
 import type {
   AnnotationModel,
   FlattenedAnnotationSchemeLabel,
@@ -84,8 +86,6 @@ import type {
   Label,
   UserModel,
 } from '@/plugins/api/api-core';
-import { defineComponent } from 'vue';
-import type { PropType } from 'vue';
 import BoolLabel from '@/components/annotations/resolve/BoolLabel.vue';
 import ChoiceLabel from '@/components/annotations/resolve/ChoiceLabel.vue';
 import MultiLabel from '@/components/annotations/resolve/MultiLabel.vue';

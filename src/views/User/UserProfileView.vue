@@ -136,8 +136,8 @@
 </template>
 
 <script lang="ts">
-import { currentProjectStore, currentUserStore } from '@/stores';
 import { defineComponent } from 'vue';
+import { currentProjectStore, currentUserStore } from '@/stores';
 import type { AuthTokenModel, UserModel } from '@/plugins/api/api-core';
 import { API, toastReject } from '@/plugins/api';
 import ToolTip from '@/components/ToolTip.vue';

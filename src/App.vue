@@ -49,6 +49,7 @@
 </template>
 
 <script lang="ts">
+import { defineComponent } from 'vue';
 import NacsosLogo from '@/components/NacsosLogo.vue';
 import TopBar from '@/components/TopBar.vue';
 import SideBar from '@/components/SideBar.vue';
@@ -56,7 +57,6 @@ import ToastsViewer from '@/components/ToastsViewer.vue';
 import ConfirmationModal from '@/components/ConfirmationModal.vue';
 import { currentProjectStore, currentUserStore } from '@/stores';
 import { isOnRoute } from '@/util';
-import { defineComponent } from 'vue';
 import LoginView from '@/views/User/LoginView.vue';
 
 export default defineComponent({

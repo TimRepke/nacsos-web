@@ -27,11 +27,11 @@
 </template>
 
 <script lang="ts">
+import { defineComponent } from 'vue';
 import { currentProjectStore } from '@/stores';
 import InlineToolTip from '@/components/InlineToolTip.vue';
 import type { UserProjectAssignmentScope } from '@/plugins/api/api-core';
 import { API, ignore } from '@/plugins/api';
-import { defineComponent } from 'vue';
 
 export default defineComponent({
   name: 'AssignmentScopesView',

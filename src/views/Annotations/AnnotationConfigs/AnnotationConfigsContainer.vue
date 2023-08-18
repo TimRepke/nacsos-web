@@ -10,8 +10,8 @@
 </template>
 
 <script lang="ts">
-import { currentProjectStore } from '@/stores';
 import { defineComponent } from 'vue';
+import { currentProjectStore } from '@/stores';
 import type { ProjectPermissionsModel } from '@/plugins/api/api-core';
 
 export default defineComponent({

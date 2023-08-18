@@ -32,6 +32,8 @@
 </template>
 
 <script lang="ts">
+import { defineComponent } from 'vue';
+import type { PropType } from 'vue';
 import 'core-js/modules/es.array.to-sorted';
 import type {
   AnnotationModel,
@@ -40,10 +42,8 @@ import type {
   UserModel,
 } from '@/plugins/api/api-core';
 import InlineToolTip from '@/components/InlineToolTip.vue';
-import type { PropType } from 'vue';
 import { EventBus } from '@/plugins/events';
 import { ToastEvent } from '@/plugins/events/events/toast';
-import { defineComponent } from 'vue';
 
 interface BoolLabelData {
   changed: boolean,

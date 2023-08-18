@@ -1,8 +1,26 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-export const $ProgressIndicator = {
+export const $AssignmentInfo = {
   properties: {
+    user_id: {
+      type: 'any-of',
+      contains: [{
+        type: 'string',
+      }, {
+        type: 'string',
+        format: 'uuid',
+      }],
+      isRequired: true,
+    },
+    username: {
+      type: 'string',
+      isRequired: true,
+    },
+    order: {
+      type: 'number',
+      isRequired: true,
+    },
     assignment_id: {
       type: 'any-of',
       contains: [{
@@ -11,20 +29,6 @@ export const $ProgressIndicator = {
         type: 'string',
         format: 'uuid',
       }],
-      isRequired: true,
-    },
-    item_id: {
-      type: 'any-of',
-      contains: [{
-        type: 'string',
-      }, {
-        type: 'string',
-        format: 'uuid',
-      }],
-      isRequired: true,
-    },
-    order: {
-      type: 'number',
       isRequired: true,
     },
     status: {
@@ -38,7 +42,7 @@ export const $ProgressIndicator = {
         contains: {
           type: 'array',
           contains: {
-            type: 'ProgressIndicatorLabel',
+            type: 'AssignmentInfoLabel',
           },
         },
       }, {

@@ -166,7 +166,7 @@ export class ArtefactsService {
   }: {
     xProjectId: string,
     formData: Body_upload_file_api_artefacts_files_upload_post,
-    folder?: string,
+    folder?: (string | null),
   }, options?: Partial<ApiRequestOptions>): CancelablePromise<string> {
     return this.httpRequest.request({
       method: 'POST',
@@ -198,7 +198,7 @@ export class ArtefactsService {
   }: {
     xProjectId: string,
     formData: Body_upload_files_api_artefacts_files_upload_many_post,
-    folder?: string,
+    folder?: (string | null),
   }, options?: Partial<ApiRequestOptions>): CancelablePromise<Array<string>> {
     return this.httpRequest.request({
       method: 'POST',

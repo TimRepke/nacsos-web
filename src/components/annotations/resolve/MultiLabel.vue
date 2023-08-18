@@ -39,6 +39,8 @@
 <script lang="ts">
 
 import 'core-js/modules/es.array.to-sorted';
+import { defineComponent } from 'vue';
+import type { PropType } from 'vue';
 import type {
   AnnotationModel,
   AnnotationSchemeLabelChoiceFlat,
@@ -46,8 +48,6 @@ import type {
   FlattenedAnnotationSchemeLabel,
   UserModel,
 } from '@/plugins/api/api-core';
-import type { PropType } from 'vue';
-import { defineComponent } from 'vue';
 import { EventBus } from '@/plugins/events';
 import { ToastEvent } from '@/plugins/events/events/toast';
 import ClosablePill from '@/components/ClosablePill.vue';

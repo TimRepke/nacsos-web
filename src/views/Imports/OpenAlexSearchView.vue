@@ -236,12 +236,6 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import type { AcademicItemModel, TermStats } from '@/plugins/api/api-core';
-import { currentProjectStore } from '@/stores';
-import { EventBus } from '@/plugins/events';
-import { ToastEvent } from '@/plugins/events/events/toast';
-import { API } from '@/plugins/api';
-import AcademicItemComponent from '@/components/items/AcademicItem.vue';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { Bar } from 'vue-chartjs';
 import {
@@ -254,6 +248,12 @@ import {
   Tooltip,
 } from 'chart.js';
 import type { ChartOptions, ChartData } from 'chart.js';
+import type { AcademicItemModel, TermStats } from '@/plugins/api/api-core';
+import { currentProjectStore } from '@/stores';
+import { EventBus } from '@/plugins/events';
+import { ToastEvent } from '@/plugins/events/events/toast';
+import { API } from '@/plugins/api';
+import AcademicItemComponent from '@/components/items/AcademicItem.vue';
 
 ChartJS.register(Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale);
 

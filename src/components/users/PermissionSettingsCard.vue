@@ -72,10 +72,11 @@
 </template>
 
 <script lang="ts">
+import { defineComponent } from 'vue';
 import type { PropType } from 'vue';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import type { UserPermission } from '@/plugins/api/api-core';
 import ExpandableBox from '@/components/ExpandableBox.vue';
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { ProjectPermissionHints, PermissionPresets } from '@/types/permissions';
 import type { Permissions, PermissionKeys } from '@/types/permissions';
 import { EventBus } from '@/plugins/events';
@@ -83,7 +84,6 @@ import { ToastEvent } from '@/plugins/events/events/toast';
 import { currentProjectStore } from '@/stores';
 import { API } from '@/plugins/api';
 import { ConfirmationRequestEvent } from '@/plugins/events/events/confirmation';
-import { defineComponent } from 'vue';
 
 type PermissionSettingsData = {
   permission: UserPermission;

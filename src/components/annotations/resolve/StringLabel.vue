@@ -12,16 +12,16 @@
 </template>
 
 <script lang="ts">
+import { defineComponent } from 'vue';
+import type { PropType } from 'vue';
 import type {
   AnnotationModel,
   BotAnnotationModel,
   FlattenedAnnotationSchemeLabel,
   UserModel,
 } from '@/plugins/api/api-core';
-import type { PropType } from 'vue';
 import { EventBus } from '@/plugins/events';
 import { ToastEvent } from '@/plugins/events/events/toast';
-import { defineComponent } from 'vue';
 
 interface BoolLabelData {
   changed: boolean,

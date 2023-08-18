@@ -119,11 +119,11 @@
 </template>
 
 <script lang="ts">
+import { defineComponent } from 'vue';
 import { API } from '@/plugins/api';
 import { EventBus } from '@/plugins/events';
 import { ToastEvent } from '@/plugins/events/events/toast';
 import type { UserBaseModel } from '@/plugins/api/api-core';
-import { defineComponent } from 'vue';
 
 type UserModel = UserBaseModel & {
   password?: string,

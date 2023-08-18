@@ -29,13 +29,13 @@
 </template>
 
 <script lang="ts">
+import { defineComponent } from 'vue';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import type { UserBaseModel } from '@/plugins/api/api-core';
 import { currentProjectStore } from '@/stores';
 import { API } from '@/plugins/api';
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { EventBus } from '@/plugins/events';
 import { ToastEvent } from '@/plugins/events/events/toast';
-import { defineComponent } from 'vue';
 
 type SearchData = {
   users: Array<UserBaseModel>;

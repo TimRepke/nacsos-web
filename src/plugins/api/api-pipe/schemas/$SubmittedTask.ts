@@ -10,11 +10,49 @@ export const $SubmittedTask = {
       }, {
         type: 'string',
         format: 'uuid',
+      }, {
+        type: 'null',
       }],
     },
     function_name: {
       type: 'string',
       isRequired: true,
+    },
+    user_id: {
+      type: 'any-of',
+      contains: [{
+        type: 'string',
+      }, {
+        type: 'string',
+        format: 'uuid',
+      }, {
+        type: 'null',
+      }],
+    },
+    project_id: {
+      type: 'any-of',
+      contains: [{
+        type: 'string',
+      }, {
+        type: 'string',
+        format: 'uuid',
+      }, {
+        type: 'null',
+      }],
+    },
+    comment: {
+      type: 'any-of',
+      contains: [{
+        type: 'string',
+      }, {
+        type: 'null',
+      }],
+    },
+    location: {
+      type: 'all-of',
+      contains: [{
+        type: 'ExecutionLocation',
+      }],
     },
     params: {
       type: 'any-of',
@@ -34,33 +72,8 @@ export const $SubmittedTask = {
         },
       }, {
         type: 'string',
-      }],
-    },
-    user_id: {
-      type: 'any-of',
-      contains: [{
-        type: 'string',
       }, {
-        type: 'string',
-        format: 'uuid',
-      }],
-    },
-    project_id: {
-      type: 'any-of',
-      contains: [{
-        type: 'string',
-      }, {
-        type: 'string',
-        format: 'uuid',
-      }],
-    },
-    comment: {
-      type: 'string',
-    },
-    location: {
-      type: 'all-of',
-      contains: [{
-        type: 'ExecutionLocation',
+        type: 'null',
       }],
     },
     force_run: {
@@ -79,6 +92,8 @@ export const $SubmittedTask = {
           type: 'string',
           format: 'uuid',
         },
+      }, {
+        type: 'null',
       }],
     },
   },

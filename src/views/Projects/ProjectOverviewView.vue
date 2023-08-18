@@ -27,11 +27,11 @@
 </template>
 
 <script lang="ts">
+import { defineComponent } from 'vue';
+import { marked } from 'marked';
 import type { ProjectModel, ProjectPermissionsModel } from '@/plugins/api/api-core';
 import { currentProjectStore } from '@/stores';
-import { marked } from 'marked';
 import PermissionSettingsCardReadOnly from '@/components/users/PermissionSettingsCardReadOnly.vue';
-import { defineComponent } from 'vue';
 
 type ProjectOverview = {
   project?: ProjectModel;

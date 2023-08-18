@@ -1,7 +1,7 @@
-import { useRequestsStore } from '@/stores/RequestsStore';
 import type { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
 import axios from 'axios';
 import FormData from 'form-data';
+import { useRequestsStore } from '@/stores/RequestsStore';
 import { EventBus } from '@/plugins/events';
 import { ClearUserStoreEvent } from '@/plugins/events/events/auth';
 

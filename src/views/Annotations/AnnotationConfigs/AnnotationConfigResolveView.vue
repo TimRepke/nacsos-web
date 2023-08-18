@@ -304,6 +304,7 @@
 </template>
 
 <script lang="ts">
+import { defineComponent } from 'vue';
 import { currentProjectStore } from '@/stores';
 import type {
   AnnotationSchemeModel,
@@ -324,7 +325,6 @@ import ItemModal from '@/components/items/ItemModal.vue';
 import ToolTip from '@/components/ToolTip.vue';
 import { EventBus } from '@/plugins/events';
 import { ToastEvent } from '@/plugins/events/events/toast';
-import { defineComponent } from 'vue';
 import { ConfirmationRequestEvent } from '@/plugins/events/events/confirmation';
 import ResolverRow from '@/components/annotations/resolve/ResolverRow.vue';
 
