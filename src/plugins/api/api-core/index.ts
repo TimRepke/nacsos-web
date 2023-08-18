@@ -20,7 +20,10 @@ export type { AnnotationSchemeLabelChoiceFlat } from './models/AnnotationSchemeL
 export type { AnnotationSchemeModel } from './models/AnnotationSchemeModel';
 export type { AnnotationSchemeModelFlat } from './models/AnnotationSchemeModelFlat';
 export type { AssignmentCounts } from './models/AssignmentCounts';
+export type { AssignmentInfo } from './models/AssignmentInfo';
+export type { AssignmentInfoLabel } from './models/AssignmentInfoLabel';
 export type { AssignmentModel } from './models/AssignmentModel';
+export type { AssignmentScopeEntry } from './models/AssignmentScopeEntry';
 export type { AssignmentScopeModel } from './models/AssignmentScopeModel';
 export { AssignmentScopeRandomConfig } from './models/AssignmentScopeRandomConfig';
 export { AssignmentScopeRandomWithExclusionConfig } from './models/AssignmentScopeRandomWithExclusionConfig';
@@ -55,8 +58,6 @@ export type { MakeAssignmentsRequestModel } from './models/MakeAssignmentsReques
 export type { Mention } from './models/Mention';
 export { OpenAlexImport } from './models/OpenAlexImport';
 export type { OpenAlexItemImport } from './models/OpenAlexItemImport';
-export type { ProgressIndicator } from './models/ProgressIndicator';
-export type { ProgressIndicatorLabel } from './models/ProgressIndicatorLabel';
 export type { ProjectBaseInfo } from './models/ProjectBaseInfo';
 export type { ProjectBaseInfoEntry } from './models/ProjectBaseInfoEntry';
 export type { ProjectBaseInfoScopeEntry } from './models/ProjectBaseInfoScopeEntry';
@@ -101,7 +102,10 @@ export { $AnnotationSchemeLabelChoiceFlat } from './schemas/$AnnotationSchemeLab
 export { $AnnotationSchemeModel } from './schemas/$AnnotationSchemeModel';
 export { $AnnotationSchemeModelFlat } from './schemas/$AnnotationSchemeModelFlat';
 export { $AssignmentCounts } from './schemas/$AssignmentCounts';
+export { $AssignmentInfo } from './schemas/$AssignmentInfo';
+export { $AssignmentInfoLabel } from './schemas/$AssignmentInfoLabel';
 export { $AssignmentModel } from './schemas/$AssignmentModel';
+export { $AssignmentScopeEntry } from './schemas/$AssignmentScopeEntry';
 export { $AssignmentScopeModel } from './schemas/$AssignmentScopeModel';
 export { $AssignmentScopeRandomConfig } from './schemas/$AssignmentScopeRandomConfig';
 export { $AssignmentScopeRandomWithExclusionConfig } from './schemas/$AssignmentScopeRandomWithExclusionConfig';
@@ -136,8 +140,6 @@ export { $MakeAssignmentsRequestModel } from './schemas/$MakeAssignmentsRequestM
 export { $Mention } from './schemas/$Mention';
 export { $OpenAlexImport } from './schemas/$OpenAlexImport';
 export { $OpenAlexItemImport } from './schemas/$OpenAlexItemImport';
-export { $ProgressIndicator } from './schemas/$ProgressIndicator';
-export { $ProgressIndicatorLabel } from './schemas/$ProgressIndicatorLabel';
 export { $ProjectBaseInfo } from './schemas/$ProjectBaseInfo';
 export { $ProjectBaseInfoEntry } from './schemas/$ProjectBaseInfoEntry';
 export { $ProjectBaseInfoScopeEntry } from './schemas/$ProjectBaseInfoScopeEntry';

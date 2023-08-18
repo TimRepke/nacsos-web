@@ -31,12 +31,12 @@
                 v-for="assignmentLI in assignmentIndicatorsHighlighted"
                 :key="assignmentLI.assignmentId"
                 class="assignments-step"
-                :class="{ current: assignmentLI.assignmentId === assignment.assignment_id }"
+                :class="{ current: assignmentLI.assignmentId === assignment?.assignment_id }"
                 type="button"
                 :style="{ 'background-color': assignmentLI.colour }"
                 @click="saveAndGoto(assignmentLI.assignmentId)">
                 <div class="rounded-circle border border-secondary p-1 bg-light">
-                  {{ assignmentLI.order }}
+                  {{ assignmentLI.identifier }}
                 </div>
               </div>
             </div>
@@ -69,11 +69,11 @@
             <input id="annotation-description" class="toggle" type="checkbox">
             <label for="annotation-description" class="lbl-toggle" role="button">Show scheme description</label>
             <div class="collapsible-content">
-              <div class="content-inner">
+              <div class="content-inner" v-if="scheme && scope">
                 <strong>Annotation scheme:</strong> {{ scheme.name }}
-                <p v-html="markdown(scheme.description)" />
+                <p v-if="scheme.description" v-html="markdown(scheme.description)" />
                 <strong>Assignment scope:</strong> {{ scope.name }}
-                <p v-html="markdown(scope.description)" />
+                <p v-if="scope.description" v-html="markdown(scope.description)" />
               </div>
             </div>
           </div>
@@ -152,15 +152,16 @@ import type {
   AnnotationItem,
   AnnotationSchemeLabelChoice,
   AnnotationSchemeModel,
+  AssignmentInfo,
   AssignmentModel,
+  AssignmentScopeEntry,
   AssignmentScopeModel,
   HighlighterModel,
-  ProgressIndicator,
 } from '@/plugins/api/api-core';
 import { AssignmentStatus, AnnotationSchemeLabel } from '@/plugins/api/api-core';
 import type { AnyItem } from '@/types/items.d';
 import { API, ignore } from '@/plugins/api';
-import { currentProjectStore, interfaceSettingsStore } from '@/stores';
+import { currentProjectStore, currentUserStore, interfaceSettingsStore } from '@/stores';
 import type { InterfaceSettingsStoreType } from '@/stores/InterfaceSettingsStore';
 
 const motivationalQuotes = [
@@ -193,11 +194,12 @@ const motivationalQuotes = [
   // https://pypi.org/project/quotes-generator/
   'Your Skepticism Is My Fuel. — Minx',
 ];
+type UserAssignmentInfo = AssignmentInfo & { identifier: number, item_id: string };
 
 type AnnotationsViewData = {
   item?: AnyItem;
   assignment?: AssignmentModel;
-  assignments?: ProgressIndicator[];
+  assignments?: AssignmentScopeEntry[];
   scheme?: AnnotationSchemeModel;
   scope?: AssignmentScopeModel;
   labels?: AnnotationSchemeLabel[];
@@ -214,6 +216,7 @@ type AssignmentIndicator = {
   inHighlight: boolean;
   colour: string;
   order: number;
+  identifier: number;
 };
 
 export default defineComponent({
@@ -223,7 +226,7 @@ export default defineComponent({
     return {
       item: undefined as AnyItem | undefined,
       assignment: undefined as AssignmentModel | undefined,
-      assignments: undefined as ProgressIndicator[] | undefined,
+      assignments: undefined as AssignmentScopeEntry[] | undefined,
       scheme: undefined as AnnotationSchemeModel | undefined,
       scope: undefined as AssignmentScopeModel | undefined,
       labels: undefined as AnnotationSchemeLabel[] | undefined,
@@ -255,7 +258,10 @@ export default defineComponent({
         xProjectId: currentProjectStore.projectId as string,
         assignmentScopeId,
       }).then((resp) => {
-        this.highlighters = resp.data;
+        const { data } = resp;
+        if (data !== null && data !== undefined) {
+          this.highlighters = data;
+        }
       }).catch(ignore);
 
       await this.setCurrentAssignment(response);
@@ -367,7 +373,7 @@ export default defineComponent({
       this.rerenderCounter += 1;
 
       // update the assignments progress bar
-      API.core.annotations.getAssignmentIndicatorsForScopeForUserApiAnnotationsAnnotateAssignmentProgressAssignmentScopeIdGet({
+      API.core.annotations.getAssignmentIndicatorsForScopeApiAnnotationsAnnotateAssignmentProgressAssignmentScopeIdGet({
         xProjectId: currentProjectStore.projectId as string,
         assignmentScopeId: annotationItem.scope.assignment_scope_id as string,
       })
@@ -424,19 +430,39 @@ export default defineComponent({
     sidebarWidthClass() {
       return `col-md-${interfaceSettingsStore.annotation.sidebarWidth}`;
     },
+    userAssignments(): UserAssignmentInfo[] | null {
+      if (this.assignments) {
+        return this.assignments
+          .map((entry: AssignmentScopeEntry): UserAssignmentInfo | null => {
+            const userAssignments = entry.assignments
+              .filter((assignment: AssignmentInfo) => assignment.user_id === currentUserStore.user?.user_id);
+            if (userAssignments.length > 0) {
+              return {
+                ...userAssignments[0],
+                identifier: entry.identifier,
+                item_id: entry.item_id,
+              } as unknown as UserAssignmentInfo;
+            }
+            return null;
+          })
+          .filter((entry: UserAssignmentInfo | null): entry is UserAssignmentInfo => entry !== null);
+      }
+      return null;
+    },
     assignmentIndicators(): AssignmentIndicator[] | null {
       const WINDOW = 50; // 100/2
       const assignmentId = this.assignment?.assignment_id;
-      if (this.assignments && assignmentId) {
-        let focus = this.assignments.findIndex((assignment: ProgressIndicator) => assignment.assignment_id === assignmentId);
-        focus = Math.min(Math.max(WINDOW, focus), this.assignments.length - WINDOW);
-        return this.assignments.map((assignment: ProgressIndicator, index: number): AssignmentIndicator => ({
+      if (this.userAssignments && assignmentId) {
+        let focus = this.userAssignments.findIndex((assignment: UserAssignmentInfo) => assignment.assignment_id === assignmentId);
+        focus = Math.min(Math.max(WINDOW, focus), this.userAssignments.length - WINDOW);
+        return this.userAssignments.map((assignment: UserAssignmentInfo, index: number): AssignmentIndicator => ({
           assignmentId: assignment.assignment_id as string,
           inHighlight: ((index - WINDOW) <= focus) && (focus <= (index + WINDOW)),
           itemId: assignment.item_id,
           status: assignment.status,
           colour: this.indicatorLabelColourMapper(assignment),
           order: assignment.order,
+          identifier: assignment.identifier,
         }));
       }
       return null;
@@ -448,7 +474,7 @@ export default defineComponent({
       return null;
     },
     assignmentIndicatorsNeedBirdseye(): boolean {
-      return !!this.assignments && this.assignments.length > 100;
+      return !!this.userAssignments && this.userAssignments.length > 100;
     },
     availableIndicatorLabels(): AnnotationSchemeLabel[] {
       let list = [{
@@ -459,7 +485,7 @@ export default defineComponent({
       }
       return list;
     },
-    indicatorLabelColourMapper(): (indicator: ProgressIndicator) => string {
+    indicatorLabelColourMapper(): (indicator: UserAssignmentInfo) => string {
       // Colour by assignment status is always the fallback, set up respective map and mapper function
       const map = {
         undefined: 'white',
@@ -470,7 +496,7 @@ export default defineComponent({
       map[AssignmentStatus.PARTIAL] = 'yellow';
       map[AssignmentStatus.FULL] = '#42b983';
       map[AssignmentStatus.INVALID] = 'red';
-      const indicateStatusMapper = (indicator: ProgressIndicator): string => map[indicator.status] ?? 'white';
+      const indicateStatusMapper = (indicator: UserAssignmentInfo): string => map[indicator.status] ?? 'white';
 
       // User selected to colour by assignment status
       if (this.uiSettings.annotationProgressBarUseStatus) {
@@ -483,7 +509,7 @@ export default defineComponent({
       }
 
       // User selected a specific label for colouring, try to find it
-      const label: AnnotationSchemeLabel = (this.labels ?? []).find(
+      const label: AnnotationSchemeLabel | undefined = (this.labels ?? []).find(
         (lab: AnnotationSchemeLabel) => lab.key === labelKey,
       );
 
@@ -523,7 +549,7 @@ export default defineComponent({
           .forEach((value) => {
             cmap[value] = colourMap.shift() ?? 'white';
           });
-        return (indicator: ProgressIndicator): string => cmap?.[indicator.labels?.[labelKey]?.[0]?.value_int ?? -1] ?? 'white';
+        return (indicator: UserAssignmentInfo): string => cmap?.[indicator.labels?.[labelKey]?.[0]?.value_int ?? -1] ?? 'white';
       }
 
       if (label.kind === AnnotationSchemeLabel.kind.BOOL) {
@@ -592,17 +618,20 @@ export default defineComponent({
 }
 
 .assignments-step > div {
-  position: absolute;
-  left: -0.7em;
-  z-index: -1;
-  display: block;
-  margin: 0;
-  text-decoration: none;
-  text-align: center;
-  -webkit-transition: .2s ease-in-out;
-  transition: .2s ease-in-out;
-  opacity: 0;
-  top: 5em;
+    position: absolute;
+    left: -1.5ch;
+    z-index: -1;
+    display: block;
+    margin: 0;
+    text-decoration: none;
+    text-align: center;
+    -webkit-transition: .2s ease-in-out;
+    transition: .2s ease-in-out;
+    opacity: 0;
+    top: 5em;
+    width: 4ch;
+    /* height: 3em; */
+    font-size: 0.8em;
 }
 
 .assignments-step:hover > div {
