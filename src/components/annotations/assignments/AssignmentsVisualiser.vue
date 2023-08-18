@@ -3,12 +3,12 @@
     <div class="table-responsive ">
       <table class="table table-bordered">
         <tbody>
-          <tr v-for="userId in userIds" :key="userId">
-            <th>{{ userLookup[userId]?.username }}</th>
+          <tr v-for="username in usernames" :key="username">
+            <th>{{ username }}</th>
             <td
               v-for="itemId in itemIds"
               :key="itemId"
-              :class="getBackgroundColourClass(userId, itemId)">
+              :class="getBackgroundColourClass(username, itemId)">
               <!--{{ this.tryGetAssignment(userId, itemId)?.status }}-->
             </td>
           </tr>
@@ -22,71 +22,61 @@
 
 import { defineComponent } from 'vue';
 import type { PropType } from 'vue';
-import { EventBus } from '@/plugins/events';
-import { ToastEvent } from '@/plugins/events/events/toast';
-import type { AssignmentModel, UserModel } from '@/plugins/api/api-core';
-import { API } from '@/plugins/api';
-import { currentProjectStore } from '@/stores';
+import type { AssignmentInfo, AssignmentScopeEntry } from '@/plugins/api/api-core';
 
+type User = { user_id: string, username: string };
 export default defineComponent({
   name: 'AssignmentsVisualiser',
   props: {
-    assignments: {
-      type: Object as PropType<AssignmentModel[]>,
-      default: (): AssignmentModel[] => [] as AssignmentModel[],
+    assignmentEntries: {
+      type: Object as PropType<AssignmentScopeEntry[]>,
+      default: (): AssignmentScopeEntry[] => [] as AssignmentScopeEntry[],
     },
-  },
-  async mounted() {
-    this.fetchUserInfos();
   },
   data() {
-    return {
-      users: [] as UserModel[],
-    };
+    return {};
   },
   computed: {
-    lookup(): Record<string, AssignmentModel[]> {
-      const ret = this.itemIds.reduce((acc: { [key: string]: AssignmentModel[] }, itemId: string) => {
-        acc[itemId] = [];
-        return acc;
-      }, {});
-      this.assignments.forEach((assignment: AssignmentModel) => {
-        ret[assignment.item_id].push(assignment);
-      });
-      return ret;
+    users(): Array<User> {
+      return [...new Set(
+        this.assignmentEntries
+          .flatMap(
+            (entry: AssignmentScopeEntry) => entry.assignments
+              .map((assignment: AssignmentInfo) => ({
+                user_id: assignment.user_id,
+                username: assignment.username,
+              })),
+          ),
+      )] as User[];
     },
-    userIds(): Array<string> {
-      return [...new Set(this.assignments.map((assignment: AssignmentModel) => assignment.user_id))] as string[];
+    usernames(): Array<string> {
+      return [...new Set(
+        this.assignmentEntries
+          .flatMap(
+            (entry: AssignmentScopeEntry) => entry.assignments
+              .map((assignment: AssignmentInfo) => assignment.username),
+          ),
+      )] as string[];
     },
     itemIds(): Array<string> {
-      return [...new Set(this.assignments.map((assignment: AssignmentModel) => assignment.item_id))] as string[];
+      return [...new Set(this.assignmentEntries.map((entry: AssignmentScopeEntry) => entry.item_id))] as string[];
     },
-    userLookup(): Record<string, UserModel> {
-      return this.users.reduce((acc: { [key: string]: UserModel }, user: UserModel) => {
-        acc[user.user_id as string] = user;
-        return acc;
-      }, {});
-    },
-  },
-  watch: {
-    async userIds() {
-      this.fetchUserInfos();
+    lookup() {
+      return Object.fromEntries(this.assignmentEntries.map((entry: AssignmentScopeEntry) => [
+        entry.item_id,
+        {
+          ...entry,
+          assignments: Object.fromEntries(entry.assignments.map((assignment: AssignmentInfo) => [
+            assignment.username,
+            assignment,
+          ])),
+        },
+      ]));
     },
   },
   methods: {
-    fetchUserInfos() {
-      API.core.users.getUsersByIdsApiUsersDetailsGet({
-        xProjectId: currentProjectStore.projectId as string,
-        userId: this.userIds,
-      })
-        .then((result) => { this.users = result.data; })
-        .catch(() => { EventBus.emit(new ToastEvent('WARN', 'Failed to load usernames')); });
-    },
-    tryGetAssignment(userId: string, itemId: string): AssignmentModel | undefined {
-      return this.lookup[itemId]?.find((assignment: AssignmentModel) => assignment.user_id === userId);
-    },
-    getBackgroundColourClass(userId: string, itemId: string): string[] {
-      const assignment = this.tryGetAssignment(userId, itemId);
+    getBackgroundColourClass(username: string, itemId: string): string[] {
+      const assignment = this.lookup[itemId].assignments[username];
       switch (assignment?.status) {
         case 'OPEN':
           return ['table-info'];
