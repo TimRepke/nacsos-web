@@ -1,4 +1,5 @@
-export const cmap20 = [
+// eslint-disable-next-line import/prefer-default-export
+export const cmap = [
   '#e6194B', // # 0
   '#3cb44b', // # 1
   '#ffe119', // # 2
@@ -21,17 +22,8 @@ export const cmap20 = [
   '#a9a9a9', // # 19
   '#ffffff', // # 20
   '#000000', // # 21
-];
-
-export const cmap10 = [
-  '#4e79a7', // # 0
-  '#f28e2c', // # 1
-  '#e15759', // # 2
-  '#76b7b2', // # 3
-  '#59a14f', // # 4
-  '#edc949', // # 5
-  '#af7aa1', // # 6
-  '#ff9da7', // # 7
-  '#9c755f', // # 8
-  '#bab0ab', // # 9
+  // even more as a fallback
+  'aqua', 'black', 'blue', 'fuchsia', 'gray', 'green',
+  'lime', 'maroon', 'navy', 'olive', 'orange', 'purple', 'red',
+  'silver', 'teal', 'yellow',
 ];

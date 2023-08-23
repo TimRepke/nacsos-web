@@ -163,6 +163,7 @@ import type { AnyItem } from '@/types/items.d';
 import { API, ignore } from '@/plugins/api';
 import { currentProjectStore, currentUserStore, interfaceSettingsStore } from '@/stores';
 import type { InterfaceSettingsStoreType } from '@/stores/InterfaceSettingsStore';
+import { cmap as cmap20 } from '@/types/colours';
 
 const motivationalQuotes = [
   // https://www.howmuchisthefish.de/
@@ -524,30 +525,11 @@ export default defineComponent({
           null: 'white',
           // @ts-ignore TS1268
         } as { [key: undefined | null | number]: string };
-        const colourMap = [
-          // some pastel colours
-          '#C54B6C', // indian red
-          '#F7CE76', // rajah
-          '#8DA47E', // dark sea green
-          '#FFB347', // pastel orange
-          '#B6B6B4', // pastel gray
-          '#77DD77', // pastel green
-          '#AEC6CF', // pastel blue
-          '#FFAEB9', // pastel pink
-          '#CFCFC4', // pastel beige
-          '#DDBDF1', // pastel purple
-          '#FFD1DC', // pastel rose
-          // even more as a fallback
-          'aqua', 'black', 'blue', 'fuchsia', 'gray', 'green',
-          'lime', 'maroon', 'navy', 'olive', 'orange', 'purple', 'red',
-          'silver', 'teal', 'yellow',
-        ];
-
         label.choices
           .map((choice: AnnotationSchemeLabelChoice): number => choice.value)
           .sort()
           .forEach((value) => {
-            cmap[value] = colourMap.shift() ?? 'white';
+            cmap[value] = cmap20.shift() ?? 'white';
           });
         return (indicator: UserAssignmentInfo): string => cmap?.[indicator.labels?.[labelKey]?.[0]?.value_int ?? -1] ?? 'white';
       }
