@@ -79,12 +79,12 @@
           </div>
         </div>
         <div class="row g-0">
-          <AnnotationLabels :labels="labels" :assignment="assignment" :key="rerenderCounter" />
+          <AnnotationLabels :labels="labels" :assignment="assignment" :key="rerenderCounter" ref="labelsComponents" />
         </div>
         <div class="row g-0 border-top pt-2">
           <div class="col text-start">
-            <button type="button" class="btn btn-outline-secondary" @click="saveAndPrevious()" disabled>Save &
-              Previous
+            <button type="button" class="btn btn-outline-secondary" @click="saveAndPrevious()">
+              Save & Previous
             </button>
           </div>
           <div class="col text-end">
@@ -163,6 +163,7 @@ import type { AnyItem } from '@/types/items.d';
 import { API, ignore } from '@/plugins/api';
 import { currentProjectStore, currentUserStore, interfaceSettingsStore } from '@/stores';
 import type { InterfaceSettingsStoreType } from '@/stores/InterfaceSettingsStore';
+import { cmap as cmap20 } from '@/types/colours';
 
 const motivationalQuotes = [
   // https://www.howmuchisthefish.de/
@@ -203,6 +204,7 @@ type AnnotationsViewData = {
   scheme?: AnnotationSchemeModel;
   scope?: AssignmentScopeModel;
   labels?: AnnotationSchemeLabel[];
+  dirty: number;
   highlighters?: HighlighterModel[];
   uiSettings: InterfaceSettingsStoreType;
   rerenderCounter: number; // this is a hack to force-update the AnnotationLabels-component
@@ -230,16 +232,20 @@ export default defineComponent({
       scheme: undefined as AnnotationSchemeModel | undefined,
       scope: undefined as AssignmentScopeModel | undefined,
       labels: undefined as AnnotationSchemeLabel[] | undefined,
+      dirty: 0,
       highlighters: undefined as HighlighterModel[] | undefined,
       rerenderCounter: 0,
       uiSettings: interfaceSettingsStore,
       showStatusBarModal: false,
     };
   },
+  unmounted() {
+    document.removeEventListener('keydown', this.onKeyPress, false);
+  },
   async mounted() {
     const assignmentScopeId = this.$route.params.scope_id as string;
     const currentAssignmentId = this.$route.params.assignment_id as string;
-
+    document.addEventListener('keydown', this.onKeyPress, false);
     try {
       let response: AnnotationItem;
       if (currentAssignmentId) {
@@ -273,6 +279,57 @@ export default defineComponent({
     markdown(md: string) {
       return marked(md);
     },
+    onKeyPress(e: KeyboardEvent) {
+      if (e !== null && e.target !== null) {
+        const target = e.target as Element;
+        if (!target.matches('input, textarea') && !e.repeat) {
+          switch (e.key) {
+            case 'ArrowUp':
+            case 'k':
+            case 'w':
+              // UP => previous label
+              this.$refs.labelsComponents?.selectPrevious();
+              break;
+            case 'ArrowDown':
+            case 'j':
+            case 's':
+              // DOWN => next label
+              this.$refs.labelsComponents?.selectNext();
+              break;
+            case '0':
+            case '1':
+            case '2':
+            case '3':
+            case '4':
+            case '5':
+            case '6':
+            case '7':
+            case '8':
+            case '9':
+            case '+':
+            case '-':
+            case 'Enter':
+            case 'Backspace':
+              this.$refs.labelsComponents?.setValue(e.key);
+              break;
+            case 'ArrowLeft':
+            case 'h':
+            case 'a':
+              // LEFT => previous assignment
+              this.saveAndPrevious();
+              break;
+            case 'ArrowRight':
+            case 'l':
+            case 'd':
+              // RIGHT => next assignment
+              this.saveAndNext();
+              break;
+            default:
+            // pass
+          }
+        }
+      }
+    },
     populateEmptyAnnotations(labels: AnnotationSchemeLabel[]) {
       return labels.map((label: AnnotationSchemeLabel) => {
         if (!label.annotation && !!this.assignment) {
@@ -299,69 +356,71 @@ export default defineComponent({
       });
     },
     async save() {
-      // copy relevant data to break references
-      const labels = JSON.parse(JSON.stringify(this.labels));
-      const scheme = JSON.parse(JSON.stringify(this.scheme));
+      if (this.dirty > 0) {
+        // copy relevant data to break references
+        const labels = JSON.parse(JSON.stringify(this.labels));
+        const scheme = JSON.parse(JSON.stringify(this.scheme));
 
-      // first, remove all empty annotations again
-      const removeEmptyAnnotations = (subLabels: AnnotationSchemeLabel[]) => subLabels.map((label: AnnotationSchemeLabel) => {
-        if (label.annotation?.value_int === undefined
-          && label.annotation?.value_str === undefined
-          && label.annotation?.value_bool === undefined
-          && label.annotation?.value_float === undefined
-          && label.annotation?.multi_int === undefined) {
-          // eslint-disable-next-line no-param-reassign
-          delete label.annotation;
-        }
-        if (label.choices) {
-          label.choices.forEach((choice) => {
-            if (choice.children) {
-              // eslint-disable-next-line no-param-reassign
-              choice.children = removeEmptyAnnotations(choice.children);
+        // first, remove all empty annotations again
+        const removeEmptyAnnotations = (subLabels: AnnotationSchemeLabel[]) => subLabels.map((label: AnnotationSchemeLabel) => {
+          if (label.annotation?.value_int === undefined
+            && label.annotation?.value_str === undefined
+            && label.annotation?.value_bool === undefined
+            && label.annotation?.value_float === undefined
+            && label.annotation?.multi_int === undefined) {
+            // eslint-disable-next-line no-param-reassign
+            delete label.annotation;
+          }
+          if (label.choices) {
+            label.choices.forEach((choice) => {
+              if (choice.children) {
+                // eslint-disable-next-line no-param-reassign
+                choice.children = removeEmptyAnnotations(choice.children);
+              }
+            });
+          }
+          return label;
+        });
+        scheme.labels = removeEmptyAnnotations(labels);
+
+        // Send data to the server
+        API.core.annotations.saveAnnotationApiAnnotationsAnnotateSavePost({
+          xProjectId: currentProjectStore.projectId as string,
+          requestBody: {
+            scheme,
+            assignment: this.assignment as AssignmentModel,
+          },
+        })
+          .then((response) => {
+            const reason = response.data;
+            if (reason === 'PARTIAL') {
+              EventBus.emit(new ToastEvent(
+                'WARN',
+                'This annotation wasn\'t quite done yet...',
+              ));
+            }
+            EventBus.emit(new ToastEvent(
+              'SUCCESS',
+              'Successfully saved your annotation!',
+            ));
+          })
+          .catch(() => {
+            EventBus.emit(new ToastEvent(
+              'ERROR',
+              'Failed to save your annotation. Sorry. '
+              + 'Please try reloading the page and saving again.',
+            ));
+          })
+          .finally(() => {
+            if (currentProjectStore.project?.setting_motivational_quotes && Math.random() < 0.2) {
+              const quoteIndex = Math.floor(Math.random() * (motivationalQuotes.length + 1));
+              EventBus.emit(new ToastEvent(
+                'INFO',
+                motivationalQuotes[quoteIndex],
+              ));
             }
           });
-        }
-        return label;
-      });
-      scheme.labels = removeEmptyAnnotations(labels);
-
-      // Send data to the server
-      API.core.annotations.saveAnnotationApiAnnotationsAnnotateSavePost({
-        xProjectId: currentProjectStore.projectId as string,
-        requestBody: {
-          scheme,
-          assignment: this.assignment as AssignmentModel,
-        },
-      })
-        .then((response) => {
-          const reason = response.data;
-          if (reason === 'PARTIAL') {
-            EventBus.emit(new ToastEvent(
-              'WARN',
-              'This annotation wasn\'t quite done yet...',
-            ));
-          }
-          EventBus.emit(new ToastEvent(
-            'SUCCESS',
-            'Successfully saved your annotation!',
-          ));
-        })
-        .catch(() => {
-          EventBus.emit(new ToastEvent(
-            'ERROR',
-            'Failed to save your annotation. Sorry. '
-            + 'Please try reloading the page and saving again.',
-          ));
-        })
-        .finally(() => {
-          if (currentProjectStore.project?.setting_motivational_quotes && Math.random() < 0.2) {
-            const quoteIndex = Math.floor(Math.random() * (motivationalQuotes.length + 1));
-            EventBus.emit(new ToastEvent(
-              'INFO',
-              motivationalQuotes[quoteIndex],
-            ));
-          }
-        });
+      }
     },
     async setCurrentAssignment(annotationItem: AnnotationItem) {
       // update all the data
@@ -387,6 +446,7 @@ export default defineComponent({
               assignment_id: this.assignment!.assignment_id,
             },
           });
+          this.dirty = 0;
         })
         .catch(ignore);
     },
@@ -401,7 +461,14 @@ export default defineComponent({
         .catch(ignore);
     },
     async saveAndPrevious() {
-      // TODO implement "previous" endpoint and this function
+      if (this.userAssignments) {
+        const currentAssignmentIndex = this.userAssignments?.findIndex(
+          (assi: UserAssignmentInfo) => assi.assignment_id === this.assignment?.assignment_id,
+        );
+        if (currentAssignmentIndex !== undefined && currentAssignmentIndex > 0) {
+          await this.saveAndGoto(this.userAssignments[currentAssignmentIndex - 1].assignment_id);
+        }
+      }
     },
     async saveAndNext() {
       await this.save();
@@ -524,30 +591,11 @@ export default defineComponent({
           null: 'white',
           // @ts-ignore TS1268
         } as { [key: undefined | null | number]: string };
-        const colourMap = [
-          // some pastel colours
-          '#C54B6C', // indian red
-          '#F7CE76', // rajah
-          '#8DA47E', // dark sea green
-          '#FFB347', // pastel orange
-          '#B6B6B4', // pastel gray
-          '#77DD77', // pastel green
-          '#AEC6CF', // pastel blue
-          '#FFAEB9', // pastel pink
-          '#CFCFC4', // pastel beige
-          '#DDBDF1', // pastel purple
-          '#FFD1DC', // pastel rose
-          // even more as a fallback
-          'aqua', 'black', 'blue', 'fuchsia', 'gray', 'green',
-          'lime', 'maroon', 'navy', 'olive', 'orange', 'purple', 'red',
-          'silver', 'teal', 'yellow',
-        ];
-
         label.choices
           .map((choice: AnnotationSchemeLabelChoice): number => choice.value)
           .sort()
           .forEach((value) => {
-            cmap[value] = colourMap.shift() ?? 'white';
+            cmap[value] = cmap20.shift() ?? 'white';
           });
         return (indicator: UserAssignmentInfo): string => cmap?.[indicator.labels?.[labelKey]?.[0]?.value_int ?? -1] ?? 'white';
       }
@@ -567,6 +615,14 @@ export default defineComponent({
 
       // fallback to status mapper
       return indicateStatusMapper;
+    },
+  },
+  watch: {
+    labels: {
+      deep: true,
+      handler() {
+        this.dirty += 1;
+      },
     },
   },
 });
@@ -618,20 +674,20 @@ export default defineComponent({
 }
 
 .assignments-step > div {
-    position: absolute;
-    left: -1.5ch;
-    z-index: -1;
-    display: block;
-    margin: 0;
-    text-decoration: none;
-    text-align: center;
-    -webkit-transition: .2s ease-in-out;
-    transition: .2s ease-in-out;
-    opacity: 0;
-    top: 5em;
-    width: 4ch;
-    /* height: 3em; */
-    font-size: 0.8em;
+  position: absolute;
+  left: -1.5ch;
+  z-index: -1;
+  display: block;
+  margin: 0;
+  text-decoration: none;
+  text-align: center;
+  -webkit-transition: .2s ease-in-out;
+  transition: .2s ease-in-out;
+  opacity: 0;
+  top: 5em;
+  width: 4ch;
+  /* height: 3em; */
+  font-size: 0.8em;
 }
 
 .assignments-step:hover > div {

@@ -63,7 +63,7 @@ import type {
   UserModel,
 } from '@/plugins/api/api-core';
 import InlineToolTip from '@/components/InlineToolTip.vue';
-import { cmap10, cmap20 } from '@/types/colours';
+import { cmap } from '@/types/colours';
 import { EventBus } from '@/plugins/events';
 import { ToastEvent } from '@/plugins/events/events/toast';
 
@@ -115,7 +115,7 @@ export default defineComponent({
     },
     annotation2bgColor(val: AnnotationModel | BotAnnotationModel | undefined) {
       if (hasValue(val)) {
-        return this.cmap[val.value_int % this.cmap.length];
+        return cmap[val.value_int % cmap.length];
       }
       return 'transparent';
     },
@@ -152,10 +152,6 @@ export default defineComponent({
     },
   },
   computed: {
-    cmap(): string[] {
-      const { choices } = this.info;
-      return (!choices || choices.length > 10) ? cmap20 : cmap10;
-    },
     choiceLookup(): Record<number, AnnotationSchemeLabelChoiceFlat> {
       const { choices } = this.info;
       if (!choices) return {};
