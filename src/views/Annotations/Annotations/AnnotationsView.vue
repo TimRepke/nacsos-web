@@ -35,7 +35,7 @@
                 type="button"
                 :style="{ 'background-color': assignmentLI.colour }"
                 @click="saveAndGoto(assignmentLI.assignmentId)">
-                <div class="rounded-circle border border-secondary p-1 bg-light">
+                <div class="rounded-circle border border-secondary p-1 bg-light mt-2">
                   {{ assignmentLI.identifier }}
                 </div>
               </div>
