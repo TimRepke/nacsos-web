@@ -461,39 +461,25 @@ export default defineComponent({
         .catch(ignore);
     },
     async saveAndPrevious() {
-      if (this.userAssignments) {
-        const currentAssignmentIndex = this.userAssignments?.findIndex(
-          (assi: UserAssignmentInfo) => assi.assignment_id === this.assignment?.assignment_id,
-        );
-        if (currentAssignmentIndex !== undefined && currentAssignmentIndex > 0) {
-          await this.saveAndGoto(this.userAssignments[currentAssignmentIndex - 1].assignment_id);
-        }
+      if (this.currentAssignmentIndex !== undefined && this.currentAssignmentIndex > 0) {
+        await this.saveAndGoto(this.userAssignments[this.currentAssignmentIndex - 1].assignment_id);
       }
     },
     async saveAndNext() {
-      await this.save();
-
-      API.core.annotations
-        .getNextAssignmentForScopeForUserApiAnnotationsAnnotateNextAssignmentScopeIdCurrentAssignmentIdGet({
-          xProjectId: currentProjectStore.projectId as string,
-          assignmentScopeId: this.assignment!.assignment_scope_id,
-          currentAssignmentId: this.assignment!.assignment_id as string,
-        })
-        .then((response) => { this.setCurrentAssignment(response.data); })
-        .catch((reason) => {
-          console.log(reason);
-          if (reason.error?.detail?.type === 'NoNextAssignmentWarning') {
-            EventBus.emit(new ToastEvent(
-              'INFO',
-              'Seems like you reached the end. My only friend. '
-              + 'Would you like to clear all annotations and enjoy this process once again? '
-              + 'Please shout "yes" or "no" into your microphone to delete.',
-            ));
-          }
-        });
+      if (this.currentAssignmentIndex !== undefined && (this.currentAssignmentIndex + 1) <= this.userAssignments.length) {
+        await this.saveAndGoto(this.userAssignments[this.currentAssignmentIndex + 1].assignment_id);
+      }
     },
   },
   computed: {
+    currentAssignmentIndex(): number | undefined {
+      if (this.userAssignments) {
+        return this.userAssignments?.findIndex(
+          (assi: UserAssignmentInfo) => assi.assignment_id === this.assignment?.assignment_id,
+        );
+      }
+      return undefined;
+    },
     sidebarWidthClass() {
       return `col-md-${interfaceSettingsStore.annotation.sidebarWidth}`;
     },
@@ -530,7 +516,7 @@ export default defineComponent({
           colour: this.indicatorLabelColourMapper(assignment),
           order: assignment.order,
           identifier: assignment.identifier,
-        }));
+        })).sort((a: AssignmentIndicator, b: AssignmentIndicator) => a.order - b.order);
       }
       return null;
     },
