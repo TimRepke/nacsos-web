@@ -35,7 +35,7 @@
                 type="button"
                 :style="{ 'background-color': assignmentLI.colour }"
                 @click="saveAndGoto(assignmentLI.assignmentId)">
-                <div class="rounded-circle border border-secondary p-1 bg-light">
+                <div class="rounded-circle border border-secondary p-1 bg-light mt-2">
                   {{ assignmentLI.identifier }}
                 </div>
               </div>
@@ -498,7 +498,8 @@ export default defineComponent({
             }
             return null;
           })
-          .filter((entry: UserAssignmentInfo | null): entry is UserAssignmentInfo => entry !== null);
+          .filter((entry: UserAssignmentInfo | null): entry is UserAssignmentInfo => entry !== null)
+          .sort((a: UserAssignmentInfo, b: UserAssignmentInfo) => a.order - b.order);
       }
       return null;
     },
@@ -516,7 +517,7 @@ export default defineComponent({
           colour: this.indicatorLabelColourMapper(assignment),
           order: assignment.order,
           identifier: assignment.identifier,
-        })).sort((a: AssignmentIndicator, b: AssignmentIndicator) => a.order - b.order);
+        }));
       }
       return null;
     },
