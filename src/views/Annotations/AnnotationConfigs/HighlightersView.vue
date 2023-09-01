@@ -2,10 +2,19 @@
   <div>
     <h1>Project-wide text highlighting</h1>
     <div>
-      You can configure these highlighters based on a list of regular expressions.
-      Later, you can select a (different) highlighter for each
-      <router-link :to="{ name: 'config-annotation-scheme-list' }">assignment scope</router-link>
-      in this project.
+      <p>
+        You can configure these highlighters based on a list of regular expressions.
+        Later, you can select a (different) highlighter for each
+        <router-link :to="{ name: 'config-annotation-scheme-list' }">assignment scope</router-link>
+        in this project.
+      </p>
+      <p>
+        Please note, that regular expressions are very powerful and can become very complex.
+        It is strongly recommended to just use a list of terms separated by the | symbol.
+        If you need to have more complex highlighters,
+        <a href="https://regex101.com/r/im43P2/1" target="_blank" rel="noopener noreferrer">Regex101.com</a>
+        is an excellent resource to develop and test expressions.
+      </p>
     </div>
     <div class="accordion" id="highlighters">
       <div
@@ -55,6 +64,10 @@
               <span class="form-text">
                 Separate keywords by a pipe symbol (|).
               </span>
+              <p v-if="highlighter.error" class="text-warning mt-2">
+                This is not a valid expression.<br />
+                <span class="text-danger">{{ highlighter.error }}</span>
+              </p>
               <p>
                 <ClosablePill
                   v-for="keyword in highlighter.keywords"
@@ -117,7 +130,7 @@ import type { ApiResponseReject } from '@/plugins/api';
 import { API } from '@/plugins/api';
 import ClosablePill from '@/components/ClosablePill.vue';
 
-type Highlighter = HighlighterModel & { keywordsStr: string };
+type Highlighter = HighlighterModel & { keywordsStr: string, error?: str };
 
 export default defineComponent({
   name: 'HighlighterView',
@@ -160,6 +173,7 @@ export default defineComponent({
     saveHighlighter(highlighter: HighlighterModel) {
       const highlighterCopy = JSON.parse(JSON.stringify(highlighter));
       delete highlighterCopy.keywordsStr;
+      delete highlighterCopy.error;
       API.core.highlighters.upsertHighlighterApiHighlightersProjectPut({
         xProjectId: currentProjectStore.projectId as string,
         requestBody: highlighter,
@@ -175,6 +189,15 @@ export default defineComponent({
     onKeywordsStrChange(highlighter: Highlighter) {
       // eslint-disable-next-line no-param-reassign
       highlighter.keywords = this.str2lst(highlighter.keywordsStr);
+      // eslint-disable-next-line no-param-reassign
+      highlighter.error = undefined;
+      try {
+        // eslint-disable-next-line no-new
+        new RegExp(highlighter.keywords.join('|'), 'g');
+      } catch (e) {
+        // eslint-disable-next-line no-param-reassign
+        highlighter.error = e.toString();
+      }
     },
     onDropKeyword(highlighter: Highlighter, keyword: string) {
       // eslint-disable-next-line no-param-reassign

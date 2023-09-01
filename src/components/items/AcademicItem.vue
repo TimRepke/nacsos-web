@@ -109,8 +109,13 @@ export default defineComponent({
       let txt = (this.item.text || '');
       if (this.highlighters) {
         this.highlighters.forEach((highlighter: HighlighterModel) => {
-          const regex = new RegExp(highlighter.keywords.join('|'), 'g');
-          txt = txt.replaceAll(regex, `<span style="${highlighter.style}">$&</span>`);
+          try {
+            const regex = new RegExp(highlighter.keywords.join('|'), 'g');
+            txt = txt.replaceAll(regex, `<span style="${highlighter.style}">$&</span>`);
+          } catch (e) {
+            console.warn('Ignoring illegal regex!');
+            console.error(e);
+          }
         });
       }
       return txt.replaceAll('\n', '<br />');
