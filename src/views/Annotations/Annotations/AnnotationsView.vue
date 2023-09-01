@@ -461,13 +461,21 @@ export default defineComponent({
         .catch(ignore);
     },
     async saveAndPrevious() {
-      if (this.currentAssignmentIndex !== undefined && this.currentAssignmentIndex > 0) {
-        await this.saveAndGoto(this.userAssignments[this.currentAssignmentIndex - 1].assignment_id);
+      if (this.currentAssignmentIndex !== undefined) {
+        if (this.currentAssignmentIndex > 0) {
+          await this.saveAndGoto(this.userAssignments[this.currentAssignmentIndex - 1].assignment_id);
+        } else {
+          await this.saveAndGoto(this.userAssignments[this.userAssignments.length - 1].assignment_id);
+        }
       }
     },
     async saveAndNext() {
-      if (this.currentAssignmentIndex !== undefined && (this.currentAssignmentIndex + 1) <= this.userAssignments.length) {
-        await this.saveAndGoto(this.userAssignments[this.currentAssignmentIndex + 1].assignment_id);
+      if (this.currentAssignmentIndex !== undefined) {
+        if ((this.currentAssignmentIndex + 1) <= this.userAssignments.length) {
+          await this.saveAndGoto(this.userAssignments[this.currentAssignmentIndex + 1].assignment_id);
+        } else {
+          await this.saveAndGoto(this.userAssignments[0].assignment_id);
+        }
       }
     },
   },
