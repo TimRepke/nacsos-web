@@ -187,13 +187,14 @@
                       id="algorithm-selector"
                       class="form-select"
                       aria-label="Resolution algorithm"
-                      v-model="algorithm"
-                      :disabled="!isNew">
+                      disabled
+                      v-model="algorithm">
+                      <!--:disabled="!isNew">-->
                       <option value="majority">majority vote</option>
-                      <option value="trust" disabled>weighted majority</option>
-                      <option value="first" disabled>first annotation</option>
-                      <option value="last" disabled>last annotation</option>
-                      <option value="??" disabled>sorcery</option>
+                      <!--<option value="trust" disabled>weighted majority</option>-->
+                      <!--<option value="first" disabled>first annotation</option>-->
+                      <!--<option value="last" disabled>last annotation</option>-->
+                      <!--<option value="??" disabled>sorcery</option>-->
                     </select>
                   </div>
                 </div>
