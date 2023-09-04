@@ -329,6 +329,12 @@ import { ToastEvent } from '@/plugins/events/events/toast';
 import { ConfirmationRequestEvent } from '@/plugins/events/events/confirmation';
 import ResolverRow from '@/components/annotations/resolve/ResolverRow.vue';
 
+function tabClosePrevent(e: BeforeUnloadEvent) {
+  e.preventDefault();
+  // eslint-disable-next-line no-param-reassign
+  e.returnValue = '';
+}
+
 type LookupMatrix = Record<string, Record<string, { users: AnnotationModel[], bot: BotAnnotationModel | undefined }>>;
 type LabelLookupValue = {
   parentChoice?: number,
@@ -397,7 +403,10 @@ export default defineComponent({
       showText: false,
     };
   },
-
+  unmounted() {
+    clearInterval(this.autoSave);
+    window.removeEventListener('beforeunload', tabClosePrevent);
+  },
   mounted() {
     this.fetchProjectSchemas();
 
@@ -406,11 +415,7 @@ export default defineComponent({
     }, 300000); // called every 5 min
 
     // Prevent browser page reload and tab closure
-    window.addEventListener('beforeunload', (event) => {
-      event.preventDefault();
-      // eslint-disable-next-line no-param-reassign
-      event.returnValue = '';
-    });
+    window.addEventListener('beforeunload', tabClosePrevent);
 
     if (!this.isNew && this.botAnnotationMetaDataId !== undefined) {
       API.core.annotations.getSavedResolvedAnnotationsApiAnnotationsConfigResolvedBotAnnotationMetaIdGet({

@@ -11,7 +11,10 @@ export type PermissionKeys = 'owner' // eslint-disable-next-line @typescript-esl
   | 'pipelines_read' // eslint-disable-next-line @typescript-eslint/indent
   | 'pipelines_edit' // eslint-disable-next-line @typescript-eslint/indent
   | 'artefacts_read' // eslint-disable-next-line @typescript-eslint/indent
-  | 'artefacts_edit';
+  | 'artefacts_edit' // eslint-disable-next-line @typescript-eslint/indent
+  | 'search_dimensions' // eslint-disable-next-line @typescript-eslint/indent
+  | 'search_oa' // eslint-disable-next-line @typescript-eslint/indent
+  | 'import_limit_oa';
 
 export type Permissions = Pick<UserPermission, PermissionKeys>;
 
@@ -23,10 +26,13 @@ export const ProjectPermissionHints: Record<PermissionKeys, string> = {
   imports_edit: 'The user will be able to import data to this project.',
   annotations_read: 'The user will be able to see their own annotations made in this project and create/update their annotations.',
   annotations_edit: 'The user will be able to see all annotations in this project, create annotation schemes, assignments, resolve annotations, and export them.',
-  pipelines_read: 'The user will be able to [TBD]',
-  pipelines_edit: 'The user will be able to [TBD]',
-  artefacts_read: 'The user will be able to [TBD]',
-  artefacts_edit: 'The user will be able to [TBD]',
+  pipelines_read: 'The user will be able to see the status of pipelines.',
+  pipelines_edit: 'The user will be able to trigger pipeline runs.',
+  artefacts_read: 'The user will be able to see artefacts.',
+  artefacts_edit: 'The user will be able to clear pipeline runs.',
+  search_dimensions: 'The user will be able to search Dimensions on the platform.',
+  search_oa: 'The user will be able to search OpenAlex on the platform.',
+  import_limit_oa: 'Indicates the maximum number of articles that can be imported from OpenAlex.',
 };
 
 export const PermissionPresets: Record<string, Permissions> = {
@@ -42,6 +48,9 @@ export const PermissionPresets: Record<string, Permissions> = {
     pipelines_edit: false,
     artefacts_read: false,
     artefacts_edit: false,
+    search_dimensions: false,
+    search_oa: false,
+    import_limit_oa: 0,
   },
   Annotator: {
     owner: false,
@@ -55,6 +64,9 @@ export const PermissionPresets: Record<string, Permissions> = {
     pipelines_edit: false,
     artefacts_read: false,
     artefacts_edit: false,
+    search_dimensions: false,
+    search_oa: false,
+    import_limit_oa: 0,
   },
   'Full Access': {
     owner: false,
@@ -68,6 +80,9 @@ export const PermissionPresets: Record<string, Permissions> = {
     pipelines_edit: true,
     artefacts_read: true,
     artefacts_edit: true,
+    search_dimensions: false,
+    search_oa: false,
+    import_limit_oa: 0,
   },
   Owner: {
     owner: true,
@@ -81,5 +96,8 @@ export const PermissionPresets: Record<string, Permissions> = {
     pipelines_edit: true,
     artefacts_read: true,
     artefacts_edit: true,
+    search_dimensions: false,
+    search_oa: false,
+    import_limit_oa: 0,
   },
 };

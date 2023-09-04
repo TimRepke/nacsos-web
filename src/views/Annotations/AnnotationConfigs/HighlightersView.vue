@@ -130,7 +130,7 @@ import type { ApiResponseReject } from '@/plugins/api';
 import { API } from '@/plugins/api';
 import ClosablePill from '@/components/ClosablePill.vue';
 
-type Highlighter = HighlighterModel & { keywordsStr: string, error?: str };
+type Highlighter = HighlighterModel & { keywordsStr: string, error?: string };
 
 export default defineComponent({
   name: 'HighlighterView',
@@ -194,9 +194,9 @@ export default defineComponent({
       try {
         // eslint-disable-next-line no-new
         new RegExp(highlighter.keywords.join('|'), 'g');
-      } catch (e) {
+      } catch (e: unknown) {
         // eslint-disable-next-line no-param-reassign
-        highlighter.error = e.toString();
+        highlighter.error = (e as Error).toString();
       }
     },
     onDropKeyword(highlighter: Highlighter, keyword: string) {

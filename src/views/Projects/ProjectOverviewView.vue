@@ -3,6 +3,14 @@
     <div v-if="project && permissions">
       <h1>{{ project.name }}</h1>
       <div class="row mb-3">
+        <div class="col">
+          Project ID: <code>{{ project.project_id }}</code>
+        </div>
+        <div class="col">
+          Created at {{ project.time_created }}
+        </div>
+      </div>
+      <div class="row mb-3">
         <div class="col" v-html="markdownToHtml(project.description)" />
       </div>
       <div class="row mb-3">

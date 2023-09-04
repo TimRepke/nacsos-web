@@ -44,26 +44,44 @@
         </div>
       </div>
       <div class="row gy-3 gx-4">
-        <div
+        <template
           v-for="(hint, setting) in hints"
-          :key="setting"
-          class="col-lg-3">
-          <div class="form-check form-switch">
-            <input
-              :id="`toggle-${setting}-${permission.project_permission_id}`"
-              type="checkbox"
-              role="switch"
-              class="form-check-input"
-              v-model="permission[setting]"
-              aria-checked="mixed">
-            <label
-              class="form-check-label"
-              :for="`toggle-${setting}-${permission.project_permission_id}`">
-              <code>{{ setting }}</code>
-            </label>
+          :key="setting">
+          <div
+            v-if="setting !== 'import_limit_oa'"
+            class="col-lg-3">
+            <div class="form-check form-switch">
+              <input
+                :id="`toggle-${setting}-${permission.project_permission_id}`"
+                type="checkbox"
+                role="switch"
+                class="form-check-input"
+                v-model="permission[setting]"
+                aria-checked="mixed">
+              <label
+                class="form-check-label"
+                :for="`toggle-${setting}-${permission.project_permission_id}`">
+                <code>{{ setting }}</code>
+              </label>
+            </div>
+            <div class="text-muted small">
+              {{ hint }}
+            </div>
           </div>
+        </template>
+        <div class="col-lg-3">
+          <label
+            class="form-label"
+            :for="`toggle-oa-limit-${permission.project_permission_id}`">
+            <code>import_limit_oa</code>
+          </label>
+          <input
+            :id="`num-oa-limit-${permission.project_permission_id}`"
+            type="number"
+            class="form-control"
+            v-model="permission.import_limit_oa">
           <div class="text-muted small">
-            {{ hint }}
+            {{ hints.import_limit_oa }}
           </div>
         </div>
       </div>
