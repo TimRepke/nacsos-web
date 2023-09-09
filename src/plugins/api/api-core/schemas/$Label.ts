@@ -17,5 +17,13 @@ export const $Label = {
       type: 'number',
       isRequired: true,
     },
+    value: {
+      type: 'any-of',
+      contains: [{
+        type: 'number',
+      }, {
+        type: 'null',
+      }],
+    },
   },
 } as const;

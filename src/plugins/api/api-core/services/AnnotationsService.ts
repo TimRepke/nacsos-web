@@ -15,7 +15,7 @@ import type { BotAnnotationModel } from '../models/BotAnnotationModel';
 import type { ItemWithCount } from '../models/ItemWithCount';
 import type { MakeAssignmentsRequestModel } from '../models/MakeAssignmentsRequestModel';
 import type { ResolutionPayload } from '../models/ResolutionPayload';
-import type { ResolutionProposalResponse } from '../models/ResolutionProposalResponse';
+import type { ResolutionProposal } from '../models/ResolutionProposal';
 import type { SavedResolutionResponse } from '../models/SavedResolutionResponse';
 import type { UserModel } from '../models/UserModel';
 import type { UserProjectAssignmentScope } from '../models/UserProjectAssignmentScope';
@@ -658,6 +658,10 @@ export class AnnotationsService {
    * columns (list index of dict entry): Label (key in scheme + repeat); index map in matrix.keys
    * cells: list of annotations by each user for item/Label combination
    *
+   * :param include_new:
+   * :param update_existing:
+   * :param existing_resolution:
+   * :param include_empty:
    * :param strategy
    * :param scheme_id:
    * :param scope_id:
@@ -668,7 +672,7 @@ export class AnnotationsService {
    * :param ignore_order:
    * :param ignore_hierarchy:
    * :return:
-   * @returns ResolutionProposalResponse Successful Response
+   * @returns ResolutionProposal Successful Response
    * @throws ApiError
    */
   public getResolvedAnnotationsApiAnnotationsConfigResolveGet({
@@ -681,6 +685,10 @@ export class AnnotationsService {
     repeat,
     ignoreOrder,
     ignoreHierarchy,
+    includeEmpty,
+    existingResolution,
+    includeNew,
+    updateExisting,
   }: {
     strategy: 'majority' | 'first' | 'last' | 'trust',
     schemeId: string,
@@ -691,7 +699,11 @@ export class AnnotationsService {
     repeat?: (Array<number> | null),
     ignoreOrder?: (boolean | null),
     ignoreHierarchy?: (boolean | null),
-  }, options?: Partial<ApiRequestOptions>): CancelablePromise<ResolutionProposalResponse> {
+    includeEmpty?: (boolean | null),
+    existingResolution?: (string | null),
+    includeNew?: (boolean | null),
+    updateExisting?: (boolean | null),
+  }, options?: Partial<ApiRequestOptions>): CancelablePromise<ResolutionProposal> {
     return this.httpRequest.request({
       method: 'GET',
       url: '/api/annotations/config/resolve/',
@@ -707,6 +719,10 @@ export class AnnotationsService {
         'repeat': repeat,
         'ignore_order': ignoreOrder,
         'ignore_hierarchy': ignoreHierarchy,
+        'include_empty': includeEmpty,
+        'existing_resolution': existingResolution,
+        'include_new': includeNew,
+        'update_existing': updateExisting,
       },
       errors: {
         422: `Validation Error`,

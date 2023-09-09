@@ -13,5 +13,6 @@
 export type Label = {
   key: string;
   repeat: number;
+  value?: (number | null);
 };
 

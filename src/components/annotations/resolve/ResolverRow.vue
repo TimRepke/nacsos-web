@@ -2,7 +2,7 @@
   <tbody>
     <tr>
       <td class="text-muted small">
-        {{ rowIdx }}
+        {{ ordering.identifier }} ({{ ordering.scope_id.substring(0, 4) }})
         <font-awesome-icon :icon="['fas', 'file-invoice']" @click="showItem = !showItem" />
       </td>
       <td>
@@ -11,58 +11,61 @@
           style="width: 20ch;"
           role="button"
           tabindex="-1"
-          @click="$emit('request-focus-item', itemId)">
-          {{ itemId }}
+          @click="$emit('request-focus-item', ordering.item_id)">
+          {{ ordering.item_id }}
         </div>
       </td>
       <td
-        v-for="(labelInfo, strLabel) in labelLookup"
-        :key="strLabel"
+        v-for="label in labels"
+        :key="label.path_key"
         class="text-end"
-        :class="{ 'bg-warning': !isValid(labelInfo, itemId, strLabel) }">
+        :class="{ 'bg-warning': !isValid(label) }">
 
-        <template v-if="schemeLookup[labelInfo.path[0].key]?.kind === 'bool'">
+        <template v-if="label.kind === 'bool'">
           <BoolLabel
             class="d-flex justify-content-end"
-            :user-annotations="row[strLabel].users"
-            :bot-annotation="row[strLabel].bot"
-            :info="schemeLookup[labelInfo.path[0].key]"
-            :users="userLookup"
+            :item-id="ordering.item_id"
+            :proposal="row[label.path_key]"
+            :proposal-row="row"
+            :label="label"
+            :users-lookup="userLookup"
+            :users="users"
+            :bot-annotation-meta-data-id="botAnnotationMetaDataId"
             @bot-annotation-changed="$emit('bot-annotation-changed', $event)" />
         </template>
 
-        <template v-else-if="schemeLookup[labelInfo.path[0].key]?.kind === 'single'">
-          <ChoiceLabel
-            class="d-flex justify-content-end"
-            :user-annotations="row[strLabel].users"
-            :bot-annotation="row[strLabel].bot"
-            :info="schemeLookup[labelInfo.path[0].key]"
-            :users="userLookup"
-            @bot-annotation-changed="$emit('bot-annotation-changed', $event)" />
-        </template>
+        <!--        <template v-else-if="schemeLookup[labelInfo.path[0].key]?.kind === 'single'">-->
+        <!--          <ChoiceLabel-->
+        <!--            class="d-flex justify-content-end"-->
+        <!--            :user-annotations="row[strLabel].users"-->
+        <!--            :bot-annotation="row[strLabel].bot"-->
+        <!--            :info="schemeLookup[labelInfo.path[0].key]"-->
+        <!--            :users="userLookup"-->
+        <!--            @bot-annotation-changed="$emit('bot-annotation-changed', $event)" />-->
+        <!--        </template>-->
 
-        <template v-else-if="schemeLookup[labelInfo.path[0].key]?.kind === 'multi'">
-          <MultiLabel
-            class="d-flex justify-content-end"
-            :user-annotations="row[strLabel].users"
-            :bot-annotation="row[strLabel].bot"
-            :info="schemeLookup[labelInfo.path[0].key]"
-            :users="selectedUserLookup"
-            @bot-annotation-changed="$emit('bot-annotation-changed', $event)" />
-        </template>
+        <!--        <template v-else-if="schemeLookup[labelInfo.path[0].key]?.kind === 'multi'">-->
+        <!--          <MultiLabel-->
+        <!--            class="d-flex justify-content-end"-->
+        <!--            :user-annotations="row[strLabel].users"-->
+        <!--            :bot-annotation="row[strLabel].bot"-->
+        <!--            :info="schemeLookup[labelInfo.path[0].key]"-->
+        <!--            :users="selectedUserLookup"-->
+        <!--            @bot-annotation-changed="$emit('bot-annotation-changed', $event)" />-->
+        <!--        </template>-->
 
-        <template v-else-if="schemeLookup[labelInfo.path[0].key]?.kind === 'str'">
-          <StringLabel
-            class="d-flex justify-content-end"
-            :user-annotations="row[strLabel].users"
-            :bot-annotation="row[strLabel].bot"
-            :info="schemeLookup[labelInfo.path[0].key]"
-            :users="userLookup"
-            @bot-annotation-changed="$emit('bot-annotation-changed', $event)" />
-        </template>
+        <!--        <template v-else-if="schemeLookup[labelInfo.path[0].key]?.kind === 'str'">-->
+        <!--          <StringLabel-->
+        <!--            class="d-flex justify-content-end"-->
+        <!--            :user-annotations="row[strLabel].users"-->
+        <!--            :bot-annotation="row[strLabel].bot"-->
+        <!--            :info="schemeLookup[labelInfo.path[0].key]"-->
+        <!--            :users="userLookup"-->
+        <!--            @bot-annotation-changed="$emit('bot-annotation-changed', $event)" />-->
+        <!--        </template>-->
 
         <template v-else>
-          Unhandled "{{ schemeLookup[labelInfo.path[0].key]?.kind }}"
+          Unhandled "{{ label.kind }}"
         </template>
       </td>
     </tr>
@@ -80,11 +83,8 @@
 import { defineComponent } from 'vue';
 import type { PropType } from 'vue';
 import type {
-  AnnotationModel,
-  FlattenedAnnotationSchemeLabel,
-  BotAnnotationModel,
-  Label,
   UserModel,
+  ResolutionCell, FlatLabel, ResolutionOrdering,
 } from '@/plugins/api/api-core';
 import BoolLabel from '@/components/annotations/resolve/BoolLabel.vue';
 import ChoiceLabel from '@/components/annotations/resolve/ChoiceLabel.vue';
@@ -93,45 +93,37 @@ import StringLabel from '@/components/annotations/resolve/StringLabel.vue';
 import type { AnyItem } from '@/types/items';
 import { API } from '@/plugins/api';
 import { currentProjectStore } from '@/stores';
+import { ImportConfigTwitter } from '@/plugins/api/api-core';
+import sort_order = ImportConfigTwitter.sort_order;
 
-type LookupMatrixRow = Record<string, { users: AnnotationModel[], bot: BotAnnotationModel | undefined }>;
-type LabelLookupValue = {
-  parentChoice?: number,
-  parentKey?: string,
-  path: Label[],
-  strParent?: string,
-};
 export default defineComponent({
   name: 'ResolverRow',
   components: { StringLabel, MultiLabel, BoolLabel, ChoiceLabel },
   emits: ['bot-annotation-changed', 'request-focus-item'],
   props: {
-    rowIdx: {
-      type: Number,
-      required: true,
-    },
-    itemId: {
-      type: String,
-      required: true,
-    },
+    botAnnotationMetaDataId: { type: String, required: true },
     row: {
-      type: Object as PropType<LookupMatrixRow>,
-      required: true,
-    },
-    schemeLookup: {
-      type: Object as PropType<Record<string, FlattenedAnnotationSchemeLabel>>,
+      type: Object as PropType<Record<string, ResolutionCell>>,
       required: true,
     },
     labelLookup: {
-      type: Object as PropType<Record<string, LabelLookupValue>>,
+      type: Object as PropType<Record<string, FlatLabel>>,
+      required: true,
+    },
+    ordering: {
+      type: Object as PropType<ResolutionOrdering>,
+      required: true,
+    },
+    labels: {
+      type: Array as PropType<Array<FlatLabel>>,
       required: true,
     },
     userLookup: {
       type: Object as PropType<Record<string, UserModel>>,
       required: true,
     },
-    selectedUserLookup: {
-      type: Object as PropType<Record<string, UserModel>>,
+    users: {
+      type: Array as PropType<Array<UserModel>>,
       required: true,
     },
     showText: {
@@ -146,37 +138,40 @@ export default defineComponent({
     };
   },
   methods: {
-    isValid(labelInfo: LabelLookupValue, itemId: string, strPath: string): boolean {
+    isValid(label: FlatLabel): boolean {
       /**
        * This function checks the validity of the resolved label for an item.
        * A label is invalid, if the parent label does not have this one as a child.
        */
 
       // entries w/o parents are always valid
-      if (labelInfo.strParent === undefined) return true;
+      if (!label.parent_key) return true;
       // empty bot annotations are always valid (independent of parent label)
-      if (this.row[strPath] === undefined
-        || this.row[strPath].bot === undefined
-        || (this.row[strPath].bot?.value_int === undefined
-          && this.row[strPath].bot?.value_bool === undefined
-          && this.row[strPath].bot?.value_str === undefined
-          && this.row[strPath].bot?.value_float === undefined
-          && this.row[strPath].bot?.multi_int === undefined)) return true;
-      // ignore if parent label not in this view
-      // FIXME: verify that this is safe to assume (e.g. what if parent choice was never assigned rather
-      //        than explicitly not selected in this configuration)
-      if (!(labelInfo.strParent in this.labelLookup)) return true;
+      if (this.row[label.path_key] === undefined
+        || this.row[label.path_key].resolution === undefined
+        || this.row[label.path_key].resolution === null
+        || (this.row[label.path_key].resolution?.value_int === undefined
+          && this.row[label.path_key].resolution?.value_bool === undefined
+          && this.row[label.path_key].resolution?.value_str === undefined
+          && this.row[label.path_key].resolution?.value_float === undefined
+          && this.row[label.path_key].resolution?.multi_int === undefined)) return true;
 
       // check if parent choice has this label as child
-      const parentValueInt: number | undefined = this.row[labelInfo.strParent].bot?.value_int;
-      const parentValueMultiInt: number[] | undefined = this.row[labelInfo.strParent].bot?.multi_int;
-      const validParentInScheme: number = this.schemeLookup[labelInfo.path[0].key].parent_choice as number;
-
+      const parentValueInt: number | undefined | null = this.row[label.path_key].resolution?.value_int;
+      const parentValueMultiInt: number[] | undefined | null = this.row[label.path_key].resolution?.multi_int;
+      const validParentInScheme: number | undefined | null = label.parent_value;
+      // can't decide with incomplete information (this case should not occur anyway)
+      if (validParentInScheme === undefined || validParentInScheme === null) return true;
       return (parentValueInt === validParentInScheme)
         || (!!parentValueMultiInt && parentValueMultiInt.indexOf(validParentInScheme) >= 0);
     },
   },
   computed: {
+    sort_order() {
+      return sort_order;
+    }, ImportConfigTwitter() {
+      return ImportConfigTwitter;
+    },
     itemHtmlText(): string {
       let ret = '';
       if (this.item) {

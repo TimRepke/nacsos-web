@@ -228,7 +228,7 @@
         </div>
       </div>
     </div>
-    <div class="row mb-5" v-if="isTableReady">
+    <div class="row mb-5 mt-2" v-if="isTableReady && proposal">
       <div class="table-responsive-sm position-relative">
         <table class="table" style="width: calc(100% - 1rem)">
           <thead class="sticky-top bg-light">
@@ -246,8 +246,8 @@
                   placeholder="Filter item_id"
                   v-model="itemIdSearch" />
               </th>
-              <th v-for="label in collection.labels" :key="label2string(label)" class="text-end">
-                <div v-for="skey in label.slice().reverse()" :key="skey.key" class="nacsos-tooltip label-pill m-1">
+              <th v-for="label in proposal.labels" :key="label.path_key" class="text-end">
+                <div v-for="skey in label.path.slice().reverse()" :key="skey.key" class="nacsos-tooltip label-pill m-1">
                   <span>{{ skey.key }}</span>
                   <span>{{ skey.repeat }}</span>
                   <div
@@ -261,7 +261,7 @@
                     <h3 class="popover-header text-dark">{{ schemeLookup[skey.key].name }}</h3>
                     <div class="popover-body">
                       Type: {{ schemeLookup[skey.key].kind }}
-                      <template v-if="hasChoices(schemeLookup[skey.key].choices)">
+                      <template v-if="hasChoices(label.choices)">
                         <ul class="list-unstyled">
                           <li v-for="choice in schemeLookup[skey.key].choices" :key="choice.value">
                             <strong>{{ choice.value }}:</strong> {{ choice.name }}
@@ -275,17 +275,17 @@
             </tr>
           </thead>
           <ResolverRow
-            v-for="(itemId, run) in Object.keys(collection.annotations)"
-            :key="itemId"
-            v-show="itemIdSearch === '' || itemId.indexOf(itemIdSearch) >= 0"
-            :row-idx="run"
-            :item-id="itemId"
-            :row="matrix[itemId]"
-            :label-lookup="labels"
-            :scheme-lookup="schemeLookup"
+            v-for="orderEntry in proposal.ordering"
+            :key="orderEntry.key"
+            v-show="itemIdSearch === '' || orderEntry.item_id.indexOf(itemIdSearch) >= 0"
+            :ordering="orderEntry"
+            :row="proposal.matrix[orderEntry.key]"
             :user-lookup="userLookup"
-            :selected-user-lookup="selectedUserLookup"
+            :users="proposal.annotators"
+            :label-lookup="labels"
+            :labels="proposal.labels"
             :show-text="showText"
+            :bot-annotation-meta-data-id="botAnnotationMetaDataId"
             @bot-annotation-changed="handleChangedBotAnnotation"
             @request-focus-item="(val) => focusItem = val" />
         </table>
@@ -309,16 +309,16 @@ import { defineComponent } from 'vue';
 import { currentProjectStore } from '@/stores';
 import type {
   AnnotationSchemeModel,
-  AnnotationModel,
   FlattenedAnnotationSchemeLabel,
   AssignmentScopeModel,
   BotAnnotationModel,
   AnnotationFilters,
   Label,
   UserModel,
+  ResolutionProposal,
   AnnotationCollectionDB,
-  AnnotationSchemeLabelChoiceFlat,
-  AnnotationCollection,
+  FlatLabel,
+  FlatLabelChoice,
 } from '@/plugins/api/api-core';
 import { BotMetaResolve, ResolutionPayload } from '@/plugins/api/api-core';
 import { API } from '@/plugins/api';
@@ -335,45 +335,10 @@ function tabClosePrevent(e: BeforeUnloadEvent) {
   e.returnValue = '';
 }
 
-type LookupMatrix = Record<string, Record<string, { users: AnnotationModel[], bot: BotAnnotationModel | undefined }>>;
-type LabelLookupValue = {
-  parentChoice?: number,
-  parentKey?: string,
-  path: Label[],
-  strParent?: string,
-};
-type LabelLookup = Record<string, LabelLookupValue>;
-
-type ResolveData = {
-  botAnnotationMetaDataId: string | undefined,
-  isNew: boolean, // set to true if this is not saved yet
-  name: string,
-  algorithm: BotMetaResolve.algorithm,
-  ignoreHierarchy: boolean,
-  ignoreOrder: boolean,
-  filters: Partial<AnnotationFilters>,
-  schemeFlat: FlattenedAnnotationSchemeLabel[],
-  collection: AnnotationCollectionDB | AnnotationCollection | undefined,
-  botAnnotations: Record<string, Array<[Label[], BotAnnotationModel]>>,
-  // id of item in focus (to be opened in modal)
-  focusItem: string | undefined,
-  // only used for setup (empty when botAnnotationMetaDataId not None)
-  projectAnnotationSchemes: AnnotationSchemeModel[],
-  // assignment scopes linking to filters.scheme_id
-  assignmentScopes: AssignmentScopeModel[],
-  annotators: UserModel[],
-  loadingProposals: boolean,
-  itemIdSearch: string,
-  // timeout-interval handler for auto-saving
-  autoSave: number | undefined,
-  // if this is set to true, the item text is loaded and shown in the table
-  showText: boolean,
-};
-
 export default defineComponent({
   name: 'AnnotationConfigResolveView',
   components: { ResolverRow, ToolTip, ItemModal },
-  data(): ResolveData {
+  data() {
     const botAnnotationMetaDataId: string | undefined = this.$route.params.bot_annotation_metadata_id as string | undefined;
 
     return {
@@ -390,17 +355,16 @@ export default defineComponent({
       algorithm: BotMetaResolve.algorithm.MAJORITY,
       ignoreHierarchy: false,
       ignoreOrder: false,
-      schemeFlat: [] as FlattenedAnnotationSchemeLabel[],
-      collection: undefined as AnnotationCollectionDB | AnnotationCollection | undefined,
-      botAnnotations: {} as Record<string, Array<[Label[], BotAnnotationModel]>>,
       focusItem: undefined as string | undefined,
       projectAnnotationSchemes: [] as AnnotationSchemeModel[],
       assignmentScopes: [] as AssignmentScopeModel[],
       annotators: [] as UserModel[],
       loadingProposals: false,
       itemIdSearch: '',
-      autoSave: undefined,
+      autoSave: undefined as undefined | number,
       showText: false,
+      proposal: undefined as ResolutionProposal | undefined,
+      schemeFlat: [] as FlattenedAnnotationSchemeLabel[],
     };
   },
   unmounted() {
@@ -473,8 +437,8 @@ export default defineComponent({
   },
 
   methods: {
-    hasChoices(value: AnnotationSchemeLabelChoiceFlat[] | undefined) {
-      return value !== undefined && Array.isArray(value) && value.length > 0;
+    hasChoices(value: FlatLabelChoice[] | undefined | null) {
+      return value !== undefined && value !== null && Array.isArray(value) && value.length > 0;
     },
     fetchProposal() {
       this.loadingProposals = true;
@@ -490,8 +454,7 @@ export default defineComponent({
         ignoreOrder: this.ignoreOrder,
       }).then((response) => {
         const { data } = response;
-        this.collection = data.collection;
-        this.botAnnotations = data.proposal as unknown as Record<string, [Label[], BotAnnotationModel][]>;
+        this.proposal = data;
         this.loadingProposals = false;
       }).catch((reason) => {
         if (reason.error?.detail?.type === 'EmptyAnnotationsError') {
@@ -576,71 +539,22 @@ export default defineComponent({
       }
       return Object.fromEntries(this.annotators.map((user: UserModel) => [user.user_id, user]));
     },
-    selectedUserLookup(): Record<string, UserModel> {
-      if (!this.annotators) {
+    labels(): Record<string, FlatLabel> {
+      if (!this.proposal) {
         return {};
       }
-      return Object.fromEntries(
-        this.annotators
-          .map((user: UserModel) => [user.user_id, user])
-          .filter((entry: [string, UserModel]) => (this.filters.user_id ?? []).indexOf(entry[0]) >= 0),
-      );
-    },
-    labels(): LabelLookup {
-      if (!this.collection || !this.collection.labels || Object.keys(this.schemeLookup).length === 0) {
-        return {};
-      }
-      return Object.fromEntries(this.collection.labels.map((label: Label[]) => [this.label2string(label),
-        {
-          path: label,
-          strParent: (label.length > 1) ? this.label2string(label.slice(1)) : undefined,
-          parentChoice: this.schemeLookup[label[0].key]?.parent_choice,
-          parentKey: this.schemeLookup[label[0].key]?.parent_label,
-        }]));
+      return Object.fromEntries(this.proposal.labels.map((label: FlatLabel) => [label.path_key, label]));
     },
     schemeLookup(): Record<string, FlattenedAnnotationSchemeLabel> {
       if (!this.schemeFlat) return {};
       return Object.fromEntries(this.schemeFlat.map((label: FlattenedAnnotationSchemeLabel) => [label.key, label]));
     },
     isTableReady(): boolean {
-      return !!this.collection && this.collection.annotations && Object.keys(this.labels).length > 0;
+      return !!this.proposal;
     },
     isConfigValid(): boolean {
       // returns true if all necessary data is available to request a resolution proposal
       return !!this.filters.scheme_id && (this.filters.key || []).length > 0 && (this.filters.user_id || []).length > 0;
-    },
-    matrix(): LookupMatrix {
-      if (!this.collection || !this.collection.annotations) {
-        return {};
-      }
-      const itemIds = Object.keys(this.collection.annotations);
-      const strPaths = Object.keys(this.labels);
-
-      const matrix = Object.fromEntries(itemIds.map((itemId) => [
-        itemId,
-        Object.fromEntries(strPaths.map((strPath) => [
-          strPath,
-          {
-            users: [] as AnnotationModel[],
-            bot: undefined as BotAnnotationModel | undefined,
-          }]))]));
-
-      Object.entries(this.collection.annotations).forEach((entry) => {
-        const [itemId, groupedAnnotations] = entry as [string, Array<[Label[], AnnotationModel[]]>];
-        groupedAnnotations.forEach(([path, annotations]) => {
-          matrix[itemId][this.label2string(path)].users = annotations;
-        });
-      });
-      if (this.botAnnotations) {
-        Object.entries(this.botAnnotations).forEach((entry) => {
-          const [itemId, botAnnotationEntry] = entry as [string, Array<[Label[], BotAnnotationModel]>];
-          botAnnotationEntry.forEach(([path, botAnnotation]) => {
-            const strPath = this.label2string(path);
-            matrix[itemId][strPath].bot = botAnnotation;
-          });
-        });
-      }
-      return matrix;
     },
   },
   beforeRouteLeave(to, from, next) {

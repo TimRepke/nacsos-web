@@ -1,19 +1,22 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-export const $Event = {
+export const $FlatLabelChoice = {
   properties: {
-    event: {
-      type: 'Enum',
+    name: {
+      type: 'string',
       isRequired: true,
     },
-    payload: {
+    hint: {
       type: 'any-of',
       contains: [{
-        type: 'ExampleEvent',
+        type: 'string',
       }, {
-        type: 'ExampleSubEvent',
+        type: 'null',
       }],
+    },
+    value: {
+      type: 'number',
       isRequired: true,
     },
   },

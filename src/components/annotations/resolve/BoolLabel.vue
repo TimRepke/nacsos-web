@@ -1,19 +1,21 @@
 <template>
   <div>
-    <span v-for="annotation in userAnnotationsSorted" :key="annotation.annotation_id">
-      <InlineToolTip :info="getPrettyUsername(annotation.user_id)">
-        <font-awesome-icon
-          :icon="['fas', annotation2icon(annotation.value_bool)]"
-          :class="[annotation2classes(annotation.value_bool)]"
-          class="border text-light p-1"
-          style="height: 1rem; width: 1rem;" />
-      </InlineToolTip>
+    <span v-for="user in users" :key="user.user_id">
+      <span v-for="annotation in proposal.labels[user.user_id]" :key="annotation.annotation.annotation_id">
+        <InlineToolTip :info="getPrettyUsername(user)" placement="bottom">
+          <font-awesome-icon
+            :icon="['fas', annotation2icon(annotation.annotation.value_bool)]"
+            :class="[annotation2classes(annotation.annotation.value_bool)]"
+            class="border text-light p-1"
+            style="height: 1rem; width: 1rem;" />
+        </InlineToolTip>
+      </span>
     </span>
 
     <div class="dropdown ps-2 d-inline-block">
       <font-awesome-icon
-        :icon="['fas', annotation2icon(botAnnotation?.value_bool)]"
-        :class="annotation2classes(botAnnotation?.value_bool)"
+        :icon="['fas', annotation2icon(proposal.resolution?.value_bool)]"
+        :class="annotation2classes(proposal.resolution?.value_bool)"
         class="border border-dark border-2 rounded-3 text-light p-1 dropdown-toggle"
         role="button"
         style="height: 1rem; width: 1rem;"
@@ -36,9 +38,9 @@ import { defineComponent } from 'vue';
 import type { PropType } from 'vue';
 import 'core-js/modules/es.array.to-sorted';
 import type {
-  AnnotationModel,
   BotAnnotationModel,
-  FlattenedAnnotationSchemeLabel,
+  FlatLabel,
+  ResolutionCell,
   UserModel,
 } from '@/plugins/api/api-core';
 import InlineToolTip from '@/components/InlineToolTip.vue';
@@ -62,58 +64,67 @@ export default defineComponent({
   },
   emits: ['botAnnotationChanged'],
   props: {
-    info: {
-      type: Object as PropType<FlattenedAnnotationSchemeLabel>,
+    botAnnotationMetaDataId: { type: String, required: true },
+    itemId: { type: String, required: true, },
+    label: {
+      type: Object as PropType<FlatLabel>,
       required: true,
     },
-    users: {
+    usersLookup: {
       type: Object as PropType<Record<string, UserModel>>,
       required: true,
     },
-    userAnnotations: {
-      type: Array as PropType<AnnotationModel[]>,
+    users: {
+      type: Array as PropType<Array<UserModel>>,
       required: true,
     },
-    botAnnotation: {
-      type: Object as PropType<BotAnnotationModel>,
-      required: false,
-      default: () => undefined,
+    proposal: {
+      type: Object as PropType<ResolutionCell>,
+      required: true,
+    },
+    proposalRow: {
+      type: Object as PropType<Record<string, ResolutionCell>>,
+      required: true,
     },
   },
   methods: {
-    annotation2icon(val: boolean | undefined): string {
-      if (val === undefined) return 'question';
+    annotation2icon(val: boolean | undefined | null): string {
+      if (val === undefined || val === null) return 'question';
       return (val) ? 'check' : 'xmark';
     },
-    annotation2classes(val: boolean | undefined): string[] {
-      if (val === undefined) return ['bg-light', 'text-dark'];
+    annotation2classes(val: boolean | undefined | null): string[] {
+      if (val === undefined || val === null) return ['bg-light', 'text-dark'];
       return (val) ? ['bg-success', 'text-light'] : ['bg-danger', 'text-light'];
     },
-    setBotAnnotation(value: boolean | undefined) {
-      if (this.botAnnotation !== undefined) {
-        const anno = this.botAnnotation;
-        anno.value_bool = value;
-        this.$emit('botAnnotationChanged', anno);
-        this.editMode = false;
+    setBotAnnotation(value: boolean | undefined | null) {
+      const { resolution } = this.proposal;
+      if (resolution !== undefined && resolution !== null) {
+        resolution.value_bool = value;
+        this.$emit('botAnnotationChanged', resolution);
       } else {
-        // FIXME: not implemented (handle adding new BotAnnotation, i.e. handle the case where item has no annotation here)
-        // const anno: BotAnnotationModel = {};
-        EventBus.emit(new ToastEvent('WARN', 'Not implemented yet.'));
+        const parentId = this.proposalRow[this.label.path_key].resolution?.bot_annotation_id;
+        if (!parentId) {
+          EventBus.emit(new ToastEvent(
+            'WARN',
+            'This is not a valid selection. Please check the parent annotation first.',
+          ));
+        }
+        this.proposal.resolution = {
+          bot_annotation_id: crypto.randomUUID(),
+          bot_annotation_metadata_id: this.botAnnotationMetaDataId,
+          item_id: this.itemId,
+          parent: parentId,
+          key: this.label.key,
+          repeat: this.label.repeat,
+          value_bool: value,
+        } as BotAnnotationModel;
+        this.$emit('botAnnotationChanged', this.proposal.resolution);
       }
+      this.editMode = false;
     },
-    getPrettyUsername(userId: string): string {
-      const user: UserModel | undefined = this.users[userId];
+    getPrettyUsername(user: UserModel | undefined | null): string {
       if (!user) return '??';
       return `${user.username} (${user.full_name})`;
-    },
-  },
-  computed: {
-    userAnnotationsSorted(): AnnotationModel[] {
-      if (!this.userAnnotations) return [];
-      return this.userAnnotations.toSorted(
-        // eslint-disable-next-line no-nested-ternary
-        (a1: AnnotationModel, a2: AnnotationModel) => ((a1.user_id < a2.user_id) ? -1 : (a1.user_id > a2.user_id) ? 1 : 0),
-      );
     },
   },
 });

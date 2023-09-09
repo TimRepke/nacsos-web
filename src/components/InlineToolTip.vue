@@ -39,3 +39,9 @@ export default defineComponent({
   },
 });
 </script>
+
+<style scoped>
+.nacsos-tooltip > .bottom {
+    transform: translate(-50%, 75%);
+}
+</style>

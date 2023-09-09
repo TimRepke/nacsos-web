@@ -26,6 +26,11 @@
  *
  */
 export type AnnotationModel = {
+  value_bool?: (boolean | null);
+  value_int?: (number | null);
+  value_float?: (number | null);
+  value_str?: (string | null);
+  multi_int?: (Array<number> | null);
   annotation_id?: (string | null);
   time_created?: (string | null);
   time_updated?: (string | null);
@@ -36,11 +41,6 @@ export type AnnotationModel = {
   key: string;
   repeat?: number;
   parent?: (string | null);
-  value_bool?: (boolean | null);
-  value_int?: (number | null);
-  value_float?: (number | null);
-  value_str?: (string | null);
-  multi_int?: (Array<number> | null);
   text_offset_start?: (number | null);
   text_offset_stop?: (number | null);
 };
