@@ -21,7 +21,7 @@
         class="text-end"
         :class="{ 'bg-warning': !isValid(label) }">
 
-        <template v-if="label.kind === 'bool'">
+        <template v-if="label.kind === 'bool' && row[label.path_key]">
           <BoolLabel
             class="d-flex justify-content-end"
             :item-id="ordering.item_id"
@@ -34,35 +34,44 @@
             @bot-annotation-changed="$emit('bot-annotation-changed', $event)" />
         </template>
 
-        <!--        <template v-else-if="schemeLookup[labelInfo.path[0].key]?.kind === 'single'">-->
-        <!--          <ChoiceLabel-->
-        <!--            class="d-flex justify-content-end"-->
-        <!--            :user-annotations="row[strLabel].users"-->
-        <!--            :bot-annotation="row[strLabel].bot"-->
-        <!--            :info="schemeLookup[labelInfo.path[0].key]"-->
-        <!--            :users="userLookup"-->
-        <!--            @bot-annotation-changed="$emit('bot-annotation-changed', $event)" />-->
-        <!--        </template>-->
+        <template v-else-if="label.kind === 'single' && row[label.path_key]">
+          <ChoiceLabel
+            class="d-flex justify-content-end"
+            :item-id="ordering.item_id"
+            :proposal="row[label.path_key]"
+            :proposal-row="row"
+            :label="label"
+            :users-lookup="userLookup"
+            :users="users"
+            :bot-annotation-meta-data-id="botAnnotationMetaDataId"
+            @bot-annotation-changed="$emit('bot-annotation-changed', $event)" />
+        </template>
 
-        <!--        <template v-else-if="schemeLookup[labelInfo.path[0].key]?.kind === 'multi'">-->
-        <!--          <MultiLabel-->
-        <!--            class="d-flex justify-content-end"-->
-        <!--            :user-annotations="row[strLabel].users"-->
-        <!--            :bot-annotation="row[strLabel].bot"-->
-        <!--            :info="schemeLookup[labelInfo.path[0].key]"-->
-        <!--            :users="selectedUserLookup"-->
-        <!--            @bot-annotation-changed="$emit('bot-annotation-changed', $event)" />-->
-        <!--        </template>-->
+        <template v-else-if="label.kind === 'multi' && row[label.path_key]">
+          <MultiLabel
+            class="d-flex justify-content-end"
+            :item-id="ordering.item_id"
+            :proposal="row[label.path_key]"
+            :proposal-row="row"
+            :label="label"
+            :users-lookup="userLookup"
+            :users="users"
+            :bot-annotation-meta-data-id="botAnnotationMetaDataId"
+            @bot-annotation-changed="$emit('bot-annotation-changed', $event)" />
+        </template>
 
-        <!--        <template v-else-if="schemeLookup[labelInfo.path[0].key]?.kind === 'str'">-->
-        <!--          <StringLabel-->
-        <!--            class="d-flex justify-content-end"-->
-        <!--            :user-annotations="row[strLabel].users"-->
-        <!--            :bot-annotation="row[strLabel].bot"-->
-        <!--            :info="schemeLookup[labelInfo.path[0].key]"-->
-        <!--            :users="userLookup"-->
-        <!--            @bot-annotation-changed="$emit('bot-annotation-changed', $event)" />-->
-        <!--        </template>-->
+        <template v-else-if="label.kind === 'str' && row[label.path_key]">
+          <StringLabel
+            class="d-flex justify-content-end"
+            :item-id="ordering.item_id"
+            :proposal="row[label.path_key]"
+            :proposal-row="row"
+            :label="label"
+            :users-lookup="userLookup"
+            :users="users"
+            :bot-annotation-meta-data-id="botAnnotationMetaDataId"
+            @bot-annotation-changed="$emit('bot-annotation-changed', $event)" />
+        </template>
 
         <template v-else>
           Unhandled "{{ label.kind }}"
@@ -93,15 +102,14 @@ import StringLabel from '@/components/annotations/resolve/StringLabel.vue';
 import type { AnyItem } from '@/types/items';
 import { API } from '@/plugins/api';
 import { currentProjectStore } from '@/stores';
-import { ImportConfigTwitter } from '@/plugins/api/api-core';
-import sort_order = ImportConfigTwitter.sort_order;
+import { is, isNone } from '@/util';
 
 export default defineComponent({
   name: 'ResolverRow',
   components: { StringLabel, MultiLabel, BoolLabel, ChoiceLabel },
   emits: ['bot-annotation-changed', 'request-focus-item'],
   props: {
-    botAnnotationMetaDataId: { type: String, required: true },
+    botAnnotationMetaDataId: { type: String, required: false, default: undefined },
     row: {
       type: Object as PropType<Record<string, ResolutionCell>>,
       required: true,
@@ -147,31 +155,27 @@ export default defineComponent({
       // entries w/o parents are always valid
       if (!label.parent_key) return true;
       // empty bot annotations are always valid (independent of parent label)
-      if (this.row[label.path_key] === undefined
-        || this.row[label.path_key].resolution === undefined
-        || this.row[label.path_key].resolution === null
-        || (this.row[label.path_key].resolution?.value_int === undefined
-          && this.row[label.path_key].resolution?.value_bool === undefined
-          && this.row[label.path_key].resolution?.value_str === undefined
-          && this.row[label.path_key].resolution?.value_float === undefined
-          && this.row[label.path_key].resolution?.multi_int === undefined)) return true;
+      if (isNone(this.row[label.path_key])
+        || isNone(this.row[label.path_key].resolution)
+        || (isNone(this.row[label.path_key].resolution?.value_int)
+          && isNone(this.row[label.path_key].resolution?.value_bool)
+          && isNone(this.row[label.path_key].resolution?.value_str)
+          && isNone(this.row[label.path_key].resolution?.value_float)
+          && isNone(this.row[label.path_key].resolution?.multi_int))) return true;
 
       // check if parent choice has this label as child
-      const parentValueInt: number | undefined | null = this.row[label.path_key].resolution?.value_int;
-      const parentValueMultiInt: number[] | undefined | null = this.row[label.path_key].resolution?.multi_int;
-      const validParentInScheme: number | undefined | null = label.parent_value;
       // can't decide with incomplete information (this case should not occur anyway)
-      if (validParentInScheme === undefined || validParentInScheme === null) return true;
+      const validParentInScheme: number | undefined | null = label.parent_value;
+      if (isNone(validParentInScheme)) return true;
+
+      const parentValueInt: number | undefined | null = this.row[label.parent_key].resolution?.value_int;
+      const parentValueMultiInt: number[] | undefined | null = this.row[label.parent_key].resolution?.multi_int;
+
       return (parentValueInt === validParentInScheme)
-        || (!!parentValueMultiInt && parentValueMultiInt.indexOf(validParentInScheme) >= 0);
+        || (is<number[]>(parentValueMultiInt) && parentValueMultiInt.indexOf(validParentInScheme) >= 0);
     },
   },
   computed: {
-    sort_order() {
-      return sort_order;
-    }, ImportConfigTwitter() {
-      return ImportConfigTwitter;
-    },
     itemHtmlText(): string {
       let ret = '';
       if (this.item) {
@@ -196,7 +200,7 @@ export default defineComponent({
       if (newValue && !this.item) {
         API.core.project.getDetailForItemApiProjectItemsDetailItemIdGet({
           xProjectId: currentProjectStore.projectId as string,
-          itemId: this.itemId,
+          itemId: this.ordering.item_id,
         }).then((response) => {
           this.item = response.data;
         }).catch(() => {

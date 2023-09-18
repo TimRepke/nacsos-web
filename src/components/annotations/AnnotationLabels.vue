@@ -4,9 +4,10 @@
       v-for="(label, labelIndex) in labels"
       :key="`${label.key}-${label.annotation.repeat}`"
       class="mb-3"
-      :class="{ selected: labelIndex === selected }"
-    >
-      <div class="mb-2">
+      :class="{ selected: labelIndex === selectedIdx && selectedChildIdx < 0 }">
+      <div
+        class="mb-2"
+        v-if="label.annotation !== undefined && label.annotation !== null && label.max_repeat !== null && label.max_repeat !== undefined">
         <div>
           <strong class="label-name">{{ label.name }}</strong>
           <span v-if="label.max_repeat > 1" style="font-size: .875rem">
@@ -84,7 +85,7 @@
             <SearchableSelect
               :options="label.choices"
               :current-option-value="label.annotation.value_int"
-              @update:current-option="newValue => singleIntNewValue(newValue, label)" />
+              @update:current-option="(newValue: number | undefined) => singleIntNewValue(newValue, label)" />
           </template>
           <template v-else>
             <div class="list-group">
@@ -106,18 +107,18 @@
             </div>
           </template>
           <div
-            v-if="label.annotation.value_int !== undefined && label.choices[val2choice(label)].children"
+            v-if="children(label)"
             class="ms-3 mt-2">
             <AnnotationLabels
-              :labels="label.choices[val2choice(label)].children"
+              :labels="children(label)"
               :assignment="assignment"
               :key="label.annotation.value_int"
-              ref="childLabels" />
+              :ref="`childLabels-${labelIndex}-${label.annotation.repeat || 0}`" />
           </div>
         </template>
 
         <template v-else-if="label.kind === 'multi'">
-          <template v-if="label.dropdown">
+          <template v-if="label.dropdown && label.choices">
             <div class="mb-2">
               <closable-pill
                 v-for="v in label.annotation.multi_int"
@@ -133,7 +134,7 @@
               :reset-text="true"
               :options="label.choices"
               :hidden-options="label.annotation.multi_int"
-              @update:currentOption="selectedValue => multiIntUpdate(label, selectedValue)" />
+              @update:currentOption="(selectedValue: number | undefined) => multiIntUpdate(label, selectedValue)" />
           </template>
           <template v-else>
             <div class="list-group">
@@ -162,7 +163,7 @@
               :labels="child.labels"
               :assignment="assignment"
               :key="child.key"
-              ref="childLabels" />
+              :ref="`childLabels-${labelIndex}-${label.annotation.repeat || 0}`" />
           </div>
         </template>
 
@@ -196,10 +197,11 @@ import SearchableSelect from '@/components/SearchableSelect.vue';
 import type { AssignmentModel, AnnotationModel, AnnotationSchemeLabelChoice } from '@/plugins/api/api-core';
 import { AnnotationSchemeLabel } from '@/plugins/api/api-core';
 import ClosablePill from '@/components/ClosablePill.vue';
+import { is, isNone } from '@/util';
 
 type SubLabels = { labels: AnnotationSchemeLabel[]; key: number; };
 
-export default defineComponent({
+const AnnotationLabels = defineComponent({
   name: 'AnnotationLabels',
   components: { ClosablePill, InlineToolTip, SearchableSelect },
   props: {
@@ -216,93 +218,118 @@ export default defineComponent({
   },
   data() {
     return {
-      selected: -1,
-      selectedChild: -1,
+      selectedIdx: -1,
+      selectedChildIdx: -1,
     };
   },
   methods: {
-    hasNext() {
-      return (this.selected + 1) < this.labels.length;
-    },
-    hasPrev() {
-      return this.selected > 0;
-    },
-    selectNext() {
-      if (this.labels) {
-        const selectedLabel = this.labels[this.selected];
-        if (selectedLabel) {
-          // Go depth first down the family tree of children
-          if (selectedLabel.annotation?.value_int !== undefined
-            && selectedLabel.choices
-            && selectedLabel.choices[this.val2choice(selectedLabel) as number].children) {
-            const { children } = selectedLabel.choices[this.val2choice(selectedLabel) as number];
-            if (children) {
-              if (this.selectedChild < 0) {
-                this.selectedChild = 0;
-                this.$refs.childLabels[this.selectedChild].selectNext();
-              } else if (this.$refs.childLabels[this.selectedChild].hasNext()) {
-                this.$refs.childLabels[this.selectedChild].selectNext();
-              } else if ((this.selectedChild + 1) >= (children.length - 1)) {
-                this.$refs.childLabels[this.selectedChild].selectNext();
-                this.selected += 1;
-                this.selectedChild = -1;
-              } else {
-                this.selectedChild += 1;
-                this.$refs.childLabels[this.selectedChild].selectNext();
-              }
-            }
-          } else { // Nothing to walk down to, so pick next sibling
-            this.selected += 1;
-            this.selectedChild = -1;
-          }
-        } else { // Seems to be the first in this subtree
-          this.selected = 0;
-          this.selectedChild = -1;
+    selectNext(): number {
+      // returns:
+      //   0) parent should hold and do nothing
+      //   1) reached end, parent should progress
+      if (this.labels && this.labels.length > 0) {
+        // Seems to be the first in this subtree
+        if ((this.selectedIdx < 0)) {
+          this.selectedIdx = 0;
+          this.selectedChildIdx = -1;
+          return 0;
         }
+
+        const label = this.labels[this.selectedIdx];
+        const children = this.children(label);
+
+        if (children.length > 0) {
+          // Encountered a label with children
+          if (this.selectedChildIdx < 0) {
+            this.selectedChildIdx = 0;
+          }
+          const refs = this.$refs[`childLabels-${this.selectedIdx}-${label.annotation?.repeat || 0}`] as typeof AnnotationLabels[];
+          const action = refs[this.selectedChildIdx].selectNext();
+
+          if (action > 0) {
+            if ((this.selectedChildIdx + 1) < children.length) {
+              this.selectedChildIdx += 1;
+            } else {
+              this.selectedChildIdx = -1;
+              this.selectedIdx += 1;
+            }
+          }
+          return action;
+        }
+
+        // Encountered a label without children
+        this.selectedChildIdx = -1;
+        if ((this.selectedIdx + 1) >= this.labels.length) {
+          // reached last label, resetting and tell parent to proceed
+          this.selectedIdx = -1;
+          return 1;
+        }
+        // continue to next label and tell parent to wait
+        this.selectedIdx += 1;
+        return 0;
       }
+      return 1;
     },
     selectPrevious() {
-      if (this.labels) {
-        const selectedLabel = this.labels[this.selected];
-        if (selectedLabel) {
-          if (selectedLabel.annotation?.value_int !== undefined
-            && selectedLabel.choices
-            && selectedLabel.choices[this.val2choice(selectedLabel) as number].children) {
-            const { children } = selectedLabel.choices[this.val2choice(selectedLabel) as number];
-            if (children) {
-              if (this.selectedChild < 0) {
-                this.selectedChild = children.length - 1;
-                this.$refs.childLabels[this.selectedChild].selectPrevious();
-              } else if (this.$refs.childLabels[this.selectedChild].hasPrev()) {
-                this.$refs.childLabels[this.selectedChild].selectPrevious();
-              } else if ((this.selected - 1) >= 0) {
-                this.$refs.childLabels[this.selectedChild].selectPrevious();
-                // this.selected -= 1;
-                this.selectedChild = -1;
-              } else {
-                this.selectedChild -= 1;
-                this.$refs.childLabels[this.selectedChild].selectPrevious();
-              }
-            }
-          } else {
-            this.selected -= 1;
-            this.selectedChild = -1;
-          }
-        } else { // Seems we lost ourselves, jump to first
-          this.selected = 0;
-          this.selectedChild = -1;
+      // returns:
+      //   0) parent should hold and do nothing
+      //   1) reached end, parent should progress
+      if (this.labels && this.labels.length > 0) {
+        // Seems to be the first in this subtree, jump to last
+        if (this.selectedIdx < 0) {
+          this.selectedIdx = this.labels.length - 1;
+          this.selectedChildIdx = -1;
+          return 0;
         }
+
+        const label = this.labels[this.selectedIdx];
+        const children = this.children(label);
+
+        if (children.length > 0) {
+          // Encountered a label with children
+          if (this.selectedChildIdx < 0) {
+            this.selectedChildIdx = children.length - 1;
+          }
+          const refs = this.$refs[`childLabels-${this.selectedIdx}-${label.annotation?.repeat || 0}`] as typeof AnnotationLabels[];
+          const action = refs[this.selectedChildIdx].selectPrevious();
+
+          if (action > 0) {
+            if ((this.selectedChildIdx - 1) < 0) {
+              this.selectedChildIdx -= 1;
+            } else {
+              this.selectedChildIdx = -1;
+              this.selectedIdx -= 1;
+            }
+          }
+          return action;
+        }
+
+        // Encountered a label without children
+        this.selectedChildIdx = -1;
+        if ((this.selectedIdx - 1) < 0) {
+          // reached first label, resetting and tell parent to proceed
+          this.selectedIdx = -1;
+          return 1;
+        }
+        // continue to next label and tell parent to wait
+        this.selectedIdx -= 1;
+        return 0;
       }
+      return 1;
     },
     setValue(v: string) {
-      const selectedLabel = this.labels[this.selected];
+      const selectedLabel = this.labels[this.selectedIdx];
       if (selectedLabel) {
-        if (v === 'Backspace') {
+        if (this.selectedChildIdx >= 0) {
+          // refer all actions to selected child
+          const refs = this.$refs[`childLabels-${this.selectedIdx}-${selectedLabel.annotation?.repeat || 0}`] as typeof AnnotationLabels[];
+          refs[this.selectedChildIdx].setValue(v);
+        } else if (v === 'Backspace') {
           this.clearAnnotation(selectedLabel);
         } else if (v === '+') {
-          this.duplicateLabel(selectedLabel, this.selected);
+          this.duplicateLabel(selectedLabel, this.selectedIdx);
         } else if (v === '-') {
-          this.deleteLabel(selectedLabel, this.selected);
+          this.deleteLabel(selectedLabel, this.selectedIdx);
         } else if (selectedLabel.kind === 'bool') {
           if (v === '0' || v === '2') {
             selectedLabel.annotation!.value_bool = false;
@@ -311,25 +338,47 @@ export default defineComponent({
           }
         } else if (selectedLabel.kind === 'single') {
           if (v === '0') {
-            selectedLabel.annotation!.value_int = 0;
+            this.singleIntNewValue(0, selectedLabel);
           } else if (v === '1') {
-            selectedLabel.annotation!.value_int = 1;
+            this.singleIntNewValue(1, selectedLabel);
           } else if (v === '2') {
-            selectedLabel.annotation!.value_int = 2;
+            this.singleIntNewValue(2, selectedLabel);
           } else if (v === '3') {
-            selectedLabel.annotation!.value_int = 3;
+            this.singleIntNewValue(3, selectedLabel);
           } else if (v === '4') {
-            selectedLabel.annotation!.value_int = 4;
+            this.singleIntNewValue(4, selectedLabel);
           } else if (v === '5') {
-            selectedLabel.annotation!.value_int = 5;
+            this.singleIntNewValue(5, selectedLabel);
           } else if (v === '6') {
-            selectedLabel.annotation!.value_int = 6;
+            this.singleIntNewValue(6, selectedLabel);
           } else if (v === '7') {
-            selectedLabel.annotation!.value_int = 7;
+            this.singleIntNewValue(7, selectedLabel);
           } else if (v === '8') {
-            selectedLabel.annotation!.value_int = 8;
+            this.singleIntNewValue(8, selectedLabel);
           } else if (v === '9') {
-            selectedLabel.annotation!.value_int = 9;
+            this.singleIntNewValue(9, selectedLabel);
+          }
+        } else if (selectedLabel.kind === 'multi') {
+          if (v === '0') {
+            this.multiIntUpdate(selectedLabel, 0);
+          } else if (v === '1') {
+            this.multiIntUpdate(selectedLabel, 1);
+          } else if (v === '2') {
+            this.multiIntUpdate(selectedLabel, 2);
+          } else if (v === '3') {
+            this.multiIntUpdate(selectedLabel, 3);
+          } else if (v === '4') {
+            this.multiIntUpdate(selectedLabel, 4);
+          } else if (v === '5') {
+            this.multiIntUpdate(selectedLabel, 5);
+          } else if (v === '6') {
+            this.multiIntUpdate(selectedLabel, 6);
+          } else if (v === '7') {
+            this.multiIntUpdate(selectedLabel, 7);
+          } else if (v === '8') {
+            this.multiIntUpdate(selectedLabel, 8);
+          } else if (v === '9') {
+            this.multiIntUpdate(selectedLabel, 9);
           }
         }
       }
@@ -408,8 +457,9 @@ export default defineComponent({
 
       if (!label.annotation?.multi_int) return [];
       return label.annotation.multi_int.map((key) => {
-        if (label.choices) {
-          const { children } = label.choices[key];
+        const choice = label.choices!.findIndex((c) => c.value === key);
+        if (label.choices && label.choices[choice]) {
+          const { children } = label.choices[choice];
           if (children) {
             return {
               labels: children,
@@ -453,10 +503,23 @@ export default defineComponent({
     },
     val2choice(label: AnnotationSchemeLabel): number | undefined {
       const value: number | null | undefined = label.annotation?.value_int;
-      if (value !== undefined && value !== null) {
-        return label.choices?.findIndex((choice) => choice.value === value);
+      if (is<number>(value)) {
+        const idx = label.choices?.findIndex((choice) => choice.value === value);
+        if (idx !== undefined && idx >= 0) {
+          return idx;
+        }
       }
       return undefined;
+    },
+    children(label: AnnotationSchemeLabel): AnnotationSchemeLabel[] {
+      const choice = this.val2choice(label);
+      if (label.choices && choice !== undefined && label.choices[choice]) {
+        const { children } = label.choices[choice];
+        if (is<AnnotationSchemeLabel[]>(children)) {
+          return children;
+        }
+      }
+      return [];
     },
   },
   computed: {
@@ -471,11 +534,14 @@ export default defineComponent({
     },
   },
 });
+export default AnnotationLabels;
 </script>
 
 <style scoped>
 .selected > div > div > .label-name {
   color: red;
+  border-left: 4px solid rebeccapurple;
+  padding-left: 6px;
 }
 
 .theme-toggle {

@@ -1,8 +1,8 @@
 <template>
-  <div v-if="botAnnotation !== undefined">
+  <div>
     <div class="flex-wrap">
       <InlineToolTip
-        v-for="tag in botAnnotation.multi_int.toSorted()"
+        v-for="tag in tags"
         :key="tag"
         :info="choiceInfo[tag]">
         <closable-pill
@@ -26,7 +26,7 @@
         <font-awesome-icon :icon="['fas', 'plus']" class="text-dark" />
       </span>
       <ul class="dropdown-menu end-0" :class="{ show: editMode }">
-        <li v-for="choice in info.choices" :key="choice.value">
+        <li v-for="choice in label.choices" :key="choice.value">
           <span class="dropdown-item" role="button" tabindex="-1" @click="addLabel(choice.value)">
             <strong>{{ choice.value }}:</strong> {{ choice.name }}
           </span>
@@ -43,26 +43,21 @@ import { defineComponent } from 'vue';
 import type { PropType } from 'vue';
 import type {
   AnnotationModel,
-  AnnotationSchemeLabelChoiceFlat,
   BotAnnotationModel,
-  FlattenedAnnotationSchemeLabel,
   UserModel,
+  FlatLabel,
+  ResolutionCell,
+  ResolutionUserEntry,
+  FlatLabelChoice,
 } from '@/plugins/api/api-core';
-import { EventBus } from '@/plugins/events';
-import { ToastEvent } from '@/plugins/events/events/toast';
 import ClosablePill from '@/components/ClosablePill.vue';
 import InlineToolTip from '@/components/InlineToolTip.vue';
+import { is, isNone, notNone } from '@/util';
 
 function hasValue(model: AnnotationModel | BotAnnotationModel | undefined | null):
   model is (AnnotationModel | BotAnnotationModel) & { multi_int: number } {
-  if (model === null || model === undefined) return false;
+  if (isNone(model)) return false;
   return (model.multi_int !== undefined && model.multi_int !== null);
-}
-
-interface MultiLabelData {
-  changed: boolean,
-  editMode: boolean,
-  AgreementColour: Record<Agreement, string>,
 }
 
 enum Agreement {
@@ -79,7 +74,7 @@ enum Agreement {
 export default defineComponent({
   name: 'MultiLabel',
   components: { ClosablePill, InlineToolTip },
-  data(): MultiLabelData {
+  data() {
     return {
       changed: false,
       editMode: false,
@@ -93,23 +88,27 @@ export default defineComponent({
   },
   emits: ['botAnnotationChanged', 'botAnnotationConfirmed'],
   props: {
-    info: {
-      type: Object as PropType<FlattenedAnnotationSchemeLabel>,
+    botAnnotationMetaDataId: { type: String, required: false, default: undefined },
+    itemId: { type: String, required: true },
+    label: {
+      type: Object as PropType<FlatLabel>,
       required: true,
     },
-    users: {
+    usersLookup: {
       type: Object as PropType<Record<string, UserModel>>,
       required: true,
     },
-    userAnnotations: {
-      type: Array as PropType<AnnotationModel[]>,
-      required: false,
-      default: () => undefined,
+    users: {
+      type: Array as PropType<Array<UserModel>>,
+      required: true,
     },
-    botAnnotation: {
-      type: Object as PropType<BotAnnotationModel>,
-      required: false,
-      default: () => undefined,
+    proposal: {
+      type: Object as PropType<ResolutionCell>,
+      required: true,
+    },
+    proposalRow: {
+      type: Object as PropType<Record<string, ResolutionCell>>,
+      required: true,
     },
   },
   methods: {
@@ -118,70 +117,78 @@ export default defineComponent({
       return hasValue(model);
     },
     addLabel(value: number) {
-      const anno = this.botAnnotation;
-      if (anno !== undefined) {
+      const anno = this.proposal.resolution;
+      if (is<BotAnnotationModel>(anno)) {
         // eslint-disable-next-line @typescript-eslint/naming-convention
         const { multi_int } = anno;
-        if (multi_int !== undefined) {
+        if (is<number[]>(multi_int)) {
           const pos: number = multi_int.indexOf(value);
           if (pos < 0) {
             this.changed = true;
             multi_int.push(value);
             this.$emit('botAnnotationChanged', anno);
-            this.editMode = false;
           }
         }
-      } else {
-        // FIXME: not implemented (handle adding new BotAnnotation, i.e. handle the case where item has no annotation here)
-        // const anno: BotAnnotationModel = {};
-        EventBus.emit(new ToastEvent('WARN', 'Not implemented yet.'));
       }
+      this.editMode = false;
     },
     removeLabel(value: number) {
-      const anno = this.botAnnotation;
-      if (anno !== undefined) {
+      const anno = this.proposal.resolution;
+      if (is<BotAnnotationModel>(anno)) {
         // eslint-disable-next-line @typescript-eslint/naming-convention
         const { multi_int } = anno;
-        if (multi_int !== undefined) {
+        if (is<number[]>(multi_int)) {
           const pos: number = multi_int.indexOf(value);
           if (pos >= 0) {
             this.changed = true;
             multi_int.splice(pos, 1);
             this.$emit('botAnnotationChanged', anno);
-            this.editMode = false;
           }
         }
-      } else {
-        // FIXME: not implemented (handle adding new BotAnnotation, i.e. handle the case where item has no annotation here)
-        // const anno: BotAnnotationModel = {};
-        EventBus.emit(new ToastEvent('WARN', 'Not implemented yet.'));
       }
+      this.editMode = false;
     },
     getPrettyUsername(userId: string): string {
-      const user: UserModel | undefined = this.users[userId];
-      if (!user) return '??';
+      const user: UserModel | undefined = this.usersLookup[userId];
+      if (isNone(user)) return '??';
       return `${user.username} (${user.full_name})`;
     },
   },
   computed: {
-    choiceLookup(): Record<number, AnnotationSchemeLabelChoiceFlat> {
-      if (this.info && this.info.choices) {
-        return Object.fromEntries(this.info.choices.map((choice: AnnotationSchemeLabelChoiceFlat) => [choice.value, choice]));
+    tags(): Array<number> {
+      const { resolution } = this.proposalRow[this.label.path_key];
+      if (is<BotAnnotationModel>(resolution)
+        && is<Array<number>>(resolution.multi_int)) {
+        return resolution.multi_int.toSorted();
       }
-      return {};
+      return [];
+    },
+    choiceLookup(): Record<number, FlatLabelChoice> {
+      const { choices } = this.label;
+      if (!choices) return {};
+      return Object.fromEntries(choices.map((choice: FlatLabelChoice) => [choice.value, choice]));
     },
     choiceUsers(): Record<number, UserModel[]> {
-      const annos = this.userAnnotations;
-      if (!annos || !this.users) return {};
-      const entries = annos
-        .flatMap((anno: AnnotationModel) => {
-          if (!anno.multi_int) return undefined;
-          return anno.multi_int.map((mi): [UserModel, number] => [this.users[anno.user_id] as UserModel, mi as number]);
+      const { labels } = this.proposalRow[this.label.path_key];
+      if (isNone(labels)) {
+        return {};
+      }
+      const entries = Object.entries(labels)
+        .flatMap((userEntry: [string, ResolutionUserEntry[]]) => {
+          const [userId, userLabels] = userEntry;
+          return userLabels.flatMap((entry: ResolutionUserEntry) => {
+            if (isNone(entry.annotation)
+              || isNone(entry.annotation.multi_int)
+              || entry.annotation.multi_int.length === 0) return undefined;
+            return entry.annotation.multi_int.map((choice: number): [number, UserModel] => {
+              return [choice as number, this.usersLookup[userId] as UserModel];
+            });
+          });
         })
-        .filter((entry: [UserModel, number] | undefined) => entry !== undefined) as [UserModel, number][];
+        .filter((entry: [number, UserModel] | undefined) => notNone(entry)) as [number, UserModel][];
 
-      return entries.reduce((accu: Record<number, UserModel[]>, entry: [UserModel, number]) => {
-        const [user, choice] = entry;
+      return entries.reduce((accu: Record<number, UserModel[]>, entry: [number, UserModel]) => {
+        const [choice, user] = entry;
         // eslint-disable-next-line no-param-reassign
         if (!accu[choice]) accu[choice] = [];
         accu[choice].push(user);
@@ -201,25 +208,21 @@ export default defineComponent({
     },
     choiceAgreements(): Record<number, Agreement> {
       const numUsers: number = Object.keys(this.users).length;
-      const multiInt = this.botAnnotation?.multi_int;
-      const annos = this.userAnnotations;
-      if (!annos || !multiInt) return {};
-      const userEntries = Object.entries(this.choiceUsers) as unknown as Array<[number, UserModel[]]>;
-      const counters: Record<number, number> = Object.fromEntries(
-        userEntries.map((entry: [number, UserModel[]]) => [entry[0], entry[1].length]),
-      );
+      const { resolution } = this.proposalRow[this.label.path_key];
 
-      if (!counters) return {};
-
+      if (isNone(resolution) || isNone(resolution.multi_int)) return {};
       return Object.fromEntries(
-        multiInt.map((choice: number) => {
-          const count = counters[choice];
-          if (!count) return [choice, Agreement.NOVEL]; // undefined, 0, null
-          if (numUsers === 1) return [choice, Agreement.FULL];
-          if (count === numUsers) return [choice, Agreement.FULL];
-          if (count === 1) return [choice, Agreement.SINGLE];
-          return [choice, Agreement.PARTIAL];
-        }),
+        Object.entries(this.choiceUsers)
+          .map((entry: [number, UserModel[]]): [number, Agreement] => {
+            const [choice, users] = entry;
+            const usernames = users.map((user) => user.username);
+            const count = (new Set(usernames)).size;
+            if (!count) return [choice, Agreement.NOVEL]; // undefined, 0, null
+            if (numUsers === 1) return [choice, Agreement.FULL];
+            if (count === numUsers) return [choice, Agreement.FULL];
+            if (count === 1) return [choice, Agreement.SINGLE];
+            return [choice, Agreement.PARTIAL];
+          }),
       );
     },
   },

@@ -166,34 +166,53 @@ import type { InterfaceSettingsStoreType } from '@/stores/InterfaceSettingsStore
 import { cmap as cmap20 } from '@/types/colours';
 
 const motivationalQuotes = [
-  // https://www.howmuchisthefish.de/
   'The chase is better than the catch. – Scooter',
-  'It’s the first page of the second chapter – Scooter',
-  'Let’s blow a hole in the bowl – Scooter',
+  'It\'s the first page of the second chapter – Scooter',
+  'Let\'s blow a hole in the bowl – Scooter',
   'Our lyrics fly like birds in the sky – Scooter',
-  'It’s nice to be important, but it’s more important to be nice – Scooter',
+  'It\'s nice to be important, but it\'s more important to be nice – Scooter',
   'Before success can manifest. You’ve got to go through the learning process. – Scooter',
-  // https://kanye.rest/
-  'Distraction is the enemy of vision – Kanye West',
-  'I love sleep; it’s my favorite. – Kanye West',
-  'Keep squares out yo circle – Kanye West',
-  // https://www.briantracy.com/blog/personal-success/inspirational-quotes/
-  'The bad news is time flies. The good news is you’re the pilot. – Michael Altshuler',
+  // 'Distraction is the enemy of vision – Kanye West',
+  // 'I love sleep; it’s my favorite. – Kanye West',
+  // 'Keep squares out yo circle – Kanye West',
+  'The bad news is time flies. The good news is you\'re the pilot. – Michael Altshuler',
   'The best way to get started is to quit talking and begin doing. ― Walt Disney',
   'Act as if what you do makes a difference. It does. – William James',
   'If you can change your mind, you can change your life. – William James',
   'Life is like riding a bicycle. To keep your balance, you must keep moving. – Albert Einstein',
-  'If you don’t like the road you’re walking, start paving another one. – Dolly Parton',
-  'Don’t count the days. Make the days count. – Muhammad Ali',
+  'If you don\'t like the road you’re walking, start paving another one. – Dolly Parton',
+  'Don\'t count the days. Make the days count. – Muhammad Ali',
   'Every moment is a fresh beginning. – T.S. Eliot',
-  'Believe you can and you’re halfway there. – Theodore Roosevelt',
+  'Believe you can and you\'re halfway there. – Theodore Roosevelt',
   'You get what you give. – Jennifer Lopez',
   'Your life only gets better when you get better. – Brian Tracy',
   'Happiness is not by chance, but by choice. – Jim Rohn',
   'Change the world by being yourself. – Amy Poehler',
-  'Change the game, don’t let the game change you. – Macklemore',
-  // https://pypi.org/project/quotes-generator/
+  'Change the game, don\'t let the game change you. – Macklemore',
   'Your Skepticism Is My Fuel. — Minx',
+  'If people are doubting how far you can go, go so far that you can\'t hear them anymore. — Michele Ruiz',
+  'Man kann es so oder so machen. Ich bin für so. — Gerhard Schröder',
+  'Now, the door to a new life is opening. That\'s exciting and inspiring. – Angela Merkel',
+  'Zwischendurch einen Moment innehalten, schweigen, nachdenken, Pause machen. – Angela Merkel',
+  'It is a matter worth pursuing intensively. – Olaf Scholz',
+  'Always forwards, never backwards. – Erich Honecker',
+  'In a gentle way, you can shake the world. – Mahatma Gandhi',
+  'If opportunity doesn\'t knock, build a door. – Kurt Cobain',
+  'Work hard in silence, let your success be the noise. – Frank Ocean',
+  'If everything seems to be under control, you\'re not going fast enough. – Mario Andretti',
+  'The best way to appreciate your job is to imagine yourself without one. – Oscar Wilde',
+  'The miracle is not that we do this work, but that we are happy to do it. – Mother Teresa',
+  'Make each day your masterpiece. – John Wooden',
+  'Dreams don\'t work unless you do. – John C. Maxwell',
+  'Go the extra mile. It\'s never crowded there. – Wayne Dyer',
+  'Today is your opportunity to build the tomorrow you want. – Ken Poirot',
+  'If you fall, I\'ll be there. – Floor',
+  'A goal is a dream with a deadline. – Napoleon Hill',
+  'The [annotations are] plentiful but the workers are few. – Jesus', // originally "harvest is"
+  'Patience is the key to well-being. – Muhammad',
+  'Всюди добре де нас нема', // The grass is always greener on the other side of the hill. (Ukrainian proverb)
+  'أشد الفاقة عدم العقل', // (Arabic proverb)
+  '千 里 之 行 始 于 足 下。--- 老 子', // A journey of a thousand miles must begin with a single step. – Lao Tzu
 ];
 type UserAssignmentInfo = AssignmentInfo & { identifier: number, item_id: string };
 

@@ -129,6 +129,10 @@
                         :disabled="!isNew">
                       <label class="form-check-label" for="check-ignore-hierarchy">
                         Ignore scheme hierarchy
+                        <ToolTip>
+                          If you have nested labels in your annotation scheme, we will keep track of all parents/children.
+                          Selecting this option will ignore these relationships and present you with a "flat" list of labels.
+                        </ToolTip>
                       </label>
                     </div>
                     <div class="form-check">
@@ -139,7 +143,12 @@
                         id="check-ignore-order"
                         :disabled="!isNew">
                       <label class="form-check-label" for="check-ignore-order">
-                        Ignore annotation order (<code>repeat</code>s)
+                        Ignore label order (<code>repeat</code>s)
+                        <ToolTip>
+                          Select this if you'd like to ignore the order of labels for those that are repeatable.
+                          This might be useful if you allowed labels to be primary, secondary, ...
+                          but now would like to treat them all the same.
+                        </ToolTip>
                       </label>
                     </div>
                   </div>
@@ -165,7 +174,7 @@
                   <div v-if="(annotators || []).length > 0" class="mb-3 border-bottom">
                     <div class="form-label">Annotator selector</div>
                     <ul class="list-unstyled ms-lg-2">
-                      <li v-for="user in annotators" :key="user.user_id">
+                      <li v-for="user in annotators" :key="user.user_id!">
                         <input
                           class="form-check-input me-1"
                           type="checkbox"
@@ -248,7 +257,10 @@
               </th>
               <th v-for="label in proposal.labels" :key="label.path_key" class="text-end">
                 <div v-for="skey in label.path.slice().reverse()" :key="skey.key" class="nacsos-tooltip label-pill m-1">
-                  <span>{{ skey.key }}</span>
+                  <span>
+                    {{ skey.key }}
+                    <span v-if="skey.value !== null && skey.value !== undefined" class="text-muted small">({{ skey.value }})</span>
+                  </span>
                   <span>{{ skey.repeat }}</span>
                   <div
                     class="nacsos-tooltiptext popover bs-popover-auto show bg-light p-0"
@@ -581,7 +593,7 @@ export default defineComponent({
   display: block !important;
 }
 
-.label-pill span {
+.label-pill > span {
   border-radius: var(--bs-border-radius-pill);
   border: 1px solid var(--bs-gray-500);
   font-weight: normal;
@@ -591,12 +603,12 @@ export default defineComponent({
   padding: .35em .65em;
 }
 
-.label-pill span:first-child {
+.label-pill > span:first-child {
   border-top-right-radius: 0;
   border-bottom-right-radius: 0;
 }
 
-.label-pill span:last-of-type {
+.label-pill > span:last-of-type {
   border-top-left-radius: 0;
   border-bottom-left-radius: 0;
   border-left: 0;

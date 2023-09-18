@@ -53,8 +53,8 @@ export const nativeIsArray = Array.isArray;
 export const isArray = (obj: unknown) => nativeIsArray(obj) || tagTester('Array')(obj);
 
 // From https://github.com/jashkenas/underscore/blob/master/modules/isEmpty.js
-export const isEmpty = (obj: unknown) => {
-  if (obj == null) return true;
+export const isEmpty = (obj: unknown | null | undefined) => {
+  if (obj === null || obj === undefined) return true;
   const length = getLength(obj);
   if (typeof length === 'number' && (
     isArray(obj) || isString(obj) || isArguments(obj)
@@ -73,7 +73,15 @@ export function isOnRoute(loc: RouteLocationNormalized, name: string): boolean {
   return loc.matched.findIndex((match: RouteRecordNormalized) => match.name === name) >= 0;
 }
 
-export function isNotNone(obj: unknown): obj is object | boolean | string | number {
+export function is<T>(obj: T | null | undefined): obj is T {
+  return obj !== null && obj !== undefined;
+}
+
+export function isNone(obj: unknown | null | undefined): obj is null | undefined {
+  return obj === null || obj === undefined;
+}
+
+export function notNone(obj: unknown | null | undefined): obj is unknown {
   return obj !== undefined && obj !== null;
 }
 
@@ -89,7 +97,9 @@ export default {
       isArtefactOrSerializedArtefact,
       type2str,
       isOnRoute,
-      isNotNone,
+      notNone,
+      isNone,
+      is,
     };
   },
 };

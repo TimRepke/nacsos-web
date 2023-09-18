@@ -46,16 +46,13 @@ import type {
 import InlineToolTip from '@/components/InlineToolTip.vue';
 import { EventBus } from '@/plugins/events';
 import { ToastEvent } from '@/plugins/events/events/toast';
+import { is, isNone } from '@/util';
 
-interface BoolLabelData {
-  changed: boolean,
-  editMode: boolean,
-}
 
 export default defineComponent({
   name: 'BoolLabel',
   components: { InlineToolTip },
-  data(): BoolLabelData {
+  data() {
     return {
       // set to true when bot annotation was manipulated
       changed: false,
@@ -64,8 +61,8 @@ export default defineComponent({
   },
   emits: ['botAnnotationChanged'],
   props: {
-    botAnnotationMetaDataId: { type: String, required: true },
-    itemId: { type: String, required: true, },
+    botAnnotationMetaDataId: { type: String, required: false, default: undefined },
+    itemId: { type: String, required: true },
     label: {
       type: Object as PropType<FlatLabel>,
       required: true,
@@ -89,41 +86,44 @@ export default defineComponent({
   },
   methods: {
     annotation2icon(val: boolean | undefined | null): string {
-      if (val === undefined || val === null) return 'question';
+      if (isNone(val)) return 'question';
       return (val) ? 'check' : 'xmark';
     },
     annotation2classes(val: boolean | undefined | null): string[] {
-      if (val === undefined || val === null) return ['bg-light', 'text-dark'];
+      if (isNone(val)) return ['bg-light', 'text-dark'];
       return (val) ? ['bg-success', 'text-light'] : ['bg-danger', 'text-light'];
     },
     setBotAnnotation(value: boolean | undefined | null) {
       const { resolution } = this.proposal;
-      if (resolution !== undefined && resolution !== null) {
-        resolution.value_bool = value;
-        this.$emit('botAnnotationChanged', resolution);
-      } else {
-        const parentId = this.proposalRow[this.label.path_key].resolution?.bot_annotation_id;
-        if (!parentId) {
-          EventBus.emit(new ToastEvent(
-            'WARN',
-            'This is not a valid selection. Please check the parent annotation first.',
-          ));
+      if (is<BotAnnotationModel>(resolution)) {
+        if (resolution.value_bool !== value) {
+          resolution.value_bool = value;
+          this.$emit('botAnnotationChanged', resolution);
+        } else {
+          const parentId = this.proposalRow[this.label.path_key].resolution?.bot_annotation_id;
+          if (!parentId) {
+            EventBus.emit(new ToastEvent(
+              'WARN',
+              'This is not a valid selection. Please check the parent annotation first.',
+            ));
+          }
+          this.proposal.resolution = {
+            bot_annotation_id: crypto.randomUUID(),
+            bot_annotation_metadata_id: this.botAnnotationMetaDataId,
+            item_id: this.itemId,
+            parent: parentId,
+            key: this.label.key,
+            repeat: this.label.repeat,
+            value_bool: value,
+          } as BotAnnotationModel;
+          this.$emit('botAnnotationChanged', this.proposal.resolution);
         }
-        this.proposal.resolution = {
-          bot_annotation_id: crypto.randomUUID(),
-          bot_annotation_metadata_id: this.botAnnotationMetaDataId,
-          item_id: this.itemId,
-          parent: parentId,
-          key: this.label.key,
-          repeat: this.label.repeat,
-          value_bool: value,
-        } as BotAnnotationModel;
-        this.$emit('botAnnotationChanged', this.proposal.resolution);
+        this.changed = true;
       }
       this.editMode = false;
     },
     getPrettyUsername(user: UserModel | undefined | null): string {
-      if (!user) return '??';
+      if (!is<UserModel>(user)) return '??';
       return `${user.username} (${user.full_name})`;
     },
   },
