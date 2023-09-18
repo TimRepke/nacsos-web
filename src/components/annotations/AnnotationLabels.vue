@@ -290,6 +290,7 @@ const AnnotationLabels = defineComponent({
           if (this.selectedChildIdx < 0) {
             this.selectedChildIdx = children.length - 1;
           }
+          // FIXME: this may jump two levels upwards at once without properly clearing each child
           const refs = this.$refs[`childLabels-${this.selectedIdx}-${label.annotation?.repeat || 0}`] as typeof AnnotationLabels[];
           const action = refs[this.selectedChildIdx].selectPrevious();
 
