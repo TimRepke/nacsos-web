@@ -1,7 +1,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-export const $BotMetaResolve = {
+export const $BotMetaResolveBase = {
   properties: {
     algorithm: {
       type: 'Enum',
@@ -29,20 +29,6 @@ export const $BotMetaResolve = {
       }, {
         type: 'null',
       }],
-    },
-    snapshot: {
-      type: 'array',
-      contains: {
-        type: 'SnapshotEntry',
-      },
-      isRequired: true,
-    },
-    resolutions: {
-      type: 'array',
-      contains: {
-        type: 'ResolutionSnapshotEntry',
-      },
-      isRequired: true,
     },
   },
 } as const;

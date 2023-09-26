@@ -197,7 +197,7 @@ import SearchableSelect from '@/components/SearchableSelect.vue';
 import type { AssignmentModel, AnnotationModel, AnnotationSchemeLabelChoice } from '@/plugins/api/api-core';
 import { AnnotationSchemeLabel } from '@/plugins/api/api-core';
 import ClosablePill from '@/components/ClosablePill.vue';
-import { is, isNone } from '@/util';
+import { is } from '@/util';
 
 type SubLabels = { labels: AnnotationSchemeLabel[]; key: number; };
 

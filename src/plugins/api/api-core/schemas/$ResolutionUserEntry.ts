@@ -14,7 +14,7 @@ export const $ResolutionUserEntry = {
     annotation: {
       type: 'any-of',
       contains: [{
-        type: 'AnnotationModel',
+        type: 'ItemAnnotation',
       }, {
         type: 'null',
       }],

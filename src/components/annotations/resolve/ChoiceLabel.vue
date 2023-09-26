@@ -7,7 +7,8 @@
         <InlineToolTip :info="getPrettyIntLabelInfo(annotation.annotation)" placement="bottom">
           <span
             class="border text-light p-1 ps-2 pe-2"
-            :style="{ backgroundColor: annotation2bgColor(annotation.annotation) }">
+            :style="{ backgroundColor: annotation2bgColor(annotation.annotation) }"
+            :class="{ 'resolve-label-new': annotation.status === 'NEW', 'resolve-label-changed': annotation.status === 'CHANGED' }">
             <template v-if="annotation.annotation.value_int === undefined">
               <font-awesome-icon :icon="['fas', 'question']" class="text-dark" />
             </template>
@@ -25,7 +26,7 @@
       <span
         class="border text-light p-1 border-dark border-2 rounded-3 dropdown-toggle"
         :style="{ backgroundColor: annotation2bgColor(proposal.resolution) }"
-        :class="{ 'label-new': proposal.status === 'NEW', 'label-changed': proposal.status === 'CHANGED' }"
+        :class="{ 'resolve-label-new': proposal.status === 'NEW', 'resolve-label-changed': proposal.status === 'CHANGED' }"
         role="button"
         tabindex="-1"
         @click="editMode = !editMode">
@@ -65,7 +66,7 @@ import type {
   ResolutionCell,
   ResolutionUserEntry,
   UserModel,
-  FlatLabelChoice
+  FlatLabelChoice,
 } from '@/plugins/api/api-core';
 import InlineToolTip from '@/components/InlineToolTip.vue';
 import { cmap } from '@/types/colours';
@@ -193,11 +194,5 @@ export default defineComponent({
 </script>
 
 <style scoped>
-.label-new {
-  outline: 3px dashed #32a1ce;
-}
 
-.label-changed {
-  outline: 5px double #32a1ce;
-}
 </style>

@@ -14,12 +14,8 @@ export const $ResolutionCell = {
       isRequired: true,
     },
     resolution: {
-      type: 'any-of',
-      contains: [{
-        type: 'BotAnnotationModel',
-      }, {
-        type: 'null',
-      }],
+      type: 'BotAnnotationModel',
+      isRequired: true,
     },
     status: {
       type: 'all-of',

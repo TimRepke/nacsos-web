@@ -5,7 +5,7 @@
         <InlineToolTip :info="getPrettyUsername(user)" placement="bottom">
           <font-awesome-icon
             :icon="['fas', annotation2icon(annotation.annotation.value_bool)]"
-            :class="[annotation2classes(annotation.annotation.value_bool)]"
+            :class="[val2classes(annotation.annotation.value_bool)]"
             class="border text-light p-1"
             style="height: 1rem; width: 1rem;" />
         </InlineToolTip>
@@ -15,7 +15,7 @@
     <div class="dropdown ps-2 d-inline-block">
       <font-awesome-icon
         :icon="['fas', annotation2icon(proposal.resolution?.value_bool)]"
-        :class="annotation2classes(proposal.resolution?.value_bool)"
+        :class="proposal2classes(proposal)"
         class="border border-dark border-2 rounded-3 text-light p-1 dropdown-toggle"
         role="button"
         style="height: 1rem; width: 1rem;"
@@ -47,7 +47,6 @@ import InlineToolTip from '@/components/InlineToolTip.vue';
 import { EventBus } from '@/plugins/events';
 import { ToastEvent } from '@/plugins/events/events/toast';
 import { is, isNone } from '@/util';
-
 
 export default defineComponent({
   name: 'BoolLabel',
@@ -89,9 +88,18 @@ export default defineComponent({
       if (isNone(val)) return 'question';
       return (val) ? 'check' : 'xmark';
     },
-    annotation2classes(val: boolean | undefined | null): string[] {
-      if (isNone(val)) return ['bg-light', 'text-dark'];
-      return (val) ? ['bg-success', 'text-light'] : ['bg-danger', 'text-light'];
+    val2classes(value: boolean | undefined | null) {
+      if (isNone(value)) return ['bg-light', 'text-dark'];
+      return (value) ? ['bg-success', 'text-light'] : ['bg-danger', 'text-light'];
+    },
+    proposal2classes(proposal: ResolutionCell): string[] {
+      let classes: string[] = [];
+      if (proposal.status === 'NEW') {
+        classes = ['resolve-label-new'];
+      } else if (proposal.status === 'CHANGED') {
+        classes = ['resolve-label-changed'];
+      }
+      return classes.concat(this.val2classes(proposal.resolution?.value_bool));
     },
     setBotAnnotation(value: boolean | undefined | null) {
       const { resolution } = this.proposal;

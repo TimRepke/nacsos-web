@@ -180,9 +180,9 @@ export default defineComponent({
             if (isNone(entry.annotation)
               || isNone(entry.annotation.multi_int)
               || entry.annotation.multi_int.length === 0) return undefined;
-            return entry.annotation.multi_int.map((choice: number): [number, UserModel] => {
-              return [choice as number, this.usersLookup[userId] as UserModel];
-            });
+            return entry.annotation.multi_int.map(
+              (choice: number): [number, UserModel] => [choice as number, this.usersLookup[userId] as UserModel],
+            );
           });
         })
         .filter((entry: [number, UserModel] | undefined) => notNone(entry)) as [number, UserModel][];

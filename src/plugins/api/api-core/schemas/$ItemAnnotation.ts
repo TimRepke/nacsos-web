@@ -1,7 +1,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-export const $BotAnnotationModel = {
+export const $ItemAnnotation = {
   properties: {
     value_bool: {
       type: 'any-of',
@@ -46,18 +46,7 @@ export const $BotAnnotationModel = {
         type: 'null',
       }],
     },
-    bot_annotation_id: {
-      type: 'any-of',
-      contains: [{
-        type: 'string',
-      }, {
-        type: 'string',
-        format: 'uuid',
-      }, {
-        type: 'null',
-      }],
-    },
-    bot_annotation_metadata_id: {
+    annotation_id: {
       type: 'any-of',
       contains: [{
         type: 'string',
@@ -86,6 +75,26 @@ export const $BotAnnotationModel = {
         type: 'null',
       }],
     },
+    assignment_id: {
+      type: 'any-of',
+      contains: [{
+        type: 'string',
+      }, {
+        type: 'string',
+        format: 'uuid',
+      }],
+      isRequired: true,
+    },
+    user_id: {
+      type: 'any-of',
+      contains: [{
+        type: 'string',
+      }, {
+        type: 'string',
+        format: 'uuid',
+      }],
+      isRequired: true,
+    },
     item_id: {
       type: 'any-of',
       contains: [{
@@ -95,6 +104,23 @@ export const $BotAnnotationModel = {
         format: 'uuid',
       }],
       isRequired: true,
+    },
+    annotation_scheme_id: {
+      type: 'any-of',
+      contains: [{
+        type: 'string',
+      }, {
+        type: 'string',
+        format: 'uuid',
+      }],
+      isRequired: true,
+    },
+    key: {
+      type: 'string',
+      isRequired: true,
+    },
+    repeat: {
+      type: 'number',
     },
     parent: {
       type: 'any-of',
@@ -107,18 +133,7 @@ export const $BotAnnotationModel = {
         type: 'null',
       }],
     },
-    key: {
-      type: 'any-of',
-      contains: [{
-        type: 'string',
-      }, {
-        type: 'null',
-      }],
-    },
-    repeat: {
-      type: 'number',
-    },
-    order: {
+    text_offset_start: {
       type: 'any-of',
       contains: [{
         type: 'number',
@@ -126,10 +141,25 @@ export const $BotAnnotationModel = {
         type: 'null',
       }],
     },
-    confidence: {
+    text_offset_stop: {
       type: 'any-of',
       contains: [{
         type: 'number',
+      }, {
+        type: 'null',
+      }],
+    },
+    path: {
+      type: 'array',
+      contains: {
+        type: 'Label',
+      },
+      isRequired: true,
+    },
+    old: {
+      type: 'any-of',
+      contains: [{
+        type: 'AnnotationValue',
       }, {
         type: 'null',
       }],

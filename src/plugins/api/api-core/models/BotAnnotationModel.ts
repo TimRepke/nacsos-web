@@ -3,6 +3,11 @@
 /* eslint-disable */
 
 export type BotAnnotationModel = {
+  value_bool?: (boolean | null);
+  value_int?: (number | null);
+  value_float?: (number | null);
+  value_str?: (string | null);
+  multi_int?: (Array<number> | null);
   bot_annotation_id?: (string | null);
   bot_annotation_metadata_id?: (string | null);
   time_created?: (string | null);
@@ -11,11 +16,7 @@ export type BotAnnotationModel = {
   parent?: (string | null);
   key?: (string | null);
   repeat?: number;
-  value_bool?: (boolean | null);
-  value_int?: (number | null);
-  value_float?: (number | null);
-  value_str?: (string | null);
-  multi_int?: (Array<number> | null);
+  order?: (number | null);
   confidence?: (number | null);
 };
 

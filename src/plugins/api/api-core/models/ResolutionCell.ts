@@ -8,7 +8,7 @@ import type { ResolutionUserEntry } from './ResolutionUserEntry';
 
 export type ResolutionCell = {
   labels: Record<string, Array<ResolutionUserEntry>>;
-  resolution?: (BotAnnotationModel | null);
+  resolution: BotAnnotationModel;
   status?: ResolutionStatus;
 };
 
