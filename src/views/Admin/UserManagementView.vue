@@ -12,39 +12,39 @@
                 <div class="form-check-reverse form-switch">
                   <label class="form-check-label" :for="`sa-${user.user_id}`">
                     <font-awesome-icon :icon="['fas', 'user-gear']" />
-                    Super-user permissions</label>
+                    Super-user permissions</label
+                  >
                   <input
                     class="form-check-input"
                     type="checkbox"
                     role="switch"
                     aria-checked="undefined"
                     :id="`sa-${user.user_id}`"
-                    v-model="user.is_superuser" />
+                    v-model="user.is_superuser"
+                  />
                 </div>
               </div>
               <div>
                 <div class="form-check-reverse form-switch">
                   <label class="form-check-label" :for="`active-${user.user_id}`">
                     <font-awesome-icon :icon="['fas', 'users-viewfinder']" />
-                    Active</label>
+                    Active</label
+                  >
                   <input
                     class="form-check-input"
                     type="checkbox"
                     role="switch"
                     :aria-checked="undefined"
                     :id="`active-${user.user_id}`"
-                    v-model="user.is_active" />
+                    v-model="user.is_active"
+                  />
                 </div>
               </div>
             </div>
             <div class="row mb-2" v-if="user.hasNewPassword">
               <div class="col">
-                <div>
-                  <strong>Temporary password:</strong> {{ user.password }}
-                </div>
-                <div class="text-muted small">
-                  (Only valid after saved)
-                </div>
+                <div><strong>Temporary password:</strong> {{ user.password }}</div>
+                <div class="text-muted small">(Only valid after saved)</div>
               </div>
             </div>
             <div class="row mb-2" v-if="user.isNew">
@@ -54,7 +54,8 @@
                   :id="`user-${user.user_id}`"
                   class="form-control form-control-sm"
                   type="text"
-                  v-model="user.username">
+                  v-model="user.username"
+                />
               </div>
               <div class="col">
                 <label :for="`passwd-${user.user_id}`" class="form-label">Password</label>
@@ -63,7 +64,8 @@
                   class="form-control form-control-sm"
                   type="text"
                   disabled
-                  v-model="user.password">
+                  v-model="user.password"
+                />
               </div>
               <div class="col" />
             </div>
@@ -74,7 +76,8 @@
                   :id="`username-${user.user_id}`"
                   class="form-control form-control-sm"
                   type="text"
-                  v-model="user.full_name">
+                  v-model="user.full_name"
+                />
               </div>
               <div class="col">
                 <label :for="`email-${user.user_id}`" class="form-label">Email address</label>
@@ -82,7 +85,8 @@
                   :id="`email-${user.user_id}`"
                   class="form-control form-control-sm"
                   type="email"
-                  v-model="user.email">
+                  v-model="user.email"
+                />
               </div>
               <div class="col">
                 <label :for="`affil-${user.user_id}`" class="form-label">Affiliation (short)</label>
@@ -90,7 +94,8 @@
                   :id="`affil-${user.user_id}`"
                   class="form-control form-control-sm"
                   type="text"
-                  v-model="user.affiliation">
+                  v-model="user.affiliation"
+                />
               </div>
             </div>
           </div>
@@ -119,16 +124,16 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
-import { API } from '@/plugins/api';
-import { EventBus } from '@/plugins/events';
-import { ToastEvent } from '@/plugins/events/events/toast';
-import type { UserBaseModel } from '@/plugins/api/api-core';
+import { defineComponent } from "vue";
+import { API } from "@/plugins/api";
+import { EventBus } from "@/plugins/events";
+import { ToastEvent } from "@/plugins/events/events/toast";
+import type { UserBaseModel } from "@/plugins/api/api-core";
 
 type UserModel = UserBaseModel & {
-  password?: string,
-  isNew?: boolean,
-  hasNewPassword?: boolean,
+  password?: string;
+  isNew?: boolean;
+  hasNewPassword?: boolean;
 };
 
 type UserManagementViewData = {
@@ -136,25 +141,30 @@ type UserManagementViewData = {
 };
 
 export default defineComponent({
-  name: 'UserManagementView',
+  name: "UserManagementView",
   data(): UserManagementViewData {
     return {
       users: [] as UserModel[],
     };
   },
   mounted() {
-    API.core.users.getAllUsersApiUsersListAllGet()
-      .then((response) => { this.users = response.data; })
-      .catch(() => { EventBus.emit(new ToastEvent('WARN', 'Failed to load list of users.')); });
+    API.core.users
+      .getAllUsersApiUsersListAllGet()
+      .then((response) => {
+        this.users = response.data;
+      })
+      .catch(() => {
+        EventBus.emit(new ToastEvent("WARN", "Failed to load list of users."));
+      });
   },
   methods: {
     addUser() {
       this.users.push({
         user_id: crypto.randomUUID(),
-        username: '',
-        email: '',
-        full_name: '',
-        affiliation: '',
+        username: "",
+        email: "",
+        full_name: "",
+        affiliation: "",
         is_superuser: false,
         is_active: true,
         password: this.generateRandomPassword(),
@@ -162,21 +172,26 @@ export default defineComponent({
       });
     },
     deleteUser() {
-      EventBus.emit(new ToastEvent(
-        'WARN',
-        'This is not implemented, because it can cause big problems.'
-        + 'Rather consider deactivating the user or ask a DB admin to delete the row in the table.',
-      ));
+      EventBus.emit(
+        new ToastEvent(
+          "WARN",
+          "This is not implemented, because it can cause big problems." +
+            "Rather consider deactivating the user or ask a DB admin to delete the row in the table.",
+        ),
+      );
     },
     saveUser(user: UserBaseModel) {
-      API.core.users.saveUserApiUsersDetailsPut({
-        requestBody: user,
-      }).then((response) => {
-        EventBus.emit(new ToastEvent('SUCCESS', `Successfully saved user with id: ${response.data}!`));
-      }).catch((reason) => {
-        console.error(reason);
-        EventBus.emit(new ToastEvent('ERROR', 'Failed to save user.'));
-      });
+      API.core.users
+        .saveUserApiUsersDetailsPut({
+          requestBody: user,
+        })
+        .then((response) => {
+          EventBus.emit(new ToastEvent("SUCCESS", `Successfully saved user with id: ${response.data}!`));
+        })
+        .catch((reason) => {
+          console.error(reason);
+          EventBus.emit(new ToastEvent("ERROR", "Failed to save user."));
+        });
     },
     resetPassword(user: UserModel) {
       // eslint-disable-next-line no-param-reassign
@@ -186,17 +201,17 @@ export default defineComponent({
       console.log(user);
     },
     generateRandomPassword() {
-      return Math.random().toString(36).slice(2)
-        + Math.random().toString(36).slice(2)
-        + Math.random().toString(36).slice(2)
-        + Math.random().toString(36).slice(2)
-        + Math.random().toString(36).slice(2)
-        + Math.random().toString(36).slice(2);
+      return (
+        Math.random().toString(36).slice(2) +
+        Math.random().toString(36).slice(2) +
+        Math.random().toString(36).slice(2) +
+        Math.random().toString(36).slice(2) +
+        Math.random().toString(36).slice(2) +
+        Math.random().toString(36).slice(2)
+      );
     },
   },
 });
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

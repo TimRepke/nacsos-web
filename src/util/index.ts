@@ -1,6 +1,6 @@
-import type { App } from 'vue';
-import type { RouteLocationNormalized, RouteRecordNormalized } from 'vue-router';
-import { isFunctionInfo, isArtefactOrSerializedArtefact, type2str } from '@/util/typeChecks';
+import type { App } from "vue";
+import type { RouteLocationNormalized, RouteRecordNormalized } from "vue-router";
+import { isFunctionInfo, isArtefactOrSerializedArtefact, type2str } from "@/util/typeChecks";
 // inspired by https://github.com/jashkenas/underscore/blob/master/modules/_shallowProperty.js
 // Internal helper to generate a function to obtain property `key` from `obj`.
 export function shallowProperty<T>(key: string) {
@@ -21,7 +21,7 @@ export const has = (obj: object, key: string) => obj != null && Object.prototype
 export const isObject = (obj: unknown) => {
   if (!obj) return false;
   const type = typeof obj;
-  return type === 'function' || (type === 'object' && !!obj);
+  return type === "function" || (type === "object" && !!obj);
 };
 
 // inspired by https://github.com/jashkenas/underscore/blob/master/modules/keys.js
@@ -39,26 +39,24 @@ export const keys = (obj: unknown) => {
 
 // inspired by https://github.com/jashkenas/underscore/blob/master/modules/_getLength.js
 // Internal helper to obtain the `length` property of an object.
-export const getLength = shallowProperty<number>('length');
+export const getLength = shallowProperty<number>("length");
 // inspired by https://github.com/jashkenas/underscore/blob/master/modules/isString.js
-export const isString = tagTester('String');
+export const isString = tagTester("String");
 // inspired by https://github.com/jashkenas/underscore/blob/master/modules/isArguments.js
-export const isArguments = tagTester('Arguments');
+export const isArguments = tagTester("Arguments");
 
 // inspired by https://github.com/jashkenas/underscore/blob/master/modules/isArray.js
 // inspired by https://github.com/jashkenas/underscore/blob/master/modules/_setup.js
 // Is a given value an array?
 // Delegates to ECMA5's native `Array.isArray`.
 export const nativeIsArray = Array.isArray;
-export const isArray = (obj: unknown) => nativeIsArray(obj) || tagTester('Array')(obj);
+export const isArray = (obj: unknown) => nativeIsArray(obj) || tagTester("Array")(obj);
 
 // From https://github.com/jashkenas/underscore/blob/master/modules/isEmpty.js
 export const isEmpty = (obj: unknown | null | undefined) => {
   if (obj === null || obj === undefined) return true;
   const length = getLength(obj);
-  if (typeof length === 'number' && (
-    isArray(obj) || isString(obj) || isArguments(obj)
-  )) return length === 0;
+  if (typeof length === "number" && (isArray(obj) || isString(obj) || isArguments(obj))) return length === 0;
   return getLength(keys(obj)) === 0;
 };
 

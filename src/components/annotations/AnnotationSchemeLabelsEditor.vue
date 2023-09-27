@@ -5,12 +5,14 @@
       <li
         v-for="(schemeLabel, schemeLabelIndex) in schemeLabelsWithKey"
         :key="schemeLabel.tmpKey"
-        class="border m-2 p-2 position-relative">
+        class="border m-2 p-2 position-relative"
+      >
         <div
           role="button"
           class="position-absolute top-0 end-0 m-2"
           tabindex="0"
-          @click="removeLabel(schemeLabelIndex)">
+          @click="removeLabel(schemeLabelIndex)"
+        >
           <font-awesome-icon :icon="['fas', 'trash-can']" />
         </div>
         <div>
@@ -32,7 +34,8 @@
                   aria-label="Visible name"
                   aria-describedby="basic-addon1"
                   placeholder="Visible name"
-                  v-model="schemeLabel.name">
+                  v-model="schemeLabel.name"
+                />
               </span>
             </div>
             <div>
@@ -44,21 +47,23 @@
                   aria-label="Unique key"
                   aria-describedby="basic-addon1"
                   placeholder="Unique key"
-                  v-model="schemeLabel.key">
+                  v-model="schemeLabel.key"
+                />
               </span>
             </div>
             <div>
               <div class="input-group">
-                <span
-                  id="basic-addon1"
-                  class="input-group-text"><font-awesome-icon :icon="['fas', 'circle-info']" /></span>
+                <span id="basic-addon1" class="input-group-text"
+                  ><font-awesome-icon :icon="['fas', 'circle-info']"
+                /></span>
                 <input
                   type="text"
                   class="form-control"
                   aria-label="Hint message"
                   aria-describedby="basic-addon1"
                   placeholder="Hint message"
-                  v-model="schemeLabel.hint" />
+                  v-model="schemeLabel.hint"
+                />
               </div>
             </div>
           </div>
@@ -66,11 +71,11 @@
             <div class="col-auto">
               <label for="autoSizingSelect">Type</label>
               <ToolTip>
-                <strong>bool</strong> – boolean toggle<br>
-                <strong>single</strong> – pre-defined choices (only one can be selected)<br>
-                <strong>multi</strong> – pre-defined choices (multiple can be selected)<br>
-                <strong>str</strong> – free-text string input<br>
-                <strong>...</strong> – other types are not implemented, yet<br>
+                <strong>bool</strong> – boolean toggle<br />
+                <strong>single</strong> – pre-defined choices (only one can be selected)<br />
+                <strong>multi</strong> – pre-defined choices (multiple can be selected)<br />
+                <strong>str</strong> – free-text string input<br />
+                <strong>...</strong> – other types are not implemented, yet<br />
               </ToolTip>
               <select class="form-select" id="autoSizingSelect" v-model="schemeLabel.kind">
                 <option v-for="kind in annotationSchemeLabelKinds" :key="kind" :value="kind">{{ kind }}</option>
@@ -88,7 +93,8 @@
                   :id="`label-required-${schemeLabel.tmpKey}`"
                   class="form-check-input"
                   :aria-checked="schemeLabel.required"
-                  v-model="schemeLabel.required" />
+                  v-model="schemeLabel.required"
+                />
                 <label class="form-check-label" :for="`label-required-${schemeLabel.tmpKey}`">Required</label>
               </div>
               <div class="form-check form-switch" v-if="schemeLabel.kind === 'single' || schemeLabel.kind === 'multi'">
@@ -98,7 +104,8 @@
                   :id="`label-dropdown-${schemeLabel.tmpKey}`"
                   class="form-check-input"
                   :aria-checked="schemeLabel.dropdown"
-                  v-model="schemeLabel.dropdown" />
+                  v-model="schemeLabel.dropdown"
+                />
                 <label class="form-check-label" :for="`label-required-${schemeLabel.tmpKey}`">Use dropdown</label>
               </div>
             </div>
@@ -112,26 +119,32 @@
                 <div class="row mb-2">
                   <div class="col-auto">
                     <span class="input-group">
-                      <span class="input-group-text" id="basic-addon1"><font-awesome-icon :icon="['fas', 'eye']" /></span>
+                      <span class="input-group-text" id="basic-addon1"
+                        ><font-awesome-icon :icon="['fas', 'eye']"
+                      /></span>
                       <input
                         type="text"
                         class="form-control"
                         aria-label="Visible name"
                         aria-describedby="basic-addon1"
                         placeholder="Visible name"
-                        v-model="choice.name">
+                        v-model="choice.name"
+                      />
                     </span>
                   </div>
                   <div class="col-3 col-lg-2">
                     <span class="input-group">
-                      <span class="input-group-text" id="basic-addon1"><font-awesome-icon :icon="['fas', 'key']" /></span>
+                      <span class="input-group-text" id="basic-addon1"
+                        ><font-awesome-icon :icon="['fas', 'key']"
+                      /></span>
                       <input
                         type="number"
                         class="form-control"
                         aria-label="Value"
                         aria-describedby="basic-addon1"
                         placeholder="Value"
-                        v-model="choice.value">
+                        v-model="choice.value"
+                      />
                     </span>
                   </div>
                   <div class="col-auto">
@@ -145,7 +158,8 @@
                         aria-label="Hint message"
                         aria-describedby="basic-addon1"
                         placeholder="Hint message"
-                        v-model="choice.hint" />
+                        v-model="choice.hint"
+                      />
                     </span>
                   </div>
                   <div class="col-auto align-middle">
@@ -153,25 +167,25 @@
                       role="button"
                       class="align-middle"
                       tabindex="0"
-                      @click="moveChoiceDown(schemeLabelIndex, choiceIndex)">
-                      <font-awesome-icon :icon="['fas', 'down-long']" />
-                    </span>&nbsp;
+                      @click="moveChoiceDown(schemeLabelIndex, choiceIndex)"
+                    >
+                      <font-awesome-icon :icon="['fas', 'down-long']" /> </span
+                    >&nbsp;
                     <span role="button" tabindex="0" @click="moveChoiceUp(schemeLabelIndex, choiceIndex)">
-                      <font-awesome-icon :icon="['fas', 'up-long']" />
-                    </span>&nbsp;
+                      <font-awesome-icon :icon="['fas', 'up-long']" /> </span
+                    >&nbsp;
                     <span role="button" tabindex="0" @click="removeChoice(schemeLabelIndex, choiceIndex)">
-                      <font-awesome-icon :icon="['fas', 'trash-can']" />
-                    </span>&nbsp;
+                      <font-awesome-icon :icon="['fas', 'trash-can']" /> </span
+                    >&nbsp;
                     <span
                       v-if="choice.children === null || choice.children.length === 0"
                       role="button"
                       class="nacsos-tooltip"
                       tabindex="0"
-                      @click="addChild(schemeLabelIndex, choiceIndex)">
+                      @click="addChild(schemeLabelIndex, choiceIndex)"
+                    >
                       <font-awesome-icon :icon="['fas', 'diagram-predecessor']" />
-                      <span class="nacsos-tooltiptext small">
-                        Add sub-labels
-                      </span>
+                      <span class="nacsos-tooltiptext small"> Add sub-labels </span>
                     </span>
                   </div>
                 </div>
@@ -182,7 +196,8 @@
               </li>
             </ul>
             <div>
-              <button type="button" class="btn btn-outline-secondary" @click="addChoice(schemeLabelIndex)">Add choice
+              <button type="button" class="btn btn-outline-secondary" @click="addChoice(schemeLabelIndex)">
+                Add choice
               </button>
             </div>
           </div>
@@ -197,10 +212,10 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
-import type { PropType } from 'vue';
-import ToolTip from '@/components/ToolTip.vue';
-import { AnnotationSchemeLabel } from '@/plugins/api/api-core';
+import { defineComponent } from "vue";
+import type { PropType } from "vue";
+import ToolTip from "@/components/ToolTip.vue";
+import { AnnotationSchemeLabel } from "@/plugins/api/api-core";
 
 type KeyedAnnotationSchemeLabel = AnnotationSchemeLabel & { tmpKey?: string };
 
@@ -208,7 +223,7 @@ type KeyedAnnotationSchemeLabel = AnnotationSchemeLabel & { tmpKey?: string };
 // TODO general input validation
 
 export default defineComponent({
-  name: 'AnnotationSchemeLabelsEditor',
+  name: "AnnotationSchemeLabelsEditor",
   components: { ToolTip },
   props: {
     labels: {
@@ -227,12 +242,12 @@ export default defineComponent({
     addLabel() {
       this.schemeLabels.push({
         tmpKey: crypto.randomUUID(),
-        name: '',
-        key: 'newKey',
-        hint: '',
+        name: "",
+        key: "newKey",
+        hint: "",
         required: false,
         max_repeat: 1,
-        kind: 'bool',
+        kind: "bool",
         choices: [],
       } as AnnotationSchemeLabel);
     },
@@ -241,23 +256,25 @@ export default defineComponent({
     },
     addChild(labelIndex: number, choiceIndex: number) {
       // TODO
-      this.schemeLabels[labelIndex].choices[choiceIndex].children = [{
-        tmpKey: crypto.randomUUID(),
-        name: '',
-        key: 'newKey',
-        hint: '',
-        required: false,
-        max_repeat: 1,
-        kind: 'bool',
-        choices: [],
-      } as AnnotationSchemeLabel];
+      this.schemeLabels[labelIndex].choices[choiceIndex].children = [
+        {
+          tmpKey: crypto.randomUUID(),
+          name: "",
+          key: "newKey",
+          hint: "",
+          required: false,
+          max_repeat: 1,
+          kind: "bool",
+          choices: [],
+        } as AnnotationSchemeLabel,
+      ];
     },
     addChoice(schemeLabelIndex: number) {
       this.schemeLabels[schemeLabelIndex].choices.push({
         tmpKey: crypto.randomUUID(),
         children: null,
         hint: null,
-        name: '',
+        name: "",
         value: this.schemeLabels[schemeLabelIndex].choices.length,
       });
     },
@@ -267,33 +284,43 @@ export default defineComponent({
     moveChoiceUp(schemeLabelIndex: number, currentChoiceIndex: number) {
       if (currentChoiceIndex > 0) {
         // This looks like sorcery, but it essentially just swaps two elements in an array.
-        [this.schemeLabels[schemeLabelIndex].choices[currentChoiceIndex],
-          this.schemeLabels[schemeLabelIndex].choices[currentChoiceIndex - 1]] = [
+        [
+          this.schemeLabels[schemeLabelIndex].choices[currentChoiceIndex],
           this.schemeLabels[schemeLabelIndex].choices[currentChoiceIndex - 1],
-          this.schemeLabels[schemeLabelIndex].choices[currentChoiceIndex]];
+        ] = [
+          this.schemeLabels[schemeLabelIndex].choices[currentChoiceIndex - 1],
+          this.schemeLabels[schemeLabelIndex].choices[currentChoiceIndex],
+        ];
       }
     },
     moveChoiceDown(schemeLabelIndex: number, currentChoiceIndex: number) {
-      if (currentChoiceIndex < (this.schemeLabels[schemeLabelIndex].choices.length - 1)) {
+      if (currentChoiceIndex < this.schemeLabels[schemeLabelIndex].choices.length - 1) {
         // This looks like sorcery, but it essentially just swaps two elements in an array.
-        [this.schemeLabels[schemeLabelIndex].choices[currentChoiceIndex],
-          this.schemeLabels[schemeLabelIndex].choices[currentChoiceIndex + 1]] = [
+        [
+          this.schemeLabels[schemeLabelIndex].choices[currentChoiceIndex],
           this.schemeLabels[schemeLabelIndex].choices[currentChoiceIndex + 1],
-          this.schemeLabels[schemeLabelIndex].choices[currentChoiceIndex]];
+        ] = [
+          this.schemeLabels[schemeLabelIndex].choices[currentChoiceIndex + 1],
+          this.schemeLabels[schemeLabelIndex].choices[currentChoiceIndex],
+        ];
       }
     },
     moveLabelUp(currentSchemeLabelIndex: number) {
       if (currentSchemeLabelIndex > 0) {
         // This looks like sorcery, but it essentially just swaps two elements in an array.
         [this.schemeLabels[currentSchemeLabelIndex], this.schemeLabels[currentSchemeLabelIndex - 1]] = [
-          this.schemeLabels[currentSchemeLabelIndex - 1], this.schemeLabels[currentSchemeLabelIndex]];
+          this.schemeLabels[currentSchemeLabelIndex - 1],
+          this.schemeLabels[currentSchemeLabelIndex],
+        ];
       }
     },
     moveLabelDown(currentSchemeLabelIndex: number) {
-      if (currentSchemeLabelIndex < (this.schemeLabels.length - 1)) {
+      if (currentSchemeLabelIndex < this.schemeLabels.length - 1) {
         // This looks like sorcery, but it essentially just swaps two elements in an array.
         [this.schemeLabels[currentSchemeLabelIndex], this.schemeLabels[currentSchemeLabelIndex + 1]] = [
-          this.schemeLabels[currentSchemeLabelIndex + 1], this.schemeLabels[currentSchemeLabelIndex]];
+          this.schemeLabels[currentSchemeLabelIndex + 1],
+          this.schemeLabels[currentSchemeLabelIndex],
+        ];
       }
     },
   },
@@ -319,5 +346,4 @@ export default defineComponent({
 });
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>

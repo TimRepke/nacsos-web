@@ -1,16 +1,17 @@
 <template>
-  <div class="card m-2 p-0 text-start" style="width: 20rem;">
+  <div class="card m-2 p-0 text-start" style="width: 20rem">
     <div class="card-body">
       <p>
         <small class="text-muted">
-          <i class="bi-calendar4-event" /> &nbsp; {{ item.created_at.slice(0, 19).replace('T', ' ') }}
+          <i class="bi-calendar4-event" /> &nbsp; {{ item.created_at.slice(0, 19).replace("T", " ") }}
         </small>
         <a
           class="float-end"
           :href="`https://twitter.com/s/status/${item.twitter_id}`"
           target="_blank"
           rel="noopener noreferrer"
-          aria-label="Tweet on Twitter">
+          aria-label="Tweet on Twitter"
+        >
           <!-- FIXME links to twitter ids stopped working, but they used to... -->
           <font-awesome-icon :icon="['fa-brands', 'twitter']" />
         </a>
@@ -37,9 +38,9 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
-import type { PropType } from 'vue';
-import type { HighlighterModel, TwitterItemModel, Hashtag, Mention, URL } from '@/plugins/api/api-core';
+import { defineComponent } from "vue";
+import type { PropType } from "vue";
+import type { HighlighterModel, TwitterItemModel, Hashtag, Mention, URL } from "@/plugins/api/api-core";
 
 interface Replacement {
   start: number;
@@ -48,7 +49,7 @@ interface Replacement {
 }
 
 export default defineComponent({
-  name: 'TwitterItem',
+  name: "TwitterItem",
   props: {
     item: {
       type: Object as PropType<TwitterItemModel>,
@@ -91,7 +92,7 @@ export default defineComponent({
           });
         });
       }
-      let ret = '';
+      let ret = "";
       let prevEnd = 0;
       replacements
         .sort((a, b) => a.start - b.start)

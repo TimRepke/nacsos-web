@@ -1,6 +1,5 @@
 <template>
   <div>
-
     <!-- User Annotations -->
     <span v-for="user in users" :key="user.user_id">
       <span v-for="annotation in proposal.labels[user.user_id]" :key="annotation.annotation.annotation_id">
@@ -8,7 +7,11 @@
           <span
             class="border text-light p-1 ps-2 pe-2"
             :style="{ backgroundColor: annotation2bgColor(annotation.annotation) }"
-            :class="{ 'resolve-label-new': annotation.status === 'NEW', 'resolve-label-changed': annotation.status === 'CHANGED' }">
+            :class="{
+              'resolve-label-new': annotation.status === 'NEW',
+              'resolve-label-changed': annotation.status === 'CHANGED',
+            }"
+          >
             <template v-if="annotation.annotation.value_int === undefined">
               <font-awesome-icon :icon="['fas', 'question']" class="text-dark" />
             </template>
@@ -26,10 +29,14 @@
       <span
         class="border text-light p-1 border-dark border-2 rounded-3 dropdown-toggle"
         :style="{ backgroundColor: annotation2bgColor(proposal.resolution) }"
-        :class="{ 'resolve-label-new': proposal.status === 'NEW', 'resolve-label-changed': proposal.status === 'CHANGED' }"
+        :class="{
+          'resolve-label-new': proposal.status === 'NEW',
+          'resolve-label-changed': proposal.status === 'CHANGED',
+        }"
         role="button"
         tabindex="-1"
-        @click="editMode = !editMode">
+        @click="editMode = !editMode"
+      >
         <template v-if="!hasValue(proposal.resolution)">
           <font-awesome-icon :icon="['fas', 'question']" class="text-dark" />
         </template>
@@ -43,22 +50,19 @@
             {{ choice.name }} ({{ choice.value }})
           </span>
         </li>
-        <li><span
-          class="dropdown-item"
-          role="button"
-          tabindex="-1"
-          @click="setBotAnnotation(undefined)">[NONE]</span></li>
+        <li>
+          <span class="dropdown-item" role="button" tabindex="-1" @click="setBotAnnotation(undefined)">[NONE]</span>
+        </li>
       </ul>
     </div>
     <!-- / BotAnnotation -->
-
   </div>
 </template>
 
 <script lang="ts">
-import type { PropType } from 'vue';
-import { defineComponent } from 'vue';
-import 'core-js/modules/es.array.to-sorted';
+import type { PropType } from "vue";
+import { defineComponent } from "vue";
+import "core-js/modules/es.array.to-sorted";
 import type {
   AnnotationModel,
   BotAnnotationModel,
@@ -67,26 +71,27 @@ import type {
   ResolutionUserEntry,
   UserModel,
   FlatLabelChoice,
-} from '@/plugins/api/api-core';
-import InlineToolTip from '@/components/InlineToolTip.vue';
-import { cmap } from '@/types/colours';
-import { EventBus } from '@/plugins/events';
-import { ToastEvent } from '@/plugins/events/events/toast';
-import { is, isNone } from '@/util';
+} from "@/plugins/api/api-core";
+import InlineToolTip from "@/components/InlineToolTip.vue";
+import { cmap } from "@/types/colours";
+import { EventBus } from "@/plugins/events";
+import { ToastEvent } from "@/plugins/events/events/toast";
+import { is, isNone } from "@/util";
 
-function hasValue(model: AnnotationModel | BotAnnotationModel | undefined | null):
-  model is (AnnotationModel | BotAnnotationModel) & { value_int: number } {
+function hasValue(
+  model: AnnotationModel | BotAnnotationModel | undefined | null,
+): model is (AnnotationModel | BotAnnotationModel) & { value_int: number } {
   if (isNone(model)) return false;
-  return (model.value_int !== undefined && model.value_int !== null);
+  return model.value_int !== undefined && model.value_int !== null;
 }
 
 interface ChoiceLabelData {
-  changed: boolean,
-  editMode: boolean,
+  changed: boolean;
+  editMode: boolean;
 }
 
 export default defineComponent({
-  name: 'ChoiceLabel',
+  name: "ChoiceLabel",
   components: { InlineToolTip },
   data(): ChoiceLabelData {
     return {
@@ -94,7 +99,7 @@ export default defineComponent({
       editMode: false,
     };
   },
-  emits: ['botAnnotationChanged'],
+  emits: ["botAnnotationChanged"],
   props: {
     botAnnotationMetaDataId: { type: String, required: false, default: undefined },
     itemId: { type: String, required: true },
@@ -120,29 +125,29 @@ export default defineComponent({
     },
   },
   methods: {
-    hasValue(model: AnnotationModel | BotAnnotationModel | undefined | null):
-      model is (AnnotationModel | BotAnnotationModel) & { value_int: number } {
+    hasValue(
+      model: AnnotationModel | BotAnnotationModel | undefined | null,
+    ): model is (AnnotationModel | BotAnnotationModel) & { value_int: number } {
       return hasValue(model);
     },
     annotation2bgColor(val: AnnotationModel | BotAnnotationModel | undefined | null) {
       if (hasValue(val)) {
         return cmap[val.value_int % cmap.length];
       }
-      return 'transparent';
+      return "transparent";
     },
     setBotAnnotation(value: number | undefined | null) {
       const { resolution } = this.proposal;
       if (is<BotAnnotationModel>(resolution)) {
         if (resolution.value_int !== value) {
           resolution.value_int = value;
-          this.$emit('botAnnotationChanged', resolution);
+          this.$emit("botAnnotationChanged", resolution);
         } else {
           const parentId = this.proposalRow[this.label.path_key].resolution?.bot_annotation_id;
           if (!parentId) {
-            EventBus.emit(new ToastEvent(
-              'WARN',
-              'This is not a valid selection. Please check the parent annotation first.',
-            ));
+            EventBus.emit(
+              new ToastEvent("WARN", "This is not a valid selection. Please check the parent annotation first."),
+            );
           }
           this.proposal.resolution = {
             bot_annotation_id: crypto.randomUUID(),
@@ -153,29 +158,29 @@ export default defineComponent({
             repeat: this.label.repeat,
             value_int: value,
           } as BotAnnotationModel;
-          this.$emit('botAnnotationChanged', this.proposal.resolution);
+          this.$emit("botAnnotationChanged", this.proposal.resolution);
         }
         this.changed = true;
       }
       this.editMode = false;
     },
     getPrettyIntLabelInfo(userEntry: ResolutionUserEntry): string {
-      let username: string | null | undefined = '';
+      let username: string | null | undefined = "";
       let valueInt: number | null | undefined = null;
       if (!userEntry.annotation) {
         if (!userEntry.assignment) {
-          return 'No data';
+          return "No data";
         }
         username = userEntry.assignment.user_id;
       } else {
         username = this.usersLookup[userEntry.annotation.user_id]?.username;
         valueInt = userEntry.annotation.value_int;
       }
-      let ret = '';
+      let ret = "";
       if (username) {
         ret += username;
       } else {
-        ret += '??';
+        ret += "??";
       }
       if (is<number>(valueInt) && is<FlatLabelChoice>(this.choiceLookup[valueInt])) {
         ret += `: ${this.choiceLookup[valueInt].name}`;
@@ -193,6 +198,4 @@ export default defineComponent({
 });
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

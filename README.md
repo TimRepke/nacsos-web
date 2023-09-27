@@ -47,6 +47,12 @@ npm run build-dev
 npm run lint
 ```
 
+### Check for dependency updates
+See [npm](https://www.npmjs.com/package/npm-check-updates) for more details or just run
+```
+ncu
+```
+
 ### Customize configuration
 See [Configuration Reference](https://cli.vuejs.org/config/).
 

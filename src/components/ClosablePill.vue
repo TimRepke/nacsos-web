@@ -1,5 +1,5 @@
 <template>
-  <span class="badge align-middle" :class="[background, (rounded) ? 'rounded-pill' : '']">
+  <span class="badge align-middle" :class="[background, rounded ? 'rounded-pill' : '']">
     <span class="pill-text mb-1 mt-1 me-2">
       <slot />
     </span>
@@ -10,18 +10,18 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
-import type { PropType } from 'vue';
+import { defineComponent } from "vue";
+import type { PropType } from "vue";
 
-type BackgroundColour = 'primary' | 'secondary' | 'success' | 'danger' | 'warning' | 'info' | 'dark' | 'light';
+type BackgroundColour = "primary" | "secondary" | "success" | "danger" | "warning" | "info" | "dark" | "light";
 
 export default defineComponent({
-  name: 'ClosablePill',
-  emits: ['clicked-x'],
+  name: "ClosablePill",
+  emits: ["clicked-x"],
   props: {
     colour: {
       type: String as PropType<BackgroundColour>,
-      default: 'primary',
+      default: "primary",
     },
     rounded: {
       type: Boolean,

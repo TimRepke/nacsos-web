@@ -1,3 +1,3 @@
-/* eslint-disable no-useless-constructor, import/prefer-default-export */
+/* eslint-disable no-useless-constructor */
 
 export class BaseEvent {}

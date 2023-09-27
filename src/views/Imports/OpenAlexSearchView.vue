@@ -12,22 +12,17 @@
               data-bs-toggle="collapse"
               data-bs-target="#resolve-config"
               aria-expanded="true"
-              aria-controls="resolve-config">
+              aria-controls="resolve-config"
+            >
               Query setup
             </button>
           </h2>
-          <div
-            id="resolve-config"
-            class="accordion-collapse collapse show">
+          <div id="resolve-config" class="accordion-collapse collapse show">
             <div class="accordion-body">
               <div class="row">
                 <div class="col text-end">
                   <textarea v-model="query" class="form-control" aria-label="Query" rows="3" />
-                  <span
-                    role="button"
-                    tabindex="-1"
-                    class="link-secondary me-2"
-                    @click="showTokenExpandModal = true">
+                  <span role="button" tabindex="-1" class="link-secondary me-2" @click="showTokenExpandModal = true">
                     <font-awesome-icon :icon="['fas', 'arrow-down-a-z']" />Tokens
                   </span>
                   <a
@@ -35,9 +30,11 @@
                     target="_blank"
                     class="link-secondary"
                     style="text-decoration: none"
-                    rel="noopener noreferrer">
+                    rel="noopener noreferrer"
+                  >
                     <font-awesome-icon :icon="['fas', 'circle-question']" />
-                    Help</a>
+                    Help</a
+                  >
                 </div>
               </div>
               <div class="row mt-2">
@@ -51,7 +48,8 @@
                         placeholder="Limit"
                         aria-label="Limit"
                         id="limit"
-                        v-model="limit">
+                        v-model="limit"
+                      />
                     </div>
                     <div class="col-6 col-sm-auto">
                       <label for="offset" class="form-label">Offset</label>
@@ -63,7 +61,8 @@
                             placeholder="Offset"
                             aria-label="Offset"
                             id="offset"
-                            v-model="offset">
+                            v-model="offset"
+                          />
                         </div>
                         <div class="d-flex flex-column text-muted" style="font-size: 0.7em">
                           <div class="m-auto" role="button" @click="paginate(limit)" tabindex="-1">+{{ limit }}</div>
@@ -100,14 +99,8 @@
 
                     <div class="col-6 col-sm-auto">
                       <div class="mb-2">
-                        <input
-                          id="includeHistogram"
-                          v-model="hist"
-                          class="form-check-input me-1"
-                          type="checkbox">
-                        <label for="includeHistogram" class="form-check-label">
-                          Histogram
-                        </label>
+                        <input id="includeHistogram" v-model="hist" class="form-check-input me-1" type="checkbox" />
+                        <label for="includeHistogram" class="form-check-label"> Histogram </label>
                       </div>
                       <div class="d-flex">
                         <input
@@ -117,7 +110,8 @@
                           placeholder="Start"
                           aria-label="Histogram start"
                           id="histStart"
-                          v-model="histStart">
+                          v-model="histStart"
+                        />
                         –
                         <input
                           type="number"
@@ -126,7 +120,8 @@
                           placeholder="End"
                           aria-label="Histogram end"
                           id="histEnd"
-                          v-model="histEnd">
+                          v-model="histEnd"
+                        />
                       </div>
                     </div>
                   </div>
@@ -135,7 +130,7 @@
                       <button type="button" class="btn btn-outline-success" @click="runSearch">Query</button>
                     </div>
                     <div class="col-auto text-muted align-text-bottom" v-if="nDocs !== null && qTime !== null">
-                      Found {{ nDocs.toLocaleString('en') }} works in {{ qTime }}ms
+                      Found {{ nDocs.toLocaleString("en") }} works in {{ qTime }}ms
                     </div>
                   </div>
                 </div>
@@ -156,14 +151,9 @@
     <div class="row mt-2">
       <div class="d-flex flex-row flex-wrap p-2 overflow-auto">
         <template v-if="results && results.length > 0">
-          <AcademicItemComponent
-            v-for="(item) in results"
-            :key="item.item_id"
-            :item="item" />
+          <AcademicItemComponent v-for="item in results" :key="item.item_id" :item="item" />
         </template>
-        <template v-else>
-          No results (yet).
-        </template>
+        <template v-else> No results (yet). </template>
       </div>
     </div>
 
@@ -178,14 +168,15 @@
                 class="btn-close"
                 data-bs-dismiss="modal"
                 aria-label="Close"
-                @click="showTokenExpandModal = false" />
+                @click="showTokenExpandModal = false"
+              />
             </div>
             <div class="modal-body text-start ps-4 pe-4">
               <div class="row mb-3 g-2 text-muted">
                 <p>
                   Wildcards (e.g. <code>clim*</code>) are very bad for query performance and add a lot of uncertainty.
-                  It is much better to explicitly expand those (e.g. <code>(climate OR climatic)</code>) and
-                  in the process exclude false-positives like <code>climb, climax, ...</code><br />
+                  It is much better to explicitly expand those (e.g. <code>(climate OR climatic)</code>) and in the
+                  process exclude false-positives like <code>climb, climax, ...</code><br />
                   Results include term frequency (ttf) and document frequency (df).
                 </p>
                 <!--<p>
@@ -201,12 +192,14 @@
                     v-model="tokenSearchPrefix"
                     class="form-control"
                     placeholder="Prefix without the *"
-                    aria-label="Prefix without the *">
+                    aria-label="Prefix without the *"
+                  />
                   <button
                     class="btn btn-outline-secondary"
                     type="button"
                     id="button-token-search"
-                    @click="expandTokens">
+                    @click="expandTokens"
+                  >
                     <font-awesome-icon :icon="['fas', 'magnifying-glass']" />
                   </button>
                 </div>
@@ -215,10 +208,8 @@
               <div class="row mb-3 g-2">
                 <div v-for="token in tokenSearchResult" :key="token.term" class="col-4">
                   <code>{{ token.term }}</code>
-                  <span
-                    class="text-muted small"
-                    style="white-space: nowrap;">
-                    ({{ token.ttf.toLocaleString('en') }} | {{ token.df.toLocaleString('en') }})
+                  <span class="text-muted small" style="white-space: nowrap">
+                    ({{ token.ttf.toLocaleString("en") }} | {{ token.df.toLocaleString("en") }})
                   </span>
                 </div>
               </div>
@@ -235,25 +226,17 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import { Bar } from 'vue-chartjs';
-import {
-  BarElement,
-  CategoryScale,
-  Chart as ChartJS,
-  Legend,
-  LinearScale,
-  Title,
-  Tooltip,
-} from 'chart.js';
-import type { ChartOptions, ChartData } from 'chart.js';
-import type { AcademicItemModel, TermStats } from '@/plugins/api/api-core';
-import { currentProjectStore } from '@/stores';
-import { EventBus } from '@/plugins/events';
-import { ToastEvent } from '@/plugins/events/events/toast';
-import { API } from '@/plugins/api';
-import AcademicItemComponent from '@/components/items/AcademicItem.vue';
+import { defineComponent } from "vue";
+import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
+import { Bar } from "vue-chartjs";
+import { BarElement, CategoryScale, Chart as ChartJS, Legend, LinearScale, Title, Tooltip } from "chart.js";
+import type { ChartOptions, ChartData } from "chart.js";
+import type { AcademicItemModel, TermStats } from "@/plugins/api/api-core";
+import { currentProjectStore } from "@/stores";
+import { EventBus } from "@/plugins/events";
+import { ToastEvent } from "@/plugins/events/events/toast";
+import { API } from "@/plugins/api";
+import AcademicItemComponent from "@/components/items/AcademicItem.vue";
 
 ChartJS.register(Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale);
 
@@ -262,21 +245,21 @@ interface ChartInfo {
   chartOptions: ChartOptions;
 }
 
-type DefType = 'edismax' | 'lucene' | 'dismax';
-type SearchField = 'title' | 'abstract' | 'title_abstract';
-type OpType = 'OR' | 'AND';
+type DefType = "edismax" | "lucene" | "dismax";
+type SearchField = "title" | "abstract" | "title_abstract";
+type OpType = "OR" | "AND";
 
 export default defineComponent({
-  name: 'OpenAlexSearchView',
+  name: "OpenAlexSearchView",
   components: { Bar, FontAwesomeIcon, AcademicItemComponent },
   data() {
     return {
-      query: 'Query',
+      query: "Query",
       limit: 20,
       offset: 0,
-      op: 'AND' as OpType,
-      defType: 'edismax' as DefType,
-      field: 'title_abstract' as SearchField,
+      op: "AND" as OpType,
+      defType: "edismax" as DefType,
+      field: "title_abstract" as SearchField,
       hist: false,
       histStart: 1990,
       histEnd: 2024,
@@ -285,7 +268,7 @@ export default defineComponent({
       nDocs: null as number | null,
       results: null as Array<AcademicItemModel> | null,
       showTokenExpandModal: false,
-      tokenSearchPrefix: '',
+      tokenSearchPrefix: "",
       tokenSearchLimit: 300,
       tokenSearchResult: [] as Array<TermStats>,
     };
@@ -302,17 +285,18 @@ export default defineComponent({
       }
     },
     runSearch() {
-      API.core.search.searchOpenalexApiSearchOpenalexSelectGet({
-        query: this.query,
-        xProjectId: currentProjectStore.projectId as string,
-        limit: this.limit,
-        offset: this.offset,
-        field: this.field,
-        defType: this.defType,
-        histogram: this.hist,
-        histogramFrom: this.histStart,
-        histogramTo: this.histEnd,
-      })
+      API.core.search
+        .searchOpenalexApiSearchOpenalexSelectGet({
+          query: this.query,
+          xProjectId: currentProjectStore.projectId as string,
+          limit: this.limit,
+          offset: this.offset,
+          field: this.field,
+          defType: this.defType,
+          histogram: this.hist,
+          histogramFrom: this.histStart,
+          histogramTo: this.histEnd,
+        })
         .then((response) => {
           const { data } = response;
 
@@ -322,23 +306,24 @@ export default defineComponent({
           this.histogram = data.histogram;
         })
         .catch(() => {
-          EventBus.emit(new ToastEvent('ERROR', 'Query failed. Retry or fix your query.'));
+          EventBus.emit(new ToastEvent("ERROR", "Query failed. Retry or fix your query."));
           this.results = null;
         });
     },
     expandTokens() {
-      API.core.search.termExpansionApiSearchOpenalexTermsGet({
-        xProjectId: currentProjectStore.projectId as string,
-        termPrefix: this.tokenSearchPrefix,
-        limit: this.tokenSearchLimit,
-      })
+      API.core.search
+        .termExpansionApiSearchOpenalexTermsGet({
+          xProjectId: currentProjectStore.projectId as string,
+          termPrefix: this.tokenSearchPrefix,
+          limit: this.tokenSearchLimit,
+        })
         .then((response) => {
           const { data } = response;
 
           this.tokenSearchResult = data;
         })
         .catch(() => {
-          EventBus.emit(new ToastEvent('ERROR', 'Query failed. Retry or fix your query.'));
+          EventBus.emit(new ToastEvent("ERROR", "Query failed. Retry or fix your query."));
           this.tokenSearchResult = [];
         });
     },
@@ -349,7 +334,7 @@ export default defineComponent({
         return {
           chartData: {
             labels: Object.keys(this.histogram),
-            datasets: [{ data: Object.values(this.histogram), label: 'Works' }],
+            datasets: [{ data: Object.values(this.histogram), label: "Works" }],
           },
           chartOptions: {
             responsive: true,
@@ -357,7 +342,7 @@ export default defineComponent({
             plugins: {
               legend: {
                 display: false,
-                position: 'right',
+                position: "right",
               },
             },
           },
@@ -369,6 +354,4 @@ export default defineComponent({
 });
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

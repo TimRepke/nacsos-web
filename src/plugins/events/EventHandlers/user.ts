@@ -1,6 +1,6 @@
-import { EventBus } from '@/plugins/events';
-import { AuthFailedEvent, LoggedOutEvent, UserLoginEvent } from '@/plugins/events/events/auth';
-import { currentUserStore } from '@/stores';
+import { EventBus } from "@/plugins/events";
+import { AuthFailedEvent, LoggedOutEvent, UserLoginEvent } from "@/plugins/events/events/auth";
+import { currentUserStore } from "@/stores";
 
 export default () => {
   EventBus.on(UserLoginEvent, async (event: UserLoginEvent) => {

@@ -3,32 +3,36 @@
     <ul class="list-unstyled">
       <li v-for="(subtree, key) in tree" :key="key">
         <template v-if="$util.isFunctionInfo(subtree)">
-          <code>{{ subtree.function }}(&sdot;)</code><br>
+          <code>{{ subtree.function }}(&sdot;)</code><br />
           <span>{{ subtree.name }}</span>
           <font-awesome-icon
             role="button"
             class="ms-1 text-muted"
             :icon="['fas', 'circle-info']"
-            @click="$emit('showInfo', subtree)" />
+            @click="$emit('showInfo', subtree)"
+          />
           <font-awesome-icon
             role="button"
             class="text-muted ms-1"
             :icon="['fas', 'wrench']"
-            @click="$emit('useFunc', subtree)" />
+            @click="$emit('useFunc', subtree)"
+          />
         </template>
         <template v-else-if="typeof subtree === 'object'">
           <span @click="opened[key] = !opened[key]" role="button" tabindex="-1">
             <font-awesome-icon
               class="text-muted"
               style="margin-left: -0.3em"
-              :icon="['fas', (opened[key]) ? 'caret-down' : 'caret-right']" />
+              :icon="['fas', opened[key] ? 'caret-down' : 'caret-right']"
+            />
             {{ key }}
           </span>
           <div v-show="opened[key]">
             <NestedExpandableComponent
               :tree="subtree"
               @showInfo="$emit('showInfo', $event)"
-              @useFunc="$emit('useFunc', $event)" />
+              @useFunc="$emit('useFunc', $event)"
+            />
           </div>
         </template>
       </li>
@@ -37,13 +41,13 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
-import type { PropType } from 'vue';
-import type { NestedLibrary } from '@/types/pipelines.d';
-import type { FunctionInfo } from '@/plugins/api/api-pipe';
+import { defineComponent } from "vue";
+import type { PropType } from "vue";
+import type { NestedLibrary } from "@/types/pipelines.d";
+import type { FunctionInfo } from "@/plugins/api/api-pipe";
 
 export default defineComponent({
-  name: 'NestedExpandableComponent',
+  name: "NestedExpandableComponent",
   emits: {
     showInfo: (info: FunctionInfo) => info,
     useFunc: (info: FunctionInfo) => info,
@@ -63,5 +67,4 @@ export default defineComponent({
 });
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>

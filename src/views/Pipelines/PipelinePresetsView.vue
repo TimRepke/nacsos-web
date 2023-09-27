@@ -5,20 +5,19 @@
     </div>
     <div class="row">
       <span class="text-warning">
-        <strong>TODO:</strong> have useful presets of entire (configured) pipelines of sub-tasks.
-        For example, instead of scraping WoS, deduplicating, cleaning, .... import tasks, have a preset
-        that sensibly combines all these steps with good preset parameters.
+        <strong>TODO:</strong> have useful presets of entire (configured) pipelines of sub-tasks. For example, instead
+        of scraping WoS, deduplicating, cleaning, .... import tasks, have a preset that sensibly combines all these
+        steps with good preset parameters.
       </span>
     </div>
   </div>
 </template>
 
 <script lang="ts">
-
-import { defineComponent } from 'vue';
+import { defineComponent } from "vue";
 
 export default defineComponent({
-  name: 'PipelinePresetsView',
+  name: "PipelinePresetsView",
   data() {
     return {
       // pass
@@ -36,6 +35,4 @@ export default defineComponent({
 });
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

@@ -13,13 +13,12 @@
 </template>
 
 <script lang="ts">
-
 // type Placement = 'top' | 'left' | 'bottom' | 'right';
 // type Size = 'small' | 'medium' | 'wide';
-import { defineComponent } from 'vue';
+import { defineComponent } from "vue";
 
 export default defineComponent({
-  name: 'InlineToolTip',
+  name: "InlineToolTip",
   props: {
     info: {
       type: String,
@@ -29,12 +28,12 @@ export default defineComponent({
     placement: {
       type: String,
       required: false,
-      default: 'top',
+      default: "top",
     },
     size: {
       type: String,
       required: false,
-      default: 'small',
+      default: "small",
     },
   },
 });
@@ -42,6 +41,6 @@ export default defineComponent({
 
 <style scoped>
 .nacsos-tooltip > .bottom {
-    transform: translate(-50%, 75%);
+  transform: translate(-50%, 75%);
 }
 </style>

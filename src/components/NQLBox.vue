@@ -7,9 +7,11 @@
           target="_blank"
           class="link-secondary"
           style="text-decoration: none"
-          rel="noopener noreferrer">
+          rel="noopener noreferrer"
+        >
           <font-awesome-icon :icon="['fas', 'circle-question']" />
-          Help</a>
+          Help</a
+        >
       </div>
       <div class="col text-end">
         <span class="border rounded-2 rounded-bottom-0 border-bottom-0 p-2">
@@ -33,13 +35,12 @@
         @input="$emit('update:query', $event.target.value)"
         aria-label="NQL query"
         class="form-control"
-        rows="5" />
+        rows="5"
+      />
     </div>
 
     <!-- INDENT MODE -->
-    <div class="row border rounded-2 p-2 mt-1" v-else-if="mode === 'ind'">
-      Parsed view not implemented, yet.
-    </div>
+    <div class="row border rounded-2 p-2 mt-1" v-else-if="mode === 'ind'">Parsed view not implemented, yet.</div>
 
     <!-- VISUAL MODE -->
     <div class="row border rounded-2 p-2 mt-1" v-else-if="mode === 'vis'">
@@ -49,17 +50,17 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import { API } from '@/plugins/api';
+import { defineComponent } from "vue";
+import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
+import { API } from "@/plugins/api";
 // import initPython from '@/plugins/python';
 
-type Mode = 'txt' | 'ind' | 'vis';
+type Mode = "txt" | "ind" | "vis";
 
 export default defineComponent({
-  name: 'NQLBox',
+  name: "NQLBox",
   components: { FontAwesomeIcon },
-  emits: ['update:query'],
+  emits: ["update:query"],
   props: {
     query: {
       type: String,
@@ -69,18 +70,17 @@ export default defineComponent({
   },
   data() {
     return {
-      mode: 'txt' as Mode,
+      mode: "txt" as Mode,
       queryStr: this.query,
-      grammar: '',
+      grammar: "",
       log: [] as Array<string>,
     };
   },
   mounted() {
-    API.core.search.nqlGrammarApiSearchNqlGrammarGet()
-      .then((response) => {
-        this.grammar = response.data;
-        // initPython((e: string) => { this.log = [...this.log, e]; });
-      });
+    API.core.search.nqlGrammarApiSearchNqlGrammarGet().then((response) => {
+      this.grammar = response.data;
+      // initPython((e: string) => { this.log = [...this.log, e]; });
+    });
   },
   computed: {
     // pass
@@ -94,6 +94,4 @@ export default defineComponent({
 });
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

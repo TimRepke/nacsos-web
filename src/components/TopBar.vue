@@ -1,14 +1,13 @@
 <template>
   <div class="border-bottom bg-light justify-content-end fs-6 align-items-center text-muted">
     <div class="pe-4 text-warning" v-if="authTokenIsInvalidSoon">
-      <span>
-        Your auth token is running out soon!
-      </span>
+      <span> Your auth token is running out soon! </span>
       <router-link :to="{ name: 'user-profile' }" class="nav-link d-inline-block">
         <font-awesome-icon
           class="me-1 mb-1"
-          style="font-size: 1.5em; vertical-align: middle;"
-          :icon="['fas', 'toilet-paper-slash']" />
+          style="font-size: 1.5em; vertical-align: middle"
+          :icon="['fas', 'toilet-paper-slash']"
+        />
         Replenish!
       </router-link>
     </div>
@@ -22,12 +21,13 @@
       <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
         <font-awesome-icon
           class="me-1 mb-1"
-          style="font-size: 1.5em; vertical-align: middle;"
-          :icon="['fas', 'circle-user']" />
-        {{ userStore.user?.username || 'Username' }}
+          style="font-size: 1.5em; vertical-align: middle"
+          :icon="['fas', 'circle-user']"
+        />
+        {{ userStore.user?.username || "Username" }}
       </a>
       <ul class="dropdown-menu">
-        <template v-if="userStore.user.is_superuser">
+        <template v-if="userStore.user?.is_superuser">
           <li>
             <h6 class="dropdown-header">
               <font-awesome-icon :icon="['fas', 'toolbox']" class="me-2" />
@@ -35,27 +35,17 @@
             </h6>
           </li>
           <li>
-            <router-link
-              to="/admin/projects"
-              class="dropdown-item">
-              Manage projects
-            </router-link>
+            <router-link to="/admin/projects" class="dropdown-item"> Manage projects</router-link>
           </li>
           <li>
-            <router-link
-              to="/admin/users"
-              class="dropdown-item">
-              Manage users
-            </router-link>
+            <router-link to="/admin/users" class="dropdown-item"> Manage users</router-link>
           </li>
           <li>
-            <hr class="dropdown-divider">
+            <hr class="dropdown-divider" />
           </li>
         </template>
         <li>
-          <router-link
-            to="/user/profile"
-            class="dropdown-item">
+          <router-link to="/user/profile" class="dropdown-item">
             <font-awesome-icon :icon="['fas', 'user-pen']" class="me-2" />
             Edit Profile
           </router-link>
@@ -70,14 +60,13 @@
 </template>
 
 <script lang="ts">
-
-import { defineComponent } from 'vue';
-import { currentUserStore } from '@/stores';
-import { EventBus } from '@/plugins/events';
-import { LoggedOutEvent, LogoutSuccessEvent } from '@/plugins/events/events/auth';
+import { defineComponent } from "vue";
+import { currentUserStore } from "@/stores";
+import { EventBus } from "@/plugins/events";
+import { LoggedOutEvent, LogoutSuccessEvent } from "@/plugins/events/events/auth";
 
 export default defineComponent({
-  name: 'TopBar',
+  name: "TopBar",
   data() {
     return {
       userStore: currentUserStore,
@@ -87,21 +76,28 @@ export default defineComponent({
     };
   },
   created() {
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
     const self = this;
     // update the current time every minute
-    setInterval(() => { self.now = Date.now(); }, 60 * 1000);
+    setInterval(() => {
+      self.now = Date.now();
+    }, 60 * 1000);
   },
   computed: {
     authTokenIsInvalidSoon(): boolean {
       // 24 * 60 * 60 * 1000 = 86400000 (1 day in ms)
-      return (new Date(this.userStore.authToken.valid_till)).getTime() - this.now - 86400000 < 0;
+      const valid = this.userStore.authToken?.valid_till;
+      if (!valid) {
+        return false;
+      }
+      return new Date(valid).getTime() - this.now - 86400000 < 0;
     },
   },
   methods: {
     logout() {
       EventBus.emit(new LoggedOutEvent());
       EventBus.once(LogoutSuccessEvent, () => {
-        this.$router.push({ name: 'user-login' });
+        this.$router.push({ name: "user-login" });
       });
     },
   },

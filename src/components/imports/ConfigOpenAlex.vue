@@ -3,19 +3,12 @@
     <div class="row">
       <div class="col-xxl-7">
         <h4>OpenAlex import</h4>
-        <p class="text-muted">
-          Import directly from our self-hosted OpenAlex solr database.
-        </p>
+        <p class="text-muted">Import directly from our self-hosted OpenAlex solr database.</p>
       </div>
     </div>
     <div class="row">
       <div class="col">
-        <textarea
-          v-model="config.query"
-          :disabled="!editable"
-          aria-label="Solr query"
-          class="form-control"
-          rows="5" />
+        <textarea v-model="config.query" :disabled="!editable" aria-label="Solr query" class="form-control" rows="5" />
       </div>
     </div>
     <div class="row mt-2">
@@ -47,13 +40,13 @@
 </template>
 
 <script lang="ts">
-import type { PropType } from 'vue';
-import { defineComponent } from 'vue';
-import { OpenAlexImport } from '@/plugins/api/api-core';
+import type { PropType } from "vue";
+import { defineComponent } from "vue";
+import { OpenAlexImport } from "@/plugins/api/api-core";
 
 export default defineComponent({
-  name: 'ConfigOpenAlex',
-  emits: ['configChanged'],
+  name: "ConfigOpenAlex",
+  emits: ["configChanged"],
   props: {
     existingConfig: {
       type: Object as PropType<OpenAlexImport>,
@@ -76,17 +69,19 @@ export default defineComponent({
     },
   },
   data() {
-    const config: OpenAlexImport = (this.existingConfig) ? this.existingConfig : {
-      func_name: 'nacsos_lib.academic.import.import_openalex',
-      query: '',
-      def_type: OpenAlexImport.def_type.LUCENE,
-      field: OpenAlexImport.field.TITLE_ABSTRACT,
-      op: OpenAlexImport.op.AND,
-      project_id: this.projectId,
-      import_id: this.importId,
-    };
+    const config: OpenAlexImport = this.existingConfig
+      ? this.existingConfig
+      : {
+          func_name: "nacsos_lib.academic.import.import_openalex",
+          query: "",
+          def_type: OpenAlexImport.def_type.LUCENE,
+          field: OpenAlexImport.field.TITLE_ABSTRACT,
+          op: OpenAlexImport.op.AND,
+          project_id: this.projectId,
+          import_id: this.importId,
+        };
     if (!this.existingConfig) {
-      this.$emit('configChanged', config);
+      this.$emit("configChanged", config);
     }
     if (!config.import_id && !!this.importId) {
       config.import_id = this.importId;
@@ -98,7 +93,7 @@ export default defineComponent({
   watch: {
     config: {
       handler(newValue: OpenAlexImport) {
-        this.$emit('configChanged', newValue);
+        this.$emit("configChanged", newValue);
       },
       deep: true,
     },
@@ -117,6 +112,4 @@ export default defineComponent({
 });
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

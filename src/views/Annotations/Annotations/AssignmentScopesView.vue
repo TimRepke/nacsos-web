@@ -7,7 +7,8 @@
         <em>({{ scope.scope.name }})</em>&nbsp;
         <router-link
           :to="{ name: 'project-annotate-item', params: { scope_id: scope.scope.assignment_scope_id } }"
-          class="link-secondary">
+          class="link-secondary"
+        >
           <font-awesome-icon :icon="['fas', 'tags']" />
         </router-link>
         <br />
@@ -16,25 +17,25 @@
         /
         <InlineToolTip info="Partially completed assignments">{{ scope.num_partial }}</InlineToolTip>
         /
-        <InlineToolTip info="Number of assignments"><strong>{{ scope.num_assignments }}</strong></InlineToolTip>
+        <InlineToolTip info="Number of assignments"
+          ><strong>{{ scope.num_assignments }}</strong></InlineToolTip
+        >
         ({{ ((scope.num_completed / scope.num_assignments) * 100).toFixed(0) }}%)
       </li>
     </ul>
-    <div v-else>
-      Loading assignments (or you have none)...
-    </div>
+    <div v-else>Loading assignments (or you have none)...</div>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
-import { currentProjectStore } from '@/stores';
-import InlineToolTip from '@/components/InlineToolTip.vue';
-import type { UserProjectAssignmentScope } from '@/plugins/api/api-core';
-import { API, ignore } from '@/plugins/api';
+import { defineComponent } from "vue";
+import { currentProjectStore } from "@/stores";
+import InlineToolTip from "@/components/InlineToolTip.vue";
+import type { UserProjectAssignmentScope } from "@/plugins/api/api-core";
+import { API, ignore } from "@/plugins/api";
 
 export default defineComponent({
-  name: 'AssignmentScopesView',
+  name: "AssignmentScopesView",
   components: { InlineToolTip },
   data() {
     return {
@@ -42,11 +43,14 @@ export default defineComponent({
     };
   },
   async mounted() {
-    API.core.annotations.getAssignmentScopesForUserApiAnnotationsAnnotateScopesProjectIdGet({
-      projectId: currentProjectStore.projectId as string,
-      xProjectId: currentProjectStore.projectId as string,
-    })
-      .then((response) => { this.annotationScopes = response.data; })
+    API.core.annotations
+      .getAssignmentScopesForUserApiAnnotationsAnnotateScopesProjectIdGet({
+        projectId: currentProjectStore.projectId as string,
+        xProjectId: currentProjectStore.projectId as string,
+      })
+      .then((response) => {
+        this.annotationScopes = response.data;
+      })
       .catch(ignore);
   },
   methods: {
@@ -55,6 +59,4 @@ export default defineComponent({
 });
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

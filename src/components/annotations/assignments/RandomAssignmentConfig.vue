@@ -11,7 +11,8 @@
           aria-label="Number of items"
           placeholder="Number of items"
           v-model="config.num_items"
-          :disabled="!editable" />
+          :disabled="!editable"
+        />
       </div>
       <div class="col">
         <label for="num_multi_coded_items"># multi-coded items</label>
@@ -22,7 +23,8 @@
           aria-label="# multi-coded items"
           placeholder="# multi-coded items"
           v-model="config.num_multi_coded_items"
-          :disabled="!editable" />
+          :disabled="!editable"
+        />
       </div>
       <div class="col">
         <label for="min_assignments_per_item">Min. # coders per item</label>
@@ -33,7 +35,8 @@
           aria-label="Min. # coders per item"
           placeholder="Min. # coders per item"
           v-model="config.min_assignments_per_item"
-          :disabled="!editable" />
+          :disabled="!editable"
+        />
       </div>
       <div class="col">
         <label for="max_assignments_per_item">Max. # coders per item</label>
@@ -44,7 +47,8 @@
           aria-label="Max. # coders per item"
           placeholder="Max. # coders per item"
           v-model="config.max_assignments_per_item"
-          :disabled="!editable" />
+          :disabled="!editable"
+        />
       </div>
       <div class="col">
         <label for="random_seed">Random seed</label>
@@ -55,20 +59,21 @@
           aria-label="Random seed"
           placeholder="Random seed"
           v-model="config.random_seed"
-          :disabled="!editable" />
+          :disabled="!editable"
+        />
       </div>
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
-import type { PropType } from 'vue';
-import type { AssignmentScopeRandomConfig } from '@/plugins/api/api-core';
+import { defineComponent } from "vue";
+import type { PropType } from "vue";
+import type { AssignmentScopeRandomConfig } from "@/plugins/api/api-core";
 
 export default defineComponent({
-  name: 'RandomAssignmentConfig',
-  emits: ['configChanged'],
+  name: "RandomAssignmentConfig",
+  emits: ["configChanged"],
   props: {
     existingConfig: {
       type: Object as PropType<AssignmentScopeRandomConfig>,
@@ -80,16 +85,18 @@ export default defineComponent({
     },
   },
   data() {
-    const config: AssignmentScopeRandomConfig = (this.existingConfig) ? this.existingConfig : {
-      config_type: 'random',
-      num_items: 12,
-      num_multi_coded_items: 8,
-      min_assignments_per_item: 2,
-      max_assignments_per_item: 3,
-      random_seed: 10829,
-    } as AssignmentScopeRandomConfig;
+    const config: AssignmentScopeRandomConfig = this.existingConfig
+      ? this.existingConfig
+      : ({
+          config_type: "random",
+          num_items: 12,
+          num_multi_coded_items: 8,
+          min_assignments_per_item: 2,
+          max_assignments_per_item: 3,
+          random_seed: 10829,
+        } as AssignmentScopeRandomConfig);
     if (!this.existingConfig) {
-      this.$emit('configChanged', config);
+      this.$emit("configChanged", config);
     }
     return {
       config,
@@ -98,7 +105,7 @@ export default defineComponent({
   watch: {
     config: {
       handler(newValue: AssignmentScopeRandomConfig) {
-        this.$emit('configChanged', newValue);
+        this.$emit("configChanged", newValue);
       },
       deep: true,
     },
@@ -106,6 +113,4 @@ export default defineComponent({
 });
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

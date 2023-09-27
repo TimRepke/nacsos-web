@@ -6,7 +6,8 @@
         {{ importDetails.name }}
         <router-link
           :to="{ name: 'project-imports-details', params: { import_id: importDetails.import_id } }"
-          class="link-secondary me-1">
+          class="link-secondary me-1"
+        >
           <InlineToolTip info="View and set up import">
             <font-awesome-icon :icon="['fas', 'screwdriver-wrench']" />
           </InlineToolTip>
@@ -16,7 +17,8 @@
           class="link-secondary me-1"
           aria-label="Copy import"
           tabindex="0"
-          @click="copyImport(importDetails)">
+          @click="copyImport(importDetails)"
+        >
           <InlineToolTip info="Copy">
             <font-awesome-icon :icon="['far', 'clone']" />
           </InlineToolTip>
@@ -26,7 +28,8 @@
           class="link-secondary me-1"
           aria-label="Delete import"
           tabindex="0"
-          @click="removeImport(importDetails)">
+          @click="removeImport(importDetails)"
+        >
           <InlineToolTip info="Delete">
             <font-awesome-icon :icon="['fas', 'trash-can']" />
           </InlineToolTip>
@@ -36,17 +39,15 @@
           class="link-secondary me-1"
           aria-label="Export items"
           tabindex="0"
-          @click="exportData(importDetails)">
+          @click="exportData(importDetails)"
+        >
           <InlineToolTip info="Export items">
             <font-awesome-icon :icon="['fas', 'file-export']" />
           </InlineToolTip>
         </a>
       </li>
     </ul>
-    <router-link
-      role="button"
-      class="btn btn-outline-primary m-2 btn-sm"
-      :to="{ name: 'project-imports-details' }">
+    <router-link role="button" class="btn btn-outline-primary m-2 btn-sm" :to="{ name: 'project-imports-details' }">
       <font-awesome-icon :icon="['far', 'square-plus']" />
       Create new import
     </router-link>
@@ -54,17 +55,17 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
-import type { ImportModel } from '@/plugins/api/api-core';
-import InlineToolTip from '@/components/InlineToolTip.vue';
-import { EventBus } from '@/plugins/events';
-import { ToastEvent } from '@/plugins/events/events/toast';
-import { currentProjectStore } from '@/stores';
-import { API, toastReject } from '@/plugins/api';
-import { ConfirmationRequestEvent } from '@/plugins/events/events/confirmation';
+import { defineComponent } from "vue";
+import type { ImportModel } from "@/plugins/api/api-core";
+import InlineToolTip from "@/components/InlineToolTip.vue";
+import { EventBus } from "@/plugins/events";
+import { ToastEvent } from "@/plugins/events/events/toast";
+import { currentProjectStore } from "@/stores";
+import { API, toastReject } from "@/plugins/api";
+import { ConfirmationRequestEvent } from "@/plugins/events/events/confirmation";
 
 export default defineComponent({
-  name: 'ProjectListView',
+  name: "ProjectListView",
   components: { InlineToolTip },
   data() {
     return {
@@ -72,10 +73,13 @@ export default defineComponent({
     };
   },
   async mounted() {
-    API.core.imports.getAllImportsForProjectApiImportsListGet({
-      xProjectId: currentProjectStore.projectId as string,
-    })
-      .then((response) => { this.imports = Object.fromEntries(response.data.map((i) => [i.import_id, i])); })
+    API.core.imports
+      .getAllImportsForProjectApiImportsListGet({
+        xProjectId: currentProjectStore.projectId as string,
+      })
+      .then((response) => {
+        this.imports = Object.fromEntries(response.data.map((i) => [i.import_id, i]));
+      })
       .catch(toastReject);
   },
   methods: {
@@ -87,12 +91,13 @@ export default defineComponent({
       newImport.time_created = undefined;
 
       // append "copy", so that the user has a chance to distinguish the new entry from the old one
-      newImport.name += ' copy';
+      newImport.name += " copy";
 
-      API.core.imports.putImportDetailsApiImportsImportPut({
-        requestBody: newImport,
-        xProjectId: currentProjectStore.projectId as string,
-      })
+      API.core.imports
+        .putImportDetailsApiImportsImportPut({
+          requestBody: newImport,
+          xProjectId: currentProjectStore.projectId as string,
+        })
         .then((response) => {
           // attach new data to the cloned import object
           newImport.import_id = response.data;
@@ -101,60 +106,62 @@ export default defineComponent({
           // ... and add it to the list of imports
           this.imports[newImport.import_id] = newImport;
 
-          EventBus.emit(new ToastEvent(
-            'SUCCESS',
-            'You successfully copied this import configuration. '
-            + 'Please remember renaming it in order to use the copied configuration.',
-          ));
+          EventBus.emit(
+            new ToastEvent(
+              "SUCCESS",
+              "You successfully copied this import configuration. " +
+                "Please remember renaming it in order to use the copied configuration.",
+            ),
+          );
         })
         .catch((reason) => {
           console.error(reason);
-          EventBus.emit(new ToastEvent('ERROR', 'Could not copy this import.'));
+          EventBus.emit(new ToastEvent("ERROR", "Could not copy this import."));
         });
     },
     removeImport(importDetails: ImportModel) {
-      EventBus.emit(new ConfirmationRequestEvent(
-        'Are you absolutely sure you want to delete this import?  \n'
-        + 'Doing so will also delete all items that are attached to this (as long as they are not associated with any '
-        + 'other imports). Any annotations associated with these items will also be lost.',
-        (confirmationResponse) => {
-          if (confirmationResponse === 'ACCEPT') {
-            API.core.imports.deleteImportDetailsApiImportsImportDeleteImportIdDelete({
-              // @ts-ignore
-              importId: importDetails.import_id,
-              xProjectId: currentProjectStore.projectId as string,
-            })
-              .then(() => {
-                // drop from the list of import objects
-                delete this.imports[importDetails.import_id as string];
+      EventBus.emit(
+        new ConfirmationRequestEvent(
+          "Are you absolutely sure you want to delete this import?  \n" +
+            "Doing so will also delete all items that are attached to this (as long as they are not associated with any " +
+            "other imports). Any annotations associated with these items will also be lost.",
+          (confirmationResponse) => {
+            if (confirmationResponse === "ACCEPT") {
+              API.core.imports
+                .deleteImportDetailsApiImportsImportDeleteImportIdDelete({
+                  // @ts-ignore
+                  importId: importDetails.import_id,
+                  xProjectId: currentProjectStore.projectId as string,
+                })
+                .then(() => {
+                  // drop from the list of import objects
+                  delete this.imports[importDetails.import_id as string];
 
-                EventBus.emit(new ToastEvent(
-                  'SUCCESS',
-                  'You successfully deleted this import and its related data.',
-                ));
-              })
-              .catch((reason) => {
-                console.error(reason);
-                EventBus.emit(new ToastEvent('ERROR', 'Could not delete this import.'));
-              });
-          } else {
-            EventBus.emit(new ToastEvent('WARN', 'OK, did not delete your import.'));
-          }
-        },
-        'Delete import',
-        'I understand, delete it anyway!',
-        'Cancel',
-      ));
+                  EventBus.emit(
+                    new ToastEvent("SUCCESS", "You successfully deleted this import and its related data."),
+                  );
+                })
+                .catch((reason) => {
+                  console.error(reason);
+                  EventBus.emit(new ToastEvent("ERROR", "Could not delete this import."));
+                });
+            } else {
+              EventBus.emit(new ToastEvent("WARN", "OK, did not delete your import."));
+            }
+          },
+          "Delete import",
+          "I understand, delete it anyway!",
+          "Cancel",
+        ),
+      );
     },
     exportData(importDetails: ImportModel) {
       // TODO
       console.log(importDetails);
-      EventBus.emit(new ToastEvent('WARN', 'Not implemented yet, sorry.'));
+      EventBus.emit(new ToastEvent("WARN", "Not implemented yet, sorry."));
     },
   },
 });
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

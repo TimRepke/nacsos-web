@@ -1,34 +1,38 @@
-import type { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
-import axios from 'axios';
-import FormData from 'form-data';
-import { useRequestsStore } from '@/stores/RequestsStore';
-import { EventBus } from '@/plugins/events';
-import { ClearUserStoreEvent } from '@/plugins/events/events/auth';
+import type { AxiosError, AxiosRequestConfig, AxiosResponse } from "axios";
+import axios from "axios";
+import FormData from "form-data";
+import { useRequestsStore } from "@/stores/RequestsStore";
+import { EventBus } from "@/plugins/events";
+import { ClearUserStoreEvent } from "@/plugins/events/events/auth";
 
-import type { OnCancel } from './CancelablePromise';
-import { CancelablePromise, ErrorLevel } from './CancelablePromise';
-import { ApiError } from './ApiError';
-import type { ApiRequestOptions } from './ApiRequestOptions';
-import type { ApiResult } from './ApiResult';
-import type { OpenAPIConfig } from './OpenAPI';
+import type { OnCancel } from "./CancelablePromise";
+import { CancelablePromise, ErrorLevel } from "./CancelablePromise";
+import { ApiError } from "./ApiError";
+import type { ApiRequestOptions } from "./ApiRequestOptions";
+import type { ApiResult } from "./ApiResult";
+import type { OpenAPIConfig } from "./OpenAPI";
 
-const isDefined = <T>(value: T | null | undefined): value is Exclude<T, null | undefined> => value !== undefined && value !== null;
+const isDefined = <T>(value: T | null | undefined): value is Exclude<T, null | undefined> =>
+  value !== undefined && value !== null;
 
-const isString = (value: any): value is string => typeof value === 'string';
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const isString = (value: any): value is string => typeof value === "string";
 
-const isStringWithValue = (value: any): value is string => isString(value) && value !== '';
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const isStringWithValue = (value: any): value is string => isString(value) && value !== "";
 
-const isBlob = (value: any): value is Blob => (
-  typeof value === 'object'
-  && typeof value.type === 'string'
-  && typeof value.stream === 'function'
-  && typeof value.arrayBuffer === 'function'
-  && typeof value.constructor === 'function'
-  && typeof value.constructor.name === 'string'
-  && /^(Blob|File)$/.test(value.constructor.name)
-  && /^(Blob|File)$/.test(value[Symbol.toStringTag])
-);
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const isBlob = (value: any): value is Blob =>
+  typeof value === "object" &&
+  typeof value.type === "string" &&
+  typeof value.stream === "function" &&
+  typeof value.arrayBuffer === "function" &&
+  typeof value.constructor === "function" &&
+  typeof value.constructor.name === "string" &&
+  /^(Blob|File)$/.test(value.constructor.name) &&
+  /^(Blob|File)$/.test(value[Symbol.toStringTag]);
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const isFormData = (value: any): value is FormData => value instanceof FormData;
 
 const isSuccess = (status: number): boolean => status >= 200 && status < 300;
@@ -38,24 +42,27 @@ const base64 = (str: string): string => {
     return btoa(str);
   } catch (err) {
     // @ts-ignore
-    return Buffer.from(str).toString('base64');
+    return Buffer.from(str).toString("base64");
   }
 };
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const getQueryString = (params: Record<string, any>): string => {
   const qs: string[] = [];
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const append = (key: string, value: any) => {
     qs.push(`${encodeURIComponent(key)}=${encodeURIComponent(String(value))}`);
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const process = (key: string, value: any) => {
     if (isDefined(value)) {
       if (Array.isArray(value)) {
         value.forEach((v) => {
           process(key, v);
         });
-      } else if (typeof value === 'object') {
+      } else if (typeof value === "object") {
         Object.entries(value).forEach(([k, v]) => {
           process(`${key}[${k}]`, v);
         });
@@ -70,17 +77,17 @@ const getQueryString = (params: Record<string, any>): string => {
   });
 
   if (qs.length > 0) {
-    return `?${qs.join('&')}`;
+    return `?${qs.join("&")}`;
   }
 
-  return '';
+  return "";
 };
 
 const getUrl = (config: OpenAPIConfig, options: ApiRequestOptions): string => {
   const encoder = config.ENCODE_PATH || encodeURI;
 
   const path = options.url
-    .replace('{api-version}', config.VERSION)
+    .replace("{api-version}", config.VERSION)
     .replace(/{(.*?)}/g, (substring: string, group: string) => {
       if (options.path && Object.prototype.hasOwnProperty.call(options.path, group)) {
         return encoder(String(options.path[group]));
@@ -99,6 +106,7 @@ const getFormData = (options: ApiRequestOptions): FormData | undefined => {
   if (options.formData) {
     const formData = new FormData();
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const process = (key: string, value: any) => {
       if (isString(value) || isBlob(value)) {
         formData.append(key, value);
@@ -126,31 +134,38 @@ const getFormData = (options: ApiRequestOptions): FormData | undefined => {
 type Resolver<T> = (options: ApiRequestOptions) => Promise<T>;
 
 const resolve = async <T>(options: ApiRequestOptions, resolver?: T | Resolver<T>): Promise<T | undefined> => {
-  if (typeof resolver === 'function') {
+  if (typeof resolver === "function") {
     return (resolver as Resolver<T>)(options);
   }
   return resolver;
 };
 
-const getHeaders = async (config: OpenAPIConfig, options: ApiRequestOptions, formData?: FormData): Promise<Record<string, string>> => {
+const getHeaders = async (
+  config: OpenAPIConfig,
+  options: ApiRequestOptions,
+  formData?: FormData,
+): Promise<Record<string, string>> => {
   const token = await resolve(options, config.TOKEN);
   const username = await resolve(options, config.USERNAME);
   const password = await resolve(options, config.PASSWORD);
   const additionalHeaders = await resolve(options, config.HEADERS);
-  const formHeaders = (typeof formData?.getHeaders === 'function') ? formData?.getHeaders() : {};
+  const formHeaders = typeof formData?.getHeaders === "function" ? formData?.getHeaders() : {};
 
   const headers = Object.entries({
-    Accept: 'application/json',
+    Accept: "application/json",
     ...additionalHeaders,
     ...options.headers,
     ...formHeaders,
   })
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     .filter(([_, value]) => isDefined(value))
-    .reduce((heads, [key, value]) => ({
-      ...heads,
-      [key]: String(value),
-    }), {} as Record<string, string>);
+    .reduce(
+      (heads, [key, value]) => ({
+        ...heads,
+        [key]: String(value),
+      }),
+      {} as Record<string, string>,
+    );
 
   if (isStringWithValue(token)) {
     headers.Authorization = `Bearer ${token}`;
@@ -163,19 +178,20 @@ const getHeaders = async (config: OpenAPIConfig, options: ApiRequestOptions, for
 
   if (options.body) {
     if (options.mediaType) {
-      headers['Content-Type'] = options.mediaType;
+      headers["Content-Type"] = options.mediaType;
     } else if (isBlob(options.body)) {
-      headers['Content-Type'] = options.body.type || 'application/octet-stream';
+      headers["Content-Type"] = options.body.type || "application/octet-stream";
     } else if (isString(options.body)) {
-      headers['Content-Type'] = 'text/plain';
+      headers["Content-Type"] = "text/plain";
     } else if (!isFormData(options.body)) {
-      headers['Content-Type'] = 'application/json';
+      headers["Content-Type"] = "application/json";
     }
   }
 
   return headers;
 };
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const getRequestBody = (options: ApiRequestOptions): any => {
   if (options.body) {
     return options.body;
@@ -187,6 +203,7 @@ const sendRequest = async <T>(
   config: OpenAPIConfig,
   options: ApiRequestOptions,
   url: string,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   body: any,
   formData: FormData | undefined,
   headers: Record<string, string>,
@@ -204,7 +221,7 @@ const sendRequest = async <T>(
     ...options.customRequestConfig,
   };
 
-  onCancel(() => source.cancel('The user aborted a request.'));
+  onCancel(() => source.cancel("The user aborted a request."));
 
   try {
     return await axios.request(requestConfig);
@@ -217,6 +234,7 @@ const sendRequest = async <T>(
   }
 };
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const getResponseHeader = (response: AxiosResponse<any>, responseHeader?: string): string | undefined => {
   if (responseHeader) {
     const content = response.headers[responseHeader];
@@ -227,6 +245,7 @@ const getResponseHeader = (response: AxiosResponse<any>, responseHeader?: string
   return undefined;
 };
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const getResponseBody = (response: AxiosResponse<any>): any => {
   if (response.status !== 204) {
     return response.data;
@@ -236,13 +255,13 @@ const getResponseBody = (response: AxiosResponse<any>): any => {
 
 const catchErrorCodes = (options: ApiRequestOptions, result: ApiResult): void => {
   const errors: Record<number, string> = {
-    400: 'Bad Request',
-    401: 'Unauthorized',
-    403: 'Forbidden',
-    404: 'Not Found',
-    500: 'Internal Server Error',
-    502: 'Bad Gateway',
-    503: 'Service Unavailable',
+    400: "Bad Request",
+    401: "Unauthorized",
+    403: "Forbidden",
+    404: "Not Found",
+    500: "Internal Server Error",
+    502: "Bad Gateway",
+    503: "Service Unavailable",
     ...options.errors,
   };
 
@@ -252,7 +271,7 @@ const catchErrorCodes = (options: ApiRequestOptions, result: ApiResult): void =>
   }
 
   if (!result.ok) {
-    throw new ApiError(options, result, 'Generic Error');
+    throw new ApiError(options, result, "Generic Error");
   }
 };
 
@@ -263,8 +282,7 @@ const catchErrorCodes = (options: ApiRequestOptions, result: ApiResult): void =>
  * @returns CancelablePromise<T>
  * @throws ApiError
  */
-// eslint-disable-next-line import/prefer-default-export
-export const request = <T>(config: OpenAPIConfig, options: ApiRequestOptions): CancelablePromise<T> => (
+export const request = <T>(config: OpenAPIConfig, options: ApiRequestOptions): CancelablePromise<T> =>
   new CancelablePromise(async (resolvePromise, rejectPromise, onCancel) => {
     const requestsStore = useRequestsStore();
     try {
@@ -312,7 +330,7 @@ export const request = <T>(config: OpenAPIConfig, options: ApiRequestOptions): C
         };
 
         // We might want to log-out when encountering an invalid auth error
-        if (reason.error.detail.type === 'NotAuthenticated') {
+        if (reason.error.detail.type === "NotAuthenticated") {
           EventBus.emit(new ClearUserStoreEvent());
           // const userStore = useCurrentUserStore();
           // userStore.clear();
@@ -325,12 +343,11 @@ export const request = <T>(config: OpenAPIConfig, options: ApiRequestOptions): C
           status: -1,
           error: {
             level: ErrorLevel.ERROR,
-            type: 'JSError',
-            message: 'Internal client-side error',
+            type: "JSError",
+            message: "Internal client-side error",
             error: error as Error,
           },
         });
       }
     }
-  })
-);
+  });

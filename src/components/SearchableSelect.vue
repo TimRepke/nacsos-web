@@ -1,8 +1,6 @@
 <template>
   <div class="d-flex flex-column">
-    <div
-      class="d-flex flex-row card"
-      :class="{ 'rounded-0': dropdownVisible, 'rounded-top': dropdownVisible }">
+    <div class="d-flex flex-row card" :class="{ 'rounded-0': dropdownVisible, 'rounded-top': dropdownVisible }">
       <div class="ms-1 flex-grow-1">
         <input
           class="w-100"
@@ -11,7 +9,8 @@
           v-model="searchText"
           @focusin="dropdownVisible = true"
           @focusout="unfocusSearchField"
-          style="background-color: inherit; border:none;" />
+          style="background-color: inherit; border: none"
+        />
       </div>
       <div class="text-muted me-2">
         <font-awesome-icon :icon="['fas', 'caret-down']" @click="dropdownVisible = !dropdownVisible" />
@@ -21,12 +20,13 @@
       </div>
     </div>
     <div v-show="dropdownVisible">
-      <ul class="list-group rounded-0 rounded-bottom border-top-0 overflow-auto" style="max-height: 10rem;">
+      <ul class="list-group rounded-0 rounded-bottom border-top-0 overflow-auto" style="max-height: 10rem">
         <li
           v-for="option in dropdownOptions"
           :key="`opt-${option.name}-${option.value}`"
           class="list-group-item list-group-item-action"
-          @click="pickOption(option)">
+          @click="pickOption(option)"
+        >
           <InlineToolTip :info="option.hint">
             {{ option.name }}
           </InlineToolTip>
@@ -37,9 +37,9 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
-import type { PropType } from 'vue';
-import InlineToolTip from '@/components/InlineToolTip.vue';
+import { defineComponent } from "vue";
+import type { PropType } from "vue";
+import InlineToolTip from "@/components/InlineToolTip.vue";
 
 interface Option {
   name: string;
@@ -48,9 +48,9 @@ interface Option {
 }
 
 export default defineComponent({
-  name: 'SearchableSelect',
+  name: "SearchableSelect",
   components: { InlineToolTip },
-  emits: ['update:current-option'],
+  emits: ["update:current-option"],
   props: {
     options: {
       type: Object as PropType<Option[]>,
@@ -75,7 +75,10 @@ export default defineComponent({
   },
   data() {
     return {
-      searchText: (this.currentOptionValue !== undefined && this.currentOptionValue < this.options.length) ? this.options[this.currentOptionValue].name : '',
+      searchText:
+        this.currentOptionValue !== undefined && this.currentOptionValue < this.options.length
+          ? this.options[this.currentOptionValue].name
+          : "",
       dropdownOptions: this.options,
       dropdownVisible: false,
     };
@@ -96,28 +99,32 @@ export default defineComponent({
     },
     filterDropdownOptions() {
       this.dropdownOptions = this.options.filter(
-        (option: Option) => option.name.toLowerCase().indexOf(this.searchText.toLowerCase()) >= 0
-          && (this.hiddenOptions ?? []).indexOf(option.value) < 0,
+        (option: Option) =>
+          option.name.toLowerCase().indexOf(this.searchText.toLowerCase()) >= 0 &&
+          (this.hiddenOptions ?? []).indexOf(option.value) < 0,
       );
     },
     clear() {
-      this.searchText = '';
-      this.$emit('update:current-option', undefined);
+      this.searchText = "";
+      this.$emit("update:current-option", undefined);
     },
     pickOption(option: Option) {
       if (!this.resetText) {
         this.searchText = option.name;
       }
-      this.$emit('update:current-option', option.value);
+      this.$emit("update:current-option", option.value);
       this.dropdownVisible = false;
     },
   },
   watch: {
     searchText(newValue: string) {
       setTimeout(() => {
-        if (newValue.length === 0 || (this.currentOptionValue !== undefined
-          && this.currentOptionValue < this.options.length
-          && newValue === this.options[this.currentOptionValue].name)) {
+        if (
+          newValue.length === 0 ||
+          (this.currentOptionValue !== undefined &&
+            this.currentOptionValue < this.options.length &&
+            newValue === this.options[this.currentOptionValue].name)
+        ) {
           this.resetDropdownOptions();
         } else {
           this.filterDropdownOptions();
@@ -134,6 +141,4 @@ export default defineComponent({
 });
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

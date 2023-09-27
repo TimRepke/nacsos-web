@@ -8,10 +8,8 @@
         </div>
         <div class="row m-2 mt-0 small text-muted">
           Number of documents:
-          <template v-if="queryNumItems !== null">
-            {{ queryNumItems.toLocaleString('en') }} /
-          </template>
-          {{ totalNumItems.toLocaleString('en') }}
+          <template v-if="queryNumItems !== null"> {{ queryNumItems.toLocaleString("en") }} /</template>
+          {{ totalNumItems.toLocaleString("en") }}
         </div>
         <div class="row m-2 mt-0">
           <n-q-l-box v-model:query="query" />
@@ -31,14 +29,9 @@
           <!-- Item viewer container -->
           <div class="d-flex flex-row flex-wrap p-2 overflow-auto border-bottom">
             <template v-if="itemList && itemList.length > 0">
-              <AnyItemComponent
-                v-for="(item) in itemList"
-                :key="item.item_id"
-                :item="item" />
+              <AnyItemComponent v-for="item in itemList" :key="item.item_id" :item="item" />
             </template>
-            <template v-else>
-              No data loaded yet or no data available.
-            </template>
+            <template v-else> No data loaded yet or no data available.</template>
           </div>
 
           <!-- Pagination footer -->
@@ -50,7 +43,8 @@
                   class="page-link fw-normal"
                   aria-label="First page"
                   tabindex="0"
-                  @click="pagination.currentPage = 1">
+                  @click="pagination.currentPage = 1"
+                >
                   <font-awesome-icon :icon="['fas', 'angles-left']" style="font-size: 0.7em" />
                 </div>
               </li>
@@ -60,30 +54,29 @@
                 </div>
               </li>
               <li class="page-item disabled" v-show="pagination.currentPage > navPagesWindowSize">
-                <div role="button" class="page-link fw-normal">
-                  &hellip;
-                </div>
+                <div role="button" class="page-link fw-normal">&hellip;</div>
               </li>
               <li
                 class="page-item"
                 v-for="pageIt in navPages"
                 :key="pageIt"
-                :class="{ active: pagination.currentPage === pageIt }">
+                :class="{ active: pagination.currentPage === pageIt }"
+              >
                 <div
                   @click="pagination.currentPage = pageIt"
                   role="button"
                   class="page-link fw-normal"
                   tabindex="0"
-                  :aria-label="`Page ${pageIt}`">
+                  :aria-label="`Page ${pageIt}`"
+                >
                   {{ pageIt }}
                 </div>
               </li>
               <li
                 class="page-item disabled"
-                v-show="(pagination.pageCount - pagination.currentPage) > navPagesWindowSize">
-                <div role="button" class="page-link fw-normal">
-                  &hellip;
-                </div>
+                v-show="pagination.pageCount - pagination.currentPage > navPagesWindowSize"
+              >
+                <div role="button" class="page-link fw-normal">&hellip;</div>
               </li>
               <li class="page-item" :class="{ disabled: pagination.isLastPage }">
                 <div @click="pagination.next" role="button" class="page-link fw-normal" aria-label="Next page">
@@ -96,7 +89,8 @@
                   class="page-link fw-normal"
                   tabindex="0"
                   aria-label="Last page"
-                  @click="pagination.currentPage = pagination.pageCount">
+                  @click="pagination.currentPage = pagination.pageCount"
+                >
                   <font-awesome-icon :icon="['fas', 'angles-right']" style="font-size: 0.7em" />
                 </div>
               </li>
@@ -108,28 +102,29 @@
     <button
       type="button"
       class="btn btn-outline-secondary position-fixed top-0 end-0 m-2 me-3"
-      @click="showSearchBar = !showSearchBar">
+      @click="showSearchBar = !showSearchBar"
+    >
       <font-awesome-icon :icon="['fas', 'filter']" />
     </button>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive } from 'vue';
-import { useOffsetPagination } from '@vueuse/core';
-import type { UseOffsetPaginationReturn } from '@vueuse/core';
-import { currentProjectStore } from '@/stores';
-import AnyItemComponent from '@/components/items/AnyItem.vue';
-import type { AnyItem } from '@/types/items.d';
-import { API, toastReject } from '@/plugins/api';
-import NQLBox from '@/components/NQLBox.vue';
+import { defineComponent, reactive } from "vue";
+import { useOffsetPagination } from "@vueuse/core";
+import type { UseOffsetPaginationReturn } from "@vueuse/core";
+import { currentProjectStore } from "@/stores";
+import AnyItemComponent from "@/components/items/AnyItem.vue";
+import type { AnyItem } from "@/types/items.d";
+import { API, toastReject } from "@/plugins/api";
+import NQLBox from "@/components/NQLBox.vue";
 
 export default defineComponent({
-  name: 'ProjectDataView',
+  name: "ProjectDataView",
   components: { NQLBox, AnyItemComponent },
   data() {
     return {
-      query: '',
+      query: "",
       projectType: currentProjectStore.project?.type,
       itemList: [] as AnyItem[],
       showSearchBar: true,
@@ -140,9 +135,10 @@ export default defineComponent({
     };
   },
   async mounted() {
-    API.core.project.countProjectItemsApiProjectItemsCountGet({
-      xProjectId: currentProjectStore.projectId as string,
-    })
+    API.core.project
+      .countProjectItemsApiProjectItemsCountGet({
+        xProjectId: currentProjectStore.projectId as string,
+      })
       .then((response) => {
         this.totalNumItems = response.data;
         this.pagination = reactive(
@@ -160,12 +156,13 @@ export default defineComponent({
   },
   methods: {
     fetchData({ currentPage, currentPageSize }: UseOffsetPaginationReturn): void {
-      API.core.project.listProjectDataPagedApiProjectItemsItemTypeListPagePageSizeGet({
-        xProjectId: currentProjectStore.projectId as string,
-        page: this.pagination.currentPage,
-        pageSize: this.pagination.currentPageSize,
-        itemType: currentProjectStore.project!.type,
-      })
+      API.core.project
+        .listProjectDataPagedApiProjectItemsItemTypeListPagePageSizeGet({
+          xProjectId: currentProjectStore.projectId as string,
+          page: this.pagination.currentPage,
+          pageSize: this.pagination.currentPageSize,
+          itemType: currentProjectStore.project!.type,
+        })
         .then((response) => {
           this.itemList = response.data;
           this.$router.push({ query: { page: currentPage, pageSize: currentPageSize } });
@@ -173,11 +170,12 @@ export default defineComponent({
         .catch(toastReject);
     },
     runQuery(): void {
-      API.core.search.nqlQueryApiSearchNqlQueryGet({
-        xProjectId: currentProjectStore.projectId as string,
-        query: this.query,
-        limit: 20,
-      })
+      API.core.search
+        .nqlQueryApiSearchNqlQueryGet({
+          xProjectId: currentProjectStore.projectId as string,
+          query: this.query,
+          limit: 20,
+        })
         .then((response) => {
           const { data } = response;
           this.itemList = data.docs;
@@ -187,18 +185,20 @@ export default defineComponent({
     },
     resetQuery(): void {
       this.fetchData(this.pagination);
-      this.query = '';
+      this.query = "";
       this.queryNumItems = null;
     },
   },
   computed: {
     navPages(): number[] {
-      const start = (this.pagination.currentPage <= this.navPagesWindowSize)
-        ? 1
-        : this.pagination.currentPage - this.navPagesWindowSize;
-      const end = ((this.pagination.pageCount - this.pagination.currentPage) <= this.navPagesWindowSize)
-        ? this.pagination.pageCount
-        : this.pagination.currentPage + this.navPagesWindowSize;
+      const start =
+        this.pagination.currentPage <= this.navPagesWindowSize
+          ? 1
+          : this.pagination.currentPage - this.navPagesWindowSize;
+      const end =
+        this.pagination.pageCount - this.pagination.currentPage <= this.navPagesWindowSize
+          ? this.pagination.pageCount
+          : this.pagination.currentPage + this.navPagesWindowSize;
 
       return [...this.$util.range(start, end)];
     },

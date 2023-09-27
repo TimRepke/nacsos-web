@@ -1,11 +1,11 @@
-import { createPinia } from 'pinia';
-import { useCurrentUserStore } from '@/stores/CurrentUserStore';
-import { useCurrentProjectStore } from '@/stores/CurrentProjectStore';
-import { useInterfaceSettingsStore } from '@/stores/InterfaceSettingsStore';
-import { API } from '@/plugins/api';
-import { useRequestsStore } from '@/stores/RequestsStore';
-import { ClearUserStoreEvent } from '@/plugins/events/events/auth';
-import { EventBus } from '@/plugins/events';
+import { createPinia } from "pinia";
+import { useCurrentUserStore } from "@/stores/CurrentUserStore";
+import { useCurrentProjectStore } from "@/stores/CurrentProjectStore";
+import { useInterfaceSettingsStore } from "@/stores/InterfaceSettingsStore";
+import { API } from "@/plugins/api";
+import { useRequestsStore } from "@/stores/RequestsStore";
+import { ClearUserStoreEvent } from "@/plugins/events/events/auth";
+import { EventBus } from "@/plugins/events";
 
 const pinia = createPinia();
 

@@ -1,7 +1,7 @@
-import { defineStore } from 'pinia';
-import type { Store } from 'pinia';
-import { useStorage } from '@vueuse/core';
-import type { RemovableRef } from '@vueuse/core';
+import { defineStore } from "pinia";
+import type { Store } from "pinia";
+import { useStorage } from "@vueuse/core";
+import type { RemovableRef } from "@vueuse/core";
 
 export interface AnnotationSettings {
   // true: colour "icons" in the progressbar by assignment status (e.g. OPEN, PARTIAL, FULL)
@@ -14,18 +14,23 @@ export interface AnnotationSettings {
 }
 
 export type InterfaceSettingsState = {
-  annotation: RemovableRef<AnnotationSettings>,
+  annotation: RemovableRef<AnnotationSettings>;
 };
-export type InterfaceSettingsActions = {};
-export type InterfaceSettingsGetters = {};
+export type InterfaceSettingsActions = Record<string, never>;
+export type InterfaceSettingsGetters = Record<string, never>;
 
-export type InterfaceSettingsStoreType = Store<'InterfaceSettingsStore', InterfaceSettingsState, InterfaceSettingsGetters, InterfaceSettingsActions>;
+export type InterfaceSettingsStoreType = Store<
+  "InterfaceSettingsStore",
+  InterfaceSettingsState,
+  InterfaceSettingsGetters,
+  InterfaceSettingsActions
+>;
 
-export const useInterfaceSettingsStore = defineStore('InterfaceSettingsStore', {
+export const useInterfaceSettingsStore = defineStore("InterfaceSettingsStore", {
   state(): InterfaceSettingsState {
     return {
       annotation: useStorage<AnnotationSettings>(
-        'nacsos:ui-settings:annotation',
+        "nacsos:ui-settings:annotation",
         {
           sidebarWidth: 5,
           progressBarLabelRepeat: 1,

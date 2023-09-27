@@ -1,13 +1,11 @@
 <template>
-  <div>
-    Hi
-  </div>
+  <div>Hi</div>
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent } from "vue";
 
 export default defineComponent({
-  name: 'HomeView',
+  name: "HomeView",
 });
 </script>

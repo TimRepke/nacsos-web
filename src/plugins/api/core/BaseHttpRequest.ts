@@ -1,9 +1,8 @@
-import type { CancelablePromise } from './CancelablePromise';
-import { request as __request } from './request';
-import type { ApiRequestOptions } from './ApiRequestOptions';
-import type { OpenAPIConfig } from './OpenAPI';
+import type { CancelablePromise } from "./CancelablePromise";
+import { request as __request } from "./request";
+import type { ApiRequestOptions } from "./ApiRequestOptions";
+import type { OpenAPIConfig } from "./OpenAPI";
 
-// eslint-disable-next-line import/prefer-default-export
 export class BaseHttpRequest {
   constructor(public readonly config: OpenAPIConfig) {}
 

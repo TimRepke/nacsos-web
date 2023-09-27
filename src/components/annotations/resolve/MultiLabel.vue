@@ -1,10 +1,7 @@
 <template>
   <div>
     <div class="flex-wrap">
-      <InlineToolTip
-        v-for="tag in tags"
-        :key="tag"
-        :info="choiceInfo[tag]">
+      <InlineToolTip v-for="tag in tags" :key="tag" :info="choiceInfo[tag]">
         <closable-pill
           class="me-1 mb-1"
           :bg-override="true"
@@ -12,7 +9,8 @@
             'background-color': `${AgreementColour[choiceAgreements[tag]]}!important`,
             'font-weight': 'normal',
           }"
-          @clicked-x="removeLabel(tag)">
+          @clicked-x="removeLabel(tag)"
+        >
           {{ tag }}
         </closable-pill>
       </InlineToolTip>
@@ -22,7 +20,8 @@
         class="border text-light p-1 border-dark border-2 rounded-3"
         role="button"
         tabindex="-1"
-        @click="editMode = !editMode">
+        @click="editMode = !editMode"
+      >
         <font-awesome-icon :icon="['fas', 'plus']" class="text-dark" />
       </span>
       <ul class="dropdown-menu end-0" :class="{ show: editMode }">
@@ -37,10 +36,9 @@
 </template>
 
 <script lang="ts">
-
-import 'core-js/modules/es.array.to-sorted';
-import { defineComponent } from 'vue';
-import type { PropType } from 'vue';
+import "core-js/modules/es.array.to-sorted";
+import { defineComponent } from "vue";
+import type { PropType } from "vue";
 import type {
   AnnotationModel,
   BotAnnotationModel,
@@ -49,44 +47,45 @@ import type {
   ResolutionCell,
   ResolutionUserEntry,
   FlatLabelChoice,
-} from '@/plugins/api/api-core';
-import ClosablePill from '@/components/ClosablePill.vue';
-import InlineToolTip from '@/components/InlineToolTip.vue';
-import { is, isNone, notNone } from '@/util';
+} from "@/plugins/api/api-core";
+import ClosablePill from "@/components/ClosablePill.vue";
+import InlineToolTip from "@/components/InlineToolTip.vue";
+import { is, isNone, notNone } from "@/util";
 
-function hasValue(model: AnnotationModel | BotAnnotationModel | undefined | null):
-  model is (AnnotationModel | BotAnnotationModel) & { multi_int: number } {
+function hasValue(
+  model: AnnotationModel | BotAnnotationModel | undefined | null,
+): model is (AnnotationModel | BotAnnotationModel) & { multi_int: number } {
   if (isNone(model)) return false;
-  return (model.multi_int !== undefined && model.multi_int !== null);
+  return model.multi_int !== undefined && model.multi_int !== null;
 }
 
 enum Agreement {
   // All users from the pool picked this choice
-  FULL = 'full',
+  FULL = "full",
   // Some, but not all annotators from the pool picked this choice
-  PARTIAL = 'partial',
+  PARTIAL = "partial",
   // One user from the pool picked this choice (note, not in case only one user was in the pool)
-  SINGLE = 'single',
+  SINGLE = "single",
   // This choice was added during consolidation
-  NOVEL = 'novel',
+  NOVEL = "novel",
 }
 
 export default defineComponent({
-  name: 'MultiLabel',
+  name: "MultiLabel",
   components: { ClosablePill, InlineToolTip },
   data() {
     return {
       changed: false,
       editMode: false,
       AgreementColour: {
-        full: 'green',
-        partial: '#BB8E49',
-        single: 'orange',
-        novel: 'limegreen',
+        full: "green",
+        partial: "#BB8E49",
+        single: "orange",
+        novel: "limegreen",
       } as Record<Agreement, string>,
     };
   },
-  emits: ['botAnnotationChanged', 'botAnnotationConfirmed'],
+  emits: ["botAnnotationChanged", "botAnnotationConfirmed"],
   props: {
     botAnnotationMetaDataId: { type: String, required: false, default: undefined },
     itemId: { type: String, required: true },
@@ -112,8 +111,9 @@ export default defineComponent({
     },
   },
   methods: {
-    hasValue(model: AnnotationModel | BotAnnotationModel | undefined | null):
-      model is (AnnotationModel | BotAnnotationModel) & { multi_int: number } {
+    hasValue(
+      model: AnnotationModel | BotAnnotationModel | undefined | null,
+    ): model is (AnnotationModel | BotAnnotationModel) & { multi_int: number } {
       return hasValue(model);
     },
     addLabel(value: number) {
@@ -126,7 +126,7 @@ export default defineComponent({
           if (pos < 0) {
             this.changed = true;
             multi_int.push(value);
-            this.$emit('botAnnotationChanged', anno);
+            this.$emit("botAnnotationChanged", anno);
           }
         }
       }
@@ -142,7 +142,7 @@ export default defineComponent({
           if (pos >= 0) {
             this.changed = true;
             multi_int.splice(pos, 1);
-            this.$emit('botAnnotationChanged', anno);
+            this.$emit("botAnnotationChanged", anno);
           }
         }
       }
@@ -150,15 +150,14 @@ export default defineComponent({
     },
     getPrettyUsername(userId: string): string {
       const user: UserModel | undefined = this.usersLookup[userId];
-      if (isNone(user)) return '??';
+      if (isNone(user)) return "??";
       return `${user.username} (${user.full_name})`;
     },
   },
   computed: {
     tags(): Array<number> {
       const { resolution } = this.proposalRow[this.label.path_key];
-      if (is<BotAnnotationModel>(resolution)
-        && is<Array<number>>(resolution.multi_int)) {
+      if (is<BotAnnotationModel>(resolution) && is<Array<number>>(resolution.multi_int)) {
         return resolution.multi_int.toSorted();
       }
       return [];
@@ -173,16 +172,20 @@ export default defineComponent({
       if (isNone(labels)) {
         return {};
       }
-      const entries = Object.entries(labels)
+      const entries = Object.entries<ResolutionUserEntry[]>(labels)
         .flatMap((userEntry: [string, ResolutionUserEntry[]]) => {
           const [userId, userLabels] = userEntry;
           return userLabels.flatMap((entry: ResolutionUserEntry) => {
-            if (isNone(entry.annotation)
-              || isNone(entry.annotation.multi_int)
-              || entry.annotation.multi_int.length === 0) return undefined;
-            return entry.annotation.multi_int.map(
-              (choice: number): [number, UserModel] => [choice as number, this.usersLookup[userId] as UserModel],
-            );
+            if (
+              isNone(entry.annotation) ||
+              isNone(entry.annotation.multi_int) ||
+              entry.annotation.multi_int.length === 0
+            )
+              return undefined;
+            return entry.annotation.multi_int.map((choice: number): [number, UserModel] => [
+              choice as number,
+              this.usersLookup[userId] as UserModel,
+            ]);
           });
         })
         .filter((entry: [number, UserModel] | undefined) => notNone(entry)) as [number, UserModel][];
@@ -200,7 +203,7 @@ export default defineComponent({
       return Object.fromEntries(
         userEntries.map((entry: [number, UserModel[]]) => {
           const [choice, entryUsers] = entry;
-          const usernames = entryUsers.map((user) => user.username).join(', ');
+          const usernames = entryUsers.map((user) => user.username).join(", ");
           const choiceName = this.choiceLookup[choice].name;
           return [choice, `${usernames}: "${choiceName}"`];
         }),
@@ -212,17 +215,17 @@ export default defineComponent({
 
       if (isNone(resolution) || isNone(resolution.multi_int)) return {};
       return Object.fromEntries(
-        Object.entries(this.choiceUsers)
-          .map((entry: [number, UserModel[]]): [number, Agreement] => {
-            const [choice, users] = entry;
-            const usernames = users.map((user) => user.username);
-            const count = (new Set(usernames)).size;
-            if (!count) return [choice, Agreement.NOVEL]; // undefined, 0, null
-            if (numUsers === 1) return [choice, Agreement.FULL];
-            if (count === numUsers) return [choice, Agreement.FULL];
-            if (count === 1) return [choice, Agreement.SINGLE];
-            return [choice, Agreement.PARTIAL];
-          }),
+        Object.entries<UserModel[]>(this.choiceUsers).map((entry: [string, UserModel[]]): [number, Agreement] => {
+          const [choice_str, users] = entry;
+          const choice = parseInt(choice_str);
+          const usernames = users.map((user) => user.username);
+          const count = new Set(usernames).size;
+          if (!count) return [choice, Agreement.NOVEL]; // undefined, 0, null
+          if (numUsers === 1) return [choice, Agreement.FULL];
+          if (count === numUsers) return [choice, Agreement.FULL];
+          if (count === 1) return [choice, Agreement.SINGLE];
+          return [choice, Agreement.PARTIAL];
+        }),
       );
     },
   },

@@ -6,12 +6,7 @@
           <span class="input-group-text">
             <font-awesome-icon :icon="['fas', 'magnifying-glass']" />
           </span>
-          <input
-            v-model="projectSearch"
-            type="text"
-            aria-label="Search"
-            placeholder="Search..."
-            class="form-control" />
+          <input v-model="projectSearch" type="text" aria-label="Search" placeholder="Search..." class="form-control" />
         </div>
       </div>
       <div class="col-auto ms-auto">
@@ -36,7 +31,8 @@
                   type="text"
                   aria-label="Project name"
                   placeholder="Project name"
-                  class="form-control" />
+                  class="form-control"
+                />
               </div>
               <div class="col">
                 <select class="form-select" aria-label="Project type" v-model="project.type">
@@ -48,7 +44,8 @@
                   type="button"
                   class="btn btn-outline-success"
                   @click="saveProject(project)"
-                  :disabled="project.name.length < 10">
+                  :disabled="project.name.length < 10"
+                >
                   <font-awesome-icon :icon="['fas', 'floppy-disk']" />
                   Save
                 </button>
@@ -72,25 +69,25 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import { API } from '@/plugins/api';
-import { EventBus } from '@/plugins/events';
-import { ToastEvent } from '@/plugins/events/events/toast';
-import type { ProjectModel } from '@/plugins/api/api-core';
-import { ItemType } from '@/plugins/api/api-core';
-import ProjectTypeIcon from '@/components/ProjectTypeIcon.vue';
-import { CurrentProjectSelectedEvent, CurrentProjectSetEvent } from '@/plugins/events/events/projects';
-import { ConfirmationRequestEvent } from '@/plugins/events/events/confirmation';
+import { defineComponent } from "vue";
+import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
+import { API } from "@/plugins/api";
+import { EventBus } from "@/plugins/events";
+import { ToastEvent } from "@/plugins/events/events/toast";
+import type { ProjectModel } from "@/plugins/api/api-core";
+import { ItemType } from "@/plugins/api/api-core";
+import ProjectTypeIcon from "@/components/ProjectTypeIcon.vue";
+import { CurrentProjectSelectedEvent, CurrentProjectSetEvent } from "@/plugins/events/events/projects";
+import { ConfirmationRequestEvent } from "@/plugins/events/events/confirmation";
 
 type ProjectModelExt = ProjectModel & { isNew?: boolean };
 
 export default defineComponent({
-  name: 'ProjectManagementView',
+  name: "ProjectManagementView",
   components: { FontAwesomeIcon, ProjectTypeIcon },
   data() {
     return {
-      projectSearch: '',
+      projectSearch: "",
       projects: [] as ProjectModelExt[],
       projectTypes: ItemType,
     };
@@ -100,51 +97,60 @@ export default defineComponent({
   },
   methods: {
     refreshData() {
-      API.core.projects.getAllProjectsApiProjectsListGet()
-        .then((response) => { this.projects = response.data; })
-        .catch(() => { EventBus.emit(new ToastEvent('WARN', 'Failed to load list of projects.')); });
+      API.core.projects
+        .getAllProjectsApiProjectsListGet()
+        .then((response) => {
+          this.projects = response.data;
+        })
+        .catch(() => {
+          EventBus.emit(new ToastEvent("WARN", "Failed to load list of projects."));
+        });
     },
     addProject() {
       this.projects.unshift({
         isNew: true,
-        name: '',
-        description: '',
-        type: 'generic',
+        name: "",
+        description: "",
+        type: "generic",
       } as ProjectModelExt);
     },
     manageUsers(project: ProjectModelExt) {
       if (!project.project_id) {
-        EventBus.emit(new ToastEvent('WARN', 'Save first.'));
+        EventBus.emit(new ToastEvent("WARN", "Save first."));
       } else {
         EventBus.emit(new CurrentProjectSelectedEvent(project.project_id));
         EventBus.once(CurrentProjectSetEvent, () => {
-          this.$router.push({ name: 'project-settings-settings' });
+          this.$router.push({ name: "project-settings-settings" });
         });
       }
     },
     saveProject(project: ProjectModelExt) {
-      API.core.projects.createProjectApiProjectsCreatePut({
-        requestBody: project,
-      }).then((response) => {
-        project.project_id = response.data; // eslint-disable-line no-param-reassign
-        project.isNew = false; // eslint-disable-line no-param-reassign
-        EventBus.emit(new ToastEvent('SUCCESS', `New project created with ID ${project.project_id}`));
-      }).catch((reason) => {
-        console.error(reason);
-        EventBus.emit(new ToastEvent('ERROR', 'Failed to save.'));
-      });
+      API.core.projects
+        .createProjectApiProjectsCreatePut({
+          requestBody: project,
+        })
+        .then((response) => {
+          project.project_id = response.data; // eslint-disable-line no-param-reassign
+          project.isNew = false; // eslint-disable-line no-param-reassign
+          EventBus.emit(new ToastEvent("SUCCESS", `New project created with ID ${project.project_id}`));
+        })
+        .catch((reason) => {
+          console.error(reason);
+          EventBus.emit(new ToastEvent("ERROR", "Failed to save."));
+        });
     },
     dropProject(project: ProjectModelExt) {
-      EventBus.emit(new ConfirmationRequestEvent(
-        'Do you really want to **permanently delete** this project?\n'
-        + 'This will also delete **all data** related to this project in any way!\n'
-        + 'This action is extremely dangerous!!\n'
-        + `- "${project.name}"\n`
-        + `- ID: ${project.project_id}`,
-        (confirmationResponse) => {
-          if (confirmationResponse === 'ACCEPT') {
-            EventBus.emit(new ToastEvent('WARN', 'Not implemented yet, too dangerous.'));
-            /*
+      EventBus.emit(
+        new ConfirmationRequestEvent(
+          "Do you really want to **permanently delete** this project?\n" +
+            "This will also delete **all data** related to this project in any way!\n" +
+            "This action is extremely dangerous!!\n" +
+            `- "${project.name}"\n` +
+            `- ID: ${project.project_id}`,
+          (confirmationResponse) => {
+            if (confirmationResponse === "ACCEPT") {
+              EventBus.emit(new ToastEvent("WARN", "Not implemented yet, too dangerous."));
+              /*
             // TODO
             API.core.projects.delete({
               projectId: project.project_id,
@@ -158,17 +164,18 @@ export default defineComponent({
               ));
             });
             */
-          }
-        },
-        'Delete project',
-      ));
+            }
+          },
+          "Delete project",
+        ),
+      );
     },
   },
   computed: {
     filteredProjects(): ProjectModelExt[] {
       return this.projects.filter(
-        (project: ProjectModelExt) => project.isNew
-          || project.name.toLowerCase().indexOf(this.projectSearch.toLowerCase()) >= 0,
+        (project: ProjectModelExt) =>
+          project.isNew || project.name.toLowerCase().indexOf(this.projectSearch.toLowerCase()) >= 0,
       );
     },
   },

@@ -1,7 +1,7 @@
 <template>
   <div class="wrapper p-0 m-0 overflow-auto h-100 w-100 container-fluid d-flex justify-content-center flex-wrap">
     <div class="flex-row mt-2 mt-sm-5 w-100">
-      <NacsosLogo style="height: 200px; width:200px;" class="p-0" />
+      <NacsosLogo style="height: 200px; width: 200px" class="p-0" />
     </div>
     <div class="flex-row w-100">
       <div class="bg-body bg-opacity-75 rounded p-5 col-lg-4 col-md-6 col-sm-8 col-12 mt-2 mt-sm-5 m-auto">
@@ -14,17 +14,13 @@
             <input type="password" class="form-control" id="passwordInput" placeholder="Password" v-model="password" />
             <label for="passwordInput">Password</label>
           </div>
-          <div
-            class="alert alert-danger d-flex align-items-center"
-            :class="{ 'd-none': !error }"
-            role="alert">
+          <div class="alert alert-danger d-flex align-items-center" :class="{ 'd-none': !error }" role="alert">
             <font-awesome-icon
               :icon="['fas', 'triangle-exclamation']"
               class="flex-shrink-0 me-2"
-              style="font-size: 1.5em; vertical-align: middle;" />
-            <div class="text-start ms-3">
-              Computer says no. <br />Please double-check username and password.
-            </div>
+              style="font-size: 1.5em; vertical-align: middle"
+            />
+            <div class="text-start ms-3">Computer says no. <br />Please double-check username and password.</div>
           </div>
           <button type="submit" class="btn btn-outline-dark w-100" @click="login">LOGIN</button>
         </form>
@@ -39,27 +35,26 @@
       Picture:
       <a href="https://creativecommons.org/licenses/by/3.0" target="_blank" rel="noopener noreferrer">CC BY 3.0</a>
       (
-      <a
-        href="https://commons.wikimedia.org/wiki/File:Portara_Naxos_26.jpg"
-        target="_blank"
-        rel="noopener noreferrer">Olaf Tausch</a>)
+      <a href="https://commons.wikimedia.org/wiki/File:Portara_Naxos_26.jpg" target="_blank" rel="noopener noreferrer"
+        >Olaf Tausch</a
+      >)
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
-import NacsosLogo from '@/components/NacsosLogo.vue';
-import { EventBus } from '@/plugins/events';
-import { AuthFailedEvent, UserLoginEvent, LoginSuccessEvent } from '@/plugins/events/events/auth';
+import { defineComponent } from "vue";
+import NacsosLogo from "@/components/NacsosLogo.vue";
+import { EventBus } from "@/plugins/events";
+import { AuthFailedEvent, UserLoginEvent, LoginSuccessEvent } from "@/plugins/events/events/auth";
 
 export default defineComponent({
-  name: 'LoginView',
+  name: "LoginView",
   components: { NacsosLogo },
   data() {
     return {
-      username: '',
-      password: '',
+      username: "",
+      password: "",
       error: false,
     };
   },
@@ -73,7 +68,7 @@ export default defineComponent({
       this.error = false;
       EventBus.emit(new UserLoginEvent(this.username, this.password));
       EventBus.once(LoginSuccessEvent, () => {
-        this.$router.push({ name: 'project-list' });
+        this.$router.push({ name: "project-list" });
       });
     },
   },
@@ -86,7 +81,7 @@ input {
 }
 
 .wrapper {
-  background-image: url('@/assets/img/Portara_Naxos_26.jpg');
+  background-image: url("@/assets/img/Portara_Naxos_26.jpg");
   /*
   height: 100%;
   width: 100%;
@@ -95,7 +90,7 @@ input {
   */
   background-repeat: no-repeat;
   background-size: cover;
-  background-position: center
+  background-position: center;
 }
 
 .license {

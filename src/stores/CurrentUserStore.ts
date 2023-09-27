@@ -1,38 +1,30 @@
-import { defineStore } from 'pinia';
-import type { RemovableRef } from '@vueuse/core';
-import { useStorage } from '@vueuse/core';
-import Serializer from '@/types/serializer';
-import type { AuthTokenModel, UserModel } from '@/plugins/api/api-core';
-import { API, toastReject } from '@/plugins/api';
-import { EventBus } from '@/plugins/events';
-import { AuthFailedEvent, LoginSuccessEvent, LogoutSuccessEvent } from '@/plugins/events/events/auth';
+import { defineStore } from "pinia";
+import type { RemovableRef } from "@vueuse/core";
+import { useStorage } from "@vueuse/core";
+import Serializer from "@/types/serializer";
+import type { AuthTokenModel, UserModel } from "@/plugins/api/api-core";
+import { API, toastReject } from "@/plugins/api";
+import { EventBus } from "@/plugins/events";
+import { AuthFailedEvent, LoginSuccessEvent, LogoutSuccessEvent } from "@/plugins/events/events/auth";
 
 const UserSerializer = Serializer<UserModel>();
 const AuthtokenSerializer = Serializer<AuthTokenModel>();
 
 export type CurrentUserStoreType = {
-  user: RemovableRef<UserModel | undefined>,
-  authToken: RemovableRef<AuthTokenModel | undefined>,
+  user: RemovableRef<UserModel | undefined>;
+  authToken: RemovableRef<AuthTokenModel | undefined>;
 };
 
 function isAuthTokenValid(token: AuthTokenModel | null | undefined): boolean {
-  return !!token && !!token.valid_till && ((new Date(token.valid_till)) >= (new Date()));
+  return !!token && !!token.valid_till && new Date(token.valid_till) >= new Date();
 }
 
-export const useCurrentUserStore = defineStore('CurrentUserStore', {
+export const useCurrentUserStore = defineStore("CurrentUserStore", {
   state(): CurrentUserStoreType {
-    const user = useStorage<UserModel>(
-      'nacsos:UserStore:currentUser',
-      null,
-      undefined,
-      { serializer: UserSerializer },
-    );
-    const authToken = useStorage<AuthTokenModel>(
-      'nacsos:UserStore:authToken',
-      null,
-      undefined,
-      { serializer: AuthtokenSerializer },
-    );
+    const user = useStorage<UserModel>("nacsos:UserStore:currentUser", null, undefined, { serializer: UserSerializer });
+    const authToken = useStorage<AuthTokenModel>("nacsos:UserStore:authToken", null, undefined, {
+      serializer: AuthtokenSerializer,
+    });
 
     // check if we have a valid auth token from a previous session
     if (!isAuthTokenValid(authToken.value)) {

@@ -11,7 +11,8 @@
             class="float-end link-secondary"
             target="_blank"
             rel="noopener noreferrer"
-            aria-label="DOI">
+            aria-label="DOI"
+          >
             <font-awesome-icon :icon="['fas', 'file-lines']" class="me-2" />
           </a>
         </inline-tool-tip>
@@ -35,7 +36,8 @@
         </p>
       </template>
       <template v-else>
-        <p class="card-text text-muted" v-html="htmlAbstract" /> <!-- style="font-family: serif" -->
+        <p class="card-text text-muted" v-html="htmlAbstract" />
+        <!-- style="font-family: serif" -->
       </template>
     </div>
     <div class="card-footer d-flex justify-content-between">
@@ -50,10 +52,7 @@
             <li v-for="author in item.authors" :key="author.name" class="list-inline-item">
               <inline-tool-tip :info="authorInstitutions(author)">
                 <template v-if="author.orcid">
-                  <a
-                    :href="`https://orcid.org/${author.orcid}`"
-                    target="_blank"
-                    rel="noopener noreferrer">
+                  <a :href="`https://orcid.org/${author.orcid}`" target="_blank" rel="noopener noreferrer">
                     {{ author.name }}
                   </a>
                 </template>
@@ -66,7 +65,7 @@
         </div>
         <div v-if="item.keywords" class="d-flex me-4">
           <font-awesome-icon :icon="['fas', 'tags']" class="me-2" />
-          {{ item.keywords.join(' | ') }}
+          {{ item.keywords.join(" | ") }}
         </div>
       </div>
     </div>
@@ -74,18 +73,18 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
-import type { PropType } from 'vue';
-import InlineToolTip from '@/components/InlineToolTip.vue';
+import { defineComponent } from "vue";
+import type { PropType } from "vue";
+import InlineToolTip from "@/components/InlineToolTip.vue";
 import type {
   AcademicAuthorModel,
   AcademicItemModel,
   AffiliationModel,
   HighlighterModel,
-} from '@/plugins/api/api-core';
+} from "@/plugins/api/api-core";
 
 export default defineComponent({
-  name: 'AcademicItem',
+  name: "AcademicItem",
   components: { InlineToolTip },
   props: {
     item: {
@@ -106,26 +105,26 @@ export default defineComponent({
   },
   computed: {
     htmlAbstract() {
-      let txt = (this.item.text || '');
+      let txt = this.item.text || "";
       if (this.highlighters) {
         this.highlighters.forEach((highlighter: HighlighterModel) => {
           try {
-            const regex = new RegExp(highlighter.keywords.join('|'), 'g');
+            const regex = new RegExp(highlighter.keywords.join("|"), "g");
             txt = txt.replaceAll(regex, `<span style="${highlighter.style}">$&</span>`);
           } catch (e) {
-            console.warn('Ignoring illegal regex!');
+            console.warn("Ignoring illegal regex!");
             console.error(e);
           }
         });
       }
-      return txt.replaceAll('\n', '<br />');
+      return txt.replaceAll("\n", "<br />");
     },
   },
   methods: {
     authorInstitutions(author: AcademicAuthorModel): string | undefined {
-      return author.affiliations?.map(
-        (affiliation: AffiliationModel) => `${affiliation.name}, ${affiliation.country}`,
-      ).join(';');
+      return author.affiliations
+        ?.map((affiliation: AffiliationModel) => `${affiliation.name}, ${affiliation.country}`)
+        .join(";");
     },
   },
 });
