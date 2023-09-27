@@ -2,6 +2,7 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { AnnotationTrackerModel } from '../models/AnnotationTrackerModel';
+import type { DehydratedAnnotationTracker } from '../models/DehydratedAnnotationTracker';
 
 import type { CancelablePromise } from '@/plugins/api/core/CancelablePromise';
 import type { BaseHttpRequest } from '@/plugins/api/core/BaseHttpRequest';
@@ -11,6 +12,29 @@ import type { ApiRequestOptions } from '@/plugins/api/core/ApiRequestOptions';
 export class EvaluationService {
 
   constructor(public readonly httpRequest: BaseHttpRequest) {}
+
+  /**
+   * Get Project Trackers
+   * @returns DehydratedAnnotationTracker Successful Response
+   * @throws ApiError
+   */
+  public getProjectTrackersApiEvalTrackingTrackersGet({
+    xProjectId,
+  }: {
+    xProjectId: string,
+  }, options?: Partial<ApiRequestOptions>): CancelablePromise<Array<DehydratedAnnotationTracker>> {
+    return this.httpRequest.request({
+      method: 'GET',
+      url: '/api/eval/tracking/trackers',
+      headers: {
+        'x-project-id': xProjectId,
+      },
+      errors: {
+        422: `Validation Error`,
+      },
+      ...options,
+    });
+  }
 
   /**
    * Get Tracker

@@ -75,9 +75,29 @@
             v-if="projectPermissions.annotations_read"
             to="/project/annotate"
             class="list-group-item list-group-item-action border-end-0"
-            active-class="active"
+            :class="{
+              active: anyOf(['project-annotate-assignments', 'project-annotate-item', 'project-annotate-tracking']),
+            }"
           >
             Annotation
+          </router-link>
+          <router-link
+            v-if="projectPermissions.annotations_read && isActive('project-annotate')"
+            to="/project/annotate/scopes"
+            class="list-group-item list-group-item-action list-group-item-info border-end-0 sub-link"
+            :class="{
+              active: anyOf(['project-annotate-assignments', 'project-annotate-item']),
+            }"
+          >
+            Assignments
+          </router-link>
+          <router-link
+            v-if="projectPermissions.annotations_read && isActive('project-annotate')"
+            to="/project/annotate/tracking"
+            class="list-group-item list-group-item-action list-group-item-info border-end-0 sub-link"
+            exact-active-class="active"
+          >
+            Monitoring
           </router-link>
 
           <!-- ARTEFACTS -->
@@ -186,9 +206,9 @@ import type { ProjectPermissionsModel, UserModel } from "@/plugins/api/api-core"
 
 export default defineComponent({
   name: "SideBar",
-  data(): object {
+  data() {
     return {
-      visible: null,
+      visible: null as boolean | null,
       windowWidth: window.innerWidth,
     };
   },
@@ -237,7 +257,7 @@ export default defineComponent({
 #sidebar-toggle {
   width: 0.75rem;
   height: 2rem;
-  color: gray;
+  color: rgb(128, 128, 128);
   font-size: 0.75rem;
   font-weight: bold;
   line-height: 2rem;

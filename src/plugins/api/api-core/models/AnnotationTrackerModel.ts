@@ -12,8 +12,8 @@
  */
 export type AnnotationTrackerModel = {
   annotation_tracking_id?: (string | null);
-  project_id: string;
   name: string;
+  project_id: string;
   inclusion_rule: string;
   majority: boolean;
   n_items_total: number;

@@ -137,6 +137,14 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
           import(/* webpackChunkName: "AnnotationsView" */ "../views/Annotations/Annotations/AnnotationsView.vue"),
       },
+      {
+        path: "tracking",
+        name: "project-annotate-tracking",
+        component: () =>
+          import(
+            /* webpackChunkName: "AnnotationTrackingView" */ "../views/Annotations/Annotations/AnnotationTrackingView.vue"
+          ),
+      },
     ],
   },
   {

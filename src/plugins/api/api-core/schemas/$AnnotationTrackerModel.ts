@@ -20,6 +20,10 @@ export const $AnnotationTrackerModel = {
         type: 'null',
       }],
     },
+    name: {
+      type: 'string',
+      isRequired: true,
+    },
     project_id: {
       type: 'any-of',
       contains: [{
@@ -28,10 +32,6 @@ export const $AnnotationTrackerModel = {
       }, {
         type: 'string',
       }],
-      isRequired: true,
-    },
-    name: {
-      type: 'string',
       isRequired: true,
     },
     inclusion_rule: {
