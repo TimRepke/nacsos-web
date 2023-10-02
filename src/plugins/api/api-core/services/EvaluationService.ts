@@ -3,6 +3,7 @@
 /* eslint-disable */
 import type { AnnotationTrackerModel } from '../models/AnnotationTrackerModel';
 import type { DehydratedAnnotationTracker } from '../models/DehydratedAnnotationTracker';
+import type { LabelScope } from '../models/LabelScope';
 
 import type { CancelablePromise } from '@/plugins/api/core/CancelablePromise';
 import type { BaseHttpRequest } from '@/plugins/api/core/BaseHttpRequest';
@@ -12,6 +13,29 @@ import type { ApiRequestOptions } from '@/plugins/api/core/ApiRequestOptions';
 export class EvaluationService {
 
   constructor(public readonly httpRequest: BaseHttpRequest) {}
+
+  /**
+   * Get Project Scopes
+   * @returns LabelScope Successful Response
+   * @throws ApiError
+   */
+  public getProjectScopesApiEvalTrackingScopesGet({
+    xProjectId,
+  }: {
+    xProjectId: string,
+  }, options?: Partial<ApiRequestOptions>): CancelablePromise<Array<LabelScope>> {
+    return this.httpRequest.request({
+      method: 'GET',
+      url: '/api/eval/tracking/scopes',
+      headers: {
+        'x-project-id': xProjectId,
+      },
+      errors: {
+        422: `Validation Error`,
+      },
+      ...options,
+    });
+  }
 
   /**
    * Get Project Trackers

@@ -12,7 +12,7 @@
     </div>
     <div class="card-body" v-show="expanded">
       <div class="row g-2 row-cols-auto">
-        <div class="col">
+        <div class="col-12">
           <slot name="body" />
         </div>
       </div>
