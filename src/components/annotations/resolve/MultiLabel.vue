@@ -192,6 +192,7 @@ export default defineComponent({
 
       return entries.reduce((accu: Record<number, UserModel[]>, entry: [number, UserModel]) => {
         const [choice, user] = entry;
+
         // eslint-disable-next-line no-param-reassign
         if (!accu[choice]) accu[choice] = [];
         accu[choice].push(user);
@@ -203,7 +204,10 @@ export default defineComponent({
       return Object.fromEntries(
         userEntries.map((entry: [number, UserModel[]]) => {
           const [choice, entryUsers] = entry;
-          const usernames = entryUsers.map((user) => user.username).join(", ");
+          const usernames = entryUsers
+            .filter((user) => !!user)
+            .map((user) => user.username)
+            .join(", ");
           const choiceName = this.choiceLookup[choice].name;
           return [choice, `${usernames}: "${choiceName}"`];
         }),
@@ -218,7 +222,7 @@ export default defineComponent({
         Object.entries<UserModel[]>(this.choiceUsers).map((entry: [string, UserModel[]]): [number, Agreement] => {
           const [choice_str, users] = entry;
           const choice = parseInt(choice_str);
-          const usernames = users.map((user) => user.username);
+          const usernames = users.filter((user) => !!user).map((user) => user.username);
           const count = new Set(usernames).size;
           if (!count) return [choice, Agreement.NOVEL]; // undefined, 0, null
           if (numUsers === 1) return [choice, Agreement.FULL];

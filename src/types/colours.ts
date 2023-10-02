@@ -104,6 +104,7 @@ export function lookupMakerChoice<T>(
 }
 
 export function lookupMakerBool<T>(extract: Extractor<T, boolean>): (v: T) => string {
+  /* @ts-ignore: TS2344 */
   const mapper = lookupMaker<boolean>(
     {
       false: "#C54B6C",

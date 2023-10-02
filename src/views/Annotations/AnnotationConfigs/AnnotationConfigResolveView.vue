@@ -259,12 +259,14 @@
                 />
               </th>
               <th v-for="label in proposal.labels" :key="label.path_key" class="text-end">
-                <div v-for="skey in label.path.slice().reverse()" :key="skey.key" class="nacsos-tooltip label-pill m-1">
-                  <span>
-                    {{ skey.key }}
-                    <span v-if="skey.value !== null && skey.value !== undefined" class="text-muted small"
-                      >({{ skey.value }})</span
-                    >
+                <div
+                  v-for="skey in label.path.slice().reverse()"
+                  :key="skey.key"
+                  class="nacsos-tooltip label-pill d-flex flex-nowrap justify-content-end"
+                >
+                  <span>{{ skey.key }}</span>
+                  <span v-if="skey.value !== null && skey.value !== undefined" class="text-muted small">
+                    ({{ skey.value }})
                   </span>
                   <span>{{ skey.repeat }}</span>
                   <div
@@ -272,6 +274,7 @@
                     style="position: absolute; right: 0; margin: 0.5rem 0 0 0"
                     role="tooltip"
                     data-popper-placement="bottom"
+                    v-if="schemeLookup[skey.key]"
                   >
                     <div class="popover-arrow" style="position: absolute; right: 0; transform: translateX(-30px)" />
                     <h3 class="popover-header text-dark">{{ schemeLookup[skey.key].name }}</h3>
@@ -463,17 +466,17 @@ export default defineComponent({
     fetchProposal() {
       this.loadingProposals = true;
       API.core.annotations
-        .getResolvedAnnotationsApiAnnotationsConfigResolveGet({
+        .getResolvedAnnotationsApiAnnotationsConfigResolvePost({
           requestBody: {
             algorithm: this.algorithm,
             ignore_repeat: this.ignoreRepeat,
             ignore_hierarchy: this.ignoreHierarchy,
             filters: {
-              scheme_id: this.filters.scheme_id as string,
-              scope_id: !this.filters.scope_id ? undefined : ([this.filters.scope_id] as string[]),
-              user_id: !this.filters.user_id ? undefined : ([this.filters.user_id] as string[]),
-              key: !this.filters.key ? undefined : ([this.filters.key] as string[]),
-              repeat: !this.filters.repeat ? undefined : ([this.filters.repeat] as number[]),
+              scheme_id: this.filters.scheme_id,
+              scope_id: this.filters.scope_id,
+              user_id: this.filters.user_id,
+              key: this.filters.key,
+              repeat: this.filters.repeat,
             },
           },
           xProjectId: currentProjectStore.projectId as string,
@@ -531,34 +534,29 @@ export default defineComponent({
         });
       }
     },
-    flattenBotAnnotations(): BotAnnotationModel[] {
-      return (Object.values(this.botAnnotations) as [Label[], BotAnnotationModel][][])
-        .map((itemAnnotations) =>
-          (itemAnnotations as [Label[], BotAnnotationModel][]).map(([, annotation]) => annotation),
-        )
-        .flat();
-    },
     saveNew() {
-      if (!this.collection) {
+      if (!this.proposal) {
         EventBus.emit(new ToastEvent("WARN", "Nothing to save (yet)!"));
         return;
       }
-      const annotatorUserIds: string[] = (this.collection.annotators as UserModel[]).map(
-        (user: UserModel) => user.user_id as string,
-      );
-      const collection: AnnotationCollectionDB = JSON.parse(JSON.stringify(this.collection));
-      collection.annotators = annotatorUserIds;
       API.core.annotations
         .saveResolvedAnnotationsApiAnnotationsConfigResolvePut({
           xProjectId: currentProjectStore.projectId as string,
+          name: this.name,
           requestBody: {
-            name: this.name,
-            strategy: this.algorithm as unknown as ResolutionPayload.strategy,
-            filters: this.filters as AnnotationFilters,
-            ignore_order: this.ignoreRepeat,
-            ignore_hierarchy: this.ignoreHierarchy,
-            collection,
-            bot_annotations: this.flattenBotAnnotations(),
+            settings: {
+              algorithm: this.algorithm,
+              filters: {
+                scheme_id: this.filters.scheme_id,
+                scope_id: this.filters.scope_id,
+                user_id: this.filters.user_id,
+                key: this.filters.key,
+                repeat: this.filters.repeat,
+              },
+              ignore_hierarchy: this.ignoreHierarchy,
+              ignore_repeat: this.ignoreRepeat,
+            },
+            matrix: this.proposal.matrix,
           },
         })
         .then((response) => {
@@ -625,28 +623,33 @@ export default defineComponent({
 
 <style scoped>
 .label-pill {
-  display: block !important;
+  /*display: block !important;*/
 }
 
 .label-pill > span {
-  border-radius: var(--bs-border-radius-pill);
-  border: 1px solid var(--bs-gray-500);
   font-weight: normal;
-  /*font-size: var(--bs-badge-font-size);*/
-  font-size: 0.75em;
-  /*padding:  var(--bs-badge-padding-y) var(--bs-badge-padding-x);*/
-  padding: 0.35em 0.65em;
+  font-size: 0.7em;
+  border-top: 1px solid var(--bs-gray-500);
+  border-bottom: 1px solid var(--bs-gray-500);
+  padding-top: 0.2em;
+  padding-bottom: 0.2em;
 }
 
 .label-pill > span:first-child {
-  border-top-right-radius: 0;
-  border-bottom-right-radius: 0;
+  border: 1px solid var(--bs-gray-500);
+  border-right: 0;
+  border-top-left-radius: var(--bs-border-radius-pill);
+  border-bottom-left-radius: var(--bs-border-radius-pill);
+  padding-left: 0.5em;
+  padding-right: 0.1em;
 }
 
 .label-pill > span:last-of-type {
-  border-top-left-radius: 0;
-  border-bottom-left-radius: 0;
-  border-left: 0;
+  border: 1px solid var(--bs-gray-500);
+  border-top-right-radius: var(--bs-border-radius-pill);
+  border-bottom-right-radius: var(--bs-border-radius-pill);
   background-color: var(--bs-gray-300);
+  padding-left: 0.2em;
+  padding-right: 0.5em;
 }
 </style>

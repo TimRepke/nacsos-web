@@ -152,7 +152,6 @@ import { EventBus } from "@/plugins/events";
 import { ToastEvent } from "@/plugins/events/events/toast";
 import type {
   AnnotationItem,
-  AnnotationSchemeLabelChoice,
   AnnotationSchemeModel,
   AssignmentInfo,
   AssignmentModel,
@@ -165,7 +164,7 @@ import type { AnyItem } from "@/types/items.d";
 import { API, ignore } from "@/plugins/api";
 import { currentProjectStore, currentUserStore, interfaceSettingsStore } from "@/stores";
 import type { InterfaceSettingsStoreType } from "@/stores/InterfaceSettingsStore";
-import { cmap as cmap20, lookupMaker, lookupMakerBool, lookupMakerChoice, lookupMakerStatus } from '@/types/colours';
+import { lookupMakerBool, lookupMakerChoice, lookupMakerStatus } from "@/types/colours";
 
 const motivationalQuotes = [
   "The chase is better than the catch. – Scooter",

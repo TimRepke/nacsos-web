@@ -84,11 +84,6 @@ export const $AnnotationTrackerModel = {
     recall: {
       type: 'any-of',
       contains: [{
-        type: 'array',
-        contains: {
-          type: 'number',
-        },
-      }, {
         type: 'null',
       }],
     },

@@ -665,7 +665,7 @@ export class AnnotationsService {
    * @returns ResolutionProposal Successful Response
    * @throws ApiError
    */
-  public getResolvedAnnotationsApiAnnotationsConfigResolveGet({
+  public getResolvedAnnotationsApiAnnotationsConfigResolvePost({
     xProjectId,
     requestBody,
     includeEmpty,
@@ -681,7 +681,7 @@ export class AnnotationsService {
     updateExisting?: (boolean | null),
   }, options?: Partial<ApiRequestOptions>): CancelablePromise<ResolutionProposal> {
     return this.httpRequest.request({
-      method: 'GET',
+      method: 'POST',
       url: '/api/annotations/config/resolve/',
       headers: {
         'x-project-id': xProjectId,

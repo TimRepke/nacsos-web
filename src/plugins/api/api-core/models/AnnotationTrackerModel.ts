@@ -20,7 +20,7 @@ export type AnnotationTrackerModel = {
   recall_target: number;
   source_ids?: (Array<string> | null);
   labels?: (Array<Array<number>> | null);
-  recall?: (Array<number> | null);
+  recall?: null;
   buscar?: (Array<any[]> | null);
   time_created?: (string | null);
   time_updated?: (string | null);
