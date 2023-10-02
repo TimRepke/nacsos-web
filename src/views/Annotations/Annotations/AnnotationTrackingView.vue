@@ -348,7 +348,7 @@ export default defineComponent({
     },
     dropScope(scope: LabelScope) {
       if (this.trackerDetails && this.trackerDetails.source_ids) {
-        const scopeIndex = this.trackerDetails.source_ids.findIndex((sid) => sid === scope.scope_id);
+        const scopeIndex = this.trackerDetails.source_ids.findIndex((sid: string) => sid === scope.scope_id);
         this.trackerDetails.source_ids.splice(scopeIndex, 1);
       }
     },
@@ -381,10 +381,10 @@ export default defineComponent({
     availableScopes() {
       const source_ids = this.trackerDetails?.source_ids;
       if (!source_ids) return this.scopes;
-      return this.scopes.filter((scope) => source_ids.indexOf(scope.scope_id) < 0);
+      return this.scopes.filter((scope: LabelScope) => source_ids.indexOf(scope.scope_id) < 0);
     },
     scopesLookup(): Record<string, LabelScope> {
-      return Object.fromEntries(this.scopes.map((scope) => [scope.scope_id, scope]));
+      return Object.fromEntries(this.scopes.map((scope: LabelScope) => [scope.scope_id, scope]));
     },
     plotOptions() {
       return {
@@ -401,15 +401,20 @@ export default defineComponent({
           datasets.push({
             label: "Recall",
             backgroundColor: "#89ee61",
-            data: this.trackerDetails.recall.map((entry, idx) => ({ x: idx + 1, y: entry })),
+            data: this.trackerDetails.recall.map((entry: number, idx: number) => ({ x: idx + 1, y: entry })),
           });
-          labels = (this.trackerDetails.recall || []).map((entry, idx) => idx + 1);
+          labels = (this.trackerDetails.recall || []).map((entry: number, idx: number) => idx + 1);
         }
         if (this.trackerDetails.buscar && this.trackerDetails.buscar.length > 0) {
           datasets.push({
             label: "Stopping criterion (Buscar)",
             backgroundColor: "#f879e3",
-            data: this.trackerDetails.buscar.map((entry) => ({ x: entry[0] + 1, y: entry[1] })),
+            data: (this.trackerDetails.buscar as Array<[number, number | null]>)
+              .map((entry: [number, number | null]) => ({
+                x: entry[0] + 1,
+                y: entry[1],
+              }))
+              .filter((point): point is Point => point.y !== null),
           });
           if (!labels && this.lastBuscar) {
             labels = [...Array(this.lastBuscar[0])].map((entry, idx) => idx + 1);

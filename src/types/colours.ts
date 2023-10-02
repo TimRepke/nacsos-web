@@ -1,3 +1,6 @@
+import { AssignmentStatus } from "@/plugins/api/api-core";
+import type { AnnotationSchemeLabelChoice } from "@/plugins/api/api-core";
+
 export const cmap = [
   "#e6194B", // # 0
   "#3cb44b", // # 1
@@ -39,3 +42,76 @@ export const cmap = [
   "teal",
   "yellow",
 ];
+
+export function lookupMaker<T extends string | number | symbol>(
+  colourTable: Record<T, string>,
+  cUndefined: string,
+  cNull: string,
+  cFallback: string,
+): (value: T | undefined | null) => string {
+  return (value) => {
+    if (value === undefined) return cUndefined;
+    if (value === null) return cNull;
+    if ((value as string | symbol) in colourTable) return colourTable[value];
+    return cFallback;
+  };
+}
+
+export type Extractor<T, R> = (v: T) => R | undefined | null;
+
+export function lookupMakerStatus<T>(extract: Extractor<T, AssignmentStatus>): (v: T) => string {
+  const mapper = lookupMaker<AssignmentStatus>(
+    {
+      [AssignmentStatus.OPEN]: "white",
+      [AssignmentStatus.PARTIAL]: "yellow",
+      [AssignmentStatus.FULL]: "#42b983",
+      [AssignmentStatus.INVALID]: "red",
+    },
+    "white",
+    "white",
+    "white",
+  );
+  return (v: T) => mapper(extract(v));
+}
+
+export function lookupMakerChoice<T>(
+  choices: AnnotationSchemeLabelChoice[],
+  squeeze: boolean,
+  extract: Extractor<T, number>,
+): (v: T) => string {
+  let colourTable: Record<number, string>;
+
+  if (squeeze) {
+    colourTable = Object.fromEntries(
+      choices
+        .map((choice: AnnotationSchemeLabelChoice) => choice.value)
+        .sort()
+        .map((value: number, idx: number): [number, string] => {
+          const altValue: number = idx % Object.keys(cmap).length;
+          return [value, cmap[altValue]];
+        }),
+    );
+  } else {
+    colourTable = Object.fromEntries(
+      choices.map((choice: AnnotationSchemeLabelChoice): [number, string] => {
+        const altValue: number = (choice.value as number) % Object.keys(cmap).length;
+        return [choice.value, cmap[altValue]];
+      }),
+    );
+  }
+  const mapper = lookupMaker<number>(colourTable, "white", "white", "white");
+  return (v: T) => mapper(extract(v));
+}
+
+export function lookupMakerBool<T>(extract: Extractor<T, boolean>): (v: T) => string {
+  const mapper = lookupMaker<boolean>(
+    {
+      false: "#C54B6C",
+      true: "#8DA47E",
+    },
+    "white",
+    "white",
+    "white",
+  );
+  return (v: T) => mapper(extract(v));
+}

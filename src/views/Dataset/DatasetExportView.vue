@@ -315,7 +315,7 @@ export default defineComponent({
           itemFields: this.labelExportSettings.itemFields,
           xProjectId: currentProjectStore.projectId as string,
           ignoreHierarchy: this.labelExportSettings.ignoreHierarchy,
-          ignoreOrder: this.labelExportSettings.ignoreOrder,
+          ignoreRepeat: this.labelExportSettings.ignoreOrder,
           requestBody: labels,
         })
         .then((response) => {

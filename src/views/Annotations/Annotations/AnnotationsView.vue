@@ -165,7 +165,7 @@ import type { AnyItem } from "@/types/items.d";
 import { API, ignore } from "@/plugins/api";
 import { currentProjectStore, currentUserStore, interfaceSettingsStore } from "@/stores";
 import type { InterfaceSettingsStoreType } from "@/stores/InterfaceSettingsStore";
-import { cmap as cmap20 } from "@/types/colours";
+import { cmap as cmap20, lookupMaker, lookupMakerBool, lookupMakerChoice, lookupMakerStatus } from '@/types/colours';
 
 const motivationalQuotes = [
   "The chase is better than the catch. – Scooter",
@@ -591,16 +591,9 @@ export default defineComponent({
     },
     indicatorLabelColourMapper(): (indicator: UserAssignmentInfo) => string {
       // Colour by assignment status is always the fallback, set up respective map and mapper function
-      const map = {
-        undefined: "white",
-        null: "white",
-        // @ts-ignore TS1268
-      } as { [key: undefined | null | string]: string };
-      map[AssignmentStatus.OPEN] = "white";
-      map[AssignmentStatus.PARTIAL] = "yellow";
-      map[AssignmentStatus.FULL] = "#42b983";
-      map[AssignmentStatus.INVALID] = "red";
-      const indicateStatusMapper = (indicator: UserAssignmentInfo): string => map[indicator.status] ?? "white";
+      const indicateStatusMapper = lookupMakerStatus<UserAssignmentInfo>(
+        (indicator: UserAssignmentInfo): AssignmentStatus => indicator.status,
+      );
 
       // User selected to colour by assignment status
       if (this.uiSettings.annotationProgressBarUseStatus) {
@@ -623,33 +616,17 @@ export default defineComponent({
       }
 
       if (label.kind === AnnotationSchemeLabel.kind.SINGLE && label.choices) {
-        const cmap = {
-          undefined: "white",
-          null: "white",
-          // @ts-ignore TS1268
-        } as { [key: undefined | null | number]: string };
-        label.choices
-          .map((choice: AnnotationSchemeLabelChoice): number => choice.value)
-          .sort()
-          .forEach((value) => {
-            cmap[value] = cmap20.shift() ?? "white";
-          });
-        return (indicator: UserAssignmentInfo): string =>
-          cmap?.[indicator.labels?.[labelKey]?.[0]?.value_int ?? -1] ?? "white";
+        return lookupMakerChoice<UserAssignmentInfo>(
+          label.choices,
+          false,
+          (indicator: UserAssignmentInfo): number | null | undefined => indicator.labels?.[labelKey]?.[0]?.value_int,
+        );
       }
 
       if (label.kind === AnnotationSchemeLabel.kind.BOOL) {
-        const cmap = {
-          undefined: "white",
-          null: "white",
-          false: "#C54B6C",
-          true: "#8DA47E",
-          // @ts-ignore TS1268
-        } as { [key: undefined | null | boolean]: string };
-
-        // @ts-ignore TS2538
-        return (indicator: ProgressIndicator): string =>
-          cmap?.[indicator.labels?.[labelKey]?.[0]?.value_bool] ?? "white";
+        return lookupMakerBool<UserAssignmentInfo>(
+          (indicator: UserAssignmentInfo): boolean | null | undefined => indicator.labels?.[labelKey]?.[0]?.value_bool,
+        );
       }
 
       // fallback to status mapper
