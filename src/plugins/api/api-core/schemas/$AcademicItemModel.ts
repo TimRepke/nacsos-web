@@ -2,9 +2,7 @@
 /* tslint:disable */
 /* eslint-disable */
 export const $AcademicItemModel = {
-  description: `
-  Corresponds to db.schema.items.academic.AcademicItem
-  `,
+  description: `Corresponds to db.schema.items.academic.AcademicItem`,
   properties: {
     item_id: {
       type: 'any-of',

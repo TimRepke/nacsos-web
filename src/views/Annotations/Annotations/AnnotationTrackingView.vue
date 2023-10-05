@@ -195,17 +195,21 @@
       </div>
 
       <div class="row">
-        <div class="col" v-if="plotData">
-          <Line :data="plotData" :options="plotOptions" />
+        <div class="col" v-if="trackerDetails">
+          <BuscarChart
+            :buscar="trackerDetails.buscar"
+            :labels="trackerDetails.labels"
+            :recall="trackerDetails.recall"
+          />
         </div>
         <div class="col" v-if="trackerDetails">
           <ul>
             <li><strong>Number of items:</strong> {{ trackerDetails.n_items_total }}</li>
-            <li><strong>Number of labels:</strong> {{ trackerDetails.recall?.length || 0 }}</li>
+            <li><strong>Number of labels:</strong> {{ (trackerDetails.recall || []).length }}</li>
             <li>
               <strong>Coverage:</strong>
               {{
-                ((trackerDetails.recall?.length || 0) / trackerDetails.n_items_total).toLocaleString(undefined, {
+                ((trackerDetails.recall || []).length / trackerDetails.n_items_total).toLocaleString(undefined, {
                   style: "percent",
                   minimumFractionDigits: 2,
                 })
@@ -237,25 +241,12 @@ import ExpandableBox from "@/components/ExpandableBox.vue";
 import ToolTip from "@/components/ToolTip.vue";
 import { EventBus } from "@/plugins/events";
 import { ToastEvent } from "@/plugins/events/events/toast";
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend,
-} from "chart.js";
-import type { Point, ChartData, ChartDataset } from "chart.js";
-import { Line } from "vue-chartjs";
-
-ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
+import BuscarChart from "@/components/charts/BuscarChart.vue";
 
 export default defineComponent({
   name: "AnnotationTrackingView",
   // eslint-disable-next-line vue/no-reserved-component-names
-  components: { ToolTip, ExpandableBox, Line },
+  components: { BuscarChart, ToolTip, ExpandableBox },
   data() {
     return {
       permissions: currentProjectStore.projectPermissions as ProjectPermissionsModel,
@@ -385,47 +376,6 @@ export default defineComponent({
     },
     scopesLookup(): Record<string, LabelScope> {
       return Object.fromEntries(this.scopes.map((scope: LabelScope) => [scope.scope_id, scope]));
-    },
-    plotOptions() {
-      return {
-        responsive: true,
-        maintainAspectRatio: false,
-        aspectRatio: 1.2,
-      };
-    },
-    plotData(): ChartData<"line", Point[]> | null {
-      if (this.trackerDetails) {
-        const datasets: ChartDataset<"line", Point[]>[] = [];
-        let labels: number[] | undefined = undefined;
-        if (this.trackerDetails.recall && this.trackerDetails.recall.length > 0) {
-          datasets.push({
-            label: "Recall",
-            backgroundColor: "#89ee61",
-            data: this.trackerDetails.recall.map((entry: number, idx: number) => ({ x: idx + 1, y: entry })),
-          });
-          labels = (this.trackerDetails.recall || []).map((entry: number, idx: number) => idx + 1);
-        }
-        if (this.trackerDetails.buscar && this.trackerDetails.buscar.length > 0) {
-          datasets.push({
-            label: "Stopping criterion (Buscar)",
-            backgroundColor: "#f879e3",
-            data: (this.trackerDetails.buscar as Array<[number, number | null]>)
-              .map((entry: [number, number | null]) => ({
-                x: entry[0] + 1,
-                y: entry[1],
-              }))
-              .filter((point): point is Point => point.y !== null),
-          });
-          if (!labels && this.lastBuscar) {
-            labels = [...Array(this.lastBuscar[0])].map((entry, idx) => idx + 1);
-          }
-        }
-        return {
-          labels,
-          datasets,
-        };
-      }
-      return null;
     },
     lastBuscar(): [number, number | null] | undefined {
       if (this.trackerDetails?.buscar && this.trackerDetails.buscar.length > 0) {

@@ -5,7 +5,6 @@
 import type { AnnotationSchemeLabel } from './AnnotationSchemeLabel';
 
 /**
- *
  * Corresponds to db.models.annotations.AnnotationScheme
  *
  * AnnotationScheme defines the annotation scheme for a particular project.
@@ -15,7 +14,6 @@ import type { AnnotationSchemeLabel } from './AnnotationSchemeLabel';
  *
  * The actual annotation scheme is defined as a list of labels (see schemas.annotations.AnnotationSchemeLabel).
  * The other fields pose as meta-data.
- *
  */
 export type AnnotationSchemeModel = {
   annotation_scheme_id?: (string | null);

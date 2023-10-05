@@ -3,12 +3,10 @@
 /* eslint-disable */
 
 /**
- *
  * Tracker for annotation statistics.
  * This includes the latest stopping criterion (buscar) metrics and more.
  *
  * You may have more than one tracker per project, for example for keeping track of different progresses.
- *
  */
 export type AnnotationTrackerModel = {
   annotation_tracking_id?: (string | null);

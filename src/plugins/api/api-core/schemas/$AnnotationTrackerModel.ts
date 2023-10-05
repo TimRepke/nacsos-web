@@ -2,12 +2,10 @@
 /* tslint:disable */
 /* eslint-disable */
 export const $AnnotationTrackerModel = {
-  description: `
-  Tracker for annotation statistics.
+  description: `Tracker for annotation statistics.
   This includes the latest stopping criterion (buscar) metrics and more.
 
-  You may have more than one tracker per project, for example for keeping track of different progresses.
-  `,
+  You may have more than one tracker per project, for example for keeping track of different progresses.`,
   properties: {
     annotation_tracking_id: {
       type: 'any-of',

@@ -2,11 +2,9 @@
 /* tslint:disable */
 /* eslint-disable */
 export const $UserBaseModel = {
-  description: `
-  User represents a person.
+  description: `User represents a person.
   Most entries in the database will be (indirectly) linked to user accounts, so this is
-  at the core of access management and ownership.
-  `,
+  at the core of access management and ownership.`,
   properties: {
     user_id: {
       type: 'any-of',

@@ -12,12 +12,10 @@ import type { TwitterUserModel } from './TwitterUserModel';
 import type { URL } from './URL';
 
 /**
- *
  * Corresponds to db.models.items.TwitterItem
  *
  * For more in-depth documentation, please refer to:
  * https://developer.twitter.com/en/docs/twitter-api/data-dictionary/object-model/tweet
- *
  */
 export type TwitterItemModel = {
   item_id?: (string | null);

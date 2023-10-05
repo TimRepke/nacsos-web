@@ -5,7 +5,6 @@
 import type { AssignmentStatus } from './AssignmentStatus';
 
 /**
- *
  * Corresponds to db.models.annotations.Assignment
  *
  * Assignment is used to request a user/annotator (User) to annotate a particular item (BaseItem) in the database
@@ -20,7 +19,6 @@ import type { AssignmentStatus } from './AssignmentStatus';
  * * Creating assignments in bulk at random (e.g. 3 users should annotate 50 documents each)
  * * Creating assignments one at a time based on a set of rules (e.g. for double-coding, defined order, bias, ...)
  * * Creating assignments in small batches or one-by-one in prioritised annotation settings
- *
  */
 export type AssignmentModel = {
   assignment_id?: (string | null);

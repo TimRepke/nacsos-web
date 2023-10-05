@@ -3,11 +3,9 @@
 /* eslint-disable */
 
 /**
- *
  * User represents a person.
  * Most entries in the database will be (indirectly) linked to user accounts, so this is
  * at the core of access management and ownership.
- *
  */
 export type UserBaseModel = {
   user_id?: (string | null);

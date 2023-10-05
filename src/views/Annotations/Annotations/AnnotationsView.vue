@@ -55,14 +55,14 @@
         <div
           class="position-fixed bottom-0 border border-end-0 rounded-start text-muted text-center"
           style="margin-left: -1.325rem; width: 0.75rem; font-size: 0.75rem"
-          @click="uiSettings.annotation.sidebarWidth < 12 && uiSettings.annotation.sidebarWidth++"
+          @click="widenSidebar"
         >
           <font-awesome-icon :icon="['fas', 'caret-left']" />
         </div>
         <div
           class="position-fixed bottom-0 border border-start-0 rounded-end text-muted text-center"
           style="margin-left: -0.5rem; width: 0.75rem; font-size: 0.75rem"
-          @click="uiSettings.annotation.sidebarWidth > 0 && uiSettings.annotation.sidebarWidth--"
+          @click="shrinkSidebar"
         >
           <font-awesome-icon :icon="['fas', 'caret-right']" />
         </div>
@@ -120,7 +120,8 @@
                     Which label to use to colour document indicators
                   </label>
                   <select
-                    v-model="uiSettings.annotation.progressBarLabelKey"
+                    :value="progressBarLabelKey"
+                    @input="updateProgressBarLabelKey($event.target.value)"
                     id="progressBarLabelKey"
                     class="form-select"
                   >
@@ -163,7 +164,6 @@ import { AssignmentStatus, AnnotationSchemeLabel } from "@/plugins/api/api-core"
 import type { AnyItem } from "@/types/items.d";
 import { API, ignore } from "@/plugins/api";
 import { currentProjectStore, currentUserStore, interfaceSettingsStore } from "@/stores";
-import type { InterfaceSettingsStoreType } from "@/stores/InterfaceSettingsStore";
 import { lookupMakerBool, lookupMakerChoice, lookupMakerStatus } from "@/types/colours";
 
 const motivationalQuotes = [
@@ -226,7 +226,6 @@ type AnnotationsViewData = {
   labels?: AnnotationSchemeLabel[];
   dirty: number;
   highlighters?: HighlighterModel[];
-  uiSettings: InterfaceSettingsStoreType;
   rerenderCounter: number; // this is a hack to force-update the AnnotationLabels-component
   showStatusBarModal: boolean;
 };
@@ -255,7 +254,6 @@ export default defineComponent({
       dirty: 0,
       highlighters: undefined as HighlighterModel[] | undefined,
       rerenderCounter: 0,
-      uiSettings: interfaceSettingsStore,
       showStatusBarModal: false,
     };
   },
@@ -305,6 +303,15 @@ export default defineComponent({
     }
   },
   methods: {
+    widenSidebar() {
+      if (interfaceSettingsStore.annotation.sidebarWidth < 12) interfaceSettingsStore.annotation.sidebarWidth++;
+    },
+    shrinkSidebar() {
+      if (interfaceSettingsStore.annotation.sidebarWidth > 0) interfaceSettingsStore.annotation.sidebarWidth--;
+    },
+    updateProgressBarLabelKey(newValue: string) {
+      interfaceSettingsStore.annotation.progressBarLabelKey = newValue;
+    },
     markdown(md: string) {
       return marked(md);
     },
@@ -595,11 +602,11 @@ export default defineComponent({
       );
 
       // User selected to colour by assignment status
-      if (this.uiSettings.annotationProgressBarUseStatus) {
+      if (interfaceSettingsStore.annotationProgressBarUseStatus) {
         return indicateStatusMapper;
       }
 
-      const labelKey = this.uiSettings.annotation.progressBarLabelKey;
+      const labelKey = interfaceSettingsStore.annotation.progressBarLabelKey;
       if (!labelKey) {
         return indicateStatusMapper;
       }
@@ -630,6 +637,9 @@ export default defineComponent({
 
       // fallback to status mapper
       return indicateStatusMapper;
+    },
+    progressBarLabelKey() {
+      return interfaceSettingsStore.annotation.progressBarLabelKey;
     },
   },
   watch: {
@@ -684,7 +694,7 @@ export default defineComponent({
   max-width: 1rem;
   height: 0.8rem;
   margin: 0.05rem;
-  border: 0.1rem solid gray;
+  border: 0.1rem solid #808080;
   position: relative;
 }
 
@@ -727,7 +737,7 @@ export default defineComponent({
   display: flex;
   overflow: hidden;
   height: 0.5rem;
-  border: 1px solid gray;
+  border: 1px solid #808080;
 }
 
 .assignments-birdseye-step {

@@ -3,7 +3,6 @@
 /* eslint-disable */
 
 /**
- *
  * Corresponds to db.models.annotations.Annotation
  *
  * Annotation holds the judgement of a User for a specific Item in the context of an AnnotationScheme
@@ -23,7 +22,6 @@
  * Note, that there is no database constraints on the completeness of an Assignment/AnnotationScheme.
  * The interface/backend code should be used to make sure, to either not allow partial fulfillment of an
  * AnnotationScheme or not display an Assignment as complete.
- *
  */
 export type AnnotationModel = {
   value_bool?: (boolean | null);

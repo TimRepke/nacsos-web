@@ -6,9 +6,7 @@ import type { AcademicAuthorModel } from './AcademicAuthorModel';
 import type { ItemType } from './ItemType';
 
 /**
- *
  * Corresponds to db.schema.items.academic.AcademicItem
- *
  */
 export type AcademicItemModel = {
   item_id?: (string | null);
