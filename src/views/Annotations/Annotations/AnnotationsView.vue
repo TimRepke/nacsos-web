@@ -284,6 +284,8 @@ export default defineComponent({
         ).data;
       }
 
+      await this.setCurrentAssignment(response);
+
       API.core.highlighters
         .getScopeHighlightersApiHighlightersScopeAssignmentScopeIdGet({
           xProjectId: currentProjectStore.projectId as string,
@@ -296,8 +298,6 @@ export default defineComponent({
           }
         })
         .catch(ignore);
-
-      await this.setCurrentAssignment(response);
     } catch (e) {
       console.error(e);
     }
@@ -606,7 +606,7 @@ export default defineComponent({
         return indicateStatusMapper;
       }
 
-      const labelKey = interfaceSettingsStore.annotation.progressBarLabelKey;
+      const labelKey = this.progressBarLabelKey;
       if (!labelKey) {
         return indicateStatusMapper;
       }
@@ -638,7 +638,7 @@ export default defineComponent({
       // fallback to status mapper
       return indicateStatusMapper;
     },
-    progressBarLabelKey() {
+    progressBarLabelKey(): string | undefined | null {
       return interfaceSettingsStore.annotation.progressBarLabelKey;
     },
   },

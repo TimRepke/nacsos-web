@@ -13,8 +13,13 @@ export interface AnnotationSettings {
   sidebarWidth: number;
 }
 
+export interface ItemDisplaySettings {
+  columns?: number;
+}
+
 export type InterfaceSettingsState = {
   annotation: RemovableRef<AnnotationSettings>;
+  itemDisplay: RemovableRef<ItemDisplaySettings>;
 };
 export type InterfaceSettingsActions = Record<string, never>;
 export type InterfaceSettingsGetters = Record<string, never>;
@@ -38,6 +43,14 @@ export const useInterfaceSettingsStore = defineStore("InterfaceSettingsStore", {
         undefined,
         { mergeDefaults: true },
       ),
+      itemDisplay: useStorage<ItemDisplaySettings>(
+        "nacsos:ui-settings:item-display",
+        {
+          columns: undefined,
+        } as ItemDisplaySettings,
+        undefined,
+        { mergeDefaults: true },
+      ),
     };
   },
   actions: {
@@ -46,6 +59,16 @@ export const useInterfaceSettingsStore = defineStore("InterfaceSettingsStore", {
   getters: {
     annotationProgressBarUseStatus(): boolean {
       return this.annotation.progressBarLabelKey === undefined;
+    },
+    itemColumnStyle(): Record<string, string> {
+      if (this.itemDisplay.columns > 1) {
+        return {
+          "column-count": `${this.itemDisplay.columns}`,
+          "column-gap": "40px",
+          "column-rule": "1px solid lightgrey",
+        };
+      }
+      return {};
     },
   },
 });

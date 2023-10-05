@@ -1,9 +1,7 @@
 <template>
   <div class="card m-2 p-0 text-start w-100">
     <div class="card-header d-flex">
-      <div style="line-height: 2rem" class="fw-bold">
-        {{ item.title }}
-      </div>
+      <div style="line-height: 2rem" class="fw-bold" v-html="htmlTitle" />
       <div class="ms-auto">
         <inline-tool-tip info="DOI" placement="left" v-show="item.doi !== null">
           <a
@@ -23,7 +21,10 @@
         </inline-tool-tip>
       </div>
     </div>
-    <div class="card-body">
+    <div class="card-body position-relative">
+      <div class="text-muted small position-absolute" role="button" style="top: 0; right: 0" @click="iterateColumns">
+        <font-awesome-icon :icon="['fas', 'table-columns']" class="me-2" />
+      </div>
       <div v-if="showRaw">
         <pre>
           {{ JSON.stringify(item, null, 4) }}
@@ -36,8 +37,7 @@
         </p>
       </template>
       <template v-else>
-        <p class="card-text text-muted" v-html="htmlAbstract" />
-        <!-- style="font-family: serif" -->
+        <p class="card-text text-muted" :style="columnStyle" v-html="htmlAbstract" />
       </template>
     </div>
     <div class="card-footer d-flex justify-content-between">
@@ -82,6 +82,7 @@ import type {
   AffiliationModel,
   HighlighterModel,
 } from "@/plugins/api/api-core";
+import { interfaceSettingsStore } from "@/stores";
 
 export default defineComponent({
   name: "AcademicItem",
@@ -106,10 +107,24 @@ export default defineComponent({
   computed: {
     htmlAbstract() {
       let txt = this.item.text || "";
+      txt = this.applyHighlighters(txt);
+      return txt.replaceAll("\n", "<br />");
+    },
+    htmlTitle() {
+      let txt = this.item.title || "";
+      txt = this.applyHighlighters(txt);
+      return txt;
+    },
+    columnStyle(): Record<string, string> {
+      return interfaceSettingsStore.itemColumnStyle;
+    },
+  },
+  methods: {
+    applyHighlighters(txt: string) {
       if (this.highlighters) {
         this.highlighters.forEach((highlighter: HighlighterModel) => {
           try {
-            const regex = new RegExp(highlighter.keywords.join("|"), "g");
+            const regex = new RegExp(highlighter.keywords.join("|"), "gi");
             txt = txt.replaceAll(regex, `<span style="${highlighter.style}">$&</span>`);
           } catch (e) {
             console.warn("Ignoring illegal regex!");
@@ -117,14 +132,22 @@ export default defineComponent({
           }
         });
       }
-      return txt.replaceAll("\n", "<br />");
+      return txt;
     },
-  },
-  methods: {
     authorInstitutions(author: AcademicAuthorModel): string | undefined {
       return author.affiliations
         ?.map((affiliation: AffiliationModel) => `${affiliation.name}, ${affiliation.country}`)
         .join(";");
+    },
+    iterateColumns() {
+      if (!interfaceSettingsStore.itemDisplay.columns) {
+        interfaceSettingsStore.itemDisplay.columns = 0;
+      }
+      interfaceSettingsStore.itemDisplay.columns += 1;
+
+      if (interfaceSettingsStore.itemDisplay.columns > 4) {
+        interfaceSettingsStore.itemDisplay.columns = 1;
+      }
     },
   },
 });
