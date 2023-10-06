@@ -3,6 +3,12 @@
     <div v-if="project && permissions">
       <h1>{{ project.name }}</h1>
       <div class="row mb-3">
+        <div class="col">
+          Project ID: <code>{{ project.project_id }}</code>
+        </div>
+        <div class="col">Created at {{ project.time_created }}</div>
+      </div>
+      <div class="row mb-3">
         <div class="col" v-html="markdownToHtml(project.description)" />
       </div>
       <div class="row mb-3">
@@ -27,11 +33,11 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
-import { marked } from 'marked';
-import type { ProjectModel, ProjectPermissionsModel } from '@/plugins/api/api-core';
-import { currentProjectStore } from '@/stores';
-import PermissionSettingsCardReadOnly from '@/components/users/PermissionSettingsCardReadOnly.vue';
+import { defineComponent } from "vue";
+import { marked } from "marked";
+import type { ProjectModel, ProjectPermissionsModel } from "@/plugins/api/api-core";
+import { currentProjectStore } from "@/stores";
+import PermissionSettingsCardReadOnly from "@/components/users/PermissionSettingsCardReadOnly.vue";
 
 type ProjectOverview = {
   project?: ProjectModel;
@@ -39,7 +45,7 @@ type ProjectOverview = {
 };
 
 export default defineComponent({
-  name: 'ProjectOverviewView',
+  name: "ProjectOverviewView",
   components: { PermissionSettingsCardReadOnly },
   data(): ProjectOverview {
     return {
@@ -62,6 +68,4 @@ export default defineComponent({
 });
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

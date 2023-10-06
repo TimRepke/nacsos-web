@@ -1,4 +1,4 @@
-import { ArtefactReference, FunctionInfo, TaskInDB } from '@/plugins/api/api-pipe';
+import { ArtefactReference, FunctionInfo, TaskInDB } from "@/plugins/api/api-pipe";
 
 export type ArtefactCallback = (artefactRef: ArtefactReference) => void;
 

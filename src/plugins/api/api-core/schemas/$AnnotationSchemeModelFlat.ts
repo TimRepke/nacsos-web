@@ -2,9 +2,7 @@
 /* tslint:disable */
 /* eslint-disable */
 export const $AnnotationSchemeModelFlat = {
-  description: `
-  Same as AnnotationSchemeModel but with flattened structure.
-  `,
+  description: `Same as AnnotationSchemeModel but with flattened structure.`,
   properties: {
     annotation_scheme_id: {
       type: 'any-of',

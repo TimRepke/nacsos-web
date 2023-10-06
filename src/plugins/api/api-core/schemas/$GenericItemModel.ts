@@ -2,9 +2,7 @@
 /* tslint:disable */
 /* eslint-disable */
 export const $GenericItemModel = {
-  description: `
-  Corresponds to db.models.items.generic.GenericItem
-  `,
+  description: `Corresponds to db.models.items.generic.GenericItem`,
   properties: {
     item_id: {
       type: 'any-of',

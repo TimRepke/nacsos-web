@@ -1,5 +1,6 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-
-export type GroupedBotAnnotation = any[];
+export const $ResolutionStatus = {
+  type: 'Enum',
+} as const;

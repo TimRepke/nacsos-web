@@ -1,10 +1,10 @@
-import { defineStore } from 'pinia';
+import { defineStore } from "pinia";
 
 export type RequestsStoreType = {
-  numRequests: number,
+  numRequests: number;
 };
 
-export const useRequestsStore = defineStore('RequestsStore', {
+export const useRequestsStore = defineStore("RequestsStore", {
   state(): RequestsStoreType {
     return {
       numRequests: 0,

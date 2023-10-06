@@ -1,12 +1,14 @@
-import type { App } from 'vue';
-import type { BaseEvent } from '@/plugins/events/baseEvent';
+import type { App } from "vue";
+import type { BaseEvent } from "@/plugins/events/baseEvent";
 
 // eslint-disable-next-line  @typescript-eslint/no-explicit-any
 type CallbackHandler = (payload: any) => void;
 // eslint-disable-next-line  @typescript-eslint/no-explicit-any
-type CallbackInfo = { fn: CallbackHandler, ctx?: any, selfDestruct?: boolean };
+type CallbackInfo = { fn: CallbackHandler; ctx?: any; selfDestruct?: boolean };
 
-interface Class {name: string;}
+interface Class {
+  name: string;
+}
 
 class EventBus {
   private static instance: EventBus; // eslint-disable-line no-use-before-define
@@ -92,12 +94,10 @@ class EventBus {
   emit(payload: BaseEvent) {
     const { name } = payload.constructor;
     if (name in this.listeners) {
-      Object
-        .entries(this.listeners[name])
-        .forEach(([key, listener]) => {
-          listener.fn.apply(listener.ctx, [payload]);
-          if (listener.selfDestruct) this.off([name, key]);
-        });
+      Object.entries(this.listeners[name]).forEach(([key, listener]) => {
+        listener.fn.apply(listener.ctx, [payload]);
+        if (listener.selfDestruct) this.off([name, key]);
+      });
     }
   }
 
@@ -118,7 +118,7 @@ class EventBus {
    * @param listener Class of the event to remove or the identifier returned by on or once.
    */
   off(listener: [string, number | string] | Class) {
-    const [name, counter] = (listener instanceof Array) ? listener : [listener.name, null];
+    const [name, counter] = listener instanceof Array ? listener : [listener.name, null];
     if (counter) delete this.listeners[name][counter];
     else delete this.listeners[name];
   }

@@ -3,6 +3,49 @@
 /* eslint-disable */
 export const $BotAnnotationModel = {
   properties: {
+    value_bool: {
+      type: 'any-of',
+      contains: [{
+        type: 'boolean',
+      }, {
+        type: 'null',
+      }],
+    },
+    value_int: {
+      type: 'any-of',
+      contains: [{
+        type: 'number',
+      }, {
+        type: 'null',
+      }],
+    },
+    value_float: {
+      type: 'any-of',
+      contains: [{
+        type: 'number',
+      }, {
+        type: 'null',
+      }],
+    },
+    value_str: {
+      type: 'any-of',
+      contains: [{
+        type: 'string',
+      }, {
+        type: 'null',
+      }],
+    },
+    multi_int: {
+      type: 'any-of',
+      contains: [{
+        type: 'array',
+        contains: {
+          type: 'number',
+        },
+      }, {
+        type: 'null',
+      }],
+    },
     bot_annotation_id: {
       type: 'any-of',
       contains: [{
@@ -75,45 +118,10 @@ export const $BotAnnotationModel = {
     repeat: {
       type: 'number',
     },
-    value_bool: {
-      type: 'any-of',
-      contains: [{
-        type: 'boolean',
-      }, {
-        type: 'null',
-      }],
-    },
-    value_int: {
+    order: {
       type: 'any-of',
       contains: [{
         type: 'number',
-      }, {
-        type: 'null',
-      }],
-    },
-    value_float: {
-      type: 'any-of',
-      contains: [{
-        type: 'number',
-      }, {
-        type: 'null',
-      }],
-    },
-    value_str: {
-      type: 'any-of',
-      contains: [{
-        type: 'string',
-      }, {
-        type: 'null',
-      }],
-    },
-    multi_int: {
-      type: 'any-of',
-      contains: [{
-        type: 'array',
-        contains: {
-          type: 'number',
-        },
       }, {
         type: 'null',
       }],

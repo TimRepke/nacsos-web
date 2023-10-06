@@ -17,15 +17,16 @@
               <tr>
                 <td :class="noBorderIfOpen(entry)">
                   <div class="d-flex flex-row">
-                    <div class="me-2" style="height: 1rem; width:1rem;">
+                    <div class="me-2" style="height: 1rem; width: 1rem">
                       <font-awesome-icon
                         role="button"
                         class="text-muted"
                         @click="toggleEntry(entry)"
-                        :icon="['fas', (entry.showArtefacts) ? 'chevron-down' : 'chevron-right']" />
+                        :icon="['fas', entry.showArtefacts ? 'chevron-down' : 'chevron-right']"
+                      />
                     </div>
                     <div>
-                      {{ entry.info?.name || 'DEPRECATED' }}<br />
+                      {{ entry.info?.name || "DEPRECATED" }}<br />
                       <code class="small">{{ entry.task.function_name }}(&sdot;)</code><br />
                       <span class="text-muted small">{{ entry.task.comment }}</span>
                     </div>
@@ -35,8 +36,10 @@
                   {{ entry.task.status }}
                 </td>
                 <td :class="noBorderIfOpen(entry)">
-                  <span class="text-muted small"><strong>Submitted:</strong> {{ entry.task.time_created }}</span><br>
-                  <span class="text-muted small"><strong>Started:</strong> {{ entry.task.time_started }}</span><br>
+                  <span class="text-muted small"><strong>Submitted:</strong> {{ entry.task.time_created }}</span
+                  ><br />
+                  <span class="text-muted small"><strong>Started:</strong> {{ entry.task.time_started }}</span
+                  ><br />
                   <span class="text-muted small"><strong>Finished:</strong>{{ entry.task.time_finished }}</span>
                 </td>
                 <td :class="noBorderIfOpen(entry)">
@@ -77,15 +80,15 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
-import { marked } from 'marked';
-import type { TaskModel, FunctionInfo, FileOnDisk, QueueService } from '@/plugins/api/api-pipe';
-import { EventBus } from '@/plugins/events';
-import { ToastEvent } from '@/plugins/events/events/toast';
-import { API } from '@/plugins/api';
-import { currentProjectStore, currentUserStore } from '@/stores';
+import { defineComponent } from "vue";
+import { marked } from "marked";
+import type { TaskModel, FunctionInfo, FileOnDisk, QueueService } from "@/plugins/api/api-pipe";
+import { EventBus } from "@/plugins/events";
+import { ToastEvent } from "@/plugins/events/events/toast";
+import { API } from "@/plugins/api";
+import { currentProjectStore, currentUserStore } from "@/stores";
 
-type SearchParams = Parameters<QueueService['searchTasksApiQueueSearchGet']>[0];
+type SearchParams = Parameters<QueueService["searchTasksApiQueueSearchGet"]>[0];
 
 interface Entry {
   task: TaskModel;
@@ -105,7 +108,7 @@ type ArtefactListData = {
 };
 
 export default defineComponent({
-  name: 'ArtefactsListView',
+  name: "ArtefactsListView",
   data(): ArtefactListData {
     return {
       entries: [],
@@ -124,18 +127,22 @@ export default defineComponent({
         const tasks = (await API.pipe.queue.searchTasksApiQueueSearchGet(this.searchObject)).data;
 
         if (!tasks || tasks.length === 0) {
-          EventBus.emit(new ToastEvent('WARN', 'Failed to load tasks (or none found yet). Please try reloading the page later.'));
+          EventBus.emit(
+            new ToastEvent("WARN", "Failed to load tasks (or none found yet). Please try reloading the page later."),
+          );
           return;
         }
 
         const funcNames: string[] = Array.from(new Set(tasks.map((task: TaskModel) => task.function_name)));
         const funcInfos = (await API.pipe.library.getFunctionInfosApiLibraryInfosGet({ funcName: funcNames })).data;
         if (!funcInfos) {
-          EventBus.emit(new ToastEvent('ERROR', 'Failed to load function infos. Please try reloading the page.'));
+          EventBus.emit(new ToastEvent("ERROR", "Failed to load function infos. Please try reloading the page."));
           return;
         }
 
-        const funcs = Object.fromEntries(funcInfos.map((func: FunctionInfo) => [`${func.module}.${func.function}`, func]));
+        const funcs = Object.fromEntries(
+          funcInfos.map((func: FunctionInfo) => [`${func.module}.${func.function}`, func]),
+        );
 
         this.entries = tasks.map((task: TaskModel) => ({
           task,
@@ -146,19 +153,21 @@ export default defineComponent({
         }));
       } catch (e) {
         console.error(e);
-        EventBus.emit(new ToastEvent('ERROR', 'Loading data failed, please try reloading.'));
+        EventBus.emit(new ToastEvent("ERROR", "Loading data failed, please try reloading."));
       }
     },
     md2html(s: string): string {
       return marked(s);
     },
     async toggleEntry(entry: Entry) {
-      const artefacts = (await API.pipe.artefacts.getArtefactsApiArtefactsListGet({
-        xTaskId: entry.task.task_id as string,
-        xProjectId: currentProjectStore.projectId as string,
-      })).data;
+      const artefacts = (
+        await API.pipe.artefacts.getArtefactsApiArtefactsListGet({
+          xTaskId: entry.task.task_id as string,
+          xProjectId: currentProjectStore.projectId as string,
+        })
+      ).data;
       if (!artefacts) {
-        EventBus.emit(new ToastEvent('WARN', `Failed to load additional info for task ${entry.task.task_id}`));
+        EventBus.emit(new ToastEvent("WARN", `Failed to load additional info for task ${entry.task.task_id}`));
       } else {
         // eslint-disable-next-line no-param-reassign
         entry.artefacts = artefacts;
@@ -170,7 +179,7 @@ export default defineComponent({
       return entry.showArtefacts || entry.showLog;
     },
     noBorderIfOpen(entry: Entry): string[] {
-      return (this.isOpen(entry)) ? ['border-bottom-0'] : [];
+      return this.isOpen(entry) ? ["border-bottom-0"] : [];
     },
   },
   computed: {
@@ -180,7 +189,7 @@ export default defineComponent({
       };
       if (this.searchByUser) {
         const userId = currentUserStore.user?.user_id;
-        searchObj.userId = (userId === null || userId === undefined) ? undefined : userId;
+        searchObj.userId = userId === null || userId === undefined ? undefined : userId;
       }
       // TODO add the other search params
       return searchObj;
@@ -189,6 +198,4 @@ export default defineComponent({
 });
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

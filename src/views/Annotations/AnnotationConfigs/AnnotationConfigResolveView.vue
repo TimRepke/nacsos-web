@@ -13,13 +13,12 @@
               data-bs-toggle="collapse"
               data-bs-target="#resolve-config"
               aria-expanded="true"
-              aria-controls="resolve-config">
+              aria-controls="resolve-config"
+            >
               Annotation Export Configuration
             </button>
           </h2>
-          <div
-            id="resolve-config"
-            class="accordion-collapse collapse show">
+          <div id="resolve-config" class="accordion-collapse collapse show">
             <div class="accordion-body">
               <div class="row">
                 <div class="col">
@@ -40,12 +39,14 @@
                       id="schema-selector"
                       class="form-select"
                       aria-label="Schema selector"
-                      v-model="filters.scheme_id">
+                      v-model="filters.scheme_id"
+                    >
                       <option :value="undefined" disabled>Please choose...</option>
                       <option
                         v-for="scheme in projectAnnotationSchemes"
-                        :key="scheme.annotation_scheme_id"
-                        :value="scheme.annotation_scheme_id">
+                        :key="scheme.annotation_scheme_id as string"
+                        :value="scheme.annotation_scheme_id"
+                      >
                         {{ scheme.name }}
                       </option>
                     </select>
@@ -60,32 +61,31 @@
                           :id="`schema-label-selector-${label.key}`"
                           :value="label.key"
                           v-model="filters.key"
-                          :disabled="!isNew" />
-                        <label
-                          class="form-check-label"
-                          :for="`schema-label-selector-${label.key}`"><strong>{{ label.key }}</strong> – {{
-                            label.name
-                          }}</label>
+                          :disabled="!isNew"
+                        />
+                        <label class="form-check-label" :for="`schema-label-selector-${label.key}`"
+                          ><strong>{{ label.key }}</strong> – {{ label.name }}</label
+                        >
                       </li>
                     </ul>
                   </div>
-                  <div class="mb-3 border-bottom" v-if="filters.key.length > 0">
+                  <div class="mb-3 border-bottom" v-if="filters.key && filters.key.length > 0">
                     <div class="form-label">
                       Repeats to resolve
                       <ToolTip>
-                        Allows you to select which annotations to resolve if annotations can have an order.
-                        For example, whether to only resolve primary annotation of a kind (and ignore secondary,...)
-                        annotations.
+                        Allows you to select which annotations to resolve if annotations can have an order. For example,
+                        whether to only resolve primary annotation of a kind (and ignore secondary,...) annotations.
                       </ToolTip>
                     </div>
-                    <div class="form-check form-check-inline" v-if="filters.key.length > 0">
+                    <div class="form-check form-check-inline">
                       <input
                         class="form-check-input"
                         type="checkbox"
                         id="repeat-selector-1"
                         :value="1"
                         v-model="filters.repeat"
-                        :disabled="!isNew">
+                        :disabled="!isNew"
+                      />
                       <label class="form-check-label" for="repeat-selector-1">1</label>
                     </div>
                     <div class="form-check form-check-inline">
@@ -95,7 +95,8 @@
                         id="repeat-selector-2"
                         :value="2"
                         v-model="filters.repeat"
-                        :disabled="!isNew">
+                        :disabled="!isNew"
+                      />
                       <label class="form-check-label" for="repeat-selector-2">2</label>
                     </div>
                     <div class="form-check form-check-inline">
@@ -105,7 +106,8 @@
                         id="repeat-selector-3"
                         :value="3"
                         v-model="filters.repeat"
-                        :disabled="!isNew">
+                        :disabled="!isNew"
+                      />
                       <label class="form-check-label" for="repeat-selector-3">3</label>
                     </div>
                     <div class="form-check form-check-inline">
@@ -115,31 +117,44 @@
                         id="repeat-selector-4"
                         :value="4"
                         v-model="filters.repeat"
-                        :disabled="!isNew">
+                        :disabled="!isNew"
+                      />
                       <label class="form-check-label" for="repeat-selector-4">4</label>
                     </div>
                   </div>
-                  <div class="mb-3 border-bottom" v-if="filters.key.length > 0">
+                  <div class="mb-3 border-bottom" v-if="filters.key && filters.key.length > 0">
                     <div class="form-check">
                       <input
                         class="form-check-input"
                         type="checkbox"
                         v-model="ignoreHierarchy"
                         id="check-ignore-hierarchy"
-                        :disabled="!isNew">
+                        :disabled="!isNew"
+                      />
                       <label class="form-check-label" for="check-ignore-hierarchy">
                         Ignore scheme hierarchy
+                        <ToolTip>
+                          If you have nested labels in your annotation scheme, we will keep track of all
+                          parents/children. Selecting this option will ignore these relationships and present you with a
+                          "flat" list of labels.
+                        </ToolTip>
                       </label>
                     </div>
                     <div class="form-check">
                       <input
                         class="form-check-input"
                         type="checkbox"
-                        v-model="ignoreOrder"
+                        v-model="ignoreRepeat"
                         id="check-ignore-order"
-                        :disabled="!isNew">
+                        :disabled="!isNew"
+                      />
                       <label class="form-check-label" for="check-ignore-order">
-                        Ignore annotation order (<code>repeat</code>s)
+                        Ignore label order (<code>repeat</code>s)
+                        <ToolTip>
+                          Select this if you'd like to ignore the order of labels for those that are repeatable. This
+                          might be useful if you allowed labels to be primary, secondary, ... but now would like to
+                          treat them all the same.
+                        </ToolTip>
                       </label>
                     </div>
                   </div>
@@ -148,34 +163,34 @@
                   <div v-if="(assignmentScopes || []).length > 0" class="mb-3 border-bottom">
                     <div class="form-label">Source assignment scopes</div>
                     <ul class="list-unstyled ms-lg-2">
-                      <li v-for="scope in assignmentScopes" :key="scope.assignment_scope_id">
+                      <li v-for="scope in assignmentScopes" :key="scope.assignment_scope_id as string">
                         <input
                           class="form-check-input me-1"
                           type="checkbox"
                           :id="`scope-selector-${scope.assignment_scope_id}`"
                           :value="scope.assignment_scope_id"
                           v-model="filters.scope_id"
-                          :disabled="!isNew" />
-                        <label
-                          class="form-check-label"
-                          :for="`scope-selector-${scope.assignment_scope_id}`">{{ scope.name }}</label>
+                          :disabled="!isNew"
+                        />
+                        <label class="form-check-label" :for="`scope-selector-${scope.assignment_scope_id}`">{{
+                          scope.name
+                        }}</label>
                       </li>
                     </ul>
                   </div>
                   <div v-if="(annotators || []).length > 0" class="mb-3 border-bottom">
                     <div class="form-label">Annotator selector</div>
                     <ul class="list-unstyled ms-lg-2">
-                      <li v-for="user in annotators" :key="user.user_id">
+                      <li v-for="user in annotators" :key="user.user_id!">
                         <input
                           class="form-check-input me-1"
                           type="checkbox"
                           :id="`annotator-selector-${user.user_id}`"
                           :value="user.user_id"
                           v-model="filters.user_id"
-                          :disabled="!isNew" />
-                        <label
-                          class="form-check-label"
-                          :for="`annotator-selector-${user.user_id}`">
+                          :disabled="!isNew"
+                        />
+                        <label class="form-check-label" :for="`annotator-selector-${user.user_id}`">
                           <strong>{{ user.username }}</strong> – {{ user.full_name }}
                         </label>
                       </li>
@@ -187,13 +202,15 @@
                       id="algorithm-selector"
                       class="form-select"
                       aria-label="Resolution algorithm"
+                      disabled
                       v-model="algorithm"
-                      :disabled="!isNew">
+                    >
+                      <!--:disabled="!isNew">-->
                       <option value="majority">majority vote</option>
-                      <option value="trust" disabled>weighted majority</option>
-                      <option value="first" disabled>first annotation</option>
-                      <option value="last" disabled>last annotation</option>
-                      <option value="??" disabled>sorcery</option>
+                      <!--<option value="trust" disabled>weighted majority</option>-->
+                      <!--<option value="first" disabled>first annotation</option>-->
+                      <!--<option value="last" disabled>last annotation</option>-->
+                      <!--<option value="??" disabled>sorcery</option>-->
                     </select>
                   </div>
                 </div>
@@ -204,11 +221,7 @@
                   <label for="showText-check" class="ms-1">Show text</label>
                 </div>
                 <div class="col text-end">
-                  <button
-                    v-if="loadingProposals"
-                    class="btn btn-primary"
-                    type="button"
-                    disabled>
+                  <button v-if="loadingProposals" class="btn btn-primary" type="button" disabled>
                     <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
                     Loading...
                   </button>
@@ -217,7 +230,8 @@
                     class="btn btn-primary"
                     type="button"
                     @click="fetchProposal"
-                    :disabled="!isConfigValid || !isNew">
+                    :disabled="!isConfigValid || !isNew"
+                  >
                     Load
                   </button>
                 </div>
@@ -227,14 +241,12 @@
         </div>
       </div>
     </div>
-    <div class="row mb-5" v-if="isTableReady">
+    <div class="row mb-5 mt-2" v-if="isTableReady && proposal">
       <div class="table-responsive-sm position-relative">
         <table class="table" style="width: calc(100% - 1rem)">
           <thead class="sticky-top bg-light">
             <tr>
-              <th>
-                #
-              </th>
+              <th>#</th>
               <th>
                 Item
                 <label for="item-id-search" class="d-none">Search</label>
@@ -243,24 +255,32 @@
                   class="form-control form-control-sm"
                   type="text"
                   placeholder="Filter item_id"
-                  v-model="itemIdSearch" />
+                  v-model="itemIdSearch"
+                />
               </th>
-              <th v-for="label in collection.labels" :key="label2string(label)" class="text-end">
-                <div v-for="skey in label.slice().reverse()" :key="skey.key" class="nacsos-tooltip label-pill m-1">
+              <th v-for="label in proposal.labels" :key="label.path_key" class="text-end">
+                <div
+                  v-for="skey in label.path.slice().reverse()"
+                  :key="skey.key"
+                  class="nacsos-tooltip label-pill d-flex flex-nowrap justify-content-end"
+                >
                   <span>{{ skey.key }}</span>
+                  <span v-if="skey.value !== null && skey.value !== undefined" class="text-muted small">
+                    ({{ skey.value }})
+                  </span>
                   <span>{{ skey.repeat }}</span>
                   <div
                     class="nacsos-tooltiptext popover bs-popover-auto show bg-light p-0"
-                    style="position: absolute; right: 0; margin: 0.5rem 0 0 0;"
+                    style="position: absolute; right: 0; margin: 0.5rem 0 0 0"
                     role="tooltip"
-                    data-popper-placement="bottom">
-                    <div
-                      class="popover-arrow"
-                      style="position: absolute; right: 0; transform: translateX(-30px);" />
+                    data-popper-placement="bottom"
+                    v-if="schemeLookup[skey.key]"
+                  >
+                    <div class="popover-arrow" style="position: absolute; right: 0; transform: translateX(-30px)" />
                     <h3 class="popover-header text-dark">{{ schemeLookup[skey.key].name }}</h3>
                     <div class="popover-body">
                       Type: {{ schemeLookup[skey.key].kind }}
-                      <template v-if="hasChoices(schemeLookup[skey.key].choices)">
+                      <template v-if="hasChoices(label.choices)">
                         <ul class="list-unstyled">
                           <li v-for="choice in schemeLookup[skey.key].choices" :key="choice.value">
                             <strong>{{ choice.value }}:</strong> {{ choice.name }}
@@ -274,29 +294,26 @@
             </tr>
           </thead>
           <ResolverRow
-            v-for="(itemId, run) in Object.keys(collection.annotations)"
-            :key="itemId"
-            v-show="itemIdSearch === '' || itemId.indexOf(itemIdSearch) >= 0"
-            :row-idx="run"
-            :item-id="itemId"
-            :row="matrix[itemId]"
-            :label-lookup="labels"
-            :scheme-lookup="schemeLookup"
+            v-for="orderEntry in proposal.ordering"
+            :key="orderEntry.key"
+            v-show="itemIdSearch === '' || orderEntry.item_id.indexOf(itemIdSearch) >= 0"
+            :ordering="orderEntry"
+            :row="proposal.matrix[orderEntry.key]"
             :user-lookup="userLookup"
-            :selected-user-lookup="selectedUserLookup"
+            :users="proposal.annotators"
+            :label-lookup="labels"
+            :labels="proposal.labels"
             :show-text="showText"
+            :bot-annotation-meta-data-id="botAnnotationMetaDataId"
             @bot-annotation-changed="handleChangedBotAnnotation"
-            @request-focus-item="(val) => focusItem = val" />
+            @request-focus-item="(val) => (focusItem = val)"
+          />
         </table>
       </div>
     </div>
-    <div v-if="isTableReady" class="bg-light p-1" style="position: absolute; right: 2rem; bottom: 1rem;">
+    <div v-if="isTableReady" class="bg-light p-1" style="position: absolute; right: 2rem; bottom: 1rem">
       <div class="col">
-        <button
-          @click="save"
-          type="button"
-          class="btn btn-success m-2">Save
-        </button>
+        <button @click="save" type="button" class="btn btn-success m-2">Save</button>
       </div>
     </div>
     <ItemModal :item-id="focusItem" @dismissed="focusItem = undefined" />
@@ -304,75 +321,47 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
-import { currentProjectStore } from '@/stores';
+import { defineComponent } from "vue";
+import { currentProjectStore } from "@/stores";
 import type {
   AnnotationSchemeModel,
-  AnnotationModel,
   FlattenedAnnotationSchemeLabel,
   AssignmentScopeModel,
   BotAnnotationModel,
   AnnotationFilters,
   Label,
   UserModel,
-  AnnotationCollectionDB,
-  AnnotationSchemeLabelChoiceFlat,
-  AnnotationCollection,
-} from '@/plugins/api/api-core';
-import { BotMetaResolve, ResolutionPayload } from '@/plugins/api/api-core';
-import { API } from '@/plugins/api';
-import ItemModal from '@/components/items/ItemModal.vue';
-import ToolTip from '@/components/ToolTip.vue';
-import { EventBus } from '@/plugins/events';
-import { ToastEvent } from '@/plugins/events/events/toast';
-import { ConfirmationRequestEvent } from '@/plugins/events/events/confirmation';
-import ResolverRow from '@/components/annotations/resolve/ResolverRow.vue';
+  ResolutionProposal,
+  FlatLabel,
+  FlatLabelChoice,
+} from "@/plugins/api/api-core";
+import { BotMetaResolve } from "@/plugins/api/api-core";
+import { API } from "@/plugins/api";
+import ItemModal from "@/components/items/ItemModal.vue";
+import ToolTip from "@/components/ToolTip.vue";
+import { EventBus } from "@/plugins/events";
+import { ToastEvent } from "@/plugins/events/events/toast";
+import { ConfirmationRequestEvent } from "@/plugins/events/events/confirmation";
+import ResolverRow from "@/components/annotations/resolve/ResolverRow.vue";
 
-type LookupMatrix = Record<string, Record<string, { users: AnnotationModel[], bot: BotAnnotationModel | undefined }>>;
-type LabelLookupValue = {
-  parentChoice?: number,
-  parentKey?: string,
-  path: Label[],
-  strParent?: string,
-};
-type LabelLookup = Record<string, LabelLookupValue>;
-
-type ResolveData = {
-  botAnnotationMetaDataId: string | undefined,
-  isNew: boolean, // set to true if this is not saved yet
-  name: string,
-  algorithm: BotMetaResolve.algorithm,
-  ignoreHierarchy: boolean,
-  ignoreOrder: boolean,
-  filters: Partial<AnnotationFilters>,
-  schemeFlat: FlattenedAnnotationSchemeLabel[],
-  collection: AnnotationCollectionDB | AnnotationCollection | undefined,
-  botAnnotations: Record<string, Array<[Label[], BotAnnotationModel]>>,
-  // id of item in focus (to be opened in modal)
-  focusItem: string | undefined,
-  // only used for setup (empty when botAnnotationMetaDataId not None)
-  projectAnnotationSchemes: AnnotationSchemeModel[],
-  // assignment scopes linking to filters.scheme_id
-  assignmentScopes: AssignmentScopeModel[],
-  annotators: UserModel[],
-  loadingProposals: boolean,
-  itemIdSearch: string,
-  // timeout-interval handler for auto-saving
-  autoSave: number | undefined,
-  // if this is set to true, the item text is loaded and shown in the table
-  showText: boolean,
-};
+function tabClosePrevent(e: BeforeUnloadEvent) {
+  e.preventDefault();
+  // eslint-disable-next-line no-param-reassign
+  e.returnValue = "";
+}
 
 export default defineComponent({
-  name: 'AnnotationConfigResolveView',
+  name: "AnnotationConfigResolveView",
   components: { ResolverRow, ToolTip, ItemModal },
-  data(): ResolveData {
-    const botAnnotationMetaDataId: string | undefined = this.$route.params.bot_annotation_metadata_id as string | undefined;
+  data() {
+    const botAnnotationMetaDataId: string | undefined = this.$route.params.bot_annotation_metadata_id as
+      | string
+      | undefined;
 
     return {
       botAnnotationMetaDataId,
       isNew: !botAnnotationMetaDataId,
-      name: '',
+      name: "",
       filters: {
         scheme_id: undefined,
         scope_id: [] as string[],
@@ -382,84 +371,88 @@ export default defineComponent({
       } as Partial<AnnotationFilters>,
       algorithm: BotMetaResolve.algorithm.MAJORITY,
       ignoreHierarchy: false,
-      ignoreOrder: false,
-      schemeFlat: [] as FlattenedAnnotationSchemeLabel[],
-      collection: undefined as AnnotationCollectionDB | AnnotationCollection | undefined,
-      botAnnotations: {} as Record<string, Array<[Label[], BotAnnotationModel]>>,
+      ignoreRepeat: false,
       focusItem: undefined as string | undefined,
       projectAnnotationSchemes: [] as AnnotationSchemeModel[],
       assignmentScopes: [] as AssignmentScopeModel[],
       annotators: [] as UserModel[],
       loadingProposals: false,
-      itemIdSearch: '',
-      autoSave: undefined,
+      itemIdSearch: "",
+      autoSave: undefined as undefined | number,
       showText: false,
+      proposal: undefined as ResolutionProposal | undefined,
+      schemeFlat: [] as FlattenedAnnotationSchemeLabel[],
     };
   },
-
+  unmounted() {
+    clearInterval(this.autoSave);
+    window.removeEventListener("beforeunload", tabClosePrevent);
+  },
   mounted() {
     this.fetchProjectSchemas();
 
     this.autoSave = setInterval(() => {
-      EventBus.emit(new ToastEvent('INFO', 'You might want to click save every now and then...'));
-    }, 300000); // called every 5 min
+      EventBus.emit(new ToastEvent("INFO", "You might want to click save every now and then..."));
+    }, 300000) as unknown as number; // called every 5 min
 
     // Prevent browser page reload and tab closure
-    window.addEventListener('beforeunload', (event) => {
-      event.preventDefault();
-      // eslint-disable-next-line no-param-reassign
-      event.returnValue = '';
-    });
+    window.addEventListener("beforeunload", tabClosePrevent);
 
     if (!this.isNew && this.botAnnotationMetaDataId !== undefined) {
-      API.core.annotations.getSavedResolvedAnnotationsApiAnnotationsConfigResolvedBotAnnotationMetaIdGet({
-        botAnnotationMetadataId: this.botAnnotationMetaDataId,
-        xProjectId: currentProjectStore.projectId as string,
-      }).then((response) => {
-        const { data } = response;
-
-        this.name = data.name;
-        this.algorithm = data.meta.algorithm;
-        this.filters = data.meta.filters;
-        this.ignoreOrder = data.meta.ignore_repeat;
-        this.ignoreHierarchy = data.meta.ignore_hierarchy;
-        this.collection = data.meta.collection;
-        this.botAnnotations = data.saved as unknown as Record<string, [Label[], BotAnnotationModel][]>;
-      });
+      API.core.annotations
+        .getSavedResolvedAnnotationsApiAnnotationsConfigResolvedBotAnnotationMetaIdGet({
+          botAnnotationMetadataId: this.botAnnotationMetaDataId,
+          xProjectId: currentProjectStore.projectId as string,
+        })
+        .then((response) => {
+          const { meta, proposal } = response.data;
+          this.name = meta.name;
+          this.algorithm = meta.meta.algorithm;
+          this.filters = meta.meta.filters;
+          this.ignoreRepeat = meta.meta.ignore_repeat;
+          this.ignoreHierarchy = meta.meta.ignore_hierarchy;
+          this.proposal = proposal;
+        });
     }
   },
 
   watch: {
-    'filters.scheme_id': {
+    "filters.scheme_id": {
       handler(schemeId: string) {
         if (schemeId) {
           // fetch `AssignmentScope`s for the current `AnnotationScheme`
-          API.core.annotations.getAssignmentScopesForSchemeApiAnnotationsConfigScopesSchemeIdGet({
-            schemeId,
-            xProjectId: currentProjectStore.projectId as string,
-          }).then((response) => {
-            const { data } = response;
-            this.assignmentScopes = data;
-          });
+          API.core.annotations
+            .getAssignmentScopesForSchemeApiAnnotationsConfigScopesSchemeIdGet({
+              schemeId,
+              xProjectId: currentProjectStore.projectId as string,
+            })
+            .then((response) => {
+              const { data } = response;
+              this.assignmentScopes = data;
+            });
 
           // fetch `Users`s that created annotations linked to the current `AnnotationScheme`
-          API.core.annotations.getAnnotatorsForSchemeApiAnnotationsConfigAnnotatorsSchemeIdGet({
-            schemeId,
-            xProjectId: currentProjectStore.projectId as string,
-          }).then((response) => {
-            const { data } = response;
-            this.annotators = data;
-          });
+          API.core.annotations
+            .getAnnotatorsForSchemeApiAnnotationsConfigAnnotatorsSchemeIdGet({
+              schemeId,
+              xProjectId: currentProjectStore.projectId as string,
+            })
+            .then((response) => {
+              const { data } = response;
+              this.annotators = data;
+            });
 
           // fetch flattened annotation scheme
-          API.core.annotations.getSchemeDefinitionApiAnnotationsSchemesDefinitionAnnotationSchemeIdGet({
-            annotationSchemeId: schemeId,
-            xProjectId: currentProjectStore.projectId as string,
-            flat: true,
-          }).then((response) => {
-            const { data } = response;
-            this.schemeFlat = data.labels as FlattenedAnnotationSchemeLabel[];
-          });
+          API.core.annotations
+            .getSchemeDefinitionApiAnnotationsSchemesDefinitionAnnotationSchemeIdGet({
+              annotationSchemeId: schemeId,
+              xProjectId: currentProjectStore.projectId as string,
+              flat: true,
+            })
+            .then((response) => {
+              const { data } = response;
+              this.schemeFlat = data.labels as FlattenedAnnotationSchemeLabel[];
+            });
         }
       },
       immediate: true,
@@ -467,44 +460,57 @@ export default defineComponent({
   },
 
   methods: {
-    hasChoices(value: AnnotationSchemeLabelChoiceFlat[] | undefined) {
-      return value !== undefined && Array.isArray(value) && value.length > 0;
+    hasChoices(value: FlatLabelChoice[] | undefined | null) {
+      return value !== undefined && value !== null && Array.isArray(value) && value.length > 0;
     },
     fetchProposal() {
       this.loadingProposals = true;
-      API.core.annotations.getResolvedAnnotationsApiAnnotationsConfigResolveGet({
-        strategy: this.algorithm,
-        xProjectId: currentProjectStore.projectId as string,
-        schemeId: this.filters.scheme_id as string,
-        scopeId: (!this.filters.scope_id) ? undefined : [this.filters.scope_id] as string[],
-        userId: (!this.filters.user_id) ? undefined : [this.filters.user_id] as string[],
-        key: (!this.filters.key) ? undefined : [this.filters.key] as string[],
-        repeat: (!this.filters.repeat) ? undefined : [this.filters.repeat] as number[],
-        ignoreHierarchy: this.ignoreHierarchy,
-        ignoreOrder: this.ignoreOrder,
-      }).then((response) => {
-        const { data } = response;
-        this.collection = data.collection;
-        this.botAnnotations = data.proposal as unknown as Record<string, [Label[], BotAnnotationModel][]>;
-        this.loadingProposals = false;
-      }).catch((reason) => {
-        if (reason.error?.detail?.type === 'EmptyAnnotationsError') {
-          EventBus.emit(new ToastEvent('WARN', reason.error?.detail?.message));
-        } else {
-          EventBus.emit(new ToastEvent('ERROR', 'Something failed in the backend. '
-            + 'Please check for potentially implausible configuration or contact a developer.'));
-        }
-        this.loadingProposals = false;
-      });
+      API.core.annotations
+        .getResolvedAnnotationsApiAnnotationsConfigResolvePost({
+          requestBody: {
+            algorithm: this.algorithm,
+            ignore_repeat: this.ignoreRepeat,
+            ignore_hierarchy: this.ignoreHierarchy,
+            filters: {
+              scheme_id: this.filters.scheme_id,
+              scope_id: this.filters.scope_id,
+              user_id: this.filters.user_id,
+              key: this.filters.key,
+              repeat: this.filters.repeat,
+            },
+          },
+          xProjectId: currentProjectStore.projectId as string,
+        })
+        .then((response) => {
+          const { data } = response;
+          this.proposal = data;
+          this.loadingProposals = false;
+        })
+        .catch((reason) => {
+          if (reason.error?.detail?.type === "EmptyAnnotationsError") {
+            EventBus.emit(new ToastEvent("WARN", reason.error?.detail?.message));
+          } else {
+            EventBus.emit(
+              new ToastEvent(
+                "ERROR",
+                "Something failed in the backend. " +
+                  "Please check for potentially implausible configuration or contact a developer.",
+              ),
+            );
+          }
+          this.loadingProposals = false;
+        });
     },
     fetchProjectSchemas() {
-      API.core.annotations.getSchemeDefinitionsForProjectApiAnnotationsSchemesListProjectIdGet({
-        projectId: currentProjectStore.projectId as string,
-        xProjectId: currentProjectStore.projectId as string,
-      }).then((response) => {
-        const { data } = response;
-        this.projectAnnotationSchemes = data;
-      });
+      API.core.annotations
+        .getSchemeDefinitionsForProjectApiAnnotationsSchemesListProjectIdGet({
+          projectId: currentProjectStore.projectId as string,
+          xProjectId: currentProjectStore.projectId as string,
+        })
+        .then((response) => {
+          const { data } = response;
+          this.projectAnnotationSchemes = data;
+        });
     },
     handleChangedBotAnnotation(updatedBotAnnotation: BotAnnotationModel) {
       console.log(updatedBotAnnotation);
@@ -517,50 +523,56 @@ export default defineComponent({
       }
     },
     update() {
-      API.core.annotations.updateResolvedAnnotationsApiAnnotationsConfigResolveUpdatePut({
-        botAnnotationMetadataId: this.botAnnotationMetaDataId as string,
-        name: this.name,
-        xProjectId: currentProjectStore.projectId as string,
-        requestBody: this.flattenBotAnnotations(),
-      });
-    },
-    flattenBotAnnotations(): BotAnnotationModel[] {
-      return (Object.values(this.botAnnotations) as [Label[], BotAnnotationModel][][])
-        .map((itemAnnotations) => (itemAnnotations as [Label[], BotAnnotationModel][])
-          .map(([, annotation]) => annotation)).flat();
+      if (!this.proposal?.matrix) {
+        EventBus.emit(new ToastEvent("WARN", "Nothing to save (yet)!"));
+      } else {
+        API.core.annotations.updateResolvedAnnotationsApiAnnotationsConfigResolveUpdatePut({
+          botAnnotationMetadataId: this.botAnnotationMetaDataId as string,
+          name: this.name,
+          xProjectId: currentProjectStore.projectId as string,
+          requestBody: this.proposal.matrix,
+        });
+      }
     },
     saveNew() {
-      if (!this.collection) {
-        EventBus.emit(new ToastEvent('WARN', 'Nothing to save (yet)!'));
+      if (!this.proposal) {
+        EventBus.emit(new ToastEvent("WARN", "Nothing to save (yet)!"));
         return;
       }
-      const annotatorUserIds: string [] = (this.collection.annotators as UserModel[]).map((user: UserModel) => user.user_id as string);
-      const collection: AnnotationCollectionDB = JSON.parse(JSON.stringify(this.collection));
-      collection.annotators = annotatorUserIds;
-      API.core.annotations.saveResolvedAnnotationsApiAnnotationsConfigResolvePut({
-        xProjectId: currentProjectStore.projectId as string,
-        requestBody: {
+      API.core.annotations
+        .saveResolvedAnnotationsApiAnnotationsConfigResolvePut({
+          xProjectId: currentProjectStore.projectId as string,
           name: this.name,
-          strategy: this.algorithm as unknown as ResolutionPayload.strategy,
-          filters: this.filters as AnnotationFilters,
-          ignore_order: this.ignoreOrder,
-          ignore_hierarchy: this.ignoreHierarchy,
-          collection,
-          bot_annotations: this.flattenBotAnnotations(),
-        },
-      }).then((response) => {
-        const { data } = response;
-        EventBus.emit(new ToastEvent('SUCCESS', `Saved new annotation resolution as ${data}`));
-        this.isNew = false;
-        this.botAnnotationMetaDataId = data;
-        this.$router.replace({ name: 'config-annotation-resolve', params: { bot_annotation_metadata_id: data } });
-      }).catch((reason) => {
-        console.error(reason);
-        EventBus.emit(new ToastEvent('ERROR', 'Failed to save new annotation resolution!'));
-      });
+          requestBody: {
+            settings: {
+              algorithm: this.algorithm,
+              filters: {
+                scheme_id: this.filters.scheme_id,
+                scope_id: this.filters.scope_id,
+                user_id: this.filters.user_id,
+                key: this.filters.key,
+                repeat: this.filters.repeat,
+              },
+              ignore_hierarchy: this.ignoreHierarchy,
+              ignore_repeat: this.ignoreRepeat,
+            },
+            matrix: this.proposal.matrix,
+          },
+        })
+        .then((response) => {
+          const { data } = response;
+          EventBus.emit(new ToastEvent("SUCCESS", `Saved new annotation resolution as ${data}`));
+          this.isNew = false;
+          this.botAnnotationMetaDataId = data;
+          this.$router.replace({ name: "config-annotation-resolve", params: { bot_annotation_metadata_id: data } });
+        })
+        .catch((reason) => {
+          console.error(reason);
+          EventBus.emit(new ToastEvent("ERROR", "Failed to save new annotation resolution!"));
+        });
     },
     label2string(label: Label[]) {
-      return label.map((label_: Label) => `${label_.key}:${label_.repeat}`).join('-');
+      return label.map((label_: Label) => `${label_.key}:${label_.repeat}`).join("-");
     },
   },
   computed: {
@@ -570,117 +582,74 @@ export default defineComponent({
       }
       return Object.fromEntries(this.annotators.map((user: UserModel) => [user.user_id, user]));
     },
-    selectedUserLookup(): Record<string, UserModel> {
-      if (!this.annotators) {
+    labels(): Record<string, FlatLabel> {
+      if (!this.proposal) {
         return {};
       }
-      return Object.fromEntries(
-        this.annotators
-          .map((user: UserModel) => [user.user_id, user])
-          .filter((entry: [string, UserModel]) => (this.filters.user_id ?? []).indexOf(entry[0]) >= 0),
-      );
-    },
-    labels(): LabelLookup {
-      if (!this.collection || !this.collection.labels || Object.keys(this.schemeLookup).length === 0) {
-        return {};
-      }
-      return Object.fromEntries(this.collection.labels.map((label: Label[]) => [this.label2string(label),
-        {
-          path: label,
-          strParent: (label.length > 1) ? this.label2string(label.slice(1)) : undefined,
-          parentChoice: this.schemeLookup[label[0].key]?.parent_choice,
-          parentKey: this.schemeLookup[label[0].key]?.parent_label,
-        }]));
+      return Object.fromEntries(this.proposal.labels.map((label: FlatLabel) => [label.path_key, label]));
     },
     schemeLookup(): Record<string, FlattenedAnnotationSchemeLabel> {
       if (!this.schemeFlat) return {};
       return Object.fromEntries(this.schemeFlat.map((label: FlattenedAnnotationSchemeLabel) => [label.key, label]));
     },
     isTableReady(): boolean {
-      return !!this.collection && this.collection.annotations && Object.keys(this.labels).length > 0;
+      return !!this.proposal;
     },
     isConfigValid(): boolean {
       // returns true if all necessary data is available to request a resolution proposal
       return !!this.filters.scheme_id && (this.filters.key || []).length > 0 && (this.filters.user_id || []).length > 0;
     },
-    matrix(): LookupMatrix {
-      if (!this.collection || !this.collection.annotations) {
-        return {};
-      }
-      const itemIds = Object.keys(this.collection.annotations);
-      const strPaths = Object.keys(this.labels);
-
-      const matrix = Object.fromEntries(itemIds.map((itemId) => [
-        itemId,
-        Object.fromEntries(strPaths.map((strPath) => [
-          strPath,
-          {
-            users: [] as AnnotationModel[],
-            bot: undefined as BotAnnotationModel | undefined,
-          }]))]));
-
-      Object.entries(this.collection.annotations).forEach((entry) => {
-        const [itemId, groupedAnnotations] = entry as [string, Array<[Label[], AnnotationModel[]]>];
-        groupedAnnotations.forEach(([path, annotations]) => {
-          matrix[itemId][this.label2string(path)].users = annotations;
-        });
-      });
-      if (this.botAnnotations) {
-        Object.entries(this.botAnnotations).forEach((entry) => {
-          const [itemId, botAnnotationEntry] = entry as [string, Array<[Label[], BotAnnotationModel]>];
-          botAnnotationEntry.forEach(([path, botAnnotation]) => {
-            const strPath = this.label2string(path);
-            matrix[itemId][strPath].bot = botAnnotation;
-          });
-        });
-      }
-      return matrix;
-    },
   },
   beforeRouteLeave(to, from, next) {
-    EventBus.emit(new ConfirmationRequestEvent(
-      'You will loose data if you have not clicked "save".',
-      (confirmationResponse) => {
-        if (confirmationResponse === 'ACCEPT') {
-          clearInterval(this.autoSave);
-          next(true);
-        } else {
-          next(false);
-        }
-      },
-      'Do you really want to leave?',
-      'I understand.',
-      'Oh right, stop, let me save first.',
-    ));
+    EventBus.emit(
+      new ConfirmationRequestEvent(
+        'You will loose data if you have not clicked "save".',
+        (confirmationResponse) => {
+          if (confirmationResponse === "ACCEPT") {
+            clearInterval(this.autoSave);
+            next(true);
+          } else {
+            next(false);
+          }
+        },
+        "Do you really want to leave?",
+        "I understand.",
+        "Oh right, stop, let me save first.",
+      ),
+    );
   },
 });
 </script>
 
 <style scoped>
 .label-pill {
-  display: block !important;
+  /*display: block !important;*/
 }
 
-.label-pill span {
-  border-radius: var(--bs-border-radius-pill);
-  border: 1px solid var(--bs-gray-500);
+.label-pill > span {
   font-weight: normal;
-  /*font-size: var(--bs-badge-font-size);*/
-  font-size: 0.75em;
-  /*padding:  var(--bs-badge-padding-y) var(--bs-badge-padding-x);*/
-  padding: .35em .65em;
+  font-size: 0.7em;
+  border-top: 1px solid var(--bs-gray-500);
+  border-bottom: 1px solid var(--bs-gray-500);
+  padding-top: 0.2em;
+  padding-bottom: 0.2em;
 }
 
-.label-pill span:first-child {
-  border-top-right-radius: 0;
-  border-bottom-right-radius: 0;
+.label-pill > span:first-child {
+  border: 1px solid var(--bs-gray-500);
+  border-right: 0;
+  border-top-left-radius: var(--bs-border-radius-pill);
+  border-bottom-left-radius: var(--bs-border-radius-pill);
+  padding-left: 0.5em;
+  padding-right: 0.1em;
 }
 
-.label-pill span:last-of-type {
-  border-top-left-radius: 0;
-  border-bottom-left-radius: 0;
-  border-left: 0;
+.label-pill > span:last-of-type {
+  border: 1px solid var(--bs-gray-500);
+  border-top-right-radius: var(--bs-border-radius-pill);
+  border-bottom-right-radius: var(--bs-border-radius-pill);
   background-color: var(--bs-gray-300);
+  padding-left: 0.2em;
+  padding-right: 0.5em;
 }
-
 </style>

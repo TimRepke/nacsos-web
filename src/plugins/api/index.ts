@@ -1,6 +1,6 @@
-import type { App } from 'vue';
-import { CoreClient } from './api-core';
-import { PipelinesClient } from './api-pipe';
+import type { App } from "vue";
+import { CoreClient } from "./api-core";
+import { PipelinesClient } from "./api-pipe";
 
 const API = {
   pipe: new PipelinesClient({
@@ -18,5 +18,5 @@ export default {
   },
 };
 export { API };
-export type { ApiResponse, ApiResponseReject, ErrorDetails, ErrorLevel } from '@/plugins/api/core/CancelablePromise';
-export { ignore, toastReject, logReject } from '@/plugins/api/core/CancelablePromise';
+export type { ApiResponse, ApiResponseReject, ErrorDetails, ErrorLevel } from "@/plugins/api/core/CancelablePromise";
+export { ignore, toastReject, logReject } from "@/plugins/api/core/CancelablePromise";

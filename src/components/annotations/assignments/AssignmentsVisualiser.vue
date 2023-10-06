@@ -1,14 +1,11 @@
 <template>
   <div>
-    <div class="table-responsive ">
+    <div class="table-responsive">
       <table class="table table-bordered">
         <tbody>
           <tr v-for="username in usernames" :key="username">
             <th>{{ username }}</th>
-            <td
-              v-for="itemId in itemIds"
-              :key="itemId"
-              :class="getBackgroundColourClass(username, itemId)">
+            <td v-for="itemId in itemIds" :key="itemId" :class="getBackgroundColourClass(username, itemId)">
               <!--{{ this.tryGetAssignment(userId, itemId)?.status }}-->
             </td>
           </tr>
@@ -19,14 +16,13 @@
 </template>
 
 <script lang="ts">
+import { defineComponent } from "vue";
+import type { PropType } from "vue";
+import type { AssignmentInfo, AssignmentScopeEntry } from "@/plugins/api/api-core";
 
-import { defineComponent } from 'vue';
-import type { PropType } from 'vue';
-import type { AssignmentInfo, AssignmentScopeEntry } from '@/plugins/api/api-core';
-
-type User = { user_id: string, username: string };
+type User = { user_id: string; username: string };
 export default defineComponent({
-  name: 'AssignmentsVisualiser',
+  name: "AssignmentsVisualiser",
   props: {
     assignmentEntries: {
       type: Object as PropType<AssignmentScopeEntry[]>,
@@ -38,52 +34,53 @@ export default defineComponent({
   },
   computed: {
     users(): Array<User> {
-      return [...new Set(
-        this.assignmentEntries
-          .flatMap(
-            (entry: AssignmentScopeEntry) => entry.assignments
-              .map((assignment: AssignmentInfo) => ({
-                user_id: assignment.user_id,
-                username: assignment.username,
-              })),
+      return [
+        ...new Set(
+          this.assignmentEntries.flatMap((entry: AssignmentScopeEntry) =>
+            entry.assignments.map((assignment: AssignmentInfo) => ({
+              user_id: assignment.user_id,
+              username: assignment.username,
+            })),
           ),
-      )] as User[];
+        ),
+      ] as User[];
     },
     usernames(): Array<string> {
-      return [...new Set(
-        this.assignmentEntries
-          .flatMap(
-            (entry: AssignmentScopeEntry) => entry.assignments
-              .map((assignment: AssignmentInfo) => assignment.username),
+      return [
+        ...new Set(
+          this.assignmentEntries.flatMap((entry: AssignmentScopeEntry) =>
+            entry.assignments.map((assignment: AssignmentInfo) => assignment.username),
           ),
-      )] as string[];
+        ),
+      ] as string[];
     },
     itemIds(): Array<string> {
       return [...new Set(this.assignmentEntries.map((entry: AssignmentScopeEntry) => entry.item_id))] as string[];
     },
     lookup() {
-      return Object.fromEntries(this.assignmentEntries.map((entry: AssignmentScopeEntry) => [
-        entry.item_id,
-        {
-          ...entry,
-          assignments: Object.fromEntries(entry.assignments.map((assignment: AssignmentInfo) => [
-            assignment.username,
-            assignment,
-          ])),
-        },
-      ]));
+      return Object.fromEntries(
+        this.assignmentEntries.map((entry: AssignmentScopeEntry) => [
+          entry.item_id,
+          {
+            ...entry,
+            assignments: Object.fromEntries(
+              entry.assignments.map((assignment: AssignmentInfo) => [assignment.username, assignment]),
+            ),
+          },
+        ]),
+      );
     },
   },
   methods: {
     getBackgroundColourClass(username: string, itemId: string): string[] {
       const assignment = this.lookup[itemId].assignments[username];
       switch (assignment?.status) {
-        case 'OPEN':
-          return ['table-info'];
-        case 'PARTIAL':
-          return ['table-warning'];
-        case 'FULL':
-          return ['table-success'];
+        case "OPEN":
+          return ["table-info"];
+        case "PARTIAL":
+          return ["table-warning"];
+        case "FULL":
+          return ["table-success"];
         default:
           return [];
       }
@@ -92,6 +89,4 @@ export default defineComponent({
 });
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

@@ -1,8 +1,7 @@
-import type { AxiosResponse } from 'axios';
-import type { ApiRequestOptions } from './ApiRequestOptions';
-import type { ApiResult } from './ApiResult';
+import type { AxiosResponse } from "axios";
+import type { ApiRequestOptions } from "./ApiRequestOptions";
+import type { ApiResult } from "./ApiResult";
 
-// eslint-disable-next-line import/prefer-default-export
 export class ApiError extends Error {
   public readonly url: string;
 
@@ -12,6 +11,7 @@ export class ApiError extends Error {
 
   public readonly statusText: string;
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   public readonly body: any;
 
   public readonly response: AxiosResponse;
@@ -21,7 +21,7 @@ export class ApiError extends Error {
   constructor(request: ApiRequestOptions, response: ApiResult, message: string) {
     super(message);
 
-    this.name = 'ApiError';
+    this.name = "ApiError";
     this.ok = response.ok;
     this.url = response.url;
     this.status = response.status;

@@ -10,13 +10,14 @@ import type { AssignmentModel } from '../models/AssignmentModel';
 import type { AssignmentScopeEntry } from '../models/AssignmentScopeEntry';
 import type { AssignmentScopeModel } from '../models/AssignmentScopeModel';
 import type { AssignmentStatus } from '../models/AssignmentStatus';
+import type { Body_save_resolved_annotations_api_annotations_config_resolve__put } from '../models/Body_save_resolved_annotations_api_annotations_config_resolve__put';
 import type { BotAnnotationMetaDataBaseModel } from '../models/BotAnnotationMetaDataBaseModel';
-import type { BotAnnotationModel } from '../models/BotAnnotationModel';
+import type { BotMetaResolveBase } from '../models/BotMetaResolveBase';
 import type { ItemWithCount } from '../models/ItemWithCount';
 import type { MakeAssignmentsRequestModel } from '../models/MakeAssignmentsRequestModel';
-import type { ResolutionPayload } from '../models/ResolutionPayload';
-import type { ResolutionProposalResponse } from '../models/ResolutionProposalResponse';
-import type { SavedResolutionResponse } from '../models/SavedResolutionResponse';
+import type { ResolutionCell } from '../models/ResolutionCell';
+import type { ResolutionProposal } from '../models/ResolutionProposal';
+import type { SavedResolution } from '../models/SavedResolution';
 import type { UserModel } from '../models/UserModel';
 import type { UserProjectAssignmentScope } from '../models/UserProjectAssignmentScope';
 
@@ -653,61 +654,46 @@ export class AnnotationsService {
   /**
    * Get Resolved Annotations
    * Get all annotations that match the filters (e.g. all annotations made by users in scope with :scope_id).
-   * Annotations are returned in a 3D matrix:
-   * rows (dict entries): items (key: item_id)
-   * columns (list index of dict entry): Label (key in scheme + repeat); index map in matrix.keys
-   * cells: list of annotations by each user for item/Label combination
    *
-   * :param strategy
-   * :param scheme_id:
-   * :param scope_id:
-   * :param user_id:
-   * :param key:
-   * :param repeat:
+   * :param include_new:
+   * :param update_existing:
+   * :param existing_resolution:
+   * :param include_empty:
+   * :param settings
    * :param permissions:
-   * :param ignore_order:
-   * :param ignore_hierarchy:
    * :return:
-   * @returns ResolutionProposalResponse Successful Response
+   * @returns ResolutionProposal Successful Response
    * @throws ApiError
    */
-  public getResolvedAnnotationsApiAnnotationsConfigResolveGet({
-    strategy,
-    schemeId,
+  public getResolvedAnnotationsApiAnnotationsConfigResolvePost({
     xProjectId,
-    scopeId,
-    userId,
-    key,
-    repeat,
-    ignoreOrder,
-    ignoreHierarchy,
+    requestBody,
+    includeEmpty,
+    existingResolution,
+    includeNew,
+    updateExisting,
   }: {
-    strategy: 'majority' | 'first' | 'last' | 'trust',
-    schemeId: string,
     xProjectId: string,
-    scopeId?: (Array<string> | null),
-    userId?: (Array<string> | null),
-    key?: (Array<string> | null),
-    repeat?: (Array<number> | null),
-    ignoreOrder?: (boolean | null),
-    ignoreHierarchy?: (boolean | null),
-  }, options?: Partial<ApiRequestOptions>): CancelablePromise<ResolutionProposalResponse> {
+    requestBody: BotMetaResolveBase,
+    includeEmpty?: (boolean | null),
+    existingResolution?: (string | null),
+    includeNew?: (boolean | null),
+    updateExisting?: (boolean | null),
+  }, options?: Partial<ApiRequestOptions>): CancelablePromise<ResolutionProposal> {
     return this.httpRequest.request({
-      method: 'GET',
+      method: 'POST',
       url: '/api/annotations/config/resolve/',
       headers: {
         'x-project-id': xProjectId,
       },
       query: {
-        'strategy': strategy,
-        'scheme_id': schemeId,
-        'scope_id': scopeId,
-        'user_id': userId,
-        'key': key,
-        'repeat': repeat,
-        'ignore_order': ignoreOrder,
-        'ignore_hierarchy': ignoreHierarchy,
+        'include_empty': includeEmpty,
+        'existing_resolution': existingResolution,
+        'include_new': includeNew,
+        'update_existing': updateExisting,
       },
+      body: requestBody,
+      mediaType: 'application/json',
       errors: {
         422: `Validation Error`,
       },
@@ -721,11 +707,13 @@ export class AnnotationsService {
    * @throws ApiError
    */
   public saveResolvedAnnotationsApiAnnotationsConfigResolvePut({
+    name,
     xProjectId,
     requestBody,
   }: {
+    name: string,
     xProjectId: string,
-    requestBody: ResolutionPayload,
+    requestBody: Body_save_resolved_annotations_api_annotations_config_resolve__put,
   }, options?: Partial<ApiRequestOptions>): CancelablePromise<string> {
     return this.httpRequest.request({
       method: 'PUT',
@@ -733,39 +721,7 @@ export class AnnotationsService {
       headers: {
         'x-project-id': xProjectId,
       },
-      body: requestBody,
-      mediaType: 'application/json',
-      errors: {
-        422: `Validation Error`,
-      },
-      ...options,
-    });
-  }
-
-  /**
-   * Update Resolved Annotations
-   * @returns any Successful Response
-   * @throws ApiError
-   */
-  public updateResolvedAnnotationsApiAnnotationsConfigResolveUpdatePut({
-    botAnnotationMetadataId,
-    name,
-    xProjectId,
-    requestBody,
-  }: {
-    botAnnotationMetadataId: string,
-    name: string,
-    xProjectId: string,
-    requestBody: Array<BotAnnotationModel>,
-  }, options?: Partial<ApiRequestOptions>): CancelablePromise<any> {
-    return this.httpRequest.request({
-      method: 'PUT',
-      url: '/api/annotations/config/resolve/update',
-      headers: {
-        'x-project-id': xProjectId,
-      },
       query: {
-        'bot_annotation_metadata_id': botAnnotationMetadataId,
         'name': name,
       },
       body: requestBody,
@@ -778,31 +734,8 @@ export class AnnotationsService {
   }
 
   /**
-   * List Saved Resolved Annotations
-   * @returns BotAnnotationMetaDataBaseModel Successful Response
-   * @throws ApiError
-   */
-  public listSavedResolvedAnnotationsApiAnnotationsConfigResolvedListGet({
-    xProjectId,
-  }: {
-    xProjectId: string,
-  }, options?: Partial<ApiRequestOptions>): CancelablePromise<Array<BotAnnotationMetaDataBaseModel>> {
-    return this.httpRequest.request({
-      method: 'GET',
-      url: '/api/annotations/config/resolved-list/',
-      headers: {
-        'x-project-id': xProjectId,
-      },
-      errors: {
-        422: `Validation Error`,
-      },
-      ...options,
-    });
-  }
-
-  /**
    * Get Saved Resolved Annotations
-   * @returns SavedResolutionResponse Successful Response
+   * @returns SavedResolution Successful Response
    * @throws ApiError
    */
   public getSavedResolvedAnnotationsApiAnnotationsConfigResolvedBotAnnotationMetaIdGet({
@@ -811,7 +744,7 @@ export class AnnotationsService {
   }: {
     botAnnotationMetadataId: string,
     xProjectId: string,
-  }, options?: Partial<ApiRequestOptions>): CancelablePromise<SavedResolutionResponse> {
+  }, options?: Partial<ApiRequestOptions>): CancelablePromise<SavedResolution> {
     return this.httpRequest.request({
       method: 'GET',
       url: '/api/annotations/config/resolved/{bot_annotation_meta_id}',
@@ -848,6 +781,64 @@ export class AnnotationsService {
       },
       query: {
         'bot_annotation_metadata_id': botAnnotationMetadataId,
+      },
+      errors: {
+        422: `Validation Error`,
+      },
+      ...options,
+    });
+  }
+
+  /**
+   * Update Resolved Annotations
+   * @returns any Successful Response
+   * @throws ApiError
+   */
+  public updateResolvedAnnotationsApiAnnotationsConfigResolveUpdatePut({
+    botAnnotationMetadataId,
+    name,
+    xProjectId,
+    requestBody,
+  }: {
+    botAnnotationMetadataId: string,
+    name: string,
+    xProjectId: string,
+    requestBody: Record<string, Record<string, ResolutionCell>>,
+  }, options?: Partial<ApiRequestOptions>): CancelablePromise<any> {
+    return this.httpRequest.request({
+      method: 'PUT',
+      url: '/api/annotations/config/resolve/update',
+      headers: {
+        'x-project-id': xProjectId,
+      },
+      query: {
+        'bot_annotation_metadata_id': botAnnotationMetadataId,
+        'name': name,
+      },
+      body: requestBody,
+      mediaType: 'application/json',
+      errors: {
+        422: `Validation Error`,
+      },
+      ...options,
+    });
+  }
+
+  /**
+   * List Saved Resolved Annotations
+   * @returns BotAnnotationMetaDataBaseModel Successful Response
+   * @throws ApiError
+   */
+  public listSavedResolvedAnnotationsApiAnnotationsConfigResolvedListGet({
+    xProjectId,
+  }: {
+    xProjectId: string,
+  }, options?: Partial<ApiRequestOptions>): CancelablePromise<Array<BotAnnotationMetaDataBaseModel>> {
+    return this.httpRequest.request({
+      method: 'GET',
+      url: '/api/annotations/config/resolved-list/',
+      headers: {
+        'x-project-id': xProjectId,
       },
       errors: {
         422: `Validation Error`,

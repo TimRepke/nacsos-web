@@ -1,12 +1,12 @@
 /* eslint-disable max-classes-per-file, no-underscore-dangle, lines-between-class-members */
-import type { AxiosResponse } from 'axios';
-import { EventBus } from '@/plugins/events';
-import { ToastEvent } from '@/plugins/events/events/toast';
+import type { AxiosResponse } from "axios";
+import { EventBus } from "@/plugins/events";
+import { ToastEvent } from "@/plugins/events/events/toast";
 
 export class CancelError extends Error {
   constructor(message: string) {
     super(message);
-    this.name = 'CancelError';
+    this.name = "CancelError";
   }
 
   public get isCancelled(): boolean {
@@ -23,8 +23,8 @@ export interface OnCancel {
 }
 
 export enum ErrorLevel {
-  WARNING = 'WARNING',
-  ERROR = 'ERROR',
+  WARNING = "WARNING",
+  ERROR = "ERROR",
 }
 
 export type ErrorDetails = {
@@ -46,10 +46,14 @@ export type ApiResponseReject = ApiResponseBase & { error: ErrorDetails };
 
 export function ignore() {}
 
-export function logReject(reason: ApiResponseReject) { console.error(reason); }
+export function logReject(reason: ApiResponseReject) {
+  console.error(reason);
+}
 
 export function toastReject(reason: ApiResponseReject) {
-  EventBus.emit(new ToastEvent('WARN', `Request failed ${reason.status} ${reason.error.type}(${reason.error.message})`));
+  EventBus.emit(
+    new ToastEvent("WARN", `Request failed ${reason.status} ${reason.error.type}(${reason.error.message})`),
+  );
 }
 
 export class CancelablePromise<T> implements Promise<ApiResponse<T>> {
@@ -73,7 +77,7 @@ export class CancelablePromise<T> implements Promise<ApiResponse<T>> {
     executor: (
       resolve: (value: ApiResponse<T> | PromiseLike<ApiResponse<T>>) => void,
       reject: (reason?: ApiResponseReject) => void,
-      onCancel: OnCancel
+      onCancel: OnCancel,
     ) => void,
   ) {
     this._isResolved = false;
@@ -107,15 +111,15 @@ export class CancelablePromise<T> implements Promise<ApiResponse<T>> {
         this._cancelHandlers.push(cancelHandler);
       };
 
-      Object.defineProperty(onCancel, 'isResolved', {
+      Object.defineProperty(onCancel, "isResolved", {
         get: (): boolean => this._isResolved,
       });
 
-      Object.defineProperty(onCancel, 'isRejected', {
+      Object.defineProperty(onCancel, "isRejected", {
         get: (): boolean => this._isRejected,
       });
 
-      Object.defineProperty(onCancel, 'isCancelled', {
+      Object.defineProperty(onCancel, "isCancelled", {
         get: (): boolean => this._isCancelled,
       });
 
@@ -153,19 +157,20 @@ export class CancelablePromise<T> implements Promise<ApiResponse<T>> {
           cancelHandler();
         }
       } catch (error) {
-        console.warn('Cancellation threw an error', error);
+        console.warn("Cancellation threw an error", error);
         return;
       }
     }
     this._cancelHandlers.length = 0;
-    this._reject?.({ // new CancelError('Request aborted')
+    this._reject?.({
+      // new CancelError('Request aborted')
       ok: false,
       status: -1,
       response: undefined,
       error: {
         level: ErrorLevel.WARNING,
-        message: 'Request aborted',
-        type: 'CancelError',
+        message: "Request aborted",
+        type: "CancelError",
       },
     });
   }

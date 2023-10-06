@@ -1,42 +1,66 @@
 /* eslint-env node */
-require('@rushstack/eslint-patch/modern-module-resolution');
+require("@rushstack/eslint-patch/modern-module-resolution");
 
 module.exports = {
   root: true,
-  ignorePatterns: ['src/util/filesaver.js'],
+  ignorePatterns: ["src/util/filesaver.js"],
   extends: [
-    'plugin:vue/vue3-essential',
-    'eslint:recommended',
-    '@vue/eslint-config-typescript',
-    '@vue/eslint-config-airbnb-with-typescript',
+    "plugin:vue/vue3-essential",
+    "@vue/eslint-config-typescript/recommended",
+    "@vue/eslint-config-prettier",
+    // "plugin:vue/vue3-essential",
+    // "eslint:recommended",
+    // "@vue/eslint-config-typescript",
+    // "@vue/eslint-config-airbnb-with-typescript",
   ],
   parserOptions: {
-    ecmaVersion: 'latest',
+    ecmaVersion: "latest",
   },
   rules: {
-    'no-console': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
-    'no-debugger': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
-    'vue/max-len': ['error', { // maximum length of lines
-      code: 140,
-      ignorePattern: '(d|style)="[^"]*"', // do this to ignore long lines for svg paths and long styles
-      ignoreStrings: true,
-      ignoreTrailingComments: true, // allow comments to be longer than max. line length
-    }],
-    'vuejs-accessibility/label-has-for': ['error', {
-      required: {
-        some: ['nesting', 'id'],
+    "no-console": process.env.NODE_ENV === "production" ? "warn" : "off",
+    "no-debugger": process.env.NODE_ENV === "production" ? "warn" : "off",
+    "vue/max-len": [
+      "error",
+      {
+        // maximum length of lines
+        code: 140,
+        ignorePattern: '(d|style)="[^"]*"', // do this to ignore long lines for svg paths and long styles
+        ignoreStrings: true,
+        ignoreTrailingComments: true, // allow comments to be longer than max. line length
       },
-      allowChildren: false,
-    }],
-    'object-curly-newline': ['error', {
-      ObjectPattern: 'never',
-    }],
-    'class-methods-use-this': 'off',
-    'prefer-promise-reject-errors': 'off',
-    'vuejs-accessibility/click-events-have-key-events': 'off',
-    'vue/no-mutating-props': 'off',
-    'consistent-return': ['error', {
-      treatUndefinedAsUnspecified: false,
-    }],
+    ],
+    // "vuejs-accessibility/label-has-for": ["error", {
+    //   required: {
+    //     some: ["nesting", "id"],
+    //   },
+    //   allowChildren: false,
+    // }],
+    "object-curly-newline": [
+      "error",
+      {
+        ObjectPattern: "never",
+      },
+    ],
+    "class-methods-use-this": "off",
+    "prefer-promise-reject-errors": "off",
+    "vuejs-accessibility/click-events-have-key-events": "off",
+    "vue/no-mutating-props": "off",
+    "operator-linebreak": [
+      "error",
+      "after", // this is horrible, but prettier is refused to do before
+      {
+        overrides: {
+          "?": "before",
+          ":": "before",
+        },
+      },
+    ],
+    "consistent-return": [
+      "error",
+      {
+        treatUndefinedAsUnspecified: false,
+      },
+    ],
+    "@typescript-eslint/ban-ts-comment": "off",
   },
 };

@@ -4,7 +4,6 @@
       <h2>Pipeline setup</h2>
     </div>
     <div class="row g-2">
-
       <!-- Library Explorer -->
       <div class="col-4">
         <div class="card">
@@ -14,14 +13,16 @@
               type="button"
               class="btn ms-auto small text-muted"
               :icon="['fas', 'rotate-right']"
-              @click="reloadLibrary" />
+              @click="reloadLibrary"
+            />
           </div>
           <div class="card-body p-0 pt-2">
             <NestedExpandableComponent
               :tree="nestedLibrary"
               class="border-start-0"
               @showInfo="highlight = $event"
-              @useFunc="addTask($event)" />
+              @useFunc="addTask($event)"
+            />
           </div>
         </div>
       </div>
@@ -41,13 +42,13 @@
                 class="mb-2"
                 ref="taskConfigs"
                 @showInfo="highlight = $event"
-                @pickArtefactReference="pickReference($event)" />
+                @pickArtefactReference="pickReference($event)"
+              />
             </template>
           </div>
         </div>
       </div>
       <!-- /Config Pane -->
-
     </div>
 
     <!-- FunctionInfo Card -->
@@ -63,25 +64,31 @@
                 class="btn-close"
                 data-bs-dismiss="modal"
                 aria-label="Close"
-                @click="highlight = undefined" />
+                @click="highlight = undefined"
+              />
             </div>
             <div class="modal-body text-start">
               <div class="d-flex flex-row flex-wrap" style="gap: 2rem">
                 <ul class="list-unstyled small text-muted m-0">
-                  <li>{{ highlight.module }}.<strong>{{ highlight.function }}(&sdot;)</strong></li>
-                  <li><strong>Parameters:</strong>
+                  <li>
+                    {{ highlight.module }}.<strong>{{ highlight.function }}(&sdot;)</strong>
+                  </li>
+                  <li>
+                    <strong>Parameters:</strong>
                     <ul class="list-unstyled ms-2">
                       <li v-for="(tp, arg) in highlight.kwargs" :key="arg">
-                        <code><strong>{{ arg }}:</strong><span v-if="tp.optional !== true">*</span>
-                          {{ $util.type2str(tp) }}</code>
+                        <code
+                          ><strong>{{ arg }}:</strong><span v-if="tp.optional !== true">*</span>
+                          {{ $util.type2str(tp) }}</code
+                        >
                       </li>
                     </ul>
                   </li>
                   <li><strong>Location:</strong> {{ highlight.filepath_rel }}</li>
-                  <li v-if="highlight.tags"><strong>Tags:</strong> {{ highlight.tags.join(', ') }}</li>
+                  <li v-if="highlight.tags"><strong>Tags:</strong> {{ highlight.tags.join(", ") }}</li>
                   <li><strong>CPU load:</strong> {{ highlight.est_cpu_load }}</li>
-                  <li v-if="highlight.recommended_lifetime"><strong>Artefact lifetime:</strong>
-                    {{ highlight.recommended_lifetime }} days
+                  <li v-if="highlight.recommended_lifetime">
+                    <strong>Artefact lifetime:</strong> {{ highlight.recommended_lifetime }} days
                   </li>
                   <li v-if="!$util.isEmpty(highlight.artefacts)">
                     <strong>Produced artefacts:</strong>
@@ -119,21 +126,23 @@
                 class="btn-close"
                 data-bs-dismiss="modal"
                 aria-label="Close"
-                @click="resolveReferenceQuery(false)" />
+                @click="resolveReferenceQuery(false)"
+              />
             </div>
             <div class="modal-body text-start">
               <font-awesome-icon
                 type="button"
                 class="btn ms-auto small text-muted"
                 :icon="['fas', 'rotate-right']"
-                @click="loadQueuedTasks" />
+                @click="loadQueuedTasks"
+              />
               <ul class="list-group">
-
                 <!-- List of tasks currently configured -->
                 <li
                   class="list-group-item list-group-item-warning"
                   v-for="config in configs"
-                  :key="config.task.task_id">
+                  :key="config.task.task_id"
+                >
                   <strong>{{ config.task.task_id }}</strong> {{ config.info.name }}
                   <code>{{ config.info.function }}(&sdot;)</code><br />
                   <button
@@ -141,16 +150,14 @@
                     class="btn btn-outline-secondary btn-sm"
                     v-for="(atype, art) in config.info.artefacts"
                     :key="art"
-                    @click="selectReference(config.task.task_id, art)">
+                    @click="selectReference(config.task.task_id, art)"
+                  >
                     <strong>{{ art }}:</strong> <code>Artefact[{{ atype.serializer }}, {{ atype.dtype }}]</code>
                   </button>
                 </li>
 
                 <!-- List of tasks in the DB -->
-                <li
-                  class="list-group-item list-group-item-info"
-                  v-for="task in queuedTasks"
-                  :key="task.task_id">
+                <li class="list-group-item list-group-item-info" v-for="task in queuedTasks" :key="task.task_id">
                   <strong>{{ task.task_id }}</strong>
                   <code>{{ task.function_name }}(&sdot;)</code><br />
                   {{ task.comment }}
@@ -159,15 +166,16 @@
                     class="btn btn-outline-secondary btn-sm"
                     v-for="(atype, art) in getInfoByName(task.function_name)?.artefacts"
                     :key="art"
-                    @click="selectReference(task.task_id, art)">
+                    @click="selectReference(task.task_id, art)"
+                  >
                     <strong>{{ art }}:</strong> <code>Artefact[{{ atype.serializer }}, {{ atype.dtype }}]</code>
                   </button>
                 </li>
               </ul>
               <h5 class="mt-2">Selected:</h5>
               <ul class="list-unstyled">
-                <li><strong>Task:</strong> {{ artefactQueryReference?.task_id || '[REF?]' }}</li>
-                <li><strong>Artefact:</strong> {{ artefactQueryReference?.artefact || '[REF?]' }}</li>
+                <li><strong>Task:</strong> {{ artefactQueryReference?.task_id || "[REF?]" }}</li>
+                <li><strong>Artefact:</strong> {{ artefactQueryReference?.artefact || "[REF?]" }}</li>
               </ul>
               <div class="d-flex justify-content-end">
                 <button type="button" class="btn btn-outline-secondary m-2" @click="resolveReferenceQuery(false)">
@@ -186,20 +194,20 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
-import { marked } from 'marked';
-import { EventBus } from '@/plugins/events';
-import { ToastEvent } from '@/plugins/events/events/toast';
-import NestedExpandableComponent from '@/components/pipelines/NestedExpandableComponent.vue';
-import TaskConfigComponent from '@/components/pipelines/TaskConfig.vue';
-import { ConfirmationRequestEvent } from '@/plugins/events/events/confirmation';
-import { currentProjectStore, currentUserStore } from '@/stores';
-import { API, toastReject } from '@/plugins/api';
-import type { FunctionInfo, SerializedArtefact, TaskModel, SerializedArtefactReference } from '@/plugins/api/api-pipe';
-import type { ArtefactCallback, TaskConfig, NestedLibrary } from '@/types/pipelines.d';
+import { defineComponent } from "vue";
+import { marked } from "marked";
+import { EventBus } from "@/plugins/events";
+import { ToastEvent } from "@/plugins/events/events/toast";
+import NestedExpandableComponent from "@/components/pipelines/NestedExpandableComponent.vue";
+import TaskConfigComponent from "@/components/pipelines/TaskConfig.vue";
+import { ConfirmationRequestEvent } from "@/plugins/events/events/confirmation";
+import { currentProjectStore, currentUserStore } from "@/stores";
+import { API, toastReject } from "@/plugins/api";
+import type { FunctionInfo, SerializedArtefact, TaskModel, SerializedArtefactReference } from "@/plugins/api/api-pipe";
+import type { ArtefactCallback, TaskConfig, NestedLibrary } from "@/types/pipelines.d";
 
 export default defineComponent({
-  name: 'PipelinesSetupView',
+  name: "PipelinesSetupView",
   components: { TaskConfigComponent, NestedExpandableComponent },
   data() {
     return {
@@ -213,8 +221,11 @@ export default defineComponent({
     };
   },
   async mounted() {
-    API.pipe.library.getFullLibraryApiLibraryListGet()
-      .then((response) => { this.library = response.data; })
+    API.pipe.library
+      .getFullLibraryApiLibraryListGet()
+      .then((response) => {
+        this.library = response.data;
+      })
       .catch(toastReject);
   },
   methods: {
@@ -222,7 +233,7 @@ export default defineComponent({
       try {
         const numFunctions = (await API.pipe.library.reloadLibraryApiLibraryRefreshPatch()).data;
         this.library = (await API.pipe.library.getFullLibraryApiLibraryListGet()).data;
-        EventBus.emit(new ToastEvent('INFO', `Reload of library done, found ${numFunctions} functions.`));
+        EventBus.emit(new ToastEvent("INFO", `Reload of library done, found ${numFunctions} functions.`));
       } catch (e) {
         console.error(e);
       }
@@ -233,10 +244,13 @@ export default defineComponent({
     async loadQueuedTasks() {
       // TODO: Add type matching -> Only show tasks where an output artefact matches the type of the param artefact type
       // FIXME: Add some filters? Ideally configurable in the interface (only this project, only current user).
-      API.pipe.queue.searchTasksApiQueueSearchGet({
-        xProjectId: currentProjectStore.projectId as string,
-      })
-        .then((response) => { this.queuedTasks = response.data; })
+      API.pipe.queue
+        .searchTasksApiQueueSearchGet({
+          xProjectId: currentProjectStore.projectId as string,
+        })
+        .then((response) => {
+          this.queuedTasks = response.data;
+        })
         .catch(toastReject);
     },
     pickReference(query: [SerializedArtefact, SerializedArtefactReference]) {
@@ -284,39 +298,45 @@ export default defineComponent({
     submitTasks() {
       // TODO check that all non-optional parameters are filled
       // TODO hide submit button otherwise (and if this.configs.length === 0)
-      EventBus.emit(new ConfirmationRequestEvent(
-        'This will submit all the tasks configured in this view to the compute pipeline. '
-        + 'Please only proceed if you know exactly what you are doing!\n\n'
-        + 'Cancellation of tasks is currently not implemented, so proceeding is extra-dangerous.',
-        (confirmationResponse) => {
-          if (confirmationResponse === 'ACCEPT') {
-            // TODO implement
+      EventBus.emit(
+        new ConfirmationRequestEvent(
+          "This will submit all the tasks configured in this view to the compute pipeline. " +
+            "Please only proceed if you know exactly what you are doing!\n\n" +
+            "Cancellation of tasks is currently not implemented, so proceeding is extra-dangerous.",
+          (confirmationResponse) => {
+            if (confirmationResponse === "ACCEPT") {
+              // TODO implement
 
-            const tasks = JSON.parse(JSON.stringify(Object.fromEntries(
-              this.configs.map((config: TaskConfig) => [config.task.task_id, config.task]),
-            )));
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            // @ts-ignore FIXME
-            this.$refs.taskConfigs.forEach((config: any) => {
-              tasks[config.config.task.task_id].params = JSON.stringify(config.getTaskParams());
-            });
-            API.pipe.queue.submitBulkApiQueueSubmitTasksPut({
-              xProjectId: currentProjectStore.projectId as string,
-              requestBody: Object.values(tasks),
-            })
-              .then((response) => {
-                EventBus.emit(new ToastEvent('SUCCESS', `Submitted ${response.data?.length} tasks to the queue!`));
-              })
-              .catch((reason) => {
-                console.error(reason);
-                EventBus.emit(new ToastEvent('ERROR', 'Failed to submit tasks!'));
+              const tasks = JSON.parse(
+                JSON.stringify(
+                  Object.fromEntries(this.configs.map((config: TaskConfig) => [config.task.task_id, config.task])),
+                ),
+              );
+
+              // @ts-ignore FIXME
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              this.$refs.taskConfigs.forEach((config: any) => {
+                tasks[config.config.task.task_id].params = JSON.stringify(config.getTaskParams());
               });
-          }
-        },
-        'Submission of Task(s)',
-        'Yes, proceed',
-        'Cancel',
-      ));
+              API.pipe.queue
+                .submitBulkApiQueueSubmitTasksPut({
+                  xProjectId: currentProjectStore.projectId as string,
+                  requestBody: Object.values(tasks),
+                })
+                .then((response) => {
+                  EventBus.emit(new ToastEvent("SUCCESS", `Submitted ${response.data?.length} tasks to the queue!`));
+                })
+                .catch((reason) => {
+                  console.error(reason);
+                  EventBus.emit(new ToastEvent("ERROR", "Failed to submit tasks!"));
+                });
+            }
+          },
+          "Submission of Task(s)",
+          "Yes, proceed",
+          "Cancel",
+        ),
+      );
     },
   },
   computed: {
@@ -343,16 +363,14 @@ export default defineComponent({
       }
 
       this.filteredLibrary.forEach((info: FunctionInfo) => {
-        const path = info.module.split('.');
+        const path = info.module.split(".");
         setInfo(path, info);
       });
-      if ('nacsos_lib' in ret) return ret.nacsos_lib as NestedLibrary;
+      if ("nacsos_lib" in ret) return ret.nacsos_lib as NestedLibrary;
       return ret;
     },
   },
 });
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

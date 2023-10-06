@@ -2,8 +2,7 @@
 /* tslint:disable */
 /* eslint-disable */
 export const $AnnotationModel = {
-  description: `
-  Corresponds to db.models.annotations.Annotation
+  description: `Corresponds to db.models.annotations.Annotation
 
   Annotation holds the judgement of a User for a specific Item in the context of an AnnotationScheme
   as a response to an Assignment.
@@ -21,9 +20,51 @@ export const $AnnotationModel = {
 
   Note, that there is no database constraints on the completeness of an Assignment/AnnotationScheme.
   The interface/backend code should be used to make sure, to either not allow partial fulfillment of an
-  AnnotationScheme or not display an Assignment as complete.
-  `,
+  AnnotationScheme or not display an Assignment as complete.`,
   properties: {
+    value_bool: {
+      type: 'any-of',
+      contains: [{
+        type: 'boolean',
+      }, {
+        type: 'null',
+      }],
+    },
+    value_int: {
+      type: 'any-of',
+      contains: [{
+        type: 'number',
+      }, {
+        type: 'null',
+      }],
+    },
+    value_float: {
+      type: 'any-of',
+      contains: [{
+        type: 'number',
+      }, {
+        type: 'null',
+      }],
+    },
+    value_str: {
+      type: 'any-of',
+      contains: [{
+        type: 'string',
+      }, {
+        type: 'null',
+      }],
+    },
+    multi_int: {
+      type: 'any-of',
+      contains: [{
+        type: 'array',
+        contains: {
+          type: 'number',
+        },
+      }, {
+        type: 'null',
+      }],
+    },
     annotation_id: {
       type: 'any-of',
       contains: [{
@@ -107,49 +148,6 @@ export const $AnnotationModel = {
       }, {
         type: 'string',
         format: 'uuid',
-      }, {
-        type: 'null',
-      }],
-    },
-    value_bool: {
-      type: 'any-of',
-      contains: [{
-        type: 'boolean',
-      }, {
-        type: 'null',
-      }],
-    },
-    value_int: {
-      type: 'any-of',
-      contains: [{
-        type: 'number',
-      }, {
-        type: 'null',
-      }],
-    },
-    value_float: {
-      type: 'any-of',
-      contains: [{
-        type: 'number',
-      }, {
-        type: 'null',
-      }],
-    },
-    value_str: {
-      type: 'any-of',
-      contains: [{
-        type: 'string',
-      }, {
-        type: 'null',
-      }],
-    },
-    multi_int: {
-      type: 'any-of',
-      contains: [{
-        type: 'array',
-        contains: {
-          type: 'number',
-        },
       }, {
         type: 'null',
       }],

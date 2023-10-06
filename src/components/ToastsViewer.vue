@@ -4,23 +4,24 @@
     role="alert"
     class="toast-container position-absolute top-0 end-0 p-3 pt-5 mh-100 overflow-auto"
     aria-live="assertive"
-    aria-atomic="true">
+    aria-atomic="true"
+  >
     <template v-for="toast in toasts" :key="toast.key">
       <div
         role="alert"
         class="toast align-items-center border-0 show mb-2"
         :class="[toast.bg, toast.col]"
         aria-live="assertive"
-        aria-atomic="true">
+        aria-atomic="true"
+      >
         <div class="d-flex">
-          <div
-            class="toast-body text-start"
-            v-html="toast.htmlMessage" />
+          <div class="toast-body text-start" v-html="toast.htmlMessage" />
           <button
             type="button"
             class="btn-close btn-close-white me-2 m-auto"
             aria-label="Close"
-            @click="remove(toast.key)" />
+            @click="remove(toast.key)"
+          />
         </div>
       </div>
     </template>
@@ -29,10 +30,10 @@
 </template>
 
 <script lang="ts">
-import { marked } from 'marked';
-import { defineComponent } from 'vue';
-import { ToastEvent } from '@/plugins/events/events/toast';
-import type { ToastType } from '@/plugins/events/events/toast';
+import { marked } from "marked";
+import { defineComponent } from "vue";
+import { ToastEvent } from "@/plugins/events/events/toast";
+import type { ToastType } from "@/plugins/events/events/toast";
 
 interface Toast {
   key: number;
@@ -44,19 +45,19 @@ interface Toast {
 }
 
 const backgroundClass = {
-  SUCCESS: 'bg-success',
-  INFO: 'bg-info',
-  WARN: 'bg-warning',
-  ERROR: 'bg-danger',
+  SUCCESS: "bg-success",
+  INFO: "bg-info",
+  WARN: "bg-warning",
+  ERROR: "bg-danger",
 };
 const textColorClass = {
-  SUCCESS: 'text-white',
-  INFO: 'text-dark',
-  WARN: 'text-dark',
-  ERROR: 'text-white',
+  SUCCESS: "text-white",
+  INFO: "text-dark",
+  WARN: "text-dark",
+  ERROR: "text-white",
 };
 export default defineComponent({
-  name: 'ToastsViewer',
+  name: "ToastsViewer",
   created() {
     this.$eventBus.on(ToastEvent, (event: ToastEvent) => {
       const toast: Toast = {

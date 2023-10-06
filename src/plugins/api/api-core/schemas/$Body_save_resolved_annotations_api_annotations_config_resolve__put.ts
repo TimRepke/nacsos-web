@@ -1,22 +1,18 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-export const $SavedResolutionResponse = {
+export const $Body_save_resolved_annotations_api_annotations_config_resolve__put = {
   properties: {
-    name: {
-      type: 'string',
+    settings: {
+      type: 'BotMetaResolveBase',
       isRequired: true,
     },
-    meta: {
-      type: 'BotMetaResolve',
-      isRequired: true,
-    },
-    saved: {
+    matrix: {
       type: 'dictionary',
       contains: {
-        type: 'array',
+        type: 'dictionary',
         contains: {
-          type: 'GroupedBotAnnotation',
+          type: 'ResolutionCell',
         },
       },
       isRequired: true,

@@ -1,91 +1,68 @@
 <template>
   <div>
     <textarea
-      v-if="botAnnotation && userAnnotations"
+      v-if="notNone(proposalRow)"
       class="form-control"
-      :id="`txt-${info.key}-${userAnnotations[0].item_id}`"
-      :aria-label="info.name"
+      :id="`txt-${label.path_key}-${itemId}`"
+      :aria-label="label.name"
       rows="3"
-      :value="botAnnotation.value_str"
-      @change="setBotAnnotation($event.target.value)" />
+      :value="val"
+      @change="setBotAnnotation($event.target?.value)"
+    />
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
-import type { PropType } from 'vue';
-import type {
-  AnnotationModel,
-  BotAnnotationModel,
-  FlattenedAnnotationSchemeLabel,
-  UserModel,
-} from '@/plugins/api/api-core';
-import { EventBus } from '@/plugins/events';
-import { ToastEvent } from '@/plugins/events/events/toast';
-
-interface BoolLabelData {
-  changed: boolean,
-  editMode: boolean,
-}
+import { defineComponent } from "vue";
+import type { PropType } from "vue";
+import type { FlatLabel, ResolutionCell, BotAnnotationModel } from "@/plugins/api/api-core";
+import { is, isNone, notNone } from "@/util";
 
 export default defineComponent({
-  name: 'StringLabel',
-  data(): BoolLabelData {
+  name: "StringLabel",
+  data() {
     return {
       // set to true when bot annotation was manipulated
       changed: false,
-      editMode: false,
     };
   },
-  emits: ['botAnnotationChanged'],
+  emits: ["botAnnotationChanged"],
   props: {
-    info: {
-      type: Object as PropType<FlattenedAnnotationSchemeLabel>,
+    itemId: { type: String, required: true },
+    label: {
+      type: Object as PropType<FlatLabel>,
       required: true,
     },
-    users: {
-      type: Object as PropType<Record<string, UserModel>>,
+    proposalRow: {
+      type: Object as PropType<Record<string, ResolutionCell>>,
       required: true,
-    },
-    userAnnotations: {
-      type: Array as PropType<AnnotationModel[]>,
-      required: true,
-    },
-    botAnnotation: {
-      type: Object as PropType<BotAnnotationModel>,
-      required: false,
-      default: () => undefined,
     },
   },
   methods: {
+    notNone,
     annotation2icon(val: boolean | undefined): string {
-      if (val === undefined) return 'question';
-      return (val) ? 'check' : 'xmark';
+      if (val === undefined) return "question";
+      return val ? "check" : "xmark";
     },
     annotation2classes(val: boolean | undefined): string[] {
-      if (val === undefined) return ['bg-light', 'text-dark'];
-      return (val) ? ['bg-success', 'text-light'] : ['bg-danger', 'text-light'];
+      if (val === undefined) return ["bg-light", "text-dark"];
+      return val ? ["bg-success", "text-light"] : ["bg-danger", "text-light"];
     },
-    setBotAnnotation(value: string | undefined) {
-      if (this.botAnnotation !== undefined) {
-        const anno = this.botAnnotation;
-        anno.value_str = value;
-        this.$emit('botAnnotationChanged', anno);
-        this.editMode = false;
-      } else {
-        // FIXME: not implemented (handle adding new BotAnnotation, i.e. handle the case where item has no annotation here)
-        // const anno: BotAnnotationModel = {};
-        EventBus.emit(new ToastEvent('WARN', 'Not implemented yet.'));
+    setBotAnnotation(value: string | undefined | null) {
+      const { resolution } = this.proposalRow[this.label.path_key];
+      if (is<BotAnnotationModel>(resolution)) {
+        resolution.value_str = value;
+        this.$emit("botAnnotationChanged", resolution);
+        this.changed = true;
       }
-    },
-    getPrettyUsername(userId: string): string {
-      const user: UserModel | undefined = this.users[userId];
-      if (!user) return '??';
-      return `${user.username} (${user.full_name})`;
     },
   },
   computed: {
-    // pass
+    val(): string | undefined {
+      const { resolution } = this.proposalRow[this.label.path_key];
+      if (isNone(resolution) || isNone(resolution.value_str)) return undefined;
+      return resolution.value_str;
+    },
   },
 });
 </script>

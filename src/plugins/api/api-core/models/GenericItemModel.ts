@@ -5,9 +5,7 @@
 import type { ItemType } from './ItemType';
 
 /**
- *
  * Corresponds to db.models.items.generic.GenericItem
- *
  */
 export type GenericItemModel = {
   item_id?: (string | null);

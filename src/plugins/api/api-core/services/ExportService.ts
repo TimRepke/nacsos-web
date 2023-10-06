@@ -25,7 +25,7 @@ export class ExportService {
     assignmentScopeIds,
     userIds,
     ignoreHierarchy = true,
-    ignoreOrder = true,
+    ignoreRepeat = true,
     itemFields,
   }: {
     xProjectId: string,
@@ -34,7 +34,7 @@ export class ExportService {
     assignmentScopeIds?: (Array<string> | null),
     userIds?: (Array<string> | null),
     ignoreHierarchy?: boolean,
-    ignoreOrder?: boolean,
+    ignoreRepeat?: boolean,
     itemFields?: (Array<string> | null),
   }, options?: Partial<ApiRequestOptions>): CancelablePromise<string> {
     return this.httpRequest.request({
@@ -48,7 +48,7 @@ export class ExportService {
         'assignment_scope_ids': assignmentScopeIds,
         'user_ids': userIds,
         'ignore_hierarchy': ignoreHierarchy,
-        'ignore_order': ignoreOrder,
+        'ignore_repeat': ignoreRepeat,
         'item_fields': itemFields,
       },
       body: requestBody,

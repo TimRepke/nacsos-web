@@ -11,20 +11,20 @@
               :icon="['fas', 'gear']"
               class="text-muted"
               role="button"
-              @click="showStatusBarModal = true" />
+              @click="showStatusBarModal = true"
+            />
           </div>
 
           <div class="col align-items-center">
-            <div
-              v-if="assignmentIndicatorsNeedBirdseye"
-              class="assignments-birdseye">
+            <div v-if="assignmentIndicatorsNeedBirdseye" class="assignments-birdseye">
               <div
                 v-for="assignmentLI in assignmentIndicators"
                 :key="assignmentLI.assignmentId"
                 class="assignments-birdseye-step"
-                :class="[(assignmentLI.inHighlight) ? 'assignments-birdseye-step-inview' : '', assignmentLI.status]"
+                :class="[assignmentLI.inHighlight ? 'assignments-birdseye-step-inview' : '', assignmentLI.status]"
                 type="button"
-                @click="saveAndGoto(assignmentLI.assignmentId)" />
+                @click="saveAndGoto(assignmentLI.assignmentId)"
+              />
             </div>
             <div class="assignments align-items-center h-100">
               <div
@@ -34,7 +34,8 @@
                 :class="{ current: assignmentLI.assignmentId === assignment?.assignment_id }"
                 type="button"
                 :style="{ 'background-color': assignmentLI.colour }"
-                @click="saveAndGoto(assignmentLI.assignmentId)">
+                @click="saveAndGoto(assignmentLI.assignmentId)"
+              >
                 <div class="rounded-circle border border-secondary p-1 bg-light mt-2">
                   {{ assignmentLI.identifier }}
                 </div>
@@ -49,24 +50,27 @@
 
       <div
         class="col border-start p-2 overflow-auto h-md-100 position-relative border-top border-md-top"
-        :class="sidebarWidthClass">
+        :class="sidebarWidthClass"
+      >
         <div
           class="position-fixed bottom-0 border border-end-0 rounded-start text-muted text-center"
-          style="margin-left: -1.325rem; width: 0.75rem; font-size: 0.75rem;"
-          @click="(uiSettings.annotation.sidebarWidth < 12) && uiSettings.annotation.sidebarWidth++">
+          style="margin-left: -1.325rem; width: 0.75rem; font-size: 0.75rem"
+          @click="widenSidebar"
+        >
           <font-awesome-icon :icon="['fas', 'caret-left']" />
         </div>
         <div
           class="position-fixed bottom-0 border border-start-0 rounded-end text-muted text-center"
-          style="margin-left: -.5rem; width: 0.75rem; font-size: 0.75rem;"
-          @click="(uiSettings.annotation.sidebarWidth > 0) && uiSettings.annotation.sidebarWidth--">
+          style="margin-left: -0.5rem; width: 0.75rem; font-size: 0.75rem"
+          @click="shrinkSidebar"
+        >
           <font-awesome-icon :icon="['fas', 'caret-right']" />
         </div>
 
         <div class="row g-0">
           <h3>Annotation Panel</h3>
           <div class="collapsible">
-            <input id="annotation-description" class="toggle" type="checkbox">
+            <input id="annotation-description" class="toggle" type="checkbox" />
             <label for="annotation-description" class="lbl-toggle" role="button">Show scheme description</label>
             <div class="collapsible-content">
               <div class="content-inner" v-if="scheme && scope">
@@ -83,9 +87,7 @@
         </div>
         <div class="row g-0 border-top pt-2">
           <div class="col text-start">
-            <button type="button" class="btn btn-outline-secondary" @click="saveAndPrevious()">
-              Save & Previous
-            </button>
+            <button type="button" class="btn btn-outline-secondary" @click="saveAndPrevious()">Save & Previous</button>
           </div>
           <div class="col text-end">
             <button type="button" class="btn btn-primary" @click="saveAndNext()">Save & Next</button>
@@ -104,26 +106,27 @@
                   class="btn-close"
                   data-bs-dismiss="modal"
                   aria-label="Close"
-                  @click="showStatusBarModal = false" />
+                  @click="showStatusBarModal = false"
+                />
               </div>
               <div class="modal-body text-start ps-4 pe-4">
                 <div class="row mb-3 g-2 text-muted">
-                  These settings allow you to choose how the colour for the items in the indicator bar is chosen.
-                  Please note, that this is a "global" setting, so you may have to manually adjust it for other
-                  assignment scopes.
+                  These settings allow you to choose how the colour for the items in the indicator bar is chosen. Please
+                  note, that this is a "global" setting, so you may have to manually adjust it for other assignment
+                  scopes.
                 </div>
                 <div class="row mb-3 g-2">
                   <label for="progressBarLabelKey" class="form-label">
                     Which label to use to colour document indicators
                   </label>
                   <select
-                    v-model="uiSettings.annotation.progressBarLabelKey"
+                    :value="progressBarLabelKey"
+                    @input="updateProgressBarLabelKey($event.target.value)"
                     id="progressBarLabelKey"
-                    class="form-select">
-                    <option
-                      v-for="label in availableIndicatorLabels"
-                      :key="label.key"
-                      :value="label.key">{{ label.name }}
+                    class="form-select"
+                  >
+                    <option v-for="label in availableIndicatorLabels" :key="label.key" :value="label.key">
+                      {{ label.name }}
                     </option>
                   </select>
                 </div>
@@ -141,61 +144,78 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import { marked } from 'marked';
-import AnyItemComponent from '@/components/items/AnyItem.vue';
-import AnnotationLabels from '@/components/annotations/AnnotationLabels.vue';
-import { EventBus } from '@/plugins/events';
-import { ToastEvent } from '@/plugins/events/events/toast';
+import { defineComponent } from "vue";
+import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
+import { marked } from "marked";
+import AnyItemComponent from "@/components/items/AnyItem.vue";
+import AnnotationLabels from "@/components/annotations/AnnotationLabels.vue";
+import { EventBus } from "@/plugins/events";
+import { ToastEvent } from "@/plugins/events/events/toast";
 import type {
   AnnotationItem,
-  AnnotationSchemeLabelChoice,
   AnnotationSchemeModel,
   AssignmentInfo,
   AssignmentModel,
   AssignmentScopeEntry,
   AssignmentScopeModel,
   HighlighterModel,
-} from '@/plugins/api/api-core';
-import { AssignmentStatus, AnnotationSchemeLabel } from '@/plugins/api/api-core';
-import type { AnyItem } from '@/types/items.d';
-import { API, ignore } from '@/plugins/api';
-import { currentProjectStore, currentUserStore, interfaceSettingsStore } from '@/stores';
-import type { InterfaceSettingsStoreType } from '@/stores/InterfaceSettingsStore';
-import { cmap as cmap20 } from '@/types/colours';
+} from "@/plugins/api/api-core";
+import { AssignmentStatus, AnnotationSchemeLabel } from "@/plugins/api/api-core";
+import type { AnyItem } from "@/types/items.d";
+import { API, ignore } from "@/plugins/api";
+import { currentProjectStore, currentUserStore, interfaceSettingsStore } from "@/stores";
+import { lookupMakerBool, lookupMakerChoice, lookupMakerStatus } from "@/types/colours";
 
 const motivationalQuotes = [
-  // https://www.howmuchisthefish.de/
-  'The chase is better than the catch. – Scooter',
-  'It’s the first page of the second chapter – Scooter',
-  'Let’s blow a hole in the bowl – Scooter',
-  'Our lyrics fly like birds in the sky – Scooter',
-  'It’s nice to be important, but it’s more important to be nice – Scooter',
-  'Before success can manifest. You’ve got to go through the learning process. – Scooter',
-  // https://kanye.rest/
-  'Distraction is the enemy of vision – Kanye West',
-  'I love sleep; it’s my favorite. – Kanye West',
-  'Keep squares out yo circle – Kanye West',
-  // https://www.briantracy.com/blog/personal-success/inspirational-quotes/
-  'The bad news is time flies. The good news is you’re the pilot. – Michael Altshuler',
-  'The best way to get started is to quit talking and begin doing. ― Walt Disney',
-  'Act as if what you do makes a difference. It does. – William James',
-  'If you can change your mind, you can change your life. – William James',
-  'Life is like riding a bicycle. To keep your balance, you must keep moving. – Albert Einstein',
-  'If you don’t like the road you’re walking, start paving another one. – Dolly Parton',
-  'Don’t count the days. Make the days count. – Muhammad Ali',
-  'Every moment is a fresh beginning. – T.S. Eliot',
-  'Believe you can and you’re halfway there. – Theodore Roosevelt',
-  'You get what you give. – Jennifer Lopez',
-  'Your life only gets better when you get better. – Brian Tracy',
-  'Happiness is not by chance, but by choice. – Jim Rohn',
-  'Change the world by being yourself. – Amy Poehler',
-  'Change the game, don’t let the game change you. – Macklemore',
-  // https://pypi.org/project/quotes-generator/
-  'Your Skepticism Is My Fuel. — Minx',
+  "The chase is better than the catch. – Scooter",
+  "It's the first page of the second chapter – Scooter",
+  // "Let's blow a hole in the bowl – Scooter",
+  "Our lyrics fly like birds in the sky – Scooter",
+  "It's nice to be important, but it's more important to be nice – Scooter",
+  "Before success can manifest. You’ve got to go through the learning process. – Scooter",
+  // 'Distraction is the enemy of vision – Kanye West',
+  // 'I love sleep; it’s my favorite. – Kanye West',
+  // 'Keep squares out yo circle – Kanye West',
+  "The bad news is time flies. The good news is you're the pilot. – Michael Altshuler",
+  "The best way to get started is to quit talking and begin doing. ― Walt Disney",
+  "Act as if what you do makes a difference. It does. – William James",
+  "If you can change your mind, you can change your life. – William James",
+  "Life is like riding a bicycle. To keep your balance, you must keep moving. – Albert Einstein",
+  "If you don't like the road you’re walking, start paving another one. – Dolly Parton",
+  "Don't count the days. Make the days count. – Muhammad Ali",
+  "Every moment is a fresh beginning. – T.S. Eliot",
+  "Believe you can and you're halfway there. – Theodore Roosevelt",
+  "You get what you give. – Jennifer Lopez",
+  "Your life only gets better when you get better. – Brian Tracy",
+  "Happiness is not by chance, but by choice. – Jim Rohn",
+  "Change the world by being yourself. – Amy Poehler",
+  "Change the game, don't let the game change you. – Macklemore",
+  "Your Skepticism Is My Fuel. — Minx",
+  "If people are doubting how far you can go, go so far that you can't hear them anymore. — Michele Ruiz",
+  "Man kann es so oder so machen. Ich bin für so. — Gerhard Schröder",
+  "Now, the door to a new life is opening. That's exciting and inspiring. – Angela Merkel",
+  "Zwischendurch einen Moment innehalten, schweigen, nachdenken, Pause machen. – Angela Merkel",
+  "It is a matter worth pursuing intensively. – Olaf Scholz",
+  "Always forwards, never backwards. – Erich Honecker",
+  "In a gentle way, you can shake the world. – Mahatma Gandhi",
+  "If opportunity doesn't knock, build a door. – Kurt Cobain",
+  "Work hard in silence, let your success be the noise. – Frank Ocean",
+  "If everything seems to be under control, you're not going fast enough. – Mario Andretti",
+  "The best way to appreciate your job is to imagine yourself without one. – Oscar Wilde",
+  "The miracle is not that we do this work, but that we are happy to do it. – Mother Teresa",
+  "Make each day your masterpiece. – John Wooden",
+  "Dreams don't work unless you do. – John C. Maxwell",
+  "Go the extra mile. It's never crowded there. – Wayne Dyer",
+  "Today is your opportunity to build the tomorrow you want. – Ken Poirot",
+  "If you fall, I'll be there. – Floor",
+  "A goal is a dream with a deadline. – Napoleon Hill",
+  "The [annotations are] plentiful but the workers are few. – Jesus", // originally "harvest is"
+  "Patience is the key to well-being. – Muhammad",
+  "Всюди добре де нас нема", // The grass is always greener on the other side of the hill. (Ukrainian proverb)
+  "أشد الفاقة عدم العقل", // (Arabic proverb)
+  "千 里 之 行 始 于 足 下。--- 老 子", // A journey of a thousand miles must begin with a single step. – Lao Tzu
 ];
-type UserAssignmentInfo = AssignmentInfo & { identifier: number, item_id: string };
+type UserAssignmentInfo = AssignmentInfo & { identifier: number; item_id: string };
 
 type AnnotationsViewData = {
   item?: AnyItem;
@@ -206,7 +226,6 @@ type AnnotationsViewData = {
   labels?: AnnotationSchemeLabel[];
   dirty: number;
   highlighters?: HighlighterModel[];
-  uiSettings: InterfaceSettingsStoreType;
   rerenderCounter: number; // this is a hack to force-update the AnnotationLabels-component
   showStatusBarModal: boolean;
 };
@@ -222,7 +241,7 @@ type AssignmentIndicator = {
 };
 
 export default defineComponent({
-  name: 'AnnotationsView',
+  name: "AnnotationsView",
   components: { FontAwesomeIcon, AnnotationLabels, AnyItemComponent },
   data(): AnnotationsViewData {
     return {
@@ -235,92 +254,109 @@ export default defineComponent({
       dirty: 0,
       highlighters: undefined as HighlighterModel[] | undefined,
       rerenderCounter: 0,
-      uiSettings: interfaceSettingsStore,
       showStatusBarModal: false,
     };
   },
   unmounted() {
-    document.removeEventListener('keydown', this.onKeyPress, false);
+    document.removeEventListener("keydown", this.onKeyPress, false);
   },
   async mounted() {
     const assignmentScopeId = this.$route.params.scope_id as string;
     const currentAssignmentId = this.$route.params.assignment_id as string;
-    document.addEventListener('keydown', this.onKeyPress, false);
+    document.addEventListener("keydown", this.onKeyPress, false);
     try {
       let response: AnnotationItem;
       if (currentAssignmentId) {
-        response = (await API.core.annotations.getAssignmentApiAnnotationsAnnotateAssignmentAssignmentIdGet({
-          xProjectId: currentProjectStore.projectId as string,
-          assignmentId: currentAssignmentId,
-        })).data;
+        response = (
+          await API.core.annotations.getAssignmentApiAnnotationsAnnotateAssignmentAssignmentIdGet({
+            xProjectId: currentProjectStore.projectId as string,
+            assignmentId: currentAssignmentId,
+          })
+        ).data;
       } else {
-        response = (await API.core.annotations.getNextOpenAssignmentForScopeForUserApiAnnotationsAnnotateNextAssignmentScopeIdGet({
-          xProjectId: currentProjectStore.projectId as string,
-          assignmentScopeId,
-        })).data;
+        response = (
+          await API.core.annotations.getNextOpenAssignmentForScopeForUserApiAnnotationsAnnotateNextAssignmentScopeIdGet(
+            {
+              xProjectId: currentProjectStore.projectId as string,
+              assignmentScopeId,
+            },
+          )
+        ).data;
       }
 
-      API.core.highlighters.getScopeHighlightersApiHighlightersScopeAssignmentScopeIdGet({
-        xProjectId: currentProjectStore.projectId as string,
-        assignmentScopeId,
-      }).then((resp) => {
-        const { data } = resp;
-        if (data !== null && data !== undefined) {
-          this.highlighters = data;
-        }
-      }).catch(ignore);
-
       await this.setCurrentAssignment(response);
+
+      API.core.highlighters
+        .getScopeHighlightersApiHighlightersScopeAssignmentScopeIdGet({
+          xProjectId: currentProjectStore.projectId as string,
+          assignmentScopeId,
+        })
+        .then((resp) => {
+          const { data } = resp;
+          if (data !== null && data !== undefined) {
+            this.highlighters = data;
+          }
+        })
+        .catch(ignore);
     } catch (e) {
       console.error(e);
     }
   },
   methods: {
+    widenSidebar() {
+      if (interfaceSettingsStore.annotation.sidebarWidth < 12) interfaceSettingsStore.annotation.sidebarWidth++;
+    },
+    shrinkSidebar() {
+      if (interfaceSettingsStore.annotation.sidebarWidth > 0) interfaceSettingsStore.annotation.sidebarWidth--;
+    },
+    updateProgressBarLabelKey(newValue: string) {
+      interfaceSettingsStore.annotation.progressBarLabelKey = newValue;
+    },
     markdown(md: string) {
       return marked(md);
     },
     onKeyPress(e: KeyboardEvent) {
       if (e !== null && e.target !== null) {
         const target = e.target as Element;
-        if (!target.matches('input, textarea') && !e.repeat) {
+        if (!target.matches("input, textarea") && !e.repeat) {
           switch (e.key) {
-            case 'ArrowUp':
-            case 'k':
-            case 'w':
+            case "ArrowUp":
+            case "k":
+            case "w":
               // UP => previous label
               this.$refs.labelsComponents?.selectPrevious();
               break;
-            case 'ArrowDown':
-            case 'j':
-            case 's':
+            case "ArrowDown":
+            case "j":
+            case "s":
               // DOWN => next label
               this.$refs.labelsComponents?.selectNext();
               break;
-            case '0':
-            case '1':
-            case '2':
-            case '3':
-            case '4':
-            case '5':
-            case '6':
-            case '7':
-            case '8':
-            case '9':
-            case '+':
-            case '-':
-            case 'Enter':
-            case 'Backspace':
+            case "0":
+            case "1":
+            case "2":
+            case "3":
+            case "4":
+            case "5":
+            case "6":
+            case "7":
+            case "8":
+            case "9":
+            case "+":
+            case "-":
+            case "Enter":
+            case "Backspace":
               this.$refs.labelsComponents?.setValue(e.key);
               break;
-            case 'ArrowLeft':
-            case 'h':
-            case 'a':
+            case "ArrowLeft":
+            case "h":
+            case "a":
               // LEFT => previous assignment
               this.saveAndPrevious();
               break;
-            case 'ArrowRight':
-            case 'l':
-            case 'd':
+            case "ArrowRight":
+            case "l":
+            case "d":
               // RIGHT => next assignment
               this.saveAndNext();
               break;
@@ -362,62 +398,58 @@ export default defineComponent({
         const scheme = JSON.parse(JSON.stringify(this.scheme));
 
         // first, remove all empty annotations again
-        const removeEmptyAnnotations = (subLabels: AnnotationSchemeLabel[]) => subLabels.map((label: AnnotationSchemeLabel) => {
-          if (label.annotation?.value_int === undefined
-            && label.annotation?.value_str === undefined
-            && label.annotation?.value_bool === undefined
-            && label.annotation?.value_float === undefined
-            && label.annotation?.multi_int === undefined) {
-            // eslint-disable-next-line no-param-reassign
-            delete label.annotation;
-          }
-          if (label.choices) {
-            label.choices.forEach((choice) => {
-              if (choice.children) {
-                // eslint-disable-next-line no-param-reassign
-                choice.children = removeEmptyAnnotations(choice.children);
-              }
-            });
-          }
-          return label;
-        });
+        const removeEmptyAnnotations = (subLabels: AnnotationSchemeLabel[]) =>
+          subLabels.map((label: AnnotationSchemeLabel) => {
+            if (
+              label.annotation?.value_int === undefined &&
+              label.annotation?.value_str === undefined &&
+              label.annotation?.value_bool === undefined &&
+              label.annotation?.value_float === undefined &&
+              label.annotation?.multi_int === undefined
+            ) {
+              // eslint-disable-next-line no-param-reassign
+              delete label.annotation;
+            }
+            if (label.choices) {
+              label.choices.forEach((choice) => {
+                if (choice.children) {
+                  // eslint-disable-next-line no-param-reassign
+                  choice.children = removeEmptyAnnotations(choice.children);
+                }
+              });
+            }
+            return label;
+          });
         scheme.labels = removeEmptyAnnotations(labels);
 
         // Send data to the server
-        API.core.annotations.saveAnnotationApiAnnotationsAnnotateSavePost({
-          xProjectId: currentProjectStore.projectId as string,
-          requestBody: {
-            scheme,
-            assignment: this.assignment as AssignmentModel,
-          },
-        })
+        API.core.annotations
+          .saveAnnotationApiAnnotationsAnnotateSavePost({
+            xProjectId: currentProjectStore.projectId as string,
+            requestBody: {
+              scheme,
+              assignment: this.assignment as AssignmentModel,
+            },
+          })
           .then((response) => {
             const reason = response.data;
-            if (reason === 'PARTIAL') {
-              EventBus.emit(new ToastEvent(
-                'WARN',
-                'This annotation wasn\'t quite done yet...',
-              ));
+            if (reason === "PARTIAL") {
+              EventBus.emit(new ToastEvent("WARN", "This annotation wasn't quite done yet..."));
             }
-            EventBus.emit(new ToastEvent(
-              'SUCCESS',
-              'Successfully saved your annotation!',
-            ));
+            EventBus.emit(new ToastEvent("SUCCESS", "Successfully saved your annotation!"));
           })
           .catch(() => {
-            EventBus.emit(new ToastEvent(
-              'ERROR',
-              'Failed to save your annotation. Sorry. '
-              + 'Please try reloading the page and saving again.',
-            ));
+            EventBus.emit(
+              new ToastEvent(
+                "ERROR",
+                "Failed to save your annotation. Sorry. " + "Please try reloading the page and saving again.",
+              ),
+            );
           })
           .finally(() => {
             if (currentProjectStore.project?.setting_motivational_quotes && Math.random() < 0.2) {
               const quoteIndex = Math.floor(Math.random() * (motivationalQuotes.length + 1));
-              EventBus.emit(new ToastEvent(
-                'INFO',
-                motivationalQuotes[quoteIndex],
-              ));
+              EventBus.emit(new ToastEvent("INFO", motivationalQuotes[quoteIndex]));
             }
           });
       }
@@ -432,15 +464,16 @@ export default defineComponent({
       this.rerenderCounter += 1;
 
       // update the assignments progress bar
-      API.core.annotations.getAssignmentIndicatorsForScopeApiAnnotationsAnnotateAssignmentProgressAssignmentScopeIdGet({
-        xProjectId: currentProjectStore.projectId as string,
-        assignmentScopeId: annotationItem.scope.assignment_scope_id as string,
-      })
+      API.core.annotations
+        .getAssignmentIndicatorsForScopeApiAnnotationsAnnotateAssignmentProgressAssignmentScopeIdGet({
+          xProjectId: currentProjectStore.projectId as string,
+          assignmentScopeId: annotationItem.scope.assignment_scope_id as string,
+        })
         .then(async (response) => {
           this.assignments = response.data;
           // update the URL
           await this.$router.push({
-            name: 'project-annotate-item',
+            name: "project-annotate-item",
             params: {
               scope_id: this.scope!.assignment_scope_id,
               assignment_id: this.assignment!.assignment_id,
@@ -453,21 +486,32 @@ export default defineComponent({
     async saveAndGoto(targetAssignmentId: string) {
       await this.save();
 
-      API.core.annotations.getAssignmentApiAnnotationsAnnotateAssignmentAssignmentIdGet({
-        xProjectId: currentProjectStore.projectId as string,
-        assignmentId: targetAssignmentId,
-      })
-        .then((response) => { this.setCurrentAssignment(response.data); })
+      API.core.annotations
+        .getAssignmentApiAnnotationsAnnotateAssignmentAssignmentIdGet({
+          xProjectId: currentProjectStore.projectId as string,
+          assignmentId: targetAssignmentId,
+        })
+        .then((response) => {
+          this.setCurrentAssignment(response.data);
+        })
         .catch(ignore);
     },
     async saveAndPrevious() {
-      if (this.currentAssignmentIndex !== undefined && this.currentAssignmentIndex > 0) {
-        await this.saveAndGoto(this.userAssignments[this.currentAssignmentIndex - 1].assignment_id);
+      if (this.currentAssignmentIndex !== undefined && this.userAssignments) {
+        if (this.currentAssignmentIndex > 0) {
+          await this.saveAndGoto(this.userAssignments[this.currentAssignmentIndex - 1].assignment_id);
+        } else {
+          await this.saveAndGoto(this.userAssignments[this.userAssignments.length - 1].assignment_id);
+        }
       }
     },
     async saveAndNext() {
-      if (this.currentAssignmentIndex !== undefined && (this.currentAssignmentIndex + 1) <= this.userAssignments.length) {
-        await this.saveAndGoto(this.userAssignments[this.currentAssignmentIndex + 1].assignment_id);
+      if (this.currentAssignmentIndex !== undefined && this.userAssignments) {
+        if (this.currentAssignmentIndex + 1 <= this.userAssignments.length) {
+          await this.saveAndGoto(this.userAssignments[this.currentAssignmentIndex + 1].assignment_id);
+        } else {
+          await this.saveAndGoto(this.userAssignments[0].assignment_id);
+        }
       }
     },
   },
@@ -487,8 +531,9 @@ export default defineComponent({
       if (this.assignments) {
         return this.assignments
           .map((entry: AssignmentScopeEntry): UserAssignmentInfo | null => {
-            const userAssignments = entry.assignments
-              .filter((assignment: AssignmentInfo) => assignment.user_id === currentUserStore.user?.user_id);
+            const userAssignments = entry.assignments.filter(
+              (assignment: AssignmentInfo) => assignment.user_id === currentUserStore.user?.user_id,
+            );
             if (userAssignments.length > 0) {
               return {
                 ...userAssignments[0],
@@ -507,17 +552,21 @@ export default defineComponent({
       const WINDOW = 50; // 100/2
       const assignmentId = this.assignment?.assignment_id;
       if (this.userAssignments && assignmentId) {
-        let focus = this.userAssignments.findIndex((assignment: UserAssignmentInfo) => assignment.assignment_id === assignmentId);
+        let focus = this.userAssignments.findIndex(
+          (assignment: UserAssignmentInfo) => assignment.assignment_id === assignmentId,
+        );
         focus = Math.min(Math.max(WINDOW, focus), this.userAssignments.length - WINDOW);
-        return this.userAssignments.map((assignment: UserAssignmentInfo, index: number): AssignmentIndicator => ({
-          assignmentId: assignment.assignment_id as string,
-          inHighlight: ((index - WINDOW) <= focus) && (focus <= (index + WINDOW)),
-          itemId: assignment.item_id,
-          status: assignment.status,
-          colour: this.indicatorLabelColourMapper(assignment),
-          order: assignment.order,
-          identifier: assignment.identifier,
-        }));
+        return this.userAssignments.map(
+          (assignment: UserAssignmentInfo, index: number): AssignmentIndicator => ({
+            assignmentId: assignment.assignment_id as string,
+            inHighlight: index - WINDOW <= focus && focus <= index + WINDOW,
+            itemId: assignment.item_id,
+            status: assignment.status,
+            colour: this.indicatorLabelColourMapper(assignment),
+            order: assignment.order,
+            identifier: assignment.identifier,
+          }),
+        );
       }
       return null;
     },
@@ -531,33 +580,33 @@ export default defineComponent({
       return !!this.userAssignments && this.userAssignments.length > 100;
     },
     availableIndicatorLabels(): AnnotationSchemeLabel[] {
-      let list = [{
-        name: 'Assignment status (always fallback)',
-      } as AnnotationSchemeLabel];
+      let list = [
+        {
+          name: "Assignment status (always fallback)",
+        } as AnnotationSchemeLabel,
+      ];
       if (this.labels !== undefined) {
-        list = list.concat(this.labels.filter((label: AnnotationSchemeLabel) => (label.kind === 'bool' || label.kind === 'single') && (label.annotation?.repeat || 1) === 1));
+        list = list.concat(
+          this.labels.filter(
+            (label: AnnotationSchemeLabel) =>
+              (label.kind === "bool" || label.kind === "single") && (label.annotation?.repeat || 1) === 1,
+          ),
+        );
       }
       return list;
     },
     indicatorLabelColourMapper(): (indicator: UserAssignmentInfo) => string {
       // Colour by assignment status is always the fallback, set up respective map and mapper function
-      const map = {
-        undefined: 'white',
-        null: 'white',
-        // @ts-ignore TS1268
-      } as { [key: undefined | null | string]: string };
-      map[AssignmentStatus.OPEN] = 'white';
-      map[AssignmentStatus.PARTIAL] = 'yellow';
-      map[AssignmentStatus.FULL] = '#42b983';
-      map[AssignmentStatus.INVALID] = 'red';
-      const indicateStatusMapper = (indicator: UserAssignmentInfo): string => map[indicator.status] ?? 'white';
+      const indicateStatusMapper = lookupMakerStatus<UserAssignmentInfo>(
+        (indicator: UserAssignmentInfo): AssignmentStatus => indicator.status,
+      );
 
       // User selected to colour by assignment status
-      if (this.uiSettings.annotationProgressBarUseStatus) {
+      if (interfaceSettingsStore.annotationProgressBarUseStatus) {
         return indicateStatusMapper;
       }
 
-      const labelKey = this.uiSettings.annotation.progressBarLabelKey;
+      const labelKey = this.progressBarLabelKey;
       if (!labelKey) {
         return indicateStatusMapper;
       }
@@ -573,35 +622,24 @@ export default defineComponent({
       }
 
       if (label.kind === AnnotationSchemeLabel.kind.SINGLE && label.choices) {
-        const cmap = {
-          undefined: 'white',
-          null: 'white',
-          // @ts-ignore TS1268
-        } as { [key: undefined | null | number]: string };
-        label.choices
-          .map((choice: AnnotationSchemeLabelChoice): number => choice.value)
-          .sort()
-          .forEach((value) => {
-            cmap[value] = cmap20.shift() ?? 'white';
-          });
-        return (indicator: UserAssignmentInfo): string => cmap?.[indicator.labels?.[labelKey]?.[0]?.value_int ?? -1] ?? 'white';
+        return lookupMakerChoice<UserAssignmentInfo>(
+          label.choices,
+          false,
+          (indicator: UserAssignmentInfo): number | null | undefined => indicator.labels?.[labelKey]?.[0]?.value_int,
+        );
       }
 
       if (label.kind === AnnotationSchemeLabel.kind.BOOL) {
-        const cmap = {
-          undefined: 'white',
-          null: 'white',
-          false: '#C54B6C',
-          true: '#8DA47E',
-          // @ts-ignore TS1268
-        } as { [key: undefined | null | boolean]: string };
-
-        // @ts-ignore TS2538
-        return (indicator: ProgressIndicator): string => cmap?.[indicator.labels?.[labelKey]?.[0]?.value_bool] ?? 'white';
+        return lookupMakerBool<UserAssignmentInfo>(
+          (indicator: UserAssignmentInfo): boolean | null | undefined => indicator.labels?.[labelKey]?.[0]?.value_bool,
+        );
       }
 
       // fallback to status mapper
       return indicateStatusMapper;
+    },
+    progressBarLabelKey(): string | undefined | null {
+      return interfaceSettingsStore.annotation.progressBarLabelKey;
     },
   },
   watch: {
@@ -656,7 +694,7 @@ export default defineComponent({
   max-width: 1rem;
   height: 0.8rem;
   margin: 0.05rem;
-  border: .1rem solid gray;
+  border: 0.1rem solid #808080;
   position: relative;
 }
 
@@ -668,8 +706,8 @@ export default defineComponent({
   margin: 0;
   text-decoration: none;
   text-align: center;
-  -webkit-transition: .2s ease-in-out;
-  transition: .2s ease-in-out;
+  -webkit-transition: 0.2s ease-in-out;
+  transition: 0.2s ease-in-out;
   opacity: 0;
   top: 5em;
   width: 4ch;
@@ -699,7 +737,7 @@ export default defineComponent({
   display: flex;
   overflow: hidden;
   height: 0.5rem;
-  border: 1px solid gray;
+  border: 1px solid #808080;
 }
 
 .assignments-birdseye-step {
@@ -726,5 +764,4 @@ export default defineComponent({
 .assignments-birdseye-step.OPEN {
   background-color: white;
 }
-
 </style>

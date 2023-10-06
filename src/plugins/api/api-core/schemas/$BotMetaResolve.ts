@@ -30,8 +30,18 @@ export const $BotMetaResolve = {
         type: 'null',
       }],
     },
-    collection: {
-      type: 'AnnotationCollectionDB',
+    snapshot: {
+      type: 'array',
+      contains: {
+        type: 'SnapshotEntry',
+      },
+      isRequired: true,
+    },
+    resolutions: {
+      type: 'array',
+      contains: {
+        type: 'ResolutionSnapshotEntry',
+      },
       isRequired: true,
     },
   },

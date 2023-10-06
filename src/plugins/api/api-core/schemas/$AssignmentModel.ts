@@ -2,8 +2,7 @@
 /* tslint:disable */
 /* eslint-disable */
 export const $AssignmentModel = {
-  description: `
-  Corresponds to db.models.annotations.Assignment
+  description: `Corresponds to db.models.annotations.Assignment
 
   Assignment is used to request a user/annotator (User) to annotate a particular item (BaseItem) in the database
   following a pre-defined annotation scheme (AnnotationScheme).
@@ -16,8 +15,7 @@ export const $AssignmentModel = {
   The most common use-cases are:
    * Creating assignments in bulk at random (e.g. 3 users should annotate 50 documents each)
    * Creating assignments one at a time based on a set of rules (e.g. for double-coding, defined order, bias, ...)
-   * Creating assignments in small batches or one-by-one in prioritised annotation settings
-  `,
+   * Creating assignments in small batches or one-by-one in prioritised annotation settings`,
   properties: {
     assignment_id: {
       type: 'any-of',

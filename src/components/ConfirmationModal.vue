@@ -10,23 +10,22 @@
               class="btn-close"
               data-bs-dismiss="modal"
               aria-label="Close"
-              @click="resolveConfirmationRequest('IGNORE')" />
+              @click="resolveConfirmationRequest('IGNORE')"
+            />
           </div>
           <div class="modal-body text-start">
             <p v-html="latestConfirmationRequest.htmlBody" />
           </div>
-          <div class=" modal-footer">
+          <div class="modal-footer">
             <button
               type="button"
               class="btn btn-outline-danger"
               data-bs-dismiss="modal"
-              @click="resolveConfirmationRequest('REJECT')">
+              @click="resolveConfirmationRequest('REJECT')"
+            >
               {{ latestConfirmationRequest.reject }}
             </button>
-            <button
-              type="button"
-              class="btn btn-success"
-              @click="resolveConfirmationRequest('ACCEPT')">
+            <button type="button" class="btn btn-success" @click="resolveConfirmationRequest('ACCEPT')">
               {{ latestConfirmationRequest.accept }}
             </button>
           </div>
@@ -38,13 +37,13 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
-import { marked } from 'marked';
-import { ConfirmationRequestEvent } from '@/plugins/events/events/confirmation';
-import type { ConfirmationResponse } from '@/plugins/events/events/confirmation';
+import { defineComponent } from "vue";
+import { marked } from "marked";
+import { ConfirmationRequestEvent } from "@/plugins/events/events/confirmation";
+import type { ConfirmationResponse } from "@/plugins/events/events/confirmation";
 
 export default defineComponent({
-  name: 'ConfirmationModal',
+  name: "ConfirmationModal",
   created() {
     this.$eventBus.on(ConfirmationRequestEvent, (event: ConfirmationRequestEvent) => {
       // pass
@@ -77,6 +76,4 @@ export default defineComponent({
 });
 </script>
 
-<style>
-
-</style>
+<style></style>

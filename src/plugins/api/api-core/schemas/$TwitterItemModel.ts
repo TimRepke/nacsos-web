@@ -2,12 +2,10 @@
 /* tslint:disable */
 /* eslint-disable */
 export const $TwitterItemModel = {
-  description: `
-  Corresponds to db.models.items.TwitterItem
+  description: `Corresponds to db.models.items.TwitterItem
 
   For more in-depth documentation, please refer to:
-  https://developer.twitter.com/en/docs/twitter-api/data-dictionary/object-model/tweet
-  `,
+  https://developer.twitter.com/en/docs/twitter-api/data-dictionary/object-model/tweet`,
   properties: {
     item_id: {
       type: 'any-of',

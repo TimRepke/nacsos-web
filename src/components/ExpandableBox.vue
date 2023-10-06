@@ -5,13 +5,14 @@
       :class="{ 'border-bottom-0': !expanded }"
       tabindex="0"
       role="button"
-      @click="expanded = !expanded">
+      @click="expanded = !expanded"
+    >
       <slot name="head" />
-      <font-awesome-icon class="text-muted ms-auto" :icon="['fas', (expanded) ? 'minus' : 'plus']" />
+      <font-awesome-icon class="text-muted ms-auto" :icon="['fas', expanded ? 'minus' : 'plus']" />
     </div>
     <div class="card-body" v-show="expanded">
       <div class="row g-2 row-cols-auto">
-        <div class="col">
+        <div class="col-12">
           <slot name="body" />
         </div>
       </div>
@@ -20,10 +21,10 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent } from "vue";
 
 export default defineComponent({
-  name: 'ExpandableBox',
+  name: "ExpandableBox",
   props: {
     initiallyOpen: {
       type: Boolean,
@@ -38,6 +39,4 @@ export default defineComponent({
 });
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

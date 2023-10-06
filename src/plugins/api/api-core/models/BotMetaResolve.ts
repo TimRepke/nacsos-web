@@ -2,8 +2,9 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { AnnotationCollectionDB } from './AnnotationCollectionDB';
 import type { AnnotationFilters } from './AnnotationFilters';
+import type { ResolutionSnapshotEntry } from './ResolutionSnapshotEntry';
+import type { SnapshotEntry } from './SnapshotEntry';
 
 export type BotMetaResolve = {
   algorithm: BotMetaResolve.algorithm;
@@ -11,7 +12,8 @@ export type BotMetaResolve = {
   ignore_hierarchy: boolean;
   ignore_repeat: boolean;
   trust?: (Record<string, number> | null);
-  collection: AnnotationCollectionDB;
+  snapshot: Array<SnapshotEntry>;
+  resolutions: Array<ResolutionSnapshotEntry>;
 };
 
 export namespace BotMetaResolve {

@@ -9,12 +9,7 @@
           <span class="input-group-text">
             <font-awesome-icon :icon="['fas', 'magnifying-glass']" />
           </span>
-          <input
-            v-model="projectSearch"
-            type="text"
-            aria-label="Search"
-            placeholder="Search..."
-            class="form-control" />
+          <input v-model="projectSearch" type="text" aria-label="Search" placeholder="Search..." class="form-control" />
         </div>
       </div>
     </div>
@@ -23,23 +18,25 @@
         <table class="table table-hover">
           <thead>
             <tr>
-              <th scope="col" @click="resort('name')">Name
+              <th scope="col" @click="resort('name')">
+                Name
                 <font-awesome-icon :icon="['fas', sorting.name]" />
               </th>
-              <th scope="col" @click="resort('owner')">Owner(s)
+              <th scope="col" @click="resort('owner')">
+                Owner(s)
                 <font-awesome-icon :icon="['fas', sorting.owner]" />
               </th>
-              <th scope="col" @click="resort('assi')">Assignments
+              <th scope="col" @click="resort('assi')">
+                Assignments
                 <font-awesome-icon :icon="['fas', sorting.assi]" />
               </th>
-              <th scope="col" @click="resort('date')">Created
+              <th scope="col" @click="resort('date')">
+                Created
                 <font-awesome-icon :icon="['fas', sorting.date]" />
               </th>
             </tr>
           </thead>
-          <tbody
-            v-for="project in sortedFilteredProjects"
-            :key="project.project_id">
+          <tbody v-for="project in sortedFilteredProjects" :key="project.project_id">
             <tr>
               <td>
                 <div class="d-flex">
@@ -59,9 +56,7 @@
                   </li>
                 </ul>
               </td>
-              <td>?? open assignments
-
-              </td>
+              <td>?? open assignments</td>
               <td>{{ project.time_created.slice(0, 10) }}</td>
             </tr>
             <tr v-if="project.showDesc && project.description">
@@ -77,20 +72,20 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
-import { marked } from 'marked';
-import 'core-js/modules/es.array.to-sorted';
-import { EventBus } from '@/plugins/events';
-import { CurrentProjectSelectedEvent, CurrentProjectSetEvent } from '@/plugins/events/events/projects';
-import type { ProjectInfo } from '@/plugins/api/api-core';
-import { API, toastReject } from '@/plugins/api';
-import { ItemType } from '@/plugins/api/api-core';
-import ProjectTypeIcon from '@/components/ProjectTypeIcon.vue';
+import { defineComponent } from "vue";
+import { marked } from "marked";
+import "core-js/modules/es.array.to-sorted";
+import { EventBus } from "@/plugins/events";
+import { CurrentProjectSelectedEvent, CurrentProjectSetEvent } from "@/plugins/events/events/projects";
+import type { ProjectInfo } from "@/plugins/api/api-core";
+import { API, toastReject } from "@/plugins/api";
+import { ItemType } from "@/plugins/api/api-core";
+import ProjectTypeIcon from "@/components/ProjectTypeIcon.vue";
 
 enum Sort {
-  sort = 'sort', // ignored
-  'sort-up' = 'sort-up', // ascending
-  'sort-down' = 'sort-down', // descending
+  sort = "sort", // ignored
+  "sort-up" = "sort-up", // ascending
+  "sort-down" = "sort-down", // descending
 }
 
 interface Sorting {
@@ -103,17 +98,17 @@ interface Sorting {
 type ProjectInfoExt = ProjectInfo & { showDesc?: boolean };
 
 export default defineComponent({
-  name: 'ProjectListView',
+  name: "ProjectListView",
   components: { ProjectTypeIcon },
   data() {
     return {
       projectList: [] as ProjectInfoExt[],
-      projectSearch: '',
+      projectSearch: "",
       sorting: {
         name: Sort.sort,
         owner: Sort.sort,
         assi: Sort.sort,
-        date: Sort['sort-down'],
+        date: Sort["sort-down"],
       } as Sorting,
       projectTypes: ItemType,
     };
@@ -122,31 +117,34 @@ export default defineComponent({
     // clear the currentProjectStore to prevent side effects
     // currentProjectStore.clear();
     // get all projects from the server (that we have permission to access)
-    API.core.projects.getAllProjectsApiProjectsListGet()
-      .then((response) => { this.projectList = response.data; })
+    API.core.projects
+      .getAllProjectsApiProjectsListGet()
+      .then((response) => {
+        this.projectList = response.data;
+      })
       .catch(toastReject);
   },
   methods: {
     selectProject(projectId: string) {
       EventBus.emit(new CurrentProjectSelectedEvent(projectId));
       EventBus.once(CurrentProjectSetEvent, () => {
-        this.$router.push({ name: 'project-overview' });
+        this.$router.push({ name: "project-overview" });
       });
     },
     resort(field: keyof Sorting) {
       const currentVal = this.sorting[field];
       // reset all other column sorters
-      if (field !== 'name') this.sorting.name = 'sort';
-      if (field !== 'date') this.sorting.date = 'sort';
-      if (field !== 'owner') this.sorting.owner = 'sort';
-      if (field !== 'assi') this.sorting.assi = 'sort';
+      if (field !== "name") this.sorting.name = "sort";
+      if (field !== "date") this.sorting.date = "sort";
+      if (field !== "owner") this.sorting.owner = "sort";
+      if (field !== "assi") this.sorting.assi = "sort";
 
       // cycle through states
       if (currentVal === Sort.sort) {
-        this.sorting[field] = Sort['sort-up'];
-      } else if (currentVal === Sort['sort-up']) {
-        this.sorting[field] = Sort['sort-down'];
-      } else if (currentVal === Sort['sort-down']) {
+        this.sorting[field] = Sort["sort-up"];
+      } else if (currentVal === Sort["sort-up"]) {
+        this.sorting[field] = Sort["sort-down"];
+      } else if (currentVal === Sort["sort-down"]) {
         this.sorting[field] = Sort.sort;
       }
     },
@@ -175,8 +173,8 @@ export default defineComponent({
 
       return this.filteredProjects.toSorted((p1: ProjectInfoExt, p2: ProjectInfoExt) => {
         const [v1, v2] = comparator(p1, p2);
-        if (v1 < v2) return (dir === Sort['sort-up']) ? -1 : 1;
-        if (v1 > v2) return (dir === Sort['sort-up']) ? 1 : -1;
+        if (v1 < v2) return dir === Sort["sort-up"] ? -1 : 1;
+        if (v1 > v2) return dir === Sort["sort-up"] ? 1 : -1;
         return 0;
       });
     },
@@ -184,6 +182,4 @@ export default defineComponent({
 });
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

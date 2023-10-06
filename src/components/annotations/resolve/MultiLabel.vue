@@ -1,10 +1,7 @@
 <template>
-  <div v-if="botAnnotation !== undefined">
+  <div>
     <div class="flex-wrap">
-      <InlineToolTip
-        v-for="tag in botAnnotation.multi_int.toSorted()"
-        :key="tag"
-        :info="choiceInfo[tag]">
+      <InlineToolTip v-for="tag in tags" :key="tag" :info="choiceInfo[tag]">
         <closable-pill
           class="me-1 mb-1"
           :bg-override="true"
@@ -12,7 +9,8 @@
             'background-color': `${AgreementColour[choiceAgreements[tag]]}!important`,
             'font-weight': 'normal',
           }"
-          @clicked-x="removeLabel(tag)">
+          @clicked-x="removeLabel(tag)"
+        >
           {{ tag }}
         </closable-pill>
       </InlineToolTip>
@@ -22,11 +20,12 @@
         class="border text-light p-1 border-dark border-2 rounded-3"
         role="button"
         tabindex="-1"
-        @click="editMode = !editMode">
+        @click="editMode = !editMode"
+      >
         <font-awesome-icon :icon="['fas', 'plus']" class="text-dark" />
       </span>
       <ul class="dropdown-menu end-0" :class="{ show: editMode }">
-        <li v-for="choice in info.choices" :key="choice.value">
+        <li v-for="choice in label.choices" :key="choice.value">
           <span class="dropdown-item" role="button" tabindex="-1" @click="addLabel(choice.value)">
             <strong>{{ choice.value }}:</strong> {{ choice.name }}
           </span>
@@ -37,151 +36,163 @@
 </template>
 
 <script lang="ts">
-
-import 'core-js/modules/es.array.to-sorted';
-import { defineComponent } from 'vue';
-import type { PropType } from 'vue';
+import "core-js/modules/es.array.to-sorted";
+import { defineComponent } from "vue";
+import type { PropType } from "vue";
 import type {
   AnnotationModel,
-  AnnotationSchemeLabelChoiceFlat,
   BotAnnotationModel,
-  FlattenedAnnotationSchemeLabel,
   UserModel,
-} from '@/plugins/api/api-core';
-import { EventBus } from '@/plugins/events';
-import { ToastEvent } from '@/plugins/events/events/toast';
-import ClosablePill from '@/components/ClosablePill.vue';
-import InlineToolTip from '@/components/InlineToolTip.vue';
+  FlatLabel,
+  ResolutionCell,
+  ResolutionUserEntry,
+  FlatLabelChoice,
+} from "@/plugins/api/api-core";
+import ClosablePill from "@/components/ClosablePill.vue";
+import InlineToolTip from "@/components/InlineToolTip.vue";
+import { is, isNone, notNone } from "@/util";
 
-function hasValue(model: AnnotationModel | BotAnnotationModel | undefined | null):
-  model is (AnnotationModel | BotAnnotationModel) & { multi_int: number } {
-  if (model === null || model === undefined) return false;
-  return (model.multi_int !== undefined && model.multi_int !== null);
-}
-
-interface MultiLabelData {
-  changed: boolean,
-  editMode: boolean,
-  AgreementColour: Record<Agreement, string>,
+function hasValue(
+  model: AnnotationModel | BotAnnotationModel | undefined | null,
+): model is (AnnotationModel | BotAnnotationModel) & { multi_int: number } {
+  if (isNone(model)) return false;
+  return model.multi_int !== undefined && model.multi_int !== null;
 }
 
 enum Agreement {
   // All users from the pool picked this choice
-  FULL = 'full',
+  FULL = "full",
   // Some, but not all annotators from the pool picked this choice
-  PARTIAL = 'partial',
+  PARTIAL = "partial",
   // One user from the pool picked this choice (note, not in case only one user was in the pool)
-  SINGLE = 'single',
+  SINGLE = "single",
   // This choice was added during consolidation
-  NOVEL = 'novel',
+  NOVEL = "novel",
 }
 
 export default defineComponent({
-  name: 'MultiLabel',
+  name: "MultiLabel",
   components: { ClosablePill, InlineToolTip },
-  data(): MultiLabelData {
+  data() {
     return {
       changed: false,
       editMode: false,
       AgreementColour: {
-        full: 'green',
-        partial: '#BB8E49',
-        single: 'orange',
-        novel: 'limegreen',
+        full: "green",
+        partial: "#BB8E49",
+        single: "orange",
+        novel: "limegreen",
       } as Record<Agreement, string>,
     };
   },
-  emits: ['botAnnotationChanged', 'botAnnotationConfirmed'],
+  emits: ["botAnnotationChanged", "botAnnotationConfirmed"],
   props: {
-    info: {
-      type: Object as PropType<FlattenedAnnotationSchemeLabel>,
+    botAnnotationMetaDataId: { type: String, required: false, default: undefined },
+    itemId: { type: String, required: true },
+    label: {
+      type: Object as PropType<FlatLabel>,
       required: true,
     },
-    users: {
+    usersLookup: {
       type: Object as PropType<Record<string, UserModel>>,
       required: true,
     },
-    userAnnotations: {
-      type: Array as PropType<AnnotationModel[]>,
-      required: false,
-      default: () => undefined,
+    users: {
+      type: Array as PropType<Array<UserModel>>,
+      required: true,
     },
-    botAnnotation: {
-      type: Object as PropType<BotAnnotationModel>,
-      required: false,
-      default: () => undefined,
+    proposal: {
+      type: Object as PropType<ResolutionCell>,
+      required: true,
+    },
+    proposalRow: {
+      type: Object as PropType<Record<string, ResolutionCell>>,
+      required: true,
     },
   },
   methods: {
-    hasValue(model: AnnotationModel | BotAnnotationModel | undefined | null):
-      model is (AnnotationModel | BotAnnotationModel) & { multi_int: number } {
+    hasValue(
+      model: AnnotationModel | BotAnnotationModel | undefined | null,
+    ): model is (AnnotationModel | BotAnnotationModel) & { multi_int: number } {
       return hasValue(model);
     },
     addLabel(value: number) {
-      const anno = this.botAnnotation;
-      if (anno !== undefined) {
+      const anno = this.proposal.resolution;
+      if (is<BotAnnotationModel>(anno)) {
         // eslint-disable-next-line @typescript-eslint/naming-convention
         const { multi_int } = anno;
-        if (multi_int !== undefined) {
+        if (is<number[]>(multi_int)) {
           const pos: number = multi_int.indexOf(value);
           if (pos < 0) {
             this.changed = true;
             multi_int.push(value);
-            this.$emit('botAnnotationChanged', anno);
-            this.editMode = false;
+            this.$emit("botAnnotationChanged", anno);
           }
         }
-      } else {
-        // FIXME: not implemented (handle adding new BotAnnotation, i.e. handle the case where item has no annotation here)
-        // const anno: BotAnnotationModel = {};
-        EventBus.emit(new ToastEvent('WARN', 'Not implemented yet.'));
       }
+      this.editMode = false;
     },
     removeLabel(value: number) {
-      const anno = this.botAnnotation;
-      if (anno !== undefined) {
+      const anno = this.proposal.resolution;
+      if (is<BotAnnotationModel>(anno)) {
         // eslint-disable-next-line @typescript-eslint/naming-convention
         const { multi_int } = anno;
-        if (multi_int !== undefined) {
+        if (is<number[]>(multi_int)) {
           const pos: number = multi_int.indexOf(value);
           if (pos >= 0) {
             this.changed = true;
             multi_int.splice(pos, 1);
-            this.$emit('botAnnotationChanged', anno);
-            this.editMode = false;
+            this.$emit("botAnnotationChanged", anno);
           }
         }
-      } else {
-        // FIXME: not implemented (handle adding new BotAnnotation, i.e. handle the case where item has no annotation here)
-        // const anno: BotAnnotationModel = {};
-        EventBus.emit(new ToastEvent('WARN', 'Not implemented yet.'));
       }
+      this.editMode = false;
     },
     getPrettyUsername(userId: string): string {
-      const user: UserModel | undefined = this.users[userId];
-      if (!user) return '??';
+      const user: UserModel | undefined = this.usersLookup[userId];
+      if (isNone(user)) return "??";
       return `${user.username} (${user.full_name})`;
     },
   },
   computed: {
-    choiceLookup(): Record<number, AnnotationSchemeLabelChoiceFlat> {
-      if (this.info && this.info.choices) {
-        return Object.fromEntries(this.info.choices.map((choice: AnnotationSchemeLabelChoiceFlat) => [choice.value, choice]));
+    tags(): Array<number> {
+      const { resolution } = this.proposalRow[this.label.path_key];
+      if (is<BotAnnotationModel>(resolution) && is<Array<number>>(resolution.multi_int)) {
+        return resolution.multi_int.toSorted();
       }
-      return {};
+      return [];
+    },
+    choiceLookup(): Record<number, FlatLabelChoice> {
+      const { choices } = this.label;
+      if (!choices) return {};
+      return Object.fromEntries(choices.map((choice: FlatLabelChoice) => [choice.value, choice]));
     },
     choiceUsers(): Record<number, UserModel[]> {
-      const annos = this.userAnnotations;
-      if (!annos || !this.users) return {};
-      const entries = annos
-        .flatMap((anno: AnnotationModel) => {
-          if (!anno.multi_int) return undefined;
-          return anno.multi_int.map((mi): [UserModel, number] => [this.users[anno.user_id] as UserModel, mi as number]);
+      const { labels } = this.proposalRow[this.label.path_key];
+      if (isNone(labels)) {
+        return {};
+      }
+      const entries = Object.entries<ResolutionUserEntry[]>(labels)
+        .flatMap((userEntry: [string, ResolutionUserEntry[]]) => {
+          const [userId, userLabels] = userEntry;
+          return userLabels.flatMap((entry: ResolutionUserEntry) => {
+            if (
+              isNone(entry.annotation) ||
+              isNone(entry.annotation.multi_int) ||
+              entry.annotation.multi_int.length === 0
+            )
+              return undefined;
+            return entry.annotation.multi_int.map((choice: number): [number, UserModel] => [
+              choice as number,
+              this.usersLookup[userId] as UserModel,
+            ]);
+          });
         })
-        .filter((entry: [UserModel, number] | undefined) => entry !== undefined) as [UserModel, number][];
+        .filter((entry: [number, UserModel] | undefined) => notNone(entry)) as [number, UserModel][];
 
-      return entries.reduce((accu: Record<number, UserModel[]>, entry: [UserModel, number]) => {
-        const [user, choice] = entry;
+      return entries.reduce((accu: Record<number, UserModel[]>, entry: [number, UserModel]) => {
+        const [choice, user] = entry;
+
         // eslint-disable-next-line no-param-reassign
         if (!accu[choice]) accu[choice] = [];
         accu[choice].push(user);
@@ -193,7 +204,10 @@ export default defineComponent({
       return Object.fromEntries(
         userEntries.map((entry: [number, UserModel[]]) => {
           const [choice, entryUsers] = entry;
-          const usernames = entryUsers.map((user) => user.username).join(', ');
+          const usernames = entryUsers
+            .filter((user) => !!user)
+            .map((user) => user.username)
+            .join(", ");
           const choiceName = this.choiceLookup[choice].name;
           return [choice, `${usernames}: "${choiceName}"`];
         }),
@@ -201,19 +215,15 @@ export default defineComponent({
     },
     choiceAgreements(): Record<number, Agreement> {
       const numUsers: number = Object.keys(this.users).length;
-      const multiInt = this.botAnnotation?.multi_int;
-      const annos = this.userAnnotations;
-      if (!annos || !multiInt) return {};
-      const userEntries = Object.entries(this.choiceUsers) as unknown as Array<[number, UserModel[]]>;
-      const counters: Record<number, number> = Object.fromEntries(
-        userEntries.map((entry: [number, UserModel[]]) => [entry[0], entry[1].length]),
-      );
+      const { resolution } = this.proposalRow[this.label.path_key];
 
-      if (!counters) return {};
-
+      if (isNone(resolution) || isNone(resolution.multi_int)) return {};
       return Object.fromEntries(
-        multiInt.map((choice: number) => {
-          const count = counters[choice];
+        Object.entries<UserModel[]>(this.choiceUsers).map((entry: [string, UserModel[]]): [number, Agreement] => {
+          const [choice_str, users] = entry;
+          const choice = parseInt(choice_str);
+          const usernames = users.filter((user) => !!user).map((user) => user.username);
+          const count = new Set(usernames).size;
           if (!count) return [choice, Agreement.NOVEL]; // undefined, 0, null
           if (numUsers === 1) return [choice, Agreement.FULL];
           if (count === numUsers) return [choice, Agreement.FULL];

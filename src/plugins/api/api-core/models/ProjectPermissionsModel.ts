@@ -3,7 +3,6 @@
 /* eslint-disable */
 
 /**
- *
  * ProjectPermissions allows to define fine-grained project-level permission management.
  * Once such an entry exists, the user is assumed to have very basic access to the respective project.
  * A user may become "owner" of a project, which will allow them to do everything and effectively ignoring the
@@ -11,7 +10,6 @@
  *
  * It is assumed, that a user can always see and edit their own contributions (e.g. annotations) but
  * by giving them permission to view annotations, they can also see other users' annotations.
- *
  */
 export type ProjectPermissionsModel = {
   project_permission_id?: (string | null);

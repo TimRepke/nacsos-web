@@ -3,16 +3,16 @@
 </template>
 
 <script lang="ts">
-import { defineAsyncComponent, defineComponent, markRaw } from 'vue';
-import type { PropType, Component } from 'vue';
-import type { AnyItem } from '@/types/items.d';
-import { useCurrentProjectStore } from '@/stores/CurrentProjectStore';
-import type { HighlighterModel, ItemType, ProjectModel } from '@/plugins/api/api-core';
+import { defineAsyncComponent, defineComponent, markRaw } from "vue";
+import type { PropType, Component } from "vue";
+import type { AnyItem } from "@/types/items.d";
+import { useCurrentProjectStore } from "@/stores/CurrentProjectStore";
+import type { HighlighterModel, ItemType, ProjectModel } from "@/plugins/api/api-core";
 
 type TypeMapType = { [key in ItemType]: Component };
 
 export default defineComponent({
-  name: 'AnyItem',
+  name: "AnyItem",
   props: {
     item: {
       type: Object as PropType<AnyItem>,
@@ -27,10 +27,10 @@ export default defineComponent({
   },
   data() {
     const typeMap: TypeMapType = {
-      generic: markRaw(defineAsyncComponent(() => import('@/components/items/GenericItem.vue'))),
-      twitter: markRaw(defineAsyncComponent(() => import('@/components/items/TwitterItem.vue'))),
-      academic: markRaw(defineAsyncComponent(() => import('@/components/items/AcademicItem.vue'))),
-      patents: markRaw(defineAsyncComponent(() => import('@/components/items/GenericItem.vue'))), // FIXME: replace with correct component
+      generic: markRaw(defineAsyncComponent(() => import("@/components/items/GenericItem.vue"))),
+      twitter: markRaw(defineAsyncComponent(() => import("@/components/items/TwitterItem.vue"))),
+      academic: markRaw(defineAsyncComponent(() => import("@/components/items/AcademicItem.vue"))),
+      patents: markRaw(defineAsyncComponent(() => import("@/components/items/GenericItem.vue"))), // FIXME: replace with correct component
     };
     const store = useCurrentProjectStore();
     const { type } = store.project as ProjectModel;
@@ -41,6 +41,4 @@ export default defineComponent({
 });
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

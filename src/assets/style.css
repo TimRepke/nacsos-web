@@ -149,3 +149,11 @@ Analogous to LaTeX
   --bs-btn-padding-x: .5rem;
   --bs-btn-font-size: .75rem;
 }
+
+.resolve-label-new {
+  outline: 3px dashed #32a1ce;
+}
+
+.resolve-label-changed {
+  outline: 5px double #32a1ce;
+}

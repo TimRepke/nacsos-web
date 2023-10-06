@@ -7,7 +7,8 @@
       tabindex="-1"
       style="display: block"
       @click="dismissModal"
-      aria-hidden="true">
+      aria-hidden="true"
+    >
       <div class="modal-dialog modal-xl modal-dialog-scrollable" @click.stop="stop">
         <div class="modal-content">
           <div class="modal-header">
@@ -40,22 +41,22 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
-import type { AnyItem } from '@/types/items';
-import { API } from '@/plugins/api';
-import { currentProjectStore } from '@/stores';
-import type { CancelablePromise } from '@/plugins/api/core/CancelablePromise';
-import AnyItemComponent from '@/components/items/AnyItem.vue';
+import { defineComponent } from "vue";
+import type { AnyItem } from "@/types/items";
+import { API } from "@/plugins/api";
+import { currentProjectStore } from "@/stores";
+import type { CancelablePromise } from "@/plugins/api/core/CancelablePromise";
+import AnyItemComponent from "@/components/items/AnyItem.vue";
 
 type ItemModalData = {
-  itemInfo: AnyItem | undefined,
-  requestPromise: CancelablePromise<AnyItem> | undefined,
+  itemInfo: AnyItem | undefined;
+  requestPromise: CancelablePromise<AnyItem> | undefined;
 };
 
 export default defineComponent({
   components: { AnyItemComponent },
-  props: ['itemId'],
-  emits: ['dismissed'],
+  props: ["itemId"],
+  emits: ["dismissed"],
   data(): ItemModalData {
     return {
       itemInfo: undefined,
@@ -74,20 +75,23 @@ export default defineComponent({
   methods: {
     getItemInfo(itemId: string) {
       this.itemInfo = null;
-      this.requestPromise = API.core.project.getDetailForItemApiProjectItemsDetailItemIdGet({
-        itemId,
-        xProjectId: currentProjectStore.projectId as string,
-      }).then((result) => {
-        this.itemInfo = result.data;
-        this.requestPromise = undefined;
-      }).catch(() => {
-        this.dismissModal();
-      });
+      this.requestPromise = API.core.project
+        .getDetailForItemApiProjectItemsDetailItemIdGet({
+          itemId,
+          xProjectId: currentProjectStore.projectId as string,
+        })
+        .then((result) => {
+          this.itemInfo = result.data;
+          this.requestPromise = undefined;
+        })
+        .catch(() => {
+          this.dismissModal();
+        });
     },
     dismissModal() {
       this.resetRequest();
       this.itemInfo = undefined;
-      this.$emit('dismissed');
+      this.$emit("dismissed");
     },
     resetRequest() {
       if (this.requestPromise !== undefined) {
