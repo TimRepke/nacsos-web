@@ -169,7 +169,7 @@ import { lookupMakerBool, lookupMakerChoice, lookupMakerStatus } from "@/types/c
 const motivationalQuotes = [
   "The chase is better than the catch. – Scooter",
   "It's the first page of the second chapter – Scooter",
-  "Let's blow a hole in the bowl – Scooter",
+  // "Let's blow a hole in the bowl – Scooter",
   "Our lyrics fly like birds in the sky – Scooter",
   "It's nice to be important, but it's more important to be nice – Scooter",
   "Before success can manifest. You’ve got to go through the learning process. – Scooter",
