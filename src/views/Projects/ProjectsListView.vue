@@ -22,13 +22,13 @@
                 Name
                 <font-awesome-icon :icon="['fas', sorting.name]" />
               </th>
+              <th scope="col" @click="resort('assi')">
+                Project ID
+                <font-awesome-icon :icon="['fas', sorting.assi]" />
+              </th>
               <th scope="col" @click="resort('owner')">
                 Owner(s)
                 <font-awesome-icon :icon="['fas', sorting.owner]" />
-              </th>
-              <th scope="col" @click="resort('assi')">
-                Assignments
-                <font-awesome-icon :icon="['fas', sorting.assi]" />
               </th>
               <th scope="col" @click="resort('date')">
                 Created
@@ -36,7 +36,7 @@
               </th>
             </tr>
           </thead>
-          <tbody v-for="project in sortedFilteredProjects" :key="project.project_id">
+          <tbody v-for="project in sortedFilteredProjects" :key="project.project_id as string">
             <tr>
               <td>
                 <div class="d-flex">
@@ -49,15 +49,16 @@
                   </div>
                 </div>
               </td>
+              <td><code>{{ project.project_id }}</code></td>
               <td>
                 <ul class="list-inline">
-                  <li v-for="owner in project.owners" :key="owner.user_id" class="list-inline-item">
+                  <li v-for="owner in project.owners" :key="owner.user_id as string" class="list-inline-item">
                     {{ owner.full_name }} <span class="text-muted small">({{ owner.affiliation }})</span>
                   </li>
                 </ul>
               </td>
-              <td>?? open assignments</td>
-              <td>{{ project.time_created.slice(0, 10) }}</td>
+              <!--<td>?? open assignments</td>-->
+              <td>{{ project.time_created?.slice(0, 10) }}</td>
             </tr>
             <tr v-if="project.showDesc && project.description">
               <td colspan="4">
@@ -125,19 +126,21 @@ export default defineComponent({
       .catch(toastReject);
   },
   methods: {
-    selectProject(projectId: string) {
-      EventBus.emit(new CurrentProjectSelectedEvent(projectId));
-      EventBus.once(CurrentProjectSetEvent, () => {
-        this.$router.push({ name: "project-overview" });
-      });
+    selectProject(projectId: string | null | undefined) {
+      if (projectId) {
+        EventBus.emit(new CurrentProjectSelectedEvent(projectId));
+        EventBus.once(CurrentProjectSetEvent, () => {
+          this.$router.push({ name: "project-overview" });
+        });
+      }
     },
     resort(field: keyof Sorting) {
       const currentVal = this.sorting[field];
       // reset all other column sorters
-      if (field !== "name") this.sorting.name = "sort";
-      if (field !== "date") this.sorting.date = "sort";
-      if (field !== "owner") this.sorting.owner = "sort";
-      if (field !== "assi") this.sorting.assi = "sort";
+      if (field !== "name") this.sorting.name = Sort.sort;
+      if (field !== "date") this.sorting.date = Sort.sort;
+      if (field !== "owner") this.sorting.owner = Sort.sort;
+      if (field !== "assi") this.sorting.assi = Sort.sort;
 
       // cycle through states
       if (currentVal === Sort.sort) {

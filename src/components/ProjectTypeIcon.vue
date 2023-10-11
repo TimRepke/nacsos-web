@@ -13,6 +13,7 @@ type ProjectType =
   | "generic"
   | "twitter" // eslint-disable-line @typescript-eslint/indent
   | "academic" // eslint-disable-line @typescript-eslint/indent
+  | "lexis" // eslint-disable-line @typescript-eslint/indent
   | "patents"; // eslint-disable-line @typescript-eslint/indent
 
 export default defineComponent({
@@ -37,6 +38,9 @@ export default defineComponent({
       }
       if (this.projectType === "patents") {
         return ["fas", "scale-balanced"];
+      }
+      if (this.projectType === "lexis") {
+        return ["fas", "newspaper"];
       }
       return ["fas", "question"];
     },

@@ -22,6 +22,10 @@ export const $AnnotationItem = {
       }, {
         type: 'AcademicItemModel',
       }, {
+        type: 'LexisNexisItemModel',
+      }, {
+        type: 'FullLexisNexisItemModel',
+      }, {
         type: 'GenericItemModel',
       }],
       isRequired: true,
