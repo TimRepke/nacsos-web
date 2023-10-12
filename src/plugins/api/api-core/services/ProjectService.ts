@@ -2,7 +2,9 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { AcademicItemModel } from '../models/AcademicItemModel';
+import type { FullLexisNexisItemModel } from '../models/FullLexisNexisItemModel';
 import type { GenericItemModel } from '../models/GenericItemModel';
+import type { LexisNexisItemModel } from '../models/LexisNexisItemModel';
 import type { ProjectModel } from '../models/ProjectModel';
 import type { ProjectPermissionsModel } from '../models/ProjectPermissionsModel';
 import type { TwitterItemModel } from '../models/TwitterItemModel';
@@ -233,9 +235,9 @@ export class ProjectService {
     itemType,
     xProjectId,
   }: {
-    itemType: 'generic' | 'twitter' | 'academic' | 'patents',
+    itemType: 'generic' | 'twitter' | 'academic' | 'patents' | 'lexis',
     xProjectId: string,
-  }, options?: Partial<ApiRequestOptions>): CancelablePromise<(Array<TwitterItemModel> | Array<AcademicItemModel> | Array<GenericItemModel>)> {
+  }, options?: Partial<ApiRequestOptions>): CancelablePromise<(Array<TwitterItemModel> | Array<AcademicItemModel> | Array<LexisNexisItemModel> | Array<FullLexisNexisItemModel> | Array<GenericItemModel>)> {
     return this.httpRequest.request({
       method: 'GET',
       url: '/api/project/items/{item_type}/list',
@@ -263,11 +265,11 @@ export class ProjectService {
     pageSize,
     xProjectId,
   }: {
-    itemType: 'generic' | 'twitter' | 'academic' | 'patents',
+    itemType: 'generic' | 'twitter' | 'academic' | 'patents' | 'lexis',
     page: number,
     pageSize: number,
     xProjectId: string,
-  }, options?: Partial<ApiRequestOptions>): CancelablePromise<(Array<TwitterItemModel> | Array<AcademicItemModel> | Array<GenericItemModel>)> {
+  }, options?: Partial<ApiRequestOptions>): CancelablePromise<(Array<TwitterItemModel> | Array<AcademicItemModel> | Array<LexisNexisItemModel> | Array<FullLexisNexisItemModel> | Array<GenericItemModel>)> {
     return this.httpRequest.request({
       method: 'GET',
       url: '/api/project/items/{item_type}/list/{page}/{page_size}',
@@ -298,8 +300,8 @@ export class ProjectService {
   }: {
     itemId: string,
     xProjectId: string,
-    itemType?: ('generic' | 'twitter' | 'academic' | 'patents' | null),
-  }, options?: Partial<ApiRequestOptions>): CancelablePromise<(TwitterItemModel | AcademicItemModel | GenericItemModel)> {
+    itemType?: ('generic' | 'twitter' | 'academic' | 'patents' | 'lexis' | null),
+  }, options?: Partial<ApiRequestOptions>): CancelablePromise<(TwitterItemModel | AcademicItemModel | LexisNexisItemModel | FullLexisNexisItemModel | GenericItemModel)> {
     return this.httpRequest.request({
       method: 'GET',
       url: '/api/project/items/detail/{item_id}',

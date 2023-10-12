@@ -30,6 +30,7 @@ export default defineComponent({
       generic: markRaw(defineAsyncComponent(() => import("@/components/items/GenericItem.vue"))),
       twitter: markRaw(defineAsyncComponent(() => import("@/components/items/TwitterItem.vue"))),
       academic: markRaw(defineAsyncComponent(() => import("@/components/items/AcademicItem.vue"))),
+      lexis: markRaw(defineAsyncComponent(() => import("@/components/items/LexisNexisItem.vue"))),
       patents: markRaw(defineAsyncComponent(() => import("@/components/items/GenericItem.vue"))), // FIXME: replace with correct component
     };
     const store = useCurrentProjectStore();

@@ -161,6 +161,7 @@ const configs: Record<string, ConfigOption> = {
 export const projectTypeImportTypeCompatibility: { [key in ProjectModel["type"]]: string[] } = {
   academic: ["academicFile", "oaFile", "oa", "scopusCSV", "wos"],
   twitter: ["twitterApi", "twitterApiFile", "twitterDbFile"],
+  lexis: [],
   generic: [],
   patents: [],
 };

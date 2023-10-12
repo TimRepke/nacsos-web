@@ -10,7 +10,7 @@ export type ProjectInfo = {
   name: string;
   description?: (string | null);
   time_created?: (string | null);
-  type: ('generic' | 'twitter' | 'academic' | 'patents' | ItemType);
+  type: ('generic' | 'twitter' | 'academic' | 'patents' | 'lexis' | ItemType);
   setting_motivational_quotes?: boolean;
   owners: Array<UserBaseModel>;
 };

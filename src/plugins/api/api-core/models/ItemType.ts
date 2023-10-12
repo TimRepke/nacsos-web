@@ -7,4 +7,5 @@ export enum ItemType {
   TWITTER = 'twitter',
   ACADEMIC = 'academic',
   PATENTS = 'patents',
+  LEXIS = 'lexis',
 }

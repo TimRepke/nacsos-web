@@ -5,8 +5,11 @@
         <div class="row">
           <div class="col">
             <div class="mb-2 d-flex justify-content-start">
-              <div class="me-auto">
+              <div class="me-4">
                 <strong>{{ user.username }}</strong>
+              </div>
+              <div class="me-auto">
+                <code>{{ user.user_id }}</code>
               </div>
               <div class="me-2">
                 <div class="form-check-reverse form-switch">

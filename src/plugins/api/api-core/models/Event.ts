@@ -7,14 +7,14 @@ import type { ExampleSubEvent } from './ExampleSubEvent';
 
 export type Event = {
   event: Event.event;
-  payload: (ExampleEvent | ExampleSubEvent);
+  payload: (ExampleSubEvent | ExampleEvent);
 };
 
 export namespace Event {
 
   export enum event {
-    EXAMPLE_EVENT = 'ExampleEvent',
     EXAMPLE_SUB_EVENT = 'ExampleSubEvent',
+    EXAMPLE_EVENT = 'ExampleEvent',
   }
 
 

@@ -41,7 +41,8 @@
               <option value="generic">generic</option>
               <option value="twitter">Twitter</option>
               <option value="academic">Academic (abstracts)</option>
-              <option value="patents">Patents</option>
+              <!--<option value="patents">Patents</option>-->
+              <option value="lexis">LexisNexis</option>
             </select>
           </div>
         </div>
@@ -62,9 +63,9 @@
                 type="checkbox"
                 role="switch"
               />
-              <label class="form-check-label" for="settingsMotivationalQuotes"
-                >Motivational quotes during annotation</label
-              >
+              <label class="form-check-label" for="settingsMotivationalQuotes">
+                Motivational quotes during annotation
+              </label>
             </div>
           </div>
         </div>
@@ -93,7 +94,7 @@ import { defineComponent } from "vue";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import type { ProjectModel, UserBaseModel, UserPermission } from "@/plugins/api/api-core";
 import { currentProjectStore } from "@/stores";
-import { API } from "@/plugins/api";
+import { API, logReject } from "@/plugins/api";
 import { EventBus } from "@/plugins/events";
 import { ToastEvent } from "@/plugins/events/events/toast";
 import PermissionSettingsCard from "@/components/users/PermissionSettingsCard.vue";
@@ -124,9 +125,7 @@ export default defineComponent({
         const { data } = response;
         this.project = data;
       })
-      .catch((reason) => {
-        console.log(reason);
-      });
+      .catch(logReject);
     API.core.project
       .getAllUserPermissionsApiProjectPermissionsListUsersGet({
         xProjectId: currentProjectStore.projectId as string,
@@ -135,9 +134,7 @@ export default defineComponent({
         const { data } = response;
         this.permissions = data;
       })
-      .catch((reason) => {
-        console.log(reason);
-      });
+      .catch(logReject);
   },
   methods: {
     addUser(user: UserBaseModel) {

@@ -21,7 +21,8 @@
         <li v-for="project in filteredProjects" :key="project.project_id" class="list-group-item p-4">
           <div class="mb-2">
             <project-type-icon :project-type="project.type" class="me-2" />
-            <span class="fs-5">{{ project.name }}</span>
+            <span class="fs-5 me-4">{{ project.name }}</span>
+            <code>{{ project.project_id }}</code>
           </div>
           <div v-if="project.isNew" class="mb-2">
             <div class="row">
