@@ -17,6 +17,9 @@
           {{ JSON.stringify(item, null, 4) }}
         </pre>
       </div>
+      <p class="lead">
+        {{ item.teaser }}
+      </p>
       <p class="text-muted" v-if="item.authors">
         <font-awesome-icon :icon="['fas', 'people-group']" class="me-2" />
         <span v-for="(author, ai) in item.authors" :key="ai">
@@ -74,6 +77,7 @@ import type { PropType } from "vue";
 import InlineToolTip from "@/components/InlineToolTip.vue";
 import type { FullLexisNexisItemModel, HighlighterModel } from "@/plugins/api/api-core";
 import { interfaceSettingsStore } from "@/stores";
+import { marked } from "marked";
 
 export default defineComponent({
   name: "LexisNexisItem",
@@ -98,6 +102,8 @@ export default defineComponent({
   computed: {
     htmlAbstract() {
       let txt = this.item.text || "";
+      txt = txt.replaceAll("`", "'");
+      txt = marked.parse(txt);
       txt = this.applyHighlighters(txt);
       return txt.replaceAll("\n", "<br />");
     },
