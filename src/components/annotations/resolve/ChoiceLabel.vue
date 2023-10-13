@@ -73,8 +73,8 @@ import type {
   ResolutionCell,
   ResolutionUserEntry,
   UserModel,
-  FlatLabelChoice, ItemAnnotation,
-} from '@/plugins/api/api-core';
+  FlatLabelChoice,
+} from "@/plugins/api/api-core";
 import InlineToolTip from "@/components/InlineToolTip.vue";
 import { cmap } from "@/types/colours";
 import { EventBus } from "@/plugins/events";
@@ -193,9 +193,6 @@ export default defineComponent({
     },
   },
   computed: {
-    ItemAnnotation() {
-      return ItemAnnotation
-    },
     choiceLookup(): Record<number, FlatLabelChoice> {
       const { choices } = this.label;
       if (!choices) return {};
