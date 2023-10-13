@@ -49,7 +49,9 @@
                   </div>
                 </div>
               </td>
-              <td><code>{{ project.project_id }}</code></td>
+              <td>
+                <code>{{ project.project_id }}</code>
+              </td>
               <td>
                 <ul class="list-inline">
                   <li v-for="owner in project.owners" :key="owner.user_id as string" class="list-inline-item">

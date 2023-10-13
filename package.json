@@ -1,6 +1,6 @@
 {
   "name": "nacsos-web",
-  "version": "0.10.0",
+  "version": "0.11.2",
   "private": true,
   "config": {
     "nacsos_core": "http://127.0.0.1:8081",

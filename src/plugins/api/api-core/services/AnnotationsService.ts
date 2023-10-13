@@ -738,7 +738,7 @@ export class AnnotationsService {
    * @returns SavedResolution Successful Response
    * @throws ApiError
    */
-  public getSavedResolvedAnnotationsApiAnnotationsConfigResolvedBotAnnotationMetaIdGet({
+  public getSavedResolvedAnnotationsApiAnnotationsConfigResolvedBotAnnotationMetadataIdGet({
     botAnnotationMetadataId,
     xProjectId,
   }: {
@@ -747,40 +747,12 @@ export class AnnotationsService {
   }, options?: Partial<ApiRequestOptions>): CancelablePromise<SavedResolution> {
     return this.httpRequest.request({
       method: 'GET',
-      url: '/api/annotations/config/resolved/{bot_annotation_meta_id}',
-      headers: {
-        'x-project-id': xProjectId,
-      },
-      query: {
+      url: '/api/annotations/config/resolved/{bot_annotation_metadata_id}',
+      path: {
         'bot_annotation_metadata_id': botAnnotationMetadataId,
       },
-      errors: {
-        422: `Validation Error`,
-      },
-      ...options,
-    });
-  }
-
-  /**
-   * Delete Saved Resolved Annotations
-   * @returns any Successful Response
-   * @throws ApiError
-   */
-  public deleteSavedResolvedAnnotationsApiAnnotationsConfigResolvedBotAnnotationMetaIdDelete({
-    botAnnotationMetadataId,
-    xProjectId,
-  }: {
-    botAnnotationMetadataId: string,
-    xProjectId: string,
-  }, options?: Partial<ApiRequestOptions>): CancelablePromise<any> {
-    return this.httpRequest.request({
-      method: 'DELETE',
-      url: '/api/annotations/config/resolved/{bot_annotation_meta_id}',
       headers: {
         'x-project-id': xProjectId,
-      },
-      query: {
-        'bot_annotation_metadata_id': botAnnotationMetadataId,
       },
       errors: {
         422: `Validation Error`,
@@ -839,6 +811,34 @@ export class AnnotationsService {
       url: '/api/annotations/config/resolved-list/',
       headers: {
         'x-project-id': xProjectId,
+      },
+      errors: {
+        422: `Validation Error`,
+      },
+      ...options,
+    });
+  }
+
+  /**
+   * Delete Saved Resolved Annotations
+   * @returns any Successful Response
+   * @throws ApiError
+   */
+  public deleteSavedResolvedAnnotationsApiAnnotationsConfigResolvedBotAnnotationMetaIdDelete({
+    botAnnotationMetadataId,
+    xProjectId,
+  }: {
+    botAnnotationMetadataId: string,
+    xProjectId: string,
+  }, options?: Partial<ApiRequestOptions>): CancelablePromise<any> {
+    return this.httpRequest.request({
+      method: 'DELETE',
+      url: '/api/annotations/config/resolved/{bot_annotation_meta_id}',
+      headers: {
+        'x-project-id': xProjectId,
+      },
+      query: {
+        'bot_annotation_metadata_id': botAnnotationMetadataId,
       },
       errors: {
         422: `Validation Error`,

@@ -52,7 +52,13 @@
                     </select>
                   </div>
                   <div v-if="schemeFlat.length > 0" class="mb-3 border-bottom">
-                    <div class="form-label">Scheme labels to resolve</div>
+                    <div class="form-label">
+                      <span class="me-4">Scheme labels to resolve</span>
+                      <span class="text-muted small" role="button" @click="pickAllKeys">
+                        <font-awesome-icon :icon="['fas', 'list-check']" class="me-1" />
+                        All
+                      </span>
+                    </div>
                     <ul class="list-unstyled ms-lg-2">
                       <li v-for="label in schemeFlat" :key="label.key">
                         <input
@@ -63,9 +69,9 @@
                           v-model="filters.key"
                           :disabled="!isNew"
                         />
-                        <label class="form-check-label" :for="`schema-label-selector-${label.key}`"
-                          ><strong>{{ label.key }}</strong> – {{ label.name }}</label
-                        >
+                        <label class="form-check-label" :for="`schema-label-selector-${label.key}`">
+                          <strong>{{ label.key }}</strong> – {{ label.name }}
+                        </label>
                       </li>
                     </ul>
                   </div>
@@ -179,7 +185,13 @@
                     </ul>
                   </div>
                   <div v-if="(annotators || []).length > 0" class="mb-3 border-bottom">
-                    <div class="form-label">Annotator selector</div>
+                    <div class="form-label">
+                      <span class="me-4">Annotator selector</span>
+                      <span class="text-muted small" role="button" @click="pickAllAnnotators">
+                        <font-awesome-icon :icon="['fas', 'list-check']" class="me-1" />
+                        All
+                      </span>
+                    </div>
                     <ul class="list-unstyled ms-lg-2">
                       <li v-for="user in annotators" :key="user.user_id!">
                         <input
@@ -400,7 +412,7 @@ export default defineComponent({
 
     if (!this.isNew && this.botAnnotationMetaDataId !== undefined) {
       API.core.annotations
-        .getSavedResolvedAnnotationsApiAnnotationsConfigResolvedBotAnnotationMetaIdGet({
+        .getSavedResolvedAnnotationsApiAnnotationsConfigResolvedBotAnnotationMetadataIdGet({
           botAnnotationMetadataId: this.botAnnotationMetaDataId,
           xProjectId: currentProjectStore.projectId as string,
         })
@@ -573,6 +585,12 @@ export default defineComponent({
     },
     label2string(label: Label[]) {
       return label.map((label_: Label) => `${label_.key}:${label_.repeat}`).join("-");
+    },
+    pickAllKeys() {
+      this.filters.key = this.schemeFlat.map((label: FlattenedAnnotationSchemeLabel) => label.key);
+    },
+    pickAllAnnotators() {
+      this.filters.user_id = this.annotators.map((user: UserModel) => user.user_id as string);
     },
   },
   computed: {

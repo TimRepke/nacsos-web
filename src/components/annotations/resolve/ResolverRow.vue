@@ -164,6 +164,7 @@ export default defineComponent({
       const validParentInScheme: number | undefined | null = label.parent_value;
       if (isNone(validParentInScheme)) return true;
 
+      // TODO: Should really be recursive checking here so that the entire row is invalid if one parent is invalid!
       const parentValueInt: number | undefined | null = this.row[label.parent_key].resolution?.value_int;
       const parentValueMultiInt: number[] | undefined | null = this.row[label.parent_key].resolution?.multi_int;
 
