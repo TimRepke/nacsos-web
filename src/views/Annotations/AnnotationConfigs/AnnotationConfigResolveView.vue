@@ -412,7 +412,7 @@ export default defineComponent({
 
     if (!this.isNew && this.botAnnotationMetaDataId !== undefined) {
       API.core.annotations
-        .getSavedResolvedAnnotationsApiAnnotationsConfigResolvedBotAnnotationMetaIdGet({
+        .getSavedResolvedAnnotationsApiAnnotationsConfigResolvedBotAnnotationMetadataIdGet({
           botAnnotationMetadataId: this.botAnnotationMetaDataId,
           xProjectId: currentProjectStore.projectId as string,
         })

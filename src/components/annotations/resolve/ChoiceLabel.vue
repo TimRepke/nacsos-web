@@ -1,9 +1,12 @@
 <template>
   <div>
     <!-- User Annotations -->
-    <span v-for="user in users" :key="user.user_id">
-      <span v-for="annotation in proposal.labels[user.user_id]" :key="annotation.annotation.annotation_id">
-        <InlineToolTip :info="getPrettyIntLabelInfo(annotation.annotation)" placement="bottom">
+    <span v-for="user in users" :key="user.user_id as string">
+      <span
+        v-for="annotation in proposal.labels[user.user_id as string]"
+        :key="annotation.annotation!.annotation_id as string"
+      >
+        <InlineToolTip :info="getPrettyIntLabelInfo(annotation)" placement="bottom">
           <span
             class="border text-light p-1 ps-2 pe-2"
             :style="{ backgroundColor: annotation2bgColor(annotation.annotation) }"
@@ -12,11 +15,11 @@
               'resolve-label-changed': annotation.status === 'CHANGED',
             }"
           >
-            <template v-if="annotation.annotation.value_int === undefined">
+            <template v-if="isNone(annotation.annotation?.value_int)">
               <font-awesome-icon :icon="['fas', 'question']" class="text-dark" />
             </template>
             <template v-else>
-              {{ annotation.annotation.value_int }}
+              {{ annotation.annotation?.value_int }}
             </template>
           </span>
         </InlineToolTip>
@@ -70,8 +73,8 @@ import type {
   ResolutionCell,
   ResolutionUserEntry,
   UserModel,
-  FlatLabelChoice,
-} from "@/plugins/api/api-core";
+  FlatLabelChoice, ItemAnnotation,
+} from '@/plugins/api/api-core';
 import InlineToolTip from "@/components/InlineToolTip.vue";
 import { cmap } from "@/types/colours";
 import { EventBus } from "@/plugins/events";
@@ -125,6 +128,7 @@ export default defineComponent({
     },
   },
   methods: {
+    isNone,
     hasValue(
       model: AnnotationModel | BotAnnotationModel | undefined | null,
     ): model is (AnnotationModel | BotAnnotationModel) & { value_int: number } {
@@ -189,6 +193,9 @@ export default defineComponent({
     },
   },
   computed: {
+    ItemAnnotation() {
+      return ItemAnnotation
+    },
     choiceLookup(): Record<number, FlatLabelChoice> {
       const { choices } = this.label;
       if (!choices) return {};
