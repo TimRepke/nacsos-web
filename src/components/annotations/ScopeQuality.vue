@@ -153,7 +153,7 @@ import { API, ignore, toastReject } from "@/plugins/api";
 import type { AssignmentScopeModel } from "@/plugins/api/api-core";
 import LabelPathPills from "@/components/annotations/LabelPathPills.vue";
 import AssignmentsVisualiser from "@/components/annotations/assignments/AssignmentsVisualiser.vue";
-import { isNone } from "@/util";
+import { isArray, isNone } from "@/util";
 
 type MetricLabelLookup = {
   MEAN: AnnotationQualityModel | null;
@@ -205,8 +205,12 @@ export default defineComponent({
       if (isNone(v)) return "–";
       return v;
     },
-    annotationMatchBackground(v1: number | null | undefined, v2: number | null | undefined): string {
+    annotationMatchBackground(
+      v1: number[] | number | null | undefined,
+      v2: number[] | number | null | undefined,
+    ): string {
       if (isNone(v1) && isNone(v2)) return "";
+      if (isArray(v1) && JSON.stringify(v1) === JSON.stringify(v1)) return "bg-success";
       if (v1 === v2) return "bg-success";
       if (isNone(v1) || isNone(v2)) return "bg-warning";
       return "bg-danger";
