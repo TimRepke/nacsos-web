@@ -72,7 +72,7 @@
           <ul style="max-height: 15rem" class="list-group overflow-auto">
             <li
               v-for="user in searchFilteredUsers"
-              :key="user.user_id"
+              :key="user.user_id as string"
               class="list-group-item d-flex justify-content-between align-items-start"
               :class="{ 'list-group-item-info': isSelected(user) }"
             >
@@ -103,7 +103,7 @@
           <template v-else>
             <strong>Selected users</strong>
             <ul class="list-unstyled">
-              <li v-for="user in selectedUsers" :key="user.user_id" class="ms-2">
+              <li v-for="user in selectedUsers" :key="user.user_id as string" class="ms-2">
                 {{ user.username }}
                 <span role="button" class="link-secondary" tabindex="0" @click="unselectUser(user)">
                   <font-awesome-icon :icon="['fas', 'user-minus']" />
@@ -127,13 +127,13 @@
         <div class="mb-2" v-if="assignmentScope">
           <RandomAssignmentConfig
             v-if="strategyConfigType === 'random'"
-            :existing-config="assignmentScope.config"
+            :existing-config="assignmentScope.config as AssignmentScopeRandomConfig"
             :editable="!scopeHasAssignments"
             @config-changed="updateConfig($event)"
           />
           <RandomAssignmentWithExclusionConfig
             v-if="strategyConfigType === 'random_exclusion'"
-            :existing-config="assignmentScope.config"
+            :existing-config="assignmentScope.config as AssignmentScopeRandomWithExclusionConfig"
             :editable="!scopeHasAssignments"
             @config-changed="updateConfig($event)"
           />
@@ -163,7 +163,6 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import AssignmentsVisualiser from "@/components/annotations/assignments/AssignmentsVisualiser.vue";
 import RandomAssignmentConfig from "@/components/annotations/assignments/RandomAssignmentConfig.vue";
 import RandomAssignmentWithExclusionConfig from "@/components/annotations/assignments/RandomAssignmentWithExclusionConfig.vue";
 import { EventBus } from "@/plugins/events";
@@ -181,7 +180,7 @@ import type {
 } from "@/plugins/api/api-core";
 import { currentProjectStore } from "@/stores";
 import ScopeQuality from "@/components/annotations/ScopeQuality.vue";
-import { UserBaseModel } from "@/plugins/api/api-core";
+import type { UserBaseModel } from "@/plugins/api/api-core";
 
 type AssignmentScopeConfigData = {
   scopeId?: string;
@@ -206,7 +205,7 @@ type AssignmentScopeConfigData = {
 
 export default defineComponent({
   name: "AssignmentScopeConfigView",
-  components: { ScopeQuality, RandomAssignmentWithExclusionConfig, AssignmentsVisualiser, RandomAssignmentConfig },
+  components: { ScopeQuality, RandomAssignmentWithExclusionConfig, RandomAssignmentConfig },
   data(): AssignmentScopeConfigData {
     const scopeId = this.$route.params.scope_id as string | undefined;
     const annotationSchemeId = this.$route.query.annotation_scheme_id as string | undefined;
