@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="table-responsive">
-      <table class="table table-bordered">
+      <table class="table table-bordered table-sm">
         <tbody>
           <tr v-for="username in usernames" :key="username">
             <th>{{ username }}</th>

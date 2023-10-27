@@ -28,7 +28,7 @@
           <textarea class="form-control" id="scopeDescription" rows="3" v-model="assignmentScope.description" />
         </div>
         <div class="mb-3">
-          <label for="scopeHighlighter" class="form-label">Highlighters</label>
+          <label class="form-label">Highlighters</label>
           <ul class="list-group mt-0 ps-4 pe-4">
             <li v-for="highlighter in projectHighlighters" :key="highlighter.highlighter_id" class="list-group-item">
               <input
@@ -152,25 +152,7 @@
     <div class="row pb-2 mb-2 border-bottom g-0" v-if="scopeHasAssignments">
       <div class="col">
         <h4>Results</h4>
-        <button type="button" class="btn btn-sm btn-outline-secondary" @click="loadResults">
-          <font-awesome-icon :icon="['fas', 'rotate']" />
-          (Re)load stats
-        </button>
-        <div class="mt-2 mb-2" v-if="assignmentCounts">
-          Assignments: {{ assignmentCounts.num_total }} ( open:
-          <span class="bg-info bg-opacity-50 p-1">{{ assignmentCounts.num_open }}</span> | partial:
-          <span class="bg-warning bg-opacity-50 p-1">{{ assignmentCounts.num_partial }}</span> | done:
-          <span class="bg-success bg-opacity-50 p-1">{{ assignmentCounts.num_full }}</span
-          >)
-        </div>
-        <template v-if="statsLoaded">
-          <AssignmentsVisualiser :assignment-entries="assignments" />
-        </template>
-        <div class="mt-2 ms-2 text-warning">
-          TODO: for each user, show num assignments and progress<br />
-          TODO: some basic stats<br />
-          TODO: a few export buttons<br />
-        </div>
+        <ScopeQuality :users="annotators" :scope="assignmentScope" />
       </div>
     </div>
     <button type="button" class="btn btn-success position-fixed" style="top: 4rem; right: 1rem" @click="save()">
@@ -187,7 +169,7 @@ import RandomAssignmentWithExclusionConfig from "@/components/annotations/assign
 import { EventBus } from "@/plugins/events";
 import { ToastEvent } from "@/plugins/events/events/toast";
 import { ConfirmationRequestEvent } from "@/plugins/events/events/confirmation";
-import { API, toastReject } from "@/plugins/api";
+import { API, ignore, toastReject } from "@/plugins/api";
 import type { ApiResponseReject } from "@/plugins/api";
 import type {
   AssignmentCounts,
@@ -198,6 +180,8 @@ import type {
   UserModel,
 } from "@/plugins/api/api-core";
 import { currentProjectStore } from "@/stores";
+import ScopeQuality from "@/components/annotations/ScopeQuality.vue";
+import { UserBaseModel } from "@/plugins/api/api-core";
 
 type AssignmentScopeConfigData = {
   scopeId?: string;
@@ -215,13 +199,14 @@ type AssignmentScopeConfigData = {
   // holds the assignment counts (or undefined if none exist)
   assignmentCounts?: AssignmentCounts;
   assignments: AssignmentScopeEntry[];
-  assignmentScope: Partial<AssignmentScopeModel>;
+  assignmentScope: AssignmentScopeModel;
   projectHighlighters: Partial<HighlighterModel>[];
+  annotators: Record<string, UserBaseModel>;
 };
 
 export default defineComponent({
   name: "AssignmentScopeConfigView",
-  components: { RandomAssignmentWithExclusionConfig, AssignmentsVisualiser, RandomAssignmentConfig },
+  components: { ScopeQuality, RandomAssignmentWithExclusionConfig, AssignmentsVisualiser, RandomAssignmentConfig },
   data(): AssignmentScopeConfigData {
     const scopeId = this.$route.params.scope_id as string | undefined;
     const annotationSchemeId = this.$route.query.annotation_scheme_id as string | undefined;
@@ -247,6 +232,7 @@ export default defineComponent({
         highlighter_ids: [] as string[],
       } as AssignmentScopeModel,
       projectHighlighters: [],
+      annotators: {} as Record<string, UserBaseModel>,
     };
   },
   async mounted() {
@@ -413,6 +399,16 @@ export default defineComponent({
             this.assignments = response.data;
           })
           .catch(toastReject);
+
+        API.core.users
+          .getProjectAnnotatorUsersApiUsersListProjectAnnotatorsProjectIdGet({
+            projectId: currentProjectStore.projectId as string,
+            xProjectId: currentProjectStore.projectId as string,
+          })
+          .then((response) => {
+            this.annotators = response.data;
+          })
+          .catch(ignore);
       }
     },
     async loadListOfUsers() {

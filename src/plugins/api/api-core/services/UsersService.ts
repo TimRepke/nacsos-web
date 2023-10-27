@@ -28,6 +28,34 @@ export class UsersService {
   }
 
   /**
+   * Get Project Annotator Users
+   * @returns UserBaseModel Successful Response
+   * @throws ApiError
+   */
+  public getProjectAnnotatorUsersApiUsersListProjectAnnotatorsProjectIdGet({
+    projectId,
+    xProjectId,
+  }: {
+    projectId: string,
+    xProjectId: string,
+  }, options?: Partial<ApiRequestOptions>): CancelablePromise<Record<string, UserBaseModel>> {
+    return this.httpRequest.request({
+      method: 'GET',
+      url: '/api/users/list/project/annotators/{project_id}',
+      path: {
+        'project_id': projectId,
+      },
+      headers: {
+        'x-project-id': xProjectId,
+      },
+      errors: {
+        422: `Validation Error`,
+      },
+      ...options,
+    });
+  }
+
+  /**
    * Get Project Users
    * @returns UserBaseModel Successful Response
    * @throws ApiError

@@ -25,19 +25,19 @@ export const $UserBaseModel = {
         type: 'null',
       }],
     },
+    full_name: {
+      type: 'any-of',
+      contains: [{
+        type: 'string',
+      }, {
+        type: 'null',
+      }],
+    },
     email: {
       type: 'any-of',
       contains: [{
         type: 'string',
         format: 'email',
-      }, {
-        type: 'null',
-      }],
-    },
-    full_name: {
-      type: 'any-of',
-      contains: [{
-        type: 'string',
       }, {
         type: 'null',
       }],
