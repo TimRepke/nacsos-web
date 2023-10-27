@@ -43,7 +43,7 @@
         </button>
       </div>
       <template v-if="nestedMetrics">
-        <table class="table">
+        <table class="table" style="table-layout: fixed">
           <thead>
             <tr>
               <th>Label</th>
@@ -106,7 +106,7 @@
                     </td>
                   </tr>
                   <tr v-if="focusedMetric == userMetric.annotation_quality_id">
-                    <td colspan="10">
+                    <td colspan="10" class="overflow-x-auto">
                       <div class="d-flex justify-content-start small">
                         <div v-for="(base, i) in userMetric.annotations_base" :key="i" class="d-flex flex-column">
                           <div class="p-1">
