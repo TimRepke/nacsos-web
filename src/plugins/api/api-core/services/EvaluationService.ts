@@ -1,6 +1,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+import type { AnnotationQualityModel } from '../models/AnnotationQualityModel';
 import type { AnnotationTrackerModel } from '../models/AnnotationTrackerModel';
 import type { DehydratedAnnotationTracker } from '../models/DehydratedAnnotationTracker';
 import type { LabelScope } from '../models/LabelScope';
@@ -141,6 +142,62 @@ export class EvaluationService {
         'tracker_id': trackerId,
         'batch_size': batchSize,
         'reset': reset,
+      },
+      errors: {
+        422: `Validation Error`,
+      },
+      ...options,
+    });
+  }
+
+  /**
+   * Get Irr
+   * @returns AnnotationQualityModel Successful Response
+   * @throws ApiError
+   */
+  public getIrrApiEvalQualityLoadAssignmentScopeIdGet({
+    assignmentScopeId,
+    xProjectId,
+  }: {
+    assignmentScopeId: string,
+    xProjectId: string,
+  }, options?: Partial<ApiRequestOptions>): CancelablePromise<Array<AnnotationQualityModel>> {
+    return this.httpRequest.request({
+      method: 'GET',
+      url: '/api/eval/quality/load/{assignment_scope_id}',
+      path: {
+        'assignment_scope_id': assignmentScopeId,
+      },
+      headers: {
+        'x-project-id': xProjectId,
+      },
+      errors: {
+        422: `Validation Error`,
+      },
+      ...options,
+    });
+  }
+
+  /**
+   * Recompute Irr
+   * @returns AnnotationQualityModel Successful Response
+   * @throws ApiError
+   */
+  public recomputeIrrApiEvalQualityComputeAssignmentScopeIdGet({
+    assignmentScopeId,
+    xProjectId,
+  }: {
+    assignmentScopeId: string,
+    xProjectId: string,
+  }, options?: Partial<ApiRequestOptions>): CancelablePromise<Array<AnnotationQualityModel>> {
+    return this.httpRequest.request({
+      method: 'GET',
+      url: '/api/eval/quality/compute/{assignment_scope_id}',
+      path: {
+        'assignment_scope_id': assignmentScopeId,
+      },
+      headers: {
+        'x-project-id': xProjectId,
       },
       errors: {
         422: `Validation Error`,

@@ -138,11 +138,19 @@ const routes: Array<RouteRecordRaw> = [
           import(/* webpackChunkName: "AnnotationsView" */ "../views/Annotations/Annotations/AnnotationsView.vue"),
       },
       {
-        path: "tracking",
-        name: "project-annotate-tracking",
+        path: "quality",
+        name: "project-annotate-quality",
         component: () =>
           import(
-            /* webpackChunkName: "AnnotationTrackingView" */ "../views/Annotations/Annotations/AnnotationTrackingView.vue"
+            /* webpackChunkName: "AnnotationQualityView" */ "../views/Annotations/Annotations/AnnotationQualityView.vue"
+          ),
+      },
+      {
+        path: "progress",
+        name: "project-annotate-progress",
+        component: () =>
+          import(
+            /* webpackChunkName: "AnnotationProgressView" */ "../views/Annotations/Annotations/AnnotationProgressView.vue"
           ),
       },
     ],

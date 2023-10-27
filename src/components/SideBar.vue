@@ -76,7 +76,12 @@
             to="/project/annotate"
             class="list-group-item list-group-item-action border-end-0"
             :class="{
-              active: anyOf(['project-annotate-assignments', 'project-annotate-item', 'project-annotate-tracking']),
+              active: anyOf([
+                'project-annotate-assignments',
+                'project-annotate-item',
+                'project-annotate-quality',
+                'project-annotate-progress',
+              ]),
             }"
           >
             Annotation
@@ -93,11 +98,19 @@
           </router-link>
           <router-link
             v-if="projectPermissions.annotations_read && isActive('project-annotate')"
-            to="/project/annotate/tracking"
+            to="/project/annotate/quality"
             class="list-group-item list-group-item-action list-group-item-info border-end-0 sub-link"
             exact-active-class="active"
           >
-            Monitoring
+            Quality Monitor
+          </router-link>
+          <router-link
+            v-if="projectPermissions.annotations_read && isActive('project-annotate')"
+            to="/project/annotate/progress"
+            class="list-group-item list-group-item-action list-group-item-info border-end-0 sub-link"
+            exact-active-class="active"
+          >
+            Progress Monitor
           </router-link>
 
           <!-- ARTEFACTS -->
