@@ -97,8 +97,12 @@ export const useCurrentUserStore = defineStore("CurrentUserStore", {
     },
     async extendAuthTokenValidity() {
       try {
-        const newToken = await API.core.oauth.refreshTokenApiLoginTokenTokenIdPut({ tokenId: this.authToken.token_id });
-        this.authToken = newToken.data;
+        if (this.authToken) {
+          const newToken = await API.core.oauth.refreshTokenApiLoginTokenTokenIdPut({
+            tokenId: this.authToken.token_id,
+          });
+          this.authToken = newToken.data;
+        }
       } catch (reason) {
         this.clear();
         console.error(reason);
