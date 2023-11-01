@@ -298,7 +298,7 @@ router.beforeEach(async (to) => {
   if (!currentUserStore.isLoggedIn && to.name !== "user-login" && to.name !== "about") {
     return { name: "user-login" };
   }
-  await currentUserStore.loginWithAuthToken("d0eea538-c3da-4cd3-bbf2-64d860443c39");
+
   // if no project is selected (and it isn't on purpose) --> redirect to project selection page
   if (
     !currentProjectStore.projectSelected &&
