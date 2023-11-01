@@ -12,6 +12,6 @@ export type UserInDBModel = {
   is_active?: (boolean | null);
   time_created?: (string | null);
   time_updated?: (string | null);
-  password: string;
+  password?: (string | null);
 };
 

@@ -82,8 +82,12 @@ export const $UserInDBModel = {
       }],
     },
     password: {
-      type: 'string',
-      isRequired: true,
+      type: 'any-of',
+      contains: [{
+        type: 'string',
+      }, {
+        type: 'null',
+      }],
     },
   },
 } as const;

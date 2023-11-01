@@ -12,6 +12,7 @@ import { EventsService } from './services/EventsService';
 import { ExportService } from './services/ExportService';
 import { HighlightersService } from './services/HighlightersService';
 import { ImportsService } from './services/ImportsService';
+import { MailingService } from './services/MailingService';
 import { OauthService } from './services/OauthService';
 import { ProjectService } from './services/ProjectService';
 import { ProjectsService } from './services/ProjectsService';
@@ -30,6 +31,7 @@ export class CoreClient {
   public readonly export: ExportService;
   public readonly highlighters: HighlightersService;
   public readonly imports: ImportsService;
+  public readonly mailing: MailingService;
   public readonly oauth: OauthService;
   public readonly project: ProjectService;
   public readonly projects: ProjectsService;
@@ -59,6 +61,7 @@ export class CoreClient {
     this.export = new ExportService(this.request);
     this.highlighters = new HighlightersService(this.request);
     this.imports = new ImportsService(this.request);
+    this.mailing = new MailingService(this.request);
     this.oauth = new OauthService(this.request);
     this.project = new ProjectService(this.request);
     this.projects = new ProjectsService(this.request);
