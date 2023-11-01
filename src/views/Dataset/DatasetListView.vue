@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="position-relative">
     <div class="row g-0">
       <!-- Search sidebar -->
       <div class="col-12 col-lg-3 order-lg-last overflow-auto text-start searchbar" v-show="showSearchBar">
@@ -98,14 +98,15 @@
           </nav>
         </div>
       </div>
+      <button
+        type="button"
+        class="btn btn-outline-secondary position-absolute top-0 end-0"
+        style="width: 2.5rem"
+        @click="showSearchBar = !showSearchBar"
+      >
+        <font-awesome-icon :icon="['fas', 'filter']" />
+      </button>
     </div>
-    <button
-      type="button"
-      class="btn btn-outline-secondary position-fixed top-0 end-0 m-2 me-3"
-      @click="showSearchBar = !showSearchBar"
-    >
-      <font-awesome-icon :icon="['fas', 'filter']" />
-    </button>
   </div>
 </template>
 
