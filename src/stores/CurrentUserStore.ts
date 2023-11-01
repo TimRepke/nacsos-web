@@ -52,6 +52,24 @@ export const useCurrentUserStore = defineStore("CurrentUserStore", {
         EventBus.emit(new AuthFailedEvent());
       }
     },
+    async loginWithAuthToken(token: string) {
+      API.core.request.config.TOKEN = token;
+      try {
+        const userTokens = (await API.core.oauth.readTokensMeApiLoginMyTokensGet()).data;
+        if (userTokens[0].token_id === token) {
+          this.setAuthToken(userTokens[0]);
+          const me = await API.core.oauth.readUsersMeApiLoginMeGet();
+          this.setUser(me.data);
+          EventBus.emit(new LoginSuccessEvent(me.data));
+        } else {
+          throw Error("Invalid token!");
+        }
+      } catch (reason) {
+        this.clear();
+        console.error(reason);
+        EventBus.emit(new AuthFailedEvent());
+      }
+    },
     async logout() {
       try {
         if (this.accessToken) {
