@@ -72,7 +72,7 @@ export const useCurrentUserStore = defineStore("CurrentUserStore", {
     },
     async logout() {
       try {
-        if (this.accessToken) {
+        if (this.authToken) {
           await API.core.oauth.logoutApiLoginLogoutGet();
         }
       } catch (reason) {
