@@ -21,7 +21,7 @@
                     class="form-check-input"
                     type="checkbox"
                     role="switch"
-                    aria-checked="undefined"
+                    :aria-checked="undefined"
                     :id="`sa-${user.user_id}`"
                     v-model="user.is_superuser"
                   />
@@ -70,7 +70,12 @@
                   v-model="user.password"
                 />
               </div>
-              <div class="col" />
+              <div class="col align-bottom align-text-bottom">
+                <button type="button" class="btn btn-outline-primary btn-sm me-2 mt-2" @click="sendWelcome(user)">
+                  <font-awesome-icon :icon="['fas', 'paper-plane']" />
+                  Send welcome (save first!)
+                </button>
+              </div>
             </div>
             <div class="row">
               <div class="col">
@@ -115,6 +120,10 @@
               <font-awesome-icon :icon="['fas', 'key']" />
               Reset password
             </button>
+            <button type="button" class="btn btn-outline-primary btn-sm me-2 mt-2" @click="resetPasswordMail(user)">
+              <font-awesome-icon :icon="['fas', 'paper-plane']" />
+              Password reset mail
+            </button>
           </div>
         </div>
       </li>
@@ -128,7 +137,7 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import { API } from "@/plugins/api";
+import { API, toastReject } from "@/plugins/api";
 import { EventBus } from "@/plugins/events";
 import { ToastEvent } from "@/plugins/events/events/toast";
 import type { UserBaseModel } from "@/plugins/api/api-core";
@@ -202,6 +211,27 @@ export default defineComponent({
       // eslint-disable-next-line no-param-reassign
       user.hasNewPassword = true;
       console.log(user);
+    },
+    resetPasswordMail(user: UserModel) {
+      API.core.mailing
+        .resetPasswordApiMailResetPasswordUsernamePost({
+          username: user.username as string,
+        })
+        .then(() => {
+          EventBus.emit(new ToastEvent("SUCCESS", "Sent password reset mail to user."));
+        })
+        .catch(toastReject);
+    },
+    sendWelcome(user: UserModel) {
+      API.core.mailing
+        .welcomeMailApiMailWelcomePost({
+          username: user.username as string,
+          password: user.password as string,
+        })
+        .then(() => {
+          EventBus.emit(new ToastEvent("SUCCESS", "Sent onboarding mail to user."));
+        })
+        .catch(toastReject);
     },
     generateRandomPassword() {
       return (

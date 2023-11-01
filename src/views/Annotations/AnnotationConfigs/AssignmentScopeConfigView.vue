@@ -152,6 +152,12 @@
     <div class="row pb-2 mb-2 border-bottom g-0" v-if="scopeHasAssignments">
       <div class="col">
         <h4>Results</h4>
+        <div class="text-end">
+          <button type="button" class="btn btn-outline-warning" @click="sendReminders">
+            <font-awesome-icon :icon="['fas', 'paper-plane']" />
+            Remind users per email
+          </button>
+        </div>
         <ScopeQuality :users="annotators" :scope="assignmentScope" />
       </div>
     </div>
@@ -168,7 +174,7 @@ import RandomAssignmentWithExclusionConfig from "@/components/annotations/assign
 import { EventBus } from "@/plugins/events";
 import { ToastEvent } from "@/plugins/events/events/toast";
 import { ConfirmationRequestEvent } from "@/plugins/events/events/confirmation";
-import { API, ignore, toastReject } from "@/plugins/api";
+import { API, ignore, logReject, toastReject } from "@/plugins/api";
 import type { ApiResponseReject } from "@/plugins/api";
 import type {
   AssignmentCounts,
@@ -423,6 +429,18 @@ export default defineComponent({
         .catch(() => {
           EventBus.emit(new ToastEvent("WARN", "Failed to load list of users."));
         });
+    },
+    async sendReminders() {
+      EventBus.emit(new ToastEvent("INFO", "Please only click the button once. Sending emails may take a while."));
+      API.core.mailing
+        .remindUsersAssigmentApiMailAssignmentReminderPost({
+          assignmentScopeId: this.assignmentScope.assignment_scope_id as string,
+          xProjectId: currentProjectStore.projectId as string,
+        })
+        .then((response) => {
+          EventBus.emit(new ToastEvent("SUCCESS", `Sent emails to ${response.data}`));
+        })
+        .catch(logReject);
     },
     selectUser(user: UserModel) {
       if (!this.isSelected(user)) {

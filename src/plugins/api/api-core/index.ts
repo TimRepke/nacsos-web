@@ -209,6 +209,7 @@ export { EventsService } from './services/EventsService';
 export { ExportService } from './services/ExportService';
 export { HighlightersService } from './services/HighlightersService';
 export { ImportsService } from './services/ImportsService';
+export { MailingService } from './services/MailingService';
 export { OauthService } from './services/OauthService';
 export { ProjectService } from './services/ProjectService';
 export { ProjectsService } from './services/ProjectsService';

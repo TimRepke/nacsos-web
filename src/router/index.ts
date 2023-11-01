@@ -6,6 +6,15 @@ import HomeView from "../views/HomeView.vue";
 
 const routes: Array<RouteRecordRaw> = [
   {
+    path: "/password-reset/:token",
+    name: "password-reset",
+    component: {
+      template:
+        "<strong>Seems like you would like to set a new password. " +
+        "Please wait while I'm loading your information.</strong>",
+    },
+  },
+  {
     path: "/",
     name: "home",
     component: HomeView,
@@ -279,12 +288,17 @@ const router = createRouter({
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 router.beforeEach(async (to) => {
+  if (to.name === "password-reset") {
+    currentUserStore.loginWithAuthToken(to.params.token as string);
+    return { name: "user-profile" };
+  }
+
   // if user is not authenticated -> redirect to login page
   // prevent infinite redirects if user isn't logged in
   if (!currentUserStore.isLoggedIn && to.name !== "user-login" && to.name !== "about") {
     return { name: "user-login" };
   }
-
+  await currentUserStore.loginWithAuthToken("d0eea538-c3da-4cd3-bbf2-64d860443c39");
   // if no project is selected (and it isn't on purpose) --> redirect to project selection page
   if (
     !currentProjectStore.projectSelected &&
