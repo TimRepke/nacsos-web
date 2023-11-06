@@ -108,9 +108,12 @@ export default defineComponent({
       return txt.replaceAll("\n", "<br />");
     },
     htmlTitle() {
-      let txt = this.item.sources[0].title || "";
-      txt = this.applyHighlighters(txt);
-      return txt;
+      if (this.item.sources && this.item.sources.length > 0) {
+        let txt = this.item.sources[0].title || "";
+        txt = this.applyHighlighters(txt);
+        return txt;
+      }
+      return '[MISSING]'
     },
     columnStyle(): Record<string, string> {
       return interfaceSettingsStore.itemColumnStyle;

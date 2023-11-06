@@ -61,8 +61,11 @@ export default defineComponent({
     },
   },
   methods: {
-    markdownToHtml(txt: string) {
-      return marked(txt);
+    markdownToHtml(txt: string | null | undefined) {
+      if (txt) {
+        return marked(txt);
+      }
+      return "";
     },
   },
 });

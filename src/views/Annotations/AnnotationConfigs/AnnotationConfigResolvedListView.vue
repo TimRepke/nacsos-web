@@ -52,7 +52,7 @@
     </ul>
     <router-link role="button" class="btn btn-outline-primary m-2 btn-sm" :to="{ name: 'config-annotation-resolve' }">
       <font-awesome-icon :icon="['far', 'square-plus']" />
-      Create new export
+      Create new resolution
     </router-link>
   </div>
 </template>
