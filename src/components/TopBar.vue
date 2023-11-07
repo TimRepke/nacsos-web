@@ -17,6 +17,9 @@
     <div class="pe-4">
       <router-link to="/about" class="nav-link">About</router-link>
     </div>
+    <div class="pe-4">
+      <router-link to="https://apsis.mcc-berlin.net/nacsos-docs/" class="nav-link">Help</router-link>
+    </div>
     <div class="dropdown pe-4">
       <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
         <font-awesome-icon
