@@ -22,14 +22,12 @@
     <div v-show="dropdownVisible">
       <ul class="list-group rounded-0 rounded-bottom border-top-0 overflow-auto" style="max-height: 10rem">
         <li
-          v-for="option in dropdownOptions"
+          v-for="(option, key) in dropdownOptions"
           :key="`opt-${option.name}-${option.value}`"
           class="list-group-item list-group-item-action"
           @click="pickOption(option)"
         >
-          <InlineToolTip :info="option.hint">
-            {{ option.name }}
-          </InlineToolTip>
+          <InlineToolTip :info="option.hint"> {{ option.name }} ({{ option.value }}) </InlineToolTip>
         </li>
       </ul>
     </div>
@@ -45,6 +43,7 @@ interface Option {
   name: string;
   value: number;
   hint?: string;
+  visible?: boolean;
 }
 
 export default defineComponent({
@@ -74,12 +73,18 @@ export default defineComponent({
     },
   },
   data() {
+    const mappedOptions = Object.fromEntries(
+      this.options.map((option) => {
+        option.visible = !this.isHidden(option);
+        return [option.value, option];
+      }),
+    );
     return {
       searchText:
-        this.currentOptionValue !== undefined && this.currentOptionValue < this.options.length
-          ? this.options[this.currentOptionValue].name
+        this.currentOptionValue !== undefined && this.currentOptionValue in mappedOptions
+          ? mappedOptions[this.currentOptionValue].name
           : "",
-      dropdownOptions: this.options,
+      dropdownOptions: mappedOptions,
       dropdownVisible: false,
     };
   },
@@ -87,6 +92,9 @@ export default defineComponent({
     // pass
   },
   methods: {
+    isHidden(option: Option): boolean {
+      return (this.hiddenOptions ?? []).indexOf(option.value) >= 0;
+    },
     unfocusSearchField() {
       setTimeout(() => {
         // create a small delay, because otherwise the list entry someone clicked on is gone before the
@@ -95,14 +103,15 @@ export default defineComponent({
       }, 200);
     },
     resetDropdownOptions() {
-      this.dropdownOptions = this.options;
+      Object.entries(this.dropdownOptions).forEach((entry) => {
+        entry[1].visible = !this.isHidden(entry[1]);
+      });
     },
     filterDropdownOptions() {
-      this.dropdownOptions = this.options.filter(
-        (option: Option) =>
-          option.name.toLowerCase().indexOf(this.searchText.toLowerCase()) >= 0 &&
-          (this.hiddenOptions ?? []).indexOf(option.value) < 0,
-      );
+      Object.entries(this.dropdownOptions).forEach((entry) => {
+        entry[1].visible =
+          !this.isHidden(entry[1]) && entry[1].name.toLowerCase().indexOf(this.searchText.toLowerCase()) >= 0;
+      });
     },
     clear() {
       this.searchText = "";
@@ -122,8 +131,8 @@ export default defineComponent({
         if (
           newValue.length === 0 ||
           (this.currentOptionValue !== undefined &&
-            this.currentOptionValue < this.options.length &&
-            newValue === this.options[this.currentOptionValue].name)
+            this.currentOptionValue in this.dropdownOptions &&
+            newValue === this.dropdownOptions[this.currentOptionValue].name)
         ) {
           this.resetDropdownOptions();
         } else {
