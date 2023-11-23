@@ -507,11 +507,9 @@ export default defineComponent({
     },
     async saveAndNext() {
       if (this.currentAssignmentIndex !== undefined && this.userAssignments) {
-        if (this.currentAssignmentIndex + 1 <= this.userAssignments.length) {
-          await this.saveAndGoto(this.userAssignments[this.currentAssignmentIndex + 1].assignment_id);
-        } else {
-          await this.saveAndGoto(this.userAssignments[0].assignment_id);
-        }
+        await this.saveAndGoto(
+          this.userAssignments[(this.currentAssignmentIndex + 1) % this.userAssignments.length].assignment_id,
+        );
       }
     },
   },
