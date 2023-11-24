@@ -21,14 +21,11 @@
     </div>
     <div v-show="dropdownVisible">
       <ul class="list-group rounded-0 rounded-bottom border-top-0 overflow-auto" style="max-height: 10rem">
-        <li
-          v-for="option in dropdownOptions"
-          :key="`opt-${option.name}-${option.value}`"
-          class="list-group-item list-group-item-action"
-          @click="pickOption(option)"
-        >
-          <InlineToolTip :info="option.hint"> {{ option.name }} ({{ option.value }}) </InlineToolTip>
-        </li>
+        <template v-for="option in dropdownOptions" :key="`opt-${option.name}-${option.value}`">
+          <li v-if="option.visible" class="list-group-item list-group-item-action" @click="pickOption(option)">
+            <InlineToolTip :info="option.hint"> {{ option.name }} ({{ option.value }})</InlineToolTip>
+          </li>
+        </template>
       </ul>
     </div>
   </div>
@@ -130,9 +127,7 @@ export default defineComponent({
       setTimeout(() => {
         if (
           newValue.length === 0 ||
-          (this.currentOptionValue !== undefined &&
-            this.currentOptionValue in this.dropdownOptions &&
-            newValue === this.dropdownOptions[this.currentOptionValue].name)
+          (this.currentOptionValue !== undefined && newValue === this.dropdownOptions[this.currentOptionValue].name)
         ) {
           this.resetDropdownOptions();
         } else {
