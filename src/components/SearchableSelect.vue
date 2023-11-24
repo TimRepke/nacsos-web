@@ -22,7 +22,7 @@
     <div v-show="dropdownVisible">
       <ul class="list-group rounded-0 rounded-bottom border-top-0 overflow-auto" style="max-height: 10rem">
         <li
-          v-for="(option, key) in dropdownOptions"
+          v-for="option in dropdownOptions"
           :key="`opt-${option.name}-${option.value}`"
           class="list-group-item list-group-item-action"
           @click="pickOption(option)"
@@ -103,12 +103,12 @@ export default defineComponent({
       }, 200);
     },
     resetDropdownOptions() {
-      Object.entries(this.dropdownOptions).forEach((entry) => {
+      Object.entries<Option>(this.dropdownOptions).forEach((entry: [string, Option]) => {
         entry[1].visible = !this.isHidden(entry[1]);
       });
     },
     filterDropdownOptions() {
-      Object.entries(this.dropdownOptions).forEach((entry) => {
+      Object.entries<Option>(this.dropdownOptions).forEach((entry: [string, Option]) => {
         entry[1].visible =
           !this.isHidden(entry[1]) && entry[1].name.toLowerCase().indexOf(this.searchText.toLowerCase()) >= 0;
       });
