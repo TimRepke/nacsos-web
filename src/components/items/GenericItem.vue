@@ -57,9 +57,29 @@ export default defineComponent({
       showAll: false,
     };
   },
+  methods: {
+    applyHighlighters(txt: string) {
+      if (this.highlighters) {
+        this.highlighters.forEach((highlighter: HighlighterModel) => {
+          try {
+            const regex = new RegExp(highlighter.keywords.join("|"), "gi");
+            txt = txt.replaceAll(regex, `<span style="${highlighter.style}">$&</span>`);
+          } catch (e) {
+            console.warn("Ignoring illegal regex!");
+            console.error(e);
+          }
+        });
+      }
+      return txt;
+    },
+  },
   computed: {
     htmlText() {
-      return marked(this.item.text);
+      let txt = this.item.text || "";
+      txt = txt.replaceAll("`", "'");
+      txt = marked.parse(txt);
+      txt = this.applyHighlighters(txt);
+      return txt.replaceAll("\n", "<br />");
     },
   },
 });
