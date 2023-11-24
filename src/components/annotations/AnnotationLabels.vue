@@ -428,6 +428,7 @@ const AnnotationLabels = defineComponent({
         label.annotation.value_str = undefined;
         label.annotation.value_float = undefined;
         label.annotation.multi_int = undefined;
+        label.annotation.annotation_id = undefined;
       }
     },
     hasAnnotation(annotation: AnnotationModel): boolean {

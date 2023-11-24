@@ -17,9 +17,7 @@
           {{ JSON.stringify(item, null, 4) }}
         </pre>
       </div>
-      <p class="lead">
-        {{ item.teaser }}
-      </p>
+      <p class="lead" v-if="htmlTeaser" v-html="htmlTeaser" />
       <p class="text-muted" v-if="item.authors">
         <font-awesome-icon :icon="['fas', 'people-group']" class="me-2" />
         <span v-for="(author, ai) in item.authors" :key="ai">
@@ -113,7 +111,15 @@ export default defineComponent({
         txt = this.applyHighlighters(txt);
         return txt;
       }
-      return '[MISSING]'
+      return "[MISSING]";
+    },
+    htmlTeaser(): string | undefined {
+      if (this.item.teaser) {
+        let txt = this.item.teaser || "";
+        txt = this.applyHighlighters(txt);
+        return txt;
+      }
+      return undefined;
     },
     columnStyle(): Record<string, string> {
       return interfaceSettingsStore.itemColumnStyle;
