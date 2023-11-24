@@ -295,7 +295,7 @@
     </div>
     <div v-if="isTableReady" class="bg-light p-1" style="position: absolute; right: 2rem; bottom: 1rem">
       <div class="col">
-        <button @click="save" type="button" class="btn btn-success m-2">Save</button>
+        <button @click="save" :disabled="!savingAllowed" type="button" class="btn btn-success m-2">Save</button>
       </div>
     </div>
     <ItemModal :item-id="focusItem" @dismissed="focusItem = undefined" />
@@ -317,7 +317,7 @@ import type {
   FlatLabel,
 } from "@/plugins/api/api-core";
 import { BotMetaResolve } from "@/plugins/api/api-core";
-import { API } from "@/plugins/api";
+import { API, toastReject } from "@/plugins/api";
 import ItemModal from "@/components/items/ItemModal.vue";
 import ToolTip from "@/components/ToolTip.vue";
 import { EventBus } from "@/plugins/events";
@@ -364,6 +364,7 @@ export default defineComponent({
       showText: false,
       proposal: undefined as ResolutionProposal | undefined,
       schemeFlat: [] as FlattenedAnnotationSchemeLabel[],
+      savingAllowed: true,
     };
   },
   unmounted() {
@@ -495,60 +496,74 @@ export default defineComponent({
       console.log(updatedBotAnnotation);
     },
     save() {
-      if (!this.isNew) {
-        this.update();
-      } else {
-        this.saveNew();
+      if (this.savingAllowed) {
+        this.savingAllowed = false;
+        if (!this.isNew) {
+          this.update();
+        } else {
+          this.saveNew();
+        }
       }
     },
     update() {
       if (!this.proposal?.matrix) {
         EventBus.emit(new ToastEvent("WARN", "Nothing to save (yet)!"));
+        this.savingAllowed = true;
       } else {
-        API.core.annotations.updateResolvedAnnotationsApiAnnotationsConfigResolveUpdatePut({
-          botAnnotationMetadataId: this.botAnnotationMetaDataId as string,
-          name: this.name,
-          xProjectId: currentProjectStore.projectId as string,
-          requestBody: this.proposal.matrix,
-        });
+        API.core.annotations
+          .updateResolvedAnnotationsApiAnnotationsConfigResolveUpdatePut({
+            botAnnotationMetadataId: this.botAnnotationMetaDataId as string,
+            name: this.name,
+            xProjectId: currentProjectStore.projectId as string,
+            requestBody: this.proposal.matrix,
+          })
+          .then(() => EventBus.emit(new ToastEvent("SUCCESS", "Updated resolution")))
+          .catch(toastReject)
+          .finally(() => {
+            this.savingAllowed = true;
+          });
       }
     },
     saveNew() {
       if (!this.proposal) {
         EventBus.emit(new ToastEvent("WARN", "Nothing to save (yet)!"));
-        return;
-      }
-      API.core.annotations
-        .saveResolvedAnnotationsApiAnnotationsConfigResolvePut({
-          xProjectId: currentProjectStore.projectId as string,
-          name: this.name,
-          requestBody: {
-            settings: {
-              algorithm: this.algorithm,
-              filters: {
-                scheme_id: this.filters.scheme_id,
-                scope_id: this.filters.scope_id,
-                user_id: this.filters.user_id,
-                key: this.filters.key,
-                repeat: this.filters.repeat,
+        this.savingAllowed = true;
+      } else {
+        API.core.annotations
+          .saveResolvedAnnotationsApiAnnotationsConfigResolvePut({
+            xProjectId: currentProjectStore.projectId as string,
+            name: this.name,
+            requestBody: {
+              settings: {
+                algorithm: this.algorithm,
+                filters: {
+                  scheme_id: this.filters.scheme_id,
+                  scope_id: this.filters.scope_id,
+                  user_id: this.filters.user_id,
+                  key: this.filters.key,
+                  repeat: this.filters.repeat,
+                },
+                ignore_hierarchy: this.ignoreHierarchy,
+                ignore_repeat: this.ignoreRepeat,
               },
-              ignore_hierarchy: this.ignoreHierarchy,
-              ignore_repeat: this.ignoreRepeat,
+              matrix: this.proposal.matrix,
             },
-            matrix: this.proposal.matrix,
-          },
-        })
-        .then((response) => {
-          const { data } = response;
-          EventBus.emit(new ToastEvent("SUCCESS", `Saved new annotation resolution as ${data}`));
-          this.isNew = false;
-          this.botAnnotationMetaDataId = data;
-          this.$router.replace({ name: "config-annotation-resolve", params: { bot_annotation_metadata_id: data } });
-        })
-        .catch((reason) => {
-          console.error(reason);
-          EventBus.emit(new ToastEvent("ERROR", "Failed to save new annotation resolution!"));
-        });
+          })
+          .then((response) => {
+            const { data } = response;
+            EventBus.emit(new ToastEvent("SUCCESS", `Saved new annotation resolution as ${data}`));
+            this.isNew = false;
+            this.botAnnotationMetaDataId = data;
+            this.$router.replace({ name: "config-annotation-resolve", params: { bot_annotation_metadata_id: data } });
+          })
+          .catch((reason) => {
+            console.error(reason);
+            EventBus.emit(new ToastEvent("ERROR", "Failed to save new annotation resolution!"));
+          })
+          .finally(() => {
+            this.savingAllowed = true;
+          });
+      }
     },
     label2string(label: Label[]) {
       return label.map((label_: Label) => `${label_.key}:${label_.repeat}`).join("-");
