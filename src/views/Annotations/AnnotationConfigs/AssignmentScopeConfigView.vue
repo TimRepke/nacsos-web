@@ -368,7 +368,7 @@ export default defineComponent({
                 .catch((res) => {
                   const err = res as ApiResponseReject;
                   EventBus.emit(
-                    new ToastEvent("ERROR", `Failed to save assignment scope details. (${err.error?.type})`),
+                    new ToastEvent("ERROR", `Failed to save assignment scope details. (${err.error?.detail?.type})`),
                   );
                 });
             } else {

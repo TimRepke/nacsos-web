@@ -123,9 +123,8 @@ import { currentProjectStore } from "@/stores";
 import { EventBus } from "@/plugins/events";
 import { ToastEvent } from "@/plugins/events/events/toast";
 import type { HighlighterModel } from "@/plugins/api/api-core";
-import type { ApiResponseReject } from "@/plugins/api";
 
-import { API } from "@/plugins/api";
+import { API, toastReject } from "@/plugins/api";
 import ClosablePill from "@/components/ClosablePill.vue";
 
 type Highlighter = HighlighterModel & { keywordsStr: string; error?: string };
@@ -159,11 +158,7 @@ export default defineComponent({
           }),
         );
       })
-      .catch((reason) => {
-        console.error(reason);
-        const err = reason as ApiResponseReject;
-        EventBus.emit(new ToastEvent("ERROR", `Failed to load data (${err.error.type}: ${err.error.message})`));
-      });
+      .catch(toastReject);
   },
   methods: {
     addHighlighter() {
