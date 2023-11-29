@@ -42,7 +42,7 @@ type ApiResponseBase = {
 };
 
 export type ApiResponse<T> = ApiResponseBase & { data: T };
-export type ApiResponseReject = ApiResponseBase & { error: ErrorDetails };
+export type ApiResponseReject = ApiResponseBase & { error: { detail: ErrorDetails } };
 
 export function ignore() {}
 
@@ -52,7 +52,10 @@ export function logReject(reason: ApiResponseReject) {
 
 export function toastReject(reason: ApiResponseReject) {
   EventBus.emit(
-    new ToastEvent("WARN", `Request failed ${reason.status} ${reason.error.type}(${reason.error.message})`),
+    new ToastEvent(
+      "WARN",
+      `Request failed ${reason.error.detail.level}[${reason.status}] ${reason.error.detail.type}(${reason.error.detail.message})`,
+    ),
   );
 }
 
@@ -168,9 +171,11 @@ export class CancelablePromise<T> implements Promise<ApiResponse<T>> {
       status: -1,
       response: undefined,
       error: {
-        level: ErrorLevel.WARNING,
-        message: "Request aborted",
-        type: "CancelError",
+        detail: {
+          level: ErrorLevel.WARNING,
+          message: "Request aborted",
+          type: "CancelError",
+        },
       },
     });
   }
