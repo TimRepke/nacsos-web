@@ -63,10 +63,9 @@ import { currentProjectStore } from "@/stores";
 import { EventBus } from "@/plugins/events";
 import InlineToolTip from "@/components/InlineToolTip.vue";
 import { ToastEvent } from "@/plugins/events/events/toast";
-import type { ApiResponseReject } from "@/plugins/api";
 import type { BotAnnotationMetaDataBaseModel } from "@/plugins/api/api-core";
 import { ConfirmationRequestEvent } from "@/plugins/events/events/confirmation";
-import { API } from "@/plugins/api";
+import { API, toastReject } from "@/plugins/api";
 
 type DataModel = {
   exports: BotAnnotationMetaDataBaseModel[];
@@ -93,11 +92,7 @@ export default defineComponent({
           const { data } = response;
           this.exports = data;
         })
-        .catch((reason) => {
-          console.error(reason);
-          const err = reason as ApiResponseReject;
-          EventBus.emit(new ToastEvent("ERROR", `Failed to load data (${err.error.type}: ${err.error.message})`));
-        });
+        .catch(toastReject);
     },
     clone(bot_annotation_metadata_id: string) {
       // TODO

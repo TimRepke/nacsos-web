@@ -128,6 +128,10 @@ export default defineComponent({
             multi_int.push(value);
             this.$emit("botAnnotationChanged", anno);
           }
+        } else {
+          this.changed = true;
+          anno.multi_int = [value];
+          this.$emit("botAnnotationChanged", anno);
         }
       }
       this.editMode = false;

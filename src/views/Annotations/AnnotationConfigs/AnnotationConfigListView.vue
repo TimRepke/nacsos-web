@@ -122,7 +122,9 @@ export default defineComponent({
     } catch (e) {
       console.error(e);
       const err = e as ApiResponseReject;
-      EventBus.emit(new ToastEvent("ERROR", `Failed to load data (${err.error.type}: ${err.error.message})`));
+      EventBus.emit(
+        new ToastEvent("ERROR", `Failed to load data (${err.error.detail?.type}: ${err.error.detail?.message})`),
+      );
     }
   },
   methods: {

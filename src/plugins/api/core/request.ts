@@ -342,10 +342,12 @@ export const request = <T>(config: OpenAPIConfig, options: ApiRequestOptions): C
           ok: false,
           status: -1,
           error: {
-            level: ErrorLevel.ERROR,
-            type: "JSError",
-            message: "Internal client-side error",
-            error: error as Error,
+            detail: {
+              level: ErrorLevel.ERROR,
+              type: "JSError",
+              message: "Internal client-side error",
+              error: error as Error,
+            },
           },
         });
       }
