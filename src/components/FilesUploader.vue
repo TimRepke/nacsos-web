@@ -134,18 +134,14 @@ export default defineComponent({
     uploadFiles() {
       if (this.selectedFiles && this.selectedFiles.length > 0) {
         const folder = crypto.randomUUID();
+        const uploads = this.selectedFiles.map((file: UploadFile) => this.upload(file, folder));
+        Promise.allSettled(uploads).then(() => {
+          this.$emit("filesUpdated", this.selectedFiles);
+        });
         this.selectedFiles.forEach((file: UploadFile) => {
           this.upload(file, folder);
         });
       }
-    },
-  },
-  watch: {
-    selectedFiles: {
-      handler(newValue: UploadFile[]) {
-        this.$emit("filesUpdated", newValue);
-      },
-      deep: true,
     },
   },
 });

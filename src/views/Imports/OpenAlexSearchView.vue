@@ -286,7 +286,7 @@ export default defineComponent({
     },
     runSearch() {
       API.core.search
-        .searchOpenalexApiSearchOpenalexSelectGet({
+        .searchOpenalexApiSearchOpenalexSelectPost({
           query: this.query,
           xProjectId: currentProjectStore.projectId as string,
           limit: this.limit,
