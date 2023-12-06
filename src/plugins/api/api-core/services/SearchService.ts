@@ -19,7 +19,7 @@ export class SearchService {
    * @returns SearchResult Successful Response
    * @throws ApiError
    */
-  public searchOpenalexApiSearchOpenalexSelectGet({
+  public searchOpenalexApiSearchOpenalexSelectPost({
     query,
     xProjectId,
     limit = 20,
@@ -43,7 +43,7 @@ export class SearchService {
     histogramTo?: number,
   }, options?: Partial<ApiRequestOptions>): CancelablePromise<SearchResult> {
     return this.httpRequest.request({
-      method: 'GET',
+      method: 'POST',
       url: '/api/search/openalex/select',
       headers: {
         'x-project-id': xProjectId,
