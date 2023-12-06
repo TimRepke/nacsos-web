@@ -57,18 +57,5 @@ export const $AnnotationFilters = {
         type: 'null',
       }],
     },
-    repeat: {
-      type: 'any-of',
-      contains: [{
-        type: 'number',
-      }, {
-        type: 'array',
-        contains: {
-          type: 'number',
-        },
-      }, {
-        type: 'null',
-      }],
-    },
   },
 } as const;

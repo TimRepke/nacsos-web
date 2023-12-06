@@ -20,6 +20,5 @@ export type AnnotationFilters = {
   scope_id?: (string | Array<string> | null);
   user_id?: (string | Array<string> | null);
   key?: (string | Array<string> | null);
-  repeat?: (number | Array<number> | null);
 };
 
