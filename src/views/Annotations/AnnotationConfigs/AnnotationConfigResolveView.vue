@@ -76,59 +76,6 @@
                     </ul>
                   </div>
                   <div class="mb-3 border-bottom" v-if="filters.key && filters.key.length > 0">
-                    <div class="form-label">
-                      Repeats to resolve
-                      <ToolTip>
-                        Allows you to select which annotations to resolve if annotations can have an order. For example,
-                        whether to only resolve primary annotation of a kind (and ignore secondary,...) annotations.
-                      </ToolTip>
-                    </div>
-                    <div class="form-check form-check-inline">
-                      <input
-                        class="form-check-input"
-                        type="checkbox"
-                        id="repeat-selector-1"
-                        :value="1"
-                        v-model="filters.repeat"
-                        :disabled="!isNew"
-                      />
-                      <label class="form-check-label" for="repeat-selector-1">1</label>
-                    </div>
-                    <div class="form-check form-check-inline">
-                      <input
-                        class="form-check-input"
-                        type="checkbox"
-                        id="repeat-selector-2"
-                        :value="2"
-                        v-model="filters.repeat"
-                        :disabled="!isNew"
-                      />
-                      <label class="form-check-label" for="repeat-selector-2">2</label>
-                    </div>
-                    <div class="form-check form-check-inline">
-                      <input
-                        class="form-check-input"
-                        type="checkbox"
-                        id="repeat-selector-3"
-                        :value="3"
-                        v-model="filters.repeat"
-                        :disabled="!isNew"
-                      />
-                      <label class="form-check-label" for="repeat-selector-3">3</label>
-                    </div>
-                    <div class="form-check form-check-inline">
-                      <input
-                        class="form-check-input"
-                        type="checkbox"
-                        id="repeat-selector-4"
-                        :value="4"
-                        v-model="filters.repeat"
-                        :disabled="!isNew"
-                      />
-                      <label class="form-check-label" for="repeat-selector-4">4</label>
-                    </div>
-                  </div>
-                  <div class="mb-3 border-bottom" v-if="filters.key && filters.key.length > 0">
                     <div class="form-check">
                       <input
                         class="form-check-input"
@@ -349,7 +296,6 @@ export default defineComponent({
         scope_id: [] as string[],
         key: [] as string[],
         user_id: [] as string[],
-        repeat: [1, 2, 3, 4],
       } as Partial<AnnotationFilters>,
       algorithm: BotMetaResolve.algorithm.MAJORITY,
       ignoreHierarchy: false,
@@ -456,7 +402,6 @@ export default defineComponent({
               scope_id: this.filters.scope_id,
               user_id: this.filters.user_id,
               key: this.filters.key,
-              repeat: this.filters.repeat,
             },
           },
           xProjectId: currentProjectStore.projectId as string,
@@ -541,7 +486,6 @@ export default defineComponent({
                   scope_id: this.filters.scope_id,
                   user_id: this.filters.user_id,
                   key: this.filters.key,
-                  repeat: this.filters.repeat,
                 },
                 ignore_hierarchy: this.ignoreHierarchy,
                 ignore_repeat: this.ignoreRepeat,

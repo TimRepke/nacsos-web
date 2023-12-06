@@ -83,6 +83,20 @@ export function notNone(obj: unknown | null | undefined): obj is unknown {
   return obj !== undefined && obj !== null;
 }
 
+export function padZero(num: number, padding: number): string {
+  return num.toString(10).padStart(padding, "0");
+}
+
+export function dt2str(datetime: string | null | undefined): string | null {
+  if (datetime !== null && datetime !== undefined) {
+    const dt = new Date(datetime);
+    return `
+    ${dt.getFullYear()}-${padZero(dt.getMonth(), 2)}-${padZero(dt.getDate(), 2)} 
+    ${padZero(dt.getHours(), 2)}:${padZero(dt.getMinutes(), 2)}`;
+  }
+  return null;
+}
+
 export default {
   install(app: App) {
     // eslint-disable-next-line no-param-reassign
@@ -98,6 +112,7 @@ export default {
       notNone,
       isNone,
       is,
+      dt2str,
     };
   },
 };
