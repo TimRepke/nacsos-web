@@ -138,9 +138,6 @@ export default defineComponent({
         Promise.allSettled(uploads).then(() => {
           this.$emit("filesUpdated", this.selectedFiles);
         });
-        this.selectedFiles.forEach((file: UploadFile) => {
-          this.upload(file, folder);
-        });
       }
     },
   },
