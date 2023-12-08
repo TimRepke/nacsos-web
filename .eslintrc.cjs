@@ -3,11 +3,7 @@ require("@rushstack/eslint-patch/modern-module-resolution");
 
 module.exports = {
   root: true,
-  ignorePatterns: [
-    "src/util/filesaver.js",
-    "src/util/nql/*",
-    "src/views/ParseView.vue"
-  ],
+  ignorePatterns: ["src/util/filesaver.js", "src/util/nql/*", "src/views/ParseView.vue"],
   extends: [
     "plugin:vue/vue3-essential",
     "@vue/eslint-config-typescript/recommended",
