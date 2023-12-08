@@ -8,10 +8,18 @@ export const $QueryResult = {
       isRequired: true,
     },
     docs: {
-      type: 'array',
-      contains: {
-        type: 'AcademicItemModel',
-      },
+      type: 'any-of',
+      contains: [{
+        type: 'array',
+        contains: {
+          type: 'AcademicItemModel',
+        },
+      }, {
+        type: 'array',
+        contains: {
+          type: 'FullLexisNexisItemModel',
+        },
+      }],
       isRequired: true,
     },
   },

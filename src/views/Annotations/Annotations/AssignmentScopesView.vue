@@ -39,8 +39,23 @@
                 <tr @click.stop="navigate" role="button">
                   <td class="col-2 text-muted small">{{ $util.dt2str(scope.scope.time_created) }}</td>
                   <td class="col-3">{{ scope.scope.name }}</td>
-                  <td class="col-1 text-center">{{ scope.num_open }}</td>
-                  <td class="col-1 text-center">{{ scope.num_partial }}</td>
+                  <td
+                    class="col-1 text-center"
+                    :class="{
+                      'table-warning': scope.num_open > 0,
+                      'table-success': scope.num_open == 0,
+                    }"
+                  >
+                    {{ scope.num_open }}
+                  </td>
+                  <td
+                    class="col-1 text-center"
+                    :class="{
+                      'table-warning': scope.num_partial > 0,
+                    }"
+                  >
+                    {{ scope.num_partial }}
+                  </td>
                   <td class="col-1 text-center">
                     {{ scope.num_completed }}
                     <span class="small text-muted"

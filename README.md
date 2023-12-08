@@ -30,6 +30,12 @@ The most recent build should be committed to this repository in `tools/openapi-g
 
 We should probably clean up this change and submit a PR to the original maintainer.
 
+### Update NQL Grammar
+The grammar should be kept up-to-date with that used in the backend.
+Unfortunately, there are slight differences in the grammar for the grammar, so this has to be done manually.
+Once you edit the `grammar.ne` file, you need to compile it to javascript via `npm run nql`.
+
+
 ### Compiles and hot-reloads for development
 ```
 npm run serve
