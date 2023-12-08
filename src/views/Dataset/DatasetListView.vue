@@ -16,7 +16,13 @@
         </div>
         <div class="row m-2 mt-0">
           <div class="col">
-            <button type="button" @click="runQuery" class="btn btn-outline-primary">Query</button>
+            <button
+              type="button"
+              @click="fetchData({ currentPage: 1, currentPageSize: 30 })"
+              class="btn btn-outline-primary"
+            >
+              Query
+            </button>
           </div>
           <div class="col">
             <button type="button" @click="resetQuery" class="btn btn-outline-danger">Reset</button>
@@ -24,7 +30,7 @@
         </div>
       </div>
 
-      <div class="col">
+      <div class="col-12 col-lg-9">
         <div class="d-flex flex-column flex-shrink-1 item-container">
           <!-- Item viewer container -->
           <div class="d-flex flex-row flex-wrap p-2 overflow-auto border-bottom">
@@ -157,37 +163,43 @@ export default defineComponent({
   },
   methods: {
     fetchData({ currentPage, currentPageSize }: UseOffsetPaginationReturn): void {
-      API.core.project
-        .listProjectDataPagedApiProjectItemsItemTypeListPagePageSizeGet({
-          xProjectId: currentProjectStore.projectId as string,
-          page: this.pagination.currentPage,
-          pageSize: this.pagination.currentPageSize,
-          itemType: currentProjectStore.project!.type,
-        })
-        .then((response) => {
-          this.itemList = response.data;
-          this.$router.push({ query: { page: currentPage, pageSize: currentPageSize } });
-        })
-        .catch(toastReject);
-    },
-    runQuery(): void {
-      API.core.search
-        .nqlQueryApiSearchNqlQueryGet({
-          xProjectId: currentProjectStore.projectId as string,
-          query: this.query,
-          limit: 20,
-        })
-        .then((response) => {
-          const { data } = response;
-          this.itemList = data.docs;
-          this.queryNumItems = data.n_docs;
-        })
-        .catch(toastReject);
+      const query = this.query.trim();
+      if (query.length > 0) {
+        API.core.search
+          .nqlQueryApiSearchNqlQueryGet({
+            xProjectId: currentProjectStore.projectId as string,
+            query: this.query,
+            limit: this.$route.query.pageSize || 20,
+            page: this.$route.query.page || 1,
+          })
+          .then((response) => {
+            const { data } = response;
+            this.itemList = data.docs;
+            this.queryNumItems = data.n_docs;
+            this.$router.push({ query: { page: currentPage, pageSize: currentPageSize } });
+          })
+          .catch(toastReject);
+      } else {
+        API.core.project
+          .listProjectDataPagedApiProjectItemsItemTypeListPagePageSizeGet({
+            xProjectId: currentProjectStore.projectId as string,
+            page: this.pagination.currentPage,
+            pageSize: this.pagination.currentPageSize,
+            itemType: currentProjectStore.project!.type,
+          })
+          .then((response) => {
+            this.itemList = response.data;
+            this.$router.push({ query: { page: currentPage, pageSize: currentPageSize } });
+          })
+          .catch(toastReject);
+      }
     },
     resetQuery(): void {
+      this.pagination.currentPage = 1;
       this.fetchData(this.pagination);
       this.query = "";
       this.queryNumItems = null;
+      //this.$router.push({ query: { page: 1, pageSize: 20 } });
     },
   },
   computed: {

@@ -118,10 +118,12 @@ export class SearchService {
   public nqlQueryApiSearchNqlQueryGet({
     query,
     xProjectId,
+    page = 1,
     limit = 20,
   }: {
     query: string,
     xProjectId: string,
+    page?: number,
     limit?: number,
   }, options?: Partial<ApiRequestOptions>): CancelablePromise<QueryResult> {
     return this.httpRequest.request({
@@ -132,6 +134,7 @@ export class SearchService {
       },
       query: {
         'query': query,
+        'page': page,
         'limit': limit,
       },
       errors: {
