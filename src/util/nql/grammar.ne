@@ -3,45 +3,78 @@
 main -> _ query _ {% (d) => d[1] %}
 
 query ->
-    TITLE    ":" _ dqstring           {% (d) => ({ field: 'title',    value: d[3]             }) %}
-  | ABSTRACT ":" _ dqstring           {% (d) => ({ field: 'abstract', value: d[3]             }) %}
-  | PYEAR    ":" _ COMP _ year        {% (d) => ({ field: 'pub_year', value: d[5], comp: d[3] }) %}
-  | PDATE    ":" _ COMP _ date        {% (d) => ({ field: 'date',     value: d[5], comp: d[3] }) %}
-  | META     ":" _ meta_clause        {% (d) => ({ filter: 'meta',    ...d[3]                 }) %}
-  | LABEL    ":" _ label_clause       {% (d) => ({ filter: 'label',   ...d[3]                 }) %}
-  | IMPORT   ":" _ ie_uuids           {% (d) => ({ filter: 'import',  import_ids: d[3]        }) %}
-  | query __ AND __ query             {% (d) => ({ 'and': [d[0], d[4]]                        }) %}
-  | query __ OR  __ query             {% (d) => ({ 'or':  [d[0], d[4]]                        }) %}
-  | "(" _ query _ ")"                 {% (d) => d[2]                                            %}
+    TITLE    ":" _ dqstring           {% (d) => ({ field: 'title',       value:  d[3]             }) %}
+  | ABSTRACT ":" _ dqstring           {% (d) => ({ field: 'abstract',    value:  d[3]             }) %}
+  | PYEAR    ":" _ COMP _ year        {% (d) => ({ field: 'pub_year',    value:  d[5], comp: d[3] }) %}
+  | PDATE    ":" _ COMP _ date        {% (d) => ({ field: 'date',        value:  d[5], comp: d[3] }) %}
+  | "DOI"i   ":" _ dois               {% (d) => ({ field: 'doi',         values: d[3]             }) %}
+  | "OA"i    ":" _ oa_ids             {% (d) => ({ field: 'openalex_id', values: d[3]             }) %}
+  | "ID"i    ":" _ uuids              {% (d) => ({ field: 'item_id',     values: d[3]             }) %}
+  | SRC      ":" _ dqstring           {% (d) => ({ field: 'source',      value:  d[3]             }) %}
+  | META     ":" _ meta_clause        {% (d) => ({ filter: 'meta',    ...d[3]                     }) %}
+  | LABEL    ":" _ label_clause       {% (d) => ({ filter: 'label',   ...d[3]                     }) %}
+  | IMPORT   ":" _ ie_uuids           {% (d) => ({ filter: 'import',  import_ids: d[3]            }) %}
+  | assigned_clause                   {% id %}
+  | annotation_clause                 {% id %}
+  | query __ AND __ query             {% (d) => ({ 'and_': [d[0], d[4]]                            }) %}
+  | query __ OR  __ query             {% (d) => ({ 'or_':  [d[0], d[4]]                            }) %}
+  | "(" _ query _ ")"                 {% (d) => d[2]                                                 %}
+
+assigned_clause ->
+    "IS ASSIGNED"i                        {% (d) => ({ filter: "assignment", mode: 1,              }) %}
+  | "IS ASSIGNED IN"i           __ uuids  {% (d) => ({ filter: "assignment", mode: 2, scopes: d[2] }) %}
+  | "IS ASSIGNED BUT NOT IN"i   __ uuids  {% (d) => ({ filter: "assignment", mode: 3, scopes: d[2] }) %}
+  | "IS NOT ASSIGNED"i                    {% (d) => ({ filter: "assignment", mode: 4               }) %}
+  | "IS NOT ASSIGNED IGNORING"i __ uuids  {% (d) => ({ filter: "assignment", mode: 5, scopes: d[2] }) %}
+
+annotation_clause ->
+    "HAS ANNOTATION"i     (__ "IN" __ uuids | null)  {% (d) => ({ filter: "annotation", incl: true,  scopes: (d[1]||[])[3] }) %}
+  | "HAS NO ANNOTATION"i  (__ "IN" __ uuids | null)  {% (d) => ({ filter: "annotation", incl: false, scopes: (d[1]||[])[3] }) %}
 
 meta_clause ->
     KEY _  COMP    _  bool      {% (d) => ({ field: d[0], comp: d[2],   value: d[4] }) %}
   | KEY _  COMP    _  uint      {% (d) => ({ field: d[0], comp: d[2],   value: d[4] }) %}
   | KEY __ "LIKE"  __ dqstring  {% (d) => ({ field: d[0], comp: "LIKE", value: d[4] }) %}
 
-label_clause -> label_clause_val (__ "FROM" __ ie_uuids | null) (__ "BY" __ ie_uuids | null) {%
+label_clause -> label_type label_clause_val (__ "FROM"i __ uuids | null) label_clause_users (__ "REPEATS"i __ uints | null) {%
         (d) => ({
-            ...d[0],
-            scopes: (d[1]||[])[3],
-            users:  (d[2]||[])[3],
+            ...d[1],
+            scopes:   (d[2]||[])[3],
+            users:    d[3],
+            repeats:  (d[4]||[])[3],
+            type:     d[0]
         })
     %}
+
+label_clause_users ->
+    null                   {% (d) => null                             %}
+  | __ "BY"i     __ uuids  {% (d) => ({ user_ids: d[3], mode: 'ANY' }) %}
+  | __ "BY ANY"i __ uuids  {% (d) => ({ user_ids: d[3], mode: 'ANY' }) %}
+  | __ "BY ALL"i __ uuids  {% (d) => ({ user_ids: d[3], mode: 'ALL' }) %}
+
+label_type ->
+    null              {% (d) => ({ type: 'user'     }) %}
+  | "USER"i       __  {% (d) => ({ type: 'user'     }) %}
+  | "BOT"i        __  {% (d) => ({ type: 'bot'      }) %}
+  | "RES"i        __  {% (d) => ({ type: 'resolved' }) %}
+  | "RESOLVED"i   __  {% (d) => ({ type: 'resolved' }) %}
+  | "RESOLUTION"i __  {% (d) => ({ type: 'resolved' }) %}
 
 label_clause_val ->
     KEY _ COMP     _ uint   {% (d) => ({ key: d[0], value_int:  d[4], comp: d[2] }) %}
   | KEY _ "="      _ bool   {% (d) => ({ key: d[0], value_bool: d[4]             }) %}
   | KEY _ COMP_SET _ uints  {% (d) => ({ key: d[0], multi_int:  d[4], comp: d[2] }) %}
 
-KEY -> [A-Za-z_-]:+   {% (d) => d[0].join("") %}
+KEY   -> [A-Za-z_-]:+        {% (d) => d[0].join("") %}
 
 TITLE    -> "ti"i  | "title"i
-ABSTRACT -> "abs"i | "abstract"i
+ABSTRACT -> "abs"i | "abstract"i | "text"i
 PYEAR    -> "py"i  | "year"i | "yr"i
 PDATE    -> "pd"i  | "date"i
 IMPORT   -> "import"i
 LABEL    -> "label"i
 META     -> "meta"i
-
+SRC      -> "source"i | "src"i
 
 AND -> "and"i | "&"
 OR  -> "or"i  | "|"
@@ -55,8 +88,9 @@ COMP ->
   | "!="  {% id %}
 
 COMP_EXT ->
-    "LIKE"  {% id %}
-  | COMP    {% id %}
+    "LIKE"     {% id %}
+  | "SIMILAR"  {% id %}
+  | COMP       {% id %}
 
 COMP_SET ->
     "=="  {% id %}
@@ -83,8 +117,8 @@ uints ->
 uint  -> [0-9]:+              {% (d) => parseInt(d[0].join("")) %}
 float -> [0-9]:+ "." [0-9]:*  {% (d) => parseFloat(d[0].join("") + "." + d[2].join("")) %}
 bool  ->
-    "true"  {% (d) => true  %}
-  | "false" {% (d) => false %}
+    "true"i  {% (d) => true  %}
+  | "false"i {% (d) => false %}
 
 dqstring -> "\"" dstrchar:* "\"" {% (d) => d[1].join("") %}
 sqstring -> "'"  sstrchar:* "'"  {% (d) => d[1].join("") %}
@@ -102,6 +136,17 @@ sstrchar ->
 strescape ->
     ["\\/bfnrt]     {% id %}
   | "u" [a-fA-F0-9] [a-fA-F0-9] [a-fA-F0-9] [a-fA-F0-9] {% (d) => d.join("") %}
+
+
+dois ->
+    DOI                      {% (d) => [d[0]]              %}
+  | dois _ "," _ DOI         {% (d) => d[0].concat([d[4]]) %}
+DOI   -> [A-Za-z0-9_./:-]:+  {% (d) => d[0].join("") %}
+
+oa_ids ->
+    OA_ID                    {% (d) => [d[0]]              %}
+  | oa_ids _ "," _ OA_ID     {% (d) => d[0].concat([d[4]]) %}
+OA_ID -> "W" [0-9]:+         {% (d) => "W" + d[1].join("") %}
 
 uuids ->
     UUID                      {% (d) => [d[0]]              %}

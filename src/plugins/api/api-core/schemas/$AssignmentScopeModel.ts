@@ -59,6 +59,8 @@ export const $AssignmentScopeModel = {
       }, {
         type: 'AssignmentScopeRandomConfig',
       }, {
+        type: 'AssignmentScopeRandomWithNQLConfig',
+      }, {
         type: 'null',
       }],
     },

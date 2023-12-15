@@ -1,8 +1,18 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+import type { AnnotationFilter } from '../models/AnnotationFilter';
+import type { AssignmentFilter } from '../models/AssignmentFilter';
+import type { FieldFilter } from '../models/FieldFilter';
+import type { FieldFilters } from '../models/FieldFilters';
+import type { ImportFilter } from '../models/ImportFilter';
+import type { LabelFilterBool } from '../models/LabelFilterBool';
+import type { LabelFilterInt } from '../models/LabelFilterInt';
+import type { LabelFilterMulti } from '../models/LabelFilterMulti';
+import type { MetaFilter } from '../models/MetaFilter';
 import type { QueryResult } from '../models/QueryResult';
 import type { SearchResult } from '../models/SearchResult';
+import type { SubQuery } from '../models/SubQuery';
 import type { TermStats } from '../models/TermStats';
 
 import type { CancelablePromise } from '@/plugins/api/core/CancelablePromise';
@@ -98,45 +108,33 @@ export class SearchService {
   }
 
   /**
-   * Nql Grammar
-   * @returns string Successful Response
-   * @throws ApiError
-   */
-  public nqlGrammarApiSearchNqlGrammarGet(options?: Partial<ApiRequestOptions>): CancelablePromise<string> {
-    return this.httpRequest.request({
-      method: 'GET',
-      url: '/api/search/nql/grammar',
-      ...options,
-    });
-  }
-
-  /**
    * Nql Query
    * @returns QueryResult Successful Response
    * @throws ApiError
    */
-  public nqlQueryApiSearchNqlQueryGet({
-    query,
+  public nqlQueryApiSearchNqlQueryPost({
     xProjectId,
+    requestBody,
     page = 1,
     limit = 20,
   }: {
-    query: string,
     xProjectId: string,
+    requestBody: (FieldFilter | FieldFilters | LabelFilterMulti | LabelFilterBool | LabelFilterInt | AssignmentFilter | AnnotationFilter | ImportFilter | MetaFilter | SubQuery),
     page?: number,
     limit?: number,
   }, options?: Partial<ApiRequestOptions>): CancelablePromise<QueryResult> {
     return this.httpRequest.request({
-      method: 'GET',
+      method: 'POST',
       url: '/api/search/nql/query',
       headers: {
         'x-project-id': xProjectId,
       },
       query: {
-        'query': query,
         'page': page,
         'limit': limit,
       },
+      body: requestBody,
+      mediaType: 'application/json',
       errors: {
         422: `Validation Error`,
       },

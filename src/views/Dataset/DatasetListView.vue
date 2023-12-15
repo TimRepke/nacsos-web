@@ -125,6 +125,7 @@ import AnyItemComponent from "@/components/items/AnyItem.vue";
 import type { AnyItem } from "@/types/items.d";
 import { API, toastReject } from "@/plugins/api";
 import NQLBox from "@/components/NQLBox.vue";
+import parse from '@/util/nql';
 
 export default defineComponent({
   name: "ProjectDataView",
@@ -164,11 +165,14 @@ export default defineComponent({
   methods: {
     fetchData({ currentPage, currentPageSize }: UseOffsetPaginationReturn): void {
       const query = this.query.trim();
+
       if (query.length > 0) {
+        const queryParsed = parse(query);
+
         API.core.search
-          .nqlQueryApiSearchNqlQueryGet({
+          .nqlQueryApiSearchNqlQueryPost({
             xProjectId: currentProjectStore.projectId as string,
-            query: this.query,
+            requestBody: queryParsed[0],
             limit: this.$route.query.pageSize || 20,
             page: this.$route.query.page || 1,
           })

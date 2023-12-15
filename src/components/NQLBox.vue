@@ -52,7 +52,6 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
-import { API } from "@/plugins/api";
 // import initPython from '@/plugins/python';
 
 type Mode = "txt" | "ind" | "vis";
@@ -77,10 +76,7 @@ export default defineComponent({
     };
   },
   mounted() {
-    API.core.search.nqlGrammarApiSearchNqlGrammarGet().then((response) => {
-      this.grammar = response.data;
-      // initPython((e: string) => { this.log = [...this.log, e]; });
-    });
+    // pass
   },
   computed: {
     // pass

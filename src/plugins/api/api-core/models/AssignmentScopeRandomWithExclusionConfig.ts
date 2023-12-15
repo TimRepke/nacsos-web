@@ -18,6 +18,7 @@ export namespace AssignmentScopeRandomWithExclusionConfig {
   export enum config_type {
     RANDOM = 'random',
     RANDOM_EXCLUSION = 'random_exclusion',
+    RANDOM_NQL = 'random_nql',
   }
 
 

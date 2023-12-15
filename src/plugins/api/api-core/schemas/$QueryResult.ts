@@ -19,6 +19,11 @@ export const $QueryResult = {
         contains: {
           type: 'FullLexisNexisItemModel',
         },
+      }, {
+        type: 'array',
+        contains: {
+          type: 'GenericItemModel',
+        },
       }],
       isRequired: true,
     },
