@@ -1,5 +1,17 @@
 import { Grammar, Parser } from "nearley";
 import grammar from "@/util/nql/grammar";
+import type {
+  AnnotationFilter,
+  AssignmentFilter,
+  FieldFilter,
+  FieldFilters,
+  ImportFilter,
+  LabelFilterBool,
+  LabelFilterInt,
+  LabelFilterMulti,
+  MetaFilter,
+  SubQuery,
+} from "@/plugins/api/api-core";
 
 export const compiledGrammar = Grammar.fromCompiled(grammar);
 
@@ -7,7 +19,19 @@ export function getParser(): Parser {
   return new Parser(compiledGrammar);
 }
 
-export function parse(query: string): Array<object> {
+export type Filter =
+  | AnnotationFilter
+  | AssignmentFilter
+  | FieldFilter
+  | FieldFilters
+  | ImportFilter
+  | LabelFilterBool
+  | LabelFilterInt
+  | LabelFilterMulti
+  | MetaFilter
+  | SubQuery;
+
+export function parse(query: string): Array<Filter> {
   const parser = new Parser(compiledGrammar, { keepHistory: true });
   try {
     parser.feed(query);
@@ -20,7 +44,7 @@ export function parse(query: string): Array<object> {
   return [];
 }
 
-export function debug(query: string): Array<object> {
+export function debug(query: string): Array<Filter> {
   const parser = new Parser(compiledGrammar, { keepHistory: true });
   try {
     parser.feed(query);

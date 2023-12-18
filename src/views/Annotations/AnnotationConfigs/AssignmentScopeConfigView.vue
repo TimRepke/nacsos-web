@@ -206,7 +206,7 @@ type AssignmentScopeConfigData = {
   // users selected to be in the query pool
   selectedUsers: UserModel[];
   // assignment strategy type
-  strategyConfigType?: AssignmentScopeRandomConfig.config_type;
+  strategyConfigType?: "random";
   // indicates whether this is (or will be) a newly created scope
   isNewScope: boolean;
   // holds the assignment counts (or undefined if none exist)
@@ -464,7 +464,7 @@ export default defineComponent({
       const userIndex = this.selectedUserIds.indexOf(user.user_id as string);
       this.selectedUsers.splice(userIndex, 1);
     },
-    updateConfig(eventPayload: AssignmentScopeRandomConfig.config_type | undefined) {
+    updateConfig(eventPayload: string | undefined) {
       // FIXME
       // @ts-ignore FIXME
       this.assignmentScope.config = eventPayload;
