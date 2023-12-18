@@ -21,7 +21,8 @@ export type AssignmentScopeRandomWithNQLConfig = {
   max_assignments_per_item: number;
   num_multi_coded_items: number;
   random_seed: number;
-  query: (FieldFilter | FieldFilters | LabelFilterMulti | LabelFilterBool | LabelFilterInt | AssignmentFilter | AnnotationFilter | ImportFilter | MetaFilter | SubQuery);
+  query_parsed: (FieldFilter | FieldFilters | LabelFilterMulti | LabelFilterBool | LabelFilterInt | AssignmentFilter | AnnotationFilter | ImportFilter | MetaFilter | SubQuery);
+  query_str: string;
 };
 
 export namespace AssignmentScopeRandomWithNQLConfig {

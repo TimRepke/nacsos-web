@@ -43,7 +43,7 @@ export const $AssignmentScopeRandomWithNQLConfig = {
       type: 'number',
       isRequired: true,
     },
-    query: {
+    query_parsed: {
       type: 'any-of',
       contains: [{
         type: 'FieldFilter',
@@ -66,6 +66,10 @@ export const $AssignmentScopeRandomWithNQLConfig = {
       }, {
         type: 'SubQuery',
       }],
+      isRequired: true,
+    },
+    query_str: {
+      type: 'string',
       isRequired: true,
     },
   },

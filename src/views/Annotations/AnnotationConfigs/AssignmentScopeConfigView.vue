@@ -121,6 +121,7 @@
           <select v-model="strategyConfigType" aria-label="Strategy Config Option" :disabled="scopeHasAssignments">
             <option disabled :value="undefined">Select strategy</option>
             <option value="random">Random assignment</option>
+            <option value="random_nql">Random assignment with NQL filter</option>
             <option value="random_exclusion">Random assignment with scope exclusion</option>
           </select>
         </div>
@@ -137,9 +138,15 @@
             :editable="!scopeHasAssignments"
             @config-changed="updateConfig($event)"
           />
+          <RandomAssignmentWithNQLConfig
+            v-if="strategyConfigType === 'random_nql'"
+            :existing-config="assignmentScope.config as AssignmentScopeRandomWithNQLConfig"
+            :editable="!scopeHasAssignments"
+            @config-changed="updateConfig($event)"
+          />
         </div>
         <button
-          v-if="strategyConfigType !== undefined"
+          v-if="strategyConfigType !== undefined && !scopeHasAssignments"
           type="button"
           class="btn btn-outline-secondary"
           :disabled="scopeHasAssignments || isNewScope"
@@ -187,6 +194,7 @@ import type {
 import { currentProjectStore } from "@/stores";
 import ScopeQuality from "@/components/annotations/ScopeQuality.vue";
 import type { UserBaseModel } from "@/plugins/api/api-core";
+import RandomAssignmentWithNQLConfig from "@/components/annotations/assignments/RandomAssignmentWithNQL.vue";
 
 type AssignmentScopeConfigData = {
   scopeId?: string;
@@ -211,7 +219,12 @@ type AssignmentScopeConfigData = {
 
 export default defineComponent({
   name: "AssignmentScopeConfigView",
-  components: { ScopeQuality, RandomAssignmentWithExclusionConfig, RandomAssignmentConfig },
+  components: {
+    RandomAssignmentWithNQLConfig,
+    ScopeQuality,
+    RandomAssignmentWithExclusionConfig,
+    RandomAssignmentConfig,
+  },
   data(): AssignmentScopeConfigData {
     const scopeId = this.$route.params.scope_id as string | undefined;
     const annotationSchemeId = this.$route.query.annotation_scheme_id as string | undefined;

@@ -10,7 +10,7 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import parse from "@/util/nql";
+import { debug } from "@/util/nql";
 import { currentProjectStore } from "@/stores";
 import { API, logReject } from "@/plugins/api";
 
@@ -18,28 +18,28 @@ export default defineComponent({
   name: "HomeView",
   data() {
     let res;
-    res = parse('title: "hi"');
+    res = debug('title: "hi"');
     // console.log(res);
-    res = parse("PY: >2020");
+    res = debug("PY: >2020");
     // console.log(res);
-    res = parse('PY: >2020\n  OR\n  title: "carbon"\n');
+    res = debug('PY: >2020\n  OR\n  title: "carbon"\n');
 
-    res = parse("import: abc, 12d, -af3");
+    res = debug("import: abc, 12d, -af3");
 
-    parse("label: key=3 FROM abc, 12d");
-    parse("label: key=3");
-    parse("label: key==3,4,5");
-    parse("label: key !> 3,4,5");
-    parse("label: key !> 3,4,5 FROM abc, -12d");
-    parse("label: key <= 5 BY ~cde,123");
-    parse("label: key > 2 FROM abc, -12d BY ~cde,123");
+    debug("label: key=3 FROM abc, 12d");
+    debug("label: key=3");
+    debug("label: key==3,4,5");
+    debug("label: key !> 3,4,5");
+    debug("label: key !> 3,4,5 FROM abc, -12d");
+    debug("label: key <= 5 BY ~cde,123");
+    debug("label: key > 2 FROM abc, -12d BY ~cde,123");
 
-    parse('meta: extra LIKE "% test %"');
+    debug('meta: extra LIKE "% test %"');
 
-    parse("meta: extra <= 4");
+    debug("meta: extra <= 4");
 
-    parse("(PY:>2000 AND (PY:<2100 OR PY:>2200))");
-    parse("PY:>2000 AND PY:<2100 AND PY:>2200");
+    debug("(PY:>2000 AND (PY:<2100 OR PY:>2200))");
+    debug("PY:>2000 AND PY:<2100 AND PY:>2200");
 
     // import: 944f2985-503b-4aad-8af1-e48b694eba19
 
@@ -54,12 +54,12 @@ export default defineComponent({
   },
   methods: {
     ask() {
-      const query = parse(this.query);
+      const query = debug(this.query);
       this.count = -1;
       API.core.search
-        .nqlQueryApiSearchNqlQuery2Post({
-          projectId: currentProjectStore.projectId,
-          requestBody:query[0],
+        .nqlQueryApiSearchNqlQueryPost({
+          xProjectId: currentProjectStore.projectId as string,
+          requestBody: query[0],
         })
         .then((response) => {
           this.count = response.data;
@@ -69,7 +69,7 @@ export default defineComponent({
   },
   computed: {
     tree() {
-      return JSON.stringify(parse(this.query), null, "  ");
+      return JSON.stringify(debug(this.query), null, "  ");
     },
   },
 });

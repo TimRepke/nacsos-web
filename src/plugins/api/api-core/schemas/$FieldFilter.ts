@@ -17,8 +17,12 @@ export const $FieldFilter = {
       isRequired: true,
     },
     comp: {
-      type: 'string',
-      isRequired: true,
+      type: 'any-of',
+      contains: [{
+        type: 'string',
+      }, {
+        type: 'null',
+      }],
     },
   },
 } as const;

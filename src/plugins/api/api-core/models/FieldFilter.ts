@@ -5,7 +5,7 @@
 export type FieldFilter = {
   field: FieldFilter.field;
   value: (string | number);
-  comp: string;
+  comp?: (string | null);
 };
 
 export namespace FieldFilter {

@@ -142,4 +142,31 @@ export class SearchService {
     });
   }
 
+  /**
+   * Nql Query Count
+   * @returns number Successful Response
+   * @throws ApiError
+   */
+  public nqlQueryCountApiSearchNqlCountPost({
+    xProjectId,
+    requestBody,
+  }: {
+    xProjectId: string,
+    requestBody: (FieldFilter | FieldFilters | LabelFilterMulti | LabelFilterBool | LabelFilterInt | AssignmentFilter | AnnotationFilter | ImportFilter | MetaFilter | SubQuery),
+  }, options?: Partial<ApiRequestOptions>): CancelablePromise<number> {
+    return this.httpRequest.request({
+      method: 'POST',
+      url: '/api/search/nql/count',
+      headers: {
+        'x-project-id': xProjectId,
+      },
+      body: requestBody,
+      mediaType: 'application/json',
+      errors: {
+        422: `Validation Error`,
+      },
+      ...options,
+    });
+  }
+
 }
