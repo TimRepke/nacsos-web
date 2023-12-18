@@ -14,16 +14,20 @@
             <input type="password" class="form-control" id="passwordInput" placeholder="Password" v-model="password" />
             <label for="passwordInput">Password</label>
           </div>
-          <div class="alert alert-danger d-flex align-items-center" :class="{ 'd-none': !error }" role="alert">
-            <div>
+          <div class="alert alert-danger align-items-center" :class="{ 'd-none': !error }" role="alert">
+            <div class="d-flex">
               <font-awesome-icon
                 :icon="['fas', 'triangle-exclamation']"
-                class="flex-shrink-0 me-2"
+                class="flex-shrink-0 me-2 mt-2"
                 style="font-size: 1.5em; vertical-align: middle"
               />
               <div class="text-start ms-3">Computer says no. <br />Please double-check username and password.</div>
             </div>
-            <button type="button" class="btn btn-outline-dark w-100" @click="reset">Email password reset link</button>
+            <div>
+              <button type="button" class="btn btn-outline-dark w-100" @click="reset">
+                Send email with password reset link
+              </button>
+            </div>
           </div>
           <button type="submit" class="btn btn-outline-dark w-100" @click="login">LOGIN</button>
         </form>
