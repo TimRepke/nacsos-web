@@ -31,11 +31,12 @@
     <!-- TEXT MODE -->
     <div class="row" v-if="mode === 'txt'">
       <textarea
-        v-model="query"
+        v-model="queryStr"
         @input="$emit('update:query', $event.target.value)"
         aria-label="NQL query"
         class="form-control"
-        rows="5"
+        :disabled="!editable"
+        :rows="rows"
       />
     </div>
 
@@ -52,20 +53,29 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
-import { API } from "@/plugins/api";
-// import initPython from '@/plugins/python';
+import { parse } from "@/util/nql";
 
 type Mode = "txt" | "ind" | "vis";
 
 export default defineComponent({
   name: "NQLBox",
   components: { FontAwesomeIcon },
-  emits: ["update:query"],
+  emits: ["update:query", "update:query-parsed"],
   props: {
     query: {
       type: String,
       required: true,
       default: null as string | null,
+    },
+    rows: {
+      type: Number,
+      required: false,
+      default: 5,
+    },
+    editable: {
+      type: Boolean,
+      required: false,
+      default: true,
     },
   },
   data() {
@@ -77,10 +87,7 @@ export default defineComponent({
     };
   },
   mounted() {
-    API.core.search.nqlGrammarApiSearchNqlGrammarGet().then((response) => {
-      this.grammar = response.data;
-      // initPython((e: string) => { this.log = [...this.log, e]; });
-    });
+    // pass
   },
   computed: {
     // pass
@@ -89,7 +96,11 @@ export default defineComponent({
     // pass
   },
   watch: {
-    // pass
+    queryStr(newQuery: string) {
+      const queryParsed = parse(newQuery.trim());
+      this.$emit("update:query-parsed", queryParsed);
+      return queryParsed;
+    },
   },
 });
 </script>

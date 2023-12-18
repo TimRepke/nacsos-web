@@ -1,29 +1,30 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-export const $MakeAssignmentsRequestModel = {
+export const $MetaFilter = {
   properties: {
-    annotation_scheme_id: {
+    filter: {
+      properties: {
+      },
+    },
+    field: {
       type: 'string',
       isRequired: true,
     },
-    scope_id: {
+    comp: {
       type: 'string',
       isRequired: true,
     },
-    config: {
+    value: {
       type: 'any-of',
       contains: [{
-        type: 'AssignmentScopeRandomWithExclusionConfig',
+        type: 'string',
       }, {
-        type: 'AssignmentScopeRandomConfig',
+        type: 'number',
       }, {
-        type: 'AssignmentScopeRandomWithNQLConfig',
+        type: 'boolean',
       }],
       isRequired: true,
-    },
-    save: {
-      type: 'boolean',
     },
   },
 } as const;

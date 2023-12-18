@@ -4,6 +4,7 @@
 
 import type { AssignmentScopeRandomConfig } from './AssignmentScopeRandomConfig';
 import type { AssignmentScopeRandomWithExclusionConfig } from './AssignmentScopeRandomWithExclusionConfig';
+import type { AssignmentScopeRandomWithNQLConfig } from './AssignmentScopeRandomWithNQLConfig';
 
 /**
  * AssignmentScope can be used to logically group a set of Assignments.
@@ -20,7 +21,7 @@ export type AssignmentScopeModel = {
   time_created?: (string | null);
   name: string;
   description?: (string | null);
-  config?: (AssignmentScopeRandomWithExclusionConfig | AssignmentScopeRandomConfig | null);
+  config?: (AssignmentScopeRandomWithExclusionConfig | AssignmentScopeRandomConfig | AssignmentScopeRandomWithNQLConfig | null);
   highlighter_ids?: (Array<string> | null);
 };
 

@@ -1,19 +1,17 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-export const $Event = {
+export const $FieldFilters = {
   properties: {
-    event: {
+    field: {
       type: 'Enum',
       isRequired: true,
     },
-    payload: {
-      type: 'any-of',
-      contains: [{
-        type: 'ExampleSubEvent',
-      }, {
-        type: 'ExampleEvent',
-      }],
+    values: {
+      type: 'array',
+      contains: {
+        type: 'string',
+      },
       isRequired: true,
     },
   },

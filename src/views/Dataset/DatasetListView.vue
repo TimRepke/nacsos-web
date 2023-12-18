@@ -12,7 +12,7 @@
           {{ totalNumItems.toLocaleString("en") }}
         </div>
         <div class="row m-2 mt-0">
-          <n-q-l-box v-model:query="query" />
+          <NQLBox v-model:query="queryStr" @update:query-parsed="updateQuery" />
         </div>
         <div class="row m-2 mt-0">
           <div class="col">
@@ -131,7 +131,8 @@ export default defineComponent({
   components: { NQLBox, AnyItemComponent },
   data() {
     return {
-      query: "",
+      queryStr: "",
+      queryParsed: [],
       projectType: currentProjectStore.project?.type,
       itemList: [] as AnyItem[],
       showSearchBar: true,
@@ -162,13 +163,15 @@ export default defineComponent({
       .catch(toastReject);
   },
   methods: {
+    updateQuery(newQuery: object[]) {
+      this.queryParsed = newQuery;
+    },
     fetchData({ currentPage, currentPageSize }: UseOffsetPaginationReturn): void {
-      const query = this.query.trim();
-      if (query.length > 0) {
+      if (this.queryParsed.length > 0) {
         API.core.search
-          .nqlQueryApiSearchNqlQueryGet({
+          .nqlQueryApiSearchNqlQueryPost({
             xProjectId: currentProjectStore.projectId as string,
-            query: this.query,
+            requestBody: this.queryParsed[0],
             limit: this.$route.query.pageSize || 20,
             page: this.$route.query.page || 1,
           })
@@ -197,7 +200,8 @@ export default defineComponent({
     resetQuery(): void {
       this.pagination.currentPage = 1;
       this.fetchData(this.pagination);
-      this.query = "";
+      this.queryStr = "";
+      this.queryParsed = [];
       this.queryNumItems = null;
       //this.$router.push({ query: { page: 1, pageSize: 20 } });
     },

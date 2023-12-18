@@ -15,12 +15,15 @@
             <label for="passwordInput">Password</label>
           </div>
           <div class="alert alert-danger d-flex align-items-center" :class="{ 'd-none': !error }" role="alert">
-            <font-awesome-icon
-              :icon="['fas', 'triangle-exclamation']"
-              class="flex-shrink-0 me-2"
-              style="font-size: 1.5em; vertical-align: middle"
-            />
-            <div class="text-start ms-3">Computer says no. <br />Please double-check username and password.</div>
+            <div>
+              <font-awesome-icon
+                :icon="['fas', 'triangle-exclamation']"
+                class="flex-shrink-0 me-2"
+                style="font-size: 1.5em; vertical-align: middle"
+              />
+              <div class="text-start ms-3">Computer says no. <br />Please double-check username and password.</div>
+            </div>
+            <button type="button" class="btn btn-outline-dark w-100" @click="reset">Email password reset link</button>
           </div>
           <button type="submit" class="btn btn-outline-dark w-100" @click="login">LOGIN</button>
         </form>
@@ -47,6 +50,8 @@ import { defineComponent } from "vue";
 import NacsosLogo from "@/components/NacsosLogo.vue";
 import { EventBus } from "@/plugins/events";
 import { AuthFailedEvent, UserLoginEvent, LoginSuccessEvent } from "@/plugins/events/events/auth";
+import { API, toastReject } from "@/plugins/api";
+import { ToastEvent } from "@/plugins/events/events/toast";
 
 export default defineComponent({
   name: "LoginView",
@@ -70,6 +75,17 @@ export default defineComponent({
       EventBus.once(LoginSuccessEvent, () => {
         this.$router.push({ name: "project-list" });
       });
+    },
+    async reset() {
+      this.error = false;
+      API.core.mailing
+        .resetPasswordApiMailResetPasswordUsernamePost({
+          username: this.username as string,
+        })
+        .then(() => {
+          EventBus.emit(new ToastEvent("SUCCESS", "I sent you a password reset link. Please check your email inbox."));
+        })
+        .catch(toastReject);
     },
   },
 });
@@ -101,6 +117,7 @@ input {
   padding: 0.25rem;
   font-size: 0.7rem;
 }
+
 .imprint {
   position: absolute;
   bottom: 1rem;
