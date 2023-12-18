@@ -3,21 +3,21 @@
 main -> _ query _ {% (d) => d[1] %}
 
 query ->
-    TITLE    ":" _ dqstring           {% (d) => ({ field: 'title',       value:  d[3]             }) %}
-  | ABSTRACT ":" _ dqstring           {% (d) => ({ field: 'abstract',    value:  d[3]             }) %}
-  | PYEAR    ":" _ COMP _ year        {% (d) => ({ field: 'pub_year',    value:  d[5], comp: d[3] }) %}
-  | PDATE    ":" _ COMP _ date        {% (d) => ({ field: 'date',        value:  d[5], comp: d[3] }) %}
-  | "DOI"i   ":" _ dois               {% (d) => ({ field: 'doi',         values: d[3]             }) %}
-  | "OA"i    ":" _ oa_ids             {% (d) => ({ field: 'openalex_id', values: d[3]             }) %}
-  | "ID"i    ":" _ uuids              {% (d) => ({ field: 'item_id',     values: d[3]             }) %}
-  | SRC      ":" _ dqstring           {% (d) => ({ field: 'source',      value:  d[3]             }) %}
+    TITLE    ":" _ dqstring           {% (d) => ({ filter: 'field', field: 'title',       value:  d[3]             }) %}
+  | ABSTRACT ":" _ dqstring           {% (d) => ({ filter: 'field', field: 'abstract',    value:  d[3]             }) %}
+  | PYEAR    ":" _ COMP _ year        {% (d) => ({ filter: 'field', field: 'pub_year',    value:  d[5], comp: d[3] }) %}
+  | PDATE    ":" _ COMP _ date        {% (d) => ({ filter: 'field', field: 'date',        value:  d[5], comp: d[3] }) %}
+  | "DOI"i   ":" _ dois               {% (d) => ({ filter: 'field', field: 'doi',         values: d[3]             }) %}
+  | "OA"i    ":" _ oa_ids             {% (d) => ({ filter: 'field', field: 'openalex_id', values: d[3]             }) %}
+  | "ID"i    ":" _ uuids              {% (d) => ({ filter: 'field', field: 'item_id',     values: d[3]             }) %}
+  | SRC      ":" _ dqstring           {% (d) => ({ filter: 'field', field: 'source',      value:  d[3]             }) %}
   | META     ":" _ meta_clause        {% (d) => ({ filter: 'meta',    ...d[3]                     }) %}
   | LABEL    ":" _ label_clause       {% (d) => ({ filter: 'label',   ...d[3]                     }) %}
   | IMPORT   ":" _ ie_uuids           {% (d) => ({ filter: 'import',  import_ids: d[3]            }) %}
   | assigned_clause                   {% id %}
   | annotation_clause                 {% id %}
-  | query __ AND __ query             {% (d) => ({ 'and_': [d[0], d[4]]                            }) %}
-  | query __ OR  __ query             {% (d) => ({ 'or_':  [d[0], d[4]]                            }) %}
+  | query __ AND __ query             {% (d) => ({ filter: 'sub', 'and_': [d[0], d[4]]            }) %}
+  | query __ OR  __ query             {% (d) => ({ filter: 'sub', 'or_':  [d[0], d[4]]            }) %}
   | "(" _ query _ ")"                 {% (d) => d[2]                                                 %}
 
 assigned_clause ->
@@ -38,11 +38,11 @@ meta_clause ->
 
 label_clause -> label_type label_clause_val (__ "FROM"i __ uuids | null) label_clause_users (__ "REPEATS"i __ uints | null) {%
         (d) => ({
+            ...d[0],
             ...d[1],
             scopes:   (d[2]||[])[3],
             users:    d[3],
             repeats:  (d[4]||[])[3],
-            type:     d[0]
         })
     %}
 
@@ -61,9 +61,9 @@ label_type ->
   | "RESOLUTION"i __  {% (d) => ({ type: 'resolved' }) %}
 
 label_clause_val ->
-    KEY _ COMP     _ uint   {% (d) => ({ key: d[0], value_int:  d[4], comp: d[2] }) %}
-  | KEY _ "="      _ bool   {% (d) => ({ key: d[0], value_bool: d[4]             }) %}
-  | KEY _ COMP_SET _ uints  {% (d) => ({ key: d[0], multi_int:  d[4], comp: d[2] }) %}
+    KEY _ COMP     _ uint   {% (d) => ({ value_type: 'int',   key: d[0], value_int:  d[4], comp: d[2] }) %}
+  | KEY _ "="      _ bool   {% (d) => ({ value_type: 'bool',  key: d[0], value_bool: d[4]             }) %}
+  | KEY _ COMP_SET _ uints  {% (d) => ({ value_type: 'multi', key: d[0], multi_int:  d[4], comp: d[2] }) %}
 
 KEY   -> [A-Za-z_-]:+        {% (d) => d[0].join("") %}
 
@@ -112,13 +112,17 @@ date  -> year "-" [0-9] [0-9] "-" [0-9] [0-9]  {% (d) => d.join("") %}
 year  -> [0-9] [0-9] [0-9] [0-9]               {% (d) => parseInt(d.join("")) %}
 
 uints ->
-    uint                      {% (d) => [d[0]] %}
-  | uints _ "," _ uint        {% (d) => d[0].concat([d[4]]) %}
-uint  -> [0-9]:+              {% (d) => parseInt(d[0].join("")) %}
-float -> [0-9]:+ "." [0-9]:*  {% (d) => parseFloat(d[0].join("") + "." + d[2].join("")) %}
+    _uints                       {% (d) => d[0] %}
+  | "[" _uints "]"               {% (d) => d[1] %}  # optional brackets
+  | "{" _uints "}"               {% (d) => d[1] %}  # optional brackets
+_uints ->
+    uint                         {% (d) => [d[0]] %}
+  | _uints _ "," _ uint          {% (d) => d[0].concat([d[4]]) %}
+uint  -> [0-9]:+                 {% (d) => parseInt(d[0].join("")) %}
+float -> [0-9]:+ "." [0-9]:*     {% (d) => parseFloat(d[0].join("") + "." + d[2].join("")) %}
 bool  ->
-    "true"i  {% (d) => true  %}
-  | "false"i {% (d) => false %}
+    "true"i                      {% (d) => true  %}
+  | "false"i                     {% (d) => false %}
 
 dqstring -> "\"" dstrchar:* "\"" {% (d) => d[1].join("") %}
 sqstring -> "'"  sstrchar:* "'"  {% (d) => d[1].join("") %}
@@ -137,26 +141,41 @@ strescape ->
     ["\\/bfnrt]     {% id %}
   | "u" [a-fA-F0-9] [a-fA-F0-9] [a-fA-F0-9] [a-fA-F0-9] {% (d) => d.join("") %}
 
-
 dois ->
-    DOI                      {% (d) => [d[0]]              %}
-  | dois _ "," _ DOI         {% (d) => d[0].concat([d[4]]) %}
-DOI   -> [A-Za-z0-9_./:-]:+  {% (d) => d[0].join("") %}
+    _dois                      {% (d) => d[0] %}
+  | "[" _dois "]"              {% (d) => d[1] %}  # optional brackets
+  | "{" _dois "}"              {% (d) => d[1] %}  # optional brackets
+_dois ->
+    DOI                        {% (d) => [d[0]]              %}
+  | _dois _ "," _ DOI          {% (d) => d[0].concat([d[4]]) %}
+DOI   -> [A-Za-z0-9_./:-]:+    {% (d) => d[0].join("") %}
 
 oa_ids ->
-    OA_ID                    {% (d) => [d[0]]              %}
-  | oa_ids _ "," _ OA_ID     {% (d) => d[0].concat([d[4]]) %}
-OA_ID -> "W" [0-9]:+         {% (d) => "W" + d[1].join("") %}
+    _oa_ids                    {% (d) => d[0] %}
+  | "[" _oa_ids "]"            {% (d) => d[1] %}  # optional brackets
+  | "{" _oa_ids "}"            {% (d) => d[1] %}  # optional brackets
+_oa_ids ->
+    OA_ID                      {% (d) => [d[0]]              %}
+  | _oa_ids _ "," _ OA_ID      {% (d) => d[0].concat([d[4]]) %}
+OA_ID -> "W" [0-9]:+           {% (d) => "W" + d[1].join("") %}
 
 uuids ->
-    UUID                      {% (d) => [d[0]]              %}
-  | uuids _ "," _ UUID        {% (d) => d[0].concat([d[4]]) %}
+    _uuids                     {% (d) => d[0] %}
+  | "[" _uuids "]"             {% (d) => d[1] %}  # optional brackets
+  | "{" _uuids "}"             {% (d) => d[1] %}  # optional brackets
+_uuids ->
+    UUID                       {% (d) => [d[0]]              %}
+  | _uuids _ "," _ UUID        {% (d) => d[0].concat([d[4]]) %}
 ie_uuids ->
-    ie_uuid                   {% (d) => [d[0]]              %}
-  | ie_uuids _ "," _ ie_uuid  {% (d) => d[0].concat([d[4]]) %}
+    _ie_uuids                  {% (d) => d[0] %}
+  | "[" _ie_uuids "]"          {% (d) => d[1] %}  # optional brackets
+  | "{" _ie_uuids "}"          {% (d) => d[1] %}  # optional brackets
+_ie_uuids ->
+    ie_uuid                    {% (d) => [d[0]]              %}
+  | _ie_uuids _ "," _ ie_uuid  {% (d) => d[0].concat([d[4]]) %}
 ie_uuid -> 
-    UUID                      {% (d) => ({incl: true,  uuid: d[0]}) %}
-  | NEGATE _ UUID             {% (d) => ({incl: false, uuid: d[2]}) %}
+    UUID                       {% (d) => ({incl: true,  uuid: d[0]}) %}
+  | NEGATE _ UUID              {% (d) => ({incl: false, uuid: d[2]}) %}
 
 # /[A-Fa-f0-9]{8}-[A-Fa-f0-9]{4}-[A-Fa-f0-9]{4}-[A-Fa-f0-9]{4}-[A-Fa-f0-9]{12}/
 # /[A-Fa-f0-9]{32}/

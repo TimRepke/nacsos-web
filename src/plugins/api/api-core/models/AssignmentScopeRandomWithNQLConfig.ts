@@ -14,7 +14,7 @@ import type { MetaFilter } from './MetaFilter';
 import type { SubQuery } from './SubQuery';
 
 export type AssignmentScopeRandomWithNQLConfig = {
-  config_type?: AssignmentScopeRandomWithNQLConfig.config_type;
+  config_type?: any;
   users?: (Array<string> | null);
   num_items: number;
   min_assignments_per_item: number;
@@ -24,15 +24,4 @@ export type AssignmentScopeRandomWithNQLConfig = {
   query_parsed: (FieldFilter | FieldFilters | LabelFilterMulti | LabelFilterBool | LabelFilterInt | AssignmentFilter | AnnotationFilter | ImportFilter | MetaFilter | SubQuery);
   query_str: string;
 };
-
-export namespace AssignmentScopeRandomWithNQLConfig {
-
-  export enum config_type {
-    RANDOM = 'random',
-    RANDOM_EXCLUSION = 'random_exclusion',
-    RANDOM_NQL = 'random_nql',
-  }
-
-
-}
 

@@ -3,6 +3,11 @@
 /* eslint-disable */
 export const $SubQuery = {
   properties: {
+    filter: {
+      properties: {
+      },
+      isRequired: true,
+    },
     and_: {
       type: 'any-of',
       contains: [{

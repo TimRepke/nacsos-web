@@ -21,7 +21,7 @@ export type AssignmentScopeModel = {
   time_created?: (string | null);
   name: string;
   description?: (string | null);
-  config?: (AssignmentScopeRandomWithExclusionConfig | AssignmentScopeRandomConfig | AssignmentScopeRandomWithNQLConfig | null);
+  config?: ((AssignmentScopeRandomWithExclusionConfig | AssignmentScopeRandomWithNQLConfig | AssignmentScopeRandomConfig) | null);
   highlighter_ids?: (Array<string> | null);
 };
 
