@@ -9,7 +9,7 @@ import type { AssignmentScopeRandomWithNQLConfig } from './AssignmentScopeRandom
 export type MakeAssignmentsRequestModel = {
   annotation_scheme_id: string;
   scope_id: string;
-  config: (AssignmentScopeRandomWithExclusionConfig | AssignmentScopeRandomConfig | AssignmentScopeRandomWithNQLConfig);
+  config: (AssignmentScopeRandomWithExclusionConfig | AssignmentScopeRandomWithNQLConfig | AssignmentScopeRandomConfig);
   save?: boolean;
 };
 

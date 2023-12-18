@@ -4,7 +4,8 @@
 export const $AssignmentScopeRandomConfig = {
   properties: {
     config_type: {
-      type: 'Enum',
+      properties: {
+      },
     },
     users: {
       type: 'any-of',

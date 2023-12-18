@@ -55,11 +55,14 @@ export const $AssignmentScopeModel = {
     config: {
       type: 'any-of',
       contains: [{
-        type: 'AssignmentScopeRandomWithExclusionConfig',
-      }, {
-        type: 'AssignmentScopeRandomConfig',
-      }, {
-        type: 'AssignmentScopeRandomWithNQLConfig',
+        type: 'one-of',
+        contains: [{
+          type: 'AssignmentScopeRandomWithExclusionConfig',
+        }, {
+          type: 'AssignmentScopeRandomWithNQLConfig',
+        }, {
+          type: 'AssignmentScopeRandomConfig',
+        }],
       }, {
         type: 'null',
       }],

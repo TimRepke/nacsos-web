@@ -4,7 +4,8 @@
 export const $AssignmentScopeRandomWithNQLConfig = {
   properties: {
     config_type: {
-      type: 'Enum',
+      properties: {
+      },
     },
     users: {
       type: 'any-of',

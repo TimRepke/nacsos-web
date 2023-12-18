@@ -3,7 +3,7 @@
 /* eslint-disable */
 
 export type AssignmentScopeRandomConfig = {
-  config_type?: AssignmentScopeRandomConfig.config_type;
+  config_type?: any;
   users?: (Array<string> | null);
   num_items: number;
   min_assignments_per_item: number;
@@ -11,15 +11,4 @@ export type AssignmentScopeRandomConfig = {
   num_multi_coded_items: number;
   random_seed: number;
 };
-
-export namespace AssignmentScopeRandomConfig {
-
-  export enum config_type {
-    RANDOM = 'random',
-    RANDOM_EXCLUSION = 'random_exclusion',
-    RANDOM_NQL = 'random_nql',
-  }
-
-
-}
 

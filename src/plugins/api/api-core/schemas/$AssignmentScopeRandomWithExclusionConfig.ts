@@ -4,7 +4,8 @@
 export const $AssignmentScopeRandomWithExclusionConfig = {
   properties: {
     config_type: {
-      type: 'Enum',
+      properties: {
+      },
     },
     users: {
       type: 'any-of',
