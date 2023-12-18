@@ -187,7 +187,6 @@ import type {
   AssignmentCounts,
   AssignmentScopeEntry,
   AssignmentScopeModel,
-  AssignmentScopeRandomConfig,
   HighlighterModel,
   UserModel,
 } from "@/plugins/api/api-core";
