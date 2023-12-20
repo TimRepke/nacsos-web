@@ -99,27 +99,9 @@ export default defineComponent({
     setBotAnnotation(value: boolean | undefined | null) {
       const { resolution } = this.proposal;
       if (is<BotAnnotationModel>(resolution)) {
-        if (resolution.value_bool !== value) {
-          resolution.value_bool = value;
-          this.$emit("botAnnotationChanged", resolution);
-        } else {
-          const parentId = this.proposalRow[this.label.path_key].resolution?.bot_annotation_id;
-          if (!parentId) {
-            EventBus.emit(
-              new ToastEvent("WARN", "This is not a valid selection. Please check the parent annotation first."),
-            );
-          }
-          this.proposal.resolution = {
-            bot_annotation_id: crypto.randomUUID(),
-            bot_annotation_metadata_id: this.botAnnotationMetaDataId,
-            item_id: this.itemId,
-            parent: parentId,
-            key: this.label.key,
-            repeat: this.label.repeat,
-            value_bool: value,
-          } as BotAnnotationModel;
-          this.$emit("botAnnotationChanged", this.proposal.resolution);
-        }
+        resolution.value_bool = value;
+        this.$emit("botAnnotationChanged", resolution);
+
         this.changed = true;
       }
       this.editMode = false;

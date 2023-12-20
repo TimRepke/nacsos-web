@@ -13,6 +13,26 @@ import type {
   SubQuery,
 } from "@/plugins/api/api-core";
 
+// export interface Column {
+//   grammar: Grammar;
+//   index: number;
+//   states: Array<any>;
+//   wants: Record<string, any>;
+//   scannable: Array<any>;
+//   completed: Record<string, any>;
+//   process: (nextColumn: Column) => void;
+//   predict: (exp: any) => void;
+//   complete: (left:any, right:any) => void;
+// }
+//
+// class Parser extends Psr {
+//   table: Array<Column> = [];
+// }
+
+// export interface Parser   Psr & {
+//   table: Array<Column>;
+// }
+
 export const compiledGrammar = Grammar.fromCompiled(grammar);
 
 export function getParser(): Parser {
@@ -32,8 +52,8 @@ export type Filter =
   | SubQuery;
 
 export function parse(query: string): Array<Filter> {
-  const parser = new Parser(compiledGrammar, { keepHistory: true });
   try {
+    const parser = getParser();
     parser.feed(query);
     return parser.finish();
   } catch (parseError) {
@@ -42,6 +62,20 @@ export function parse(query: string): Array<Filter> {
     console.log("Error at character " + parseError.offset); // "Error at character 9"
   }
   return [];
+}
+
+export function parseHist(query: string): Parser | undefined {
+  try {
+    const parser = new Parser(compiledGrammar, { keepHistory: true });
+    parser.feed(query);
+    parser.finish();
+    return parser;
+  } catch (parseError) {
+    console.error(parseError);
+    // @ts-ignore
+    console.log("Error at character " + parseError.offset); // "Error at character 9"
+  }
+  return undefined;
 }
 
 export function debug(query: string): Array<Filter> {

@@ -15,6 +15,15 @@
         </closable-pill>
       </InlineToolTip>
     </div>
+    <div class="d-flex flex-wrap" style="height: 1em">
+      <span
+        v-for="tag in discardedChoices"
+        :key="tag"
+        class="badge rounded-pill text-bg-light border border-1 border-secondary"
+        style="font-weight: normal; font-size: 0.6em"
+        >{{ tag }}</span
+      >
+    </div>
     <div class="dropdown ps-2 d-inline-block">
       <span
         class="border text-light p-1 border-dark border-2 rounded-3"
@@ -235,6 +244,14 @@ export default defineComponent({
           return [choice, Agreement.PARTIAL];
         }),
       );
+    },
+    discardedChoices(): Array<number> {
+      const { resolution } = this.proposalRow[this.label.path_key];
+
+      const chosen = Object.keys(this.choiceUsers).map((value) => parseInt(value));
+      const resolved = isNone(resolution) || isNone(resolution.multi_int) ? [] : resolution.multi_int;
+
+      return chosen.filter((value) => resolved.indexOf(value) < 0);
     },
   },
 });
