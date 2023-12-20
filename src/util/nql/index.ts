@@ -13,17 +13,17 @@ import type {
   SubQuery,
 } from "@/plugins/api/api-core";
 
-// export interface Column {
-//   grammar: Grammar;
-//   index: number;
-//   states: Array<any>;
-//   wants: Record<string, any>;
-//   scannable: Array<any>;
-//   completed: Record<string, any>;
-//   process: (nextColumn: Column) => void;
-//   predict: (exp: any) => void;
-//   complete: (left:any, right:any) => void;
-// }
+export interface Column {
+  grammar: Grammar;
+  index: number;
+  states: Array<any>;
+  wants: Record<string, any>;
+  scannable: Array<any>;
+  completed: Record<string, any>;
+  process: (nextColumn: Column) => void;
+  predict: (exp: any) => void;
+  complete: (left:any, right:any) => void;
+}
 //
 // class Parser extends Psr {
 //   table: Array<Column> = [];
@@ -64,11 +64,12 @@ export function parse(query: string): Array<Filter> {
   return [];
 }
 
-export function parseHist(query: string): Parser | undefined {
+export function parseHist(query: string): Parser & {table: Array<Column>} | undefined {
   try {
     const parser = new Parser(compiledGrammar, { keepHistory: true });
     parser.feed(query);
     parser.finish();
+    // @ts-ignore
     return parser;
   } catch (parseError) {
     console.error(parseError);

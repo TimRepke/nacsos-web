@@ -1,7 +1,7 @@
 <template>
   <div>
     <span v-for="user in users" :key="user.user_id">
-      <span v-for="annotation in proposal.labels[user.user_id]" :key="annotation.annotation.annotation_id">
+      <span v-for="annotation in proposal.labels[user.user_id as string]" :key="annotation.annotation.annotation_id">
         <InlineToolTip :info="getPrettyUsername(user)" placement="bottom">
           <font-awesome-icon
             :icon="['fas', annotation2icon(annotation.annotation.value_bool)]"
@@ -39,8 +39,6 @@ import type { PropType } from "vue";
 import "core-js/modules/es.array.to-sorted";
 import type { BotAnnotationModel, FlatLabel, ResolutionCell, UserModel } from "@/plugins/api/api-core";
 import InlineToolTip from "@/components/InlineToolTip.vue";
-import { EventBus } from "@/plugins/events";
-import { ToastEvent } from "@/plugins/events/events/toast";
 import { is, isNone } from "@/util";
 
 export default defineComponent({

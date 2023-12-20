@@ -53,7 +53,7 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import { parse, parseHist, debug } from "@/util/nql";
+import { parse, parseHist, debug, type Column } from "@/util/nql";
 import { currentProjectStore } from "@/stores";
 import { API, logReject } from "@/plugins/api";
 import NQLBox from "@/components/NQLBox.vue";
@@ -114,7 +114,7 @@ export default defineComponent({
     },
   },
   computed: {
-    dump() {
+    dump(): string {
       const query = parse(this.queryStr);
       if (query.length === 0) {
         return "[No result]";
@@ -127,13 +127,13 @@ export default defineComponent({
       } else if (this.output === "json") {
         return JSON.stringify(query, null, "  ");
       } else {
+        return "[Error]";
       }
     },
-    table() {
+    table(): Array<Column> {
       try {
         const parser = parseHist(this.queryStr);
         if (!parser) return [];
-        console.log(parser.table);
         return parser.table;
       } catch (e) {
         return [];

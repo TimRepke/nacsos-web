@@ -77,8 +77,6 @@ import type {
 } from "@/plugins/api/api-core";
 import InlineToolTip from "@/components/InlineToolTip.vue";
 import { cmap } from "@/types/colours";
-import { EventBus } from "@/plugins/events";
-import { ToastEvent } from "@/plugins/events/events/toast";
 import { is, isNone } from "@/util";
 
 function hasValue(
