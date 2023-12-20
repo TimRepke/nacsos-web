@@ -78,9 +78,9 @@
                 <template v-for="userMetric in labelMetrics.USERS" :key="userMetric.annotation_quality_id as string">
                   <tr>
                     <td class="table-success small">
-                      {{ users[userMetric.user_base as string].username }}
+                      {{ userLookup[userMetric.user_base as string].username }}
                       &rarr;
-                      {{ users[userMetric.user_target as string].username }}
+                      {{ userLookup[userMetric.user_target as string].username }}
                       <span
                         class="text-muted ms-2 p-1"
                         :class="{ 'bg-success': userMetric.annotation_quality_id === focusedMetric }"
@@ -171,7 +171,8 @@ export default defineComponent({
     },
     users: {
       type: Object as PropType<Record<string, UserBaseModel>>,
-      required: true,
+      required: false,
+      default: null,
     },
   },
   data() {
@@ -179,6 +180,7 @@ export default defineComponent({
       inFocus: false,
       assignmentsVisible: false,
       onlyMean: true,
+      userLookup: this.users,
       focusedMetric: null as null | string,
       counts: null as AssignmentCounts | null,
       metrics: null as Array<AnnotationQualityModel> | null,
@@ -195,6 +197,18 @@ export default defineComponent({
         this.counts = response.data;
       })
       .catch(ignore);
+
+    if (!this.users || Object.entries(this.users).length === 0) {
+      API.core.users
+        .getProjectAnnotatorUsersApiUsersListProjectAnnotatorsProjectIdGet({
+          projectId: currentProjectStore.projectId as string,
+          xProjectId: currentProjectStore.projectId as string,
+        })
+        .then((response) => {
+          this.userLookup = response.data;
+        })
+        .catch(ignore);
+    }
   },
   methods: {
     prettyNum(v: number | null | undefined): string {
