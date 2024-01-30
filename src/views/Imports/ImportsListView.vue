@@ -124,7 +124,7 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import type { ImportModel, UserProjectAssignmentScope } from '@/plugins/api/api-core';
+import type { ImportModel } from "@/plugins/api/api-core";
 import InlineToolTip from "@/components/InlineToolTip.vue";
 import { EventBus } from "@/plugins/events";
 import { ToastEvent } from "@/plugins/events/events/toast";
@@ -269,16 +269,10 @@ export default defineComponent({
       ) => [string, string] | [number, number];
       let dir: Sort;
       if (this.sorting.name !== Sort.sort) {
-        comparator = (p1: ImportModel, p2: ImportModel) => [
-          p1.name as string,
-          p2.name as string,
-        ];
+        comparator = (p1: ImportModel, p2: ImportModel) => [p1.name as string, p2.name as string];
         dir = this.sorting.name;
       } else if (this.sorting.date !== Sort.sort) {
-        comparator = (p1: ImportModel, p2: ImportModel) => [
-          p1.time_created as string,
-          p2.time_created as string,
-        ];
+        comparator = (p1: ImportModel, p2: ImportModel) => [p1.time_created as string, p2.time_created as string];
         dir = this.sorting.date;
       } else {
         return this.filteredImports;

@@ -91,7 +91,7 @@ export function dt2str(datetime: string | null | undefined): string | null {
   if (datetime !== null && datetime !== undefined) {
     const dt = new Date(datetime);
     return `
-    ${dt.getFullYear()}-${padZero(dt.getMonth()+1, 2)}-${padZero(dt.getDate(), 2)} 
+    ${dt.getFullYear()}-${padZero(dt.getMonth() + 1, 2)}-${padZero(dt.getDate(), 2)} 
     ${padZero(dt.getHours(), 2)}:${padZero(dt.getMinutes(), 2)}`;
   }
   return null;
