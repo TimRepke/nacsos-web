@@ -263,10 +263,7 @@ export default defineComponent({
       return Object.values(this.imports);
     },
     sortedFilteredImports(): ImportModel[] {
-      let comparator: (
-        p1: ImportModel,
-        p2: ImportModel,
-      ) => [string, string] | [number, number];
+      let comparator: (p1: ImportModel, p2: ImportModel) => [string, string] | [number, number];
       let dir: Sort;
       if (this.sorting.name !== Sort.sort) {
         comparator = (p1: ImportModel, p2: ImportModel) => [p1.name as string, p2.name as string];
