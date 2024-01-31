@@ -198,18 +198,31 @@ export default defineComponent({
         .then((response) => {
           // attach new data to the cloned import object
           newImport.import_id = response.data;
-          newImport.time_created = new Date().toISOString(); // FIXME: not quite the correct format
+          // reset the import_id in the pipeline config
+          if (newImport.config && "import_id" in newImport.config) {
+            newImport.config.import_id = response.data;
+          }
 
-          // ... and add it to the list of imports
-          this.imports[newImport.import_id] = newImport;
+          // save again since we changed the config
+          API.core.imports
+            .putImportDetailsApiImportsImportPut({
+              requestBody: newImport,
+              xProjectId: currentProjectStore.projectId as string,
+            })
+            .then(() => {
+              newImport.time_created = new Date().toISOString(); // FIXME: not quite the correct format
 
-          EventBus.emit(
-            new ToastEvent(
-              "SUCCESS",
-              "You successfully copied this import configuration. " +
-                "Please remember renaming it in order to use the copied configuration.",
-            ),
-          );
+              // ... and add it to the list of imports
+              this.imports[response.data] = newImport;
+
+              EventBus.emit(
+                new ToastEvent(
+                  "SUCCESS",
+                  "You successfully copied this import configuration. " +
+                    "Please remember renaming it in order to use the copied configuration.",
+                ),
+              );
+            });
         })
         .catch((reason) => {
           console.error(reason);
