@@ -6,7 +6,6 @@ export const $SubQuery = {
     filter: {
       properties: {
       },
-      isRequired: true,
     },
     and_: {
       type: 'any-of',

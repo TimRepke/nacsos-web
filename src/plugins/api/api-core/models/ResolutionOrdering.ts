@@ -6,7 +6,6 @@ export type ResolutionOrdering = {
   identifier: number;
   first_occurrence: number;
   item_id: string;
-  scope_id: string;
   key: string;
 };
 

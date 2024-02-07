@@ -3,6 +3,7 @@
 /* eslint-disable */
 
 export type FieldFilters = {
+  filter?: any;
   field: FieldFilters.field;
   values: Array<string>;
 };

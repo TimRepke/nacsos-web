@@ -183,21 +183,27 @@ export class EvaluationService {
    * @returns AnnotationQualityModel Successful Response
    * @throws ApiError
    */
-  public recomputeIrrApiEvalQualityComputeAssignmentScopeIdGet({
+  public recomputeIrrApiEvalQualityComputeGet({
     assignmentScopeId,
     xProjectId,
+    botAnnotationMetadataId,
+    relevanceRule,
   }: {
     assignmentScopeId: string,
     xProjectId: string,
+    botAnnotationMetadataId?: (string | null),
+    relevanceRule?: (string | null),
   }, options?: Partial<ApiRequestOptions>): CancelablePromise<Array<AnnotationQualityModel>> {
     return this.httpRequest.request({
       method: 'GET',
-      url: '/api/eval/quality/compute/{assignment_scope_id}',
-      path: {
-        'assignment_scope_id': assignmentScopeId,
-      },
+      url: '/api/eval/quality/compute',
       headers: {
         'x-project-id': xProjectId,
+      },
+      query: {
+        'assignment_scope_id': assignmentScopeId,
+        'bot_annotation_metadata_id': botAnnotationMetadataId,
+        'relevance_rule': relevanceRule,
       },
       errors: {
         422: `Validation Error`,

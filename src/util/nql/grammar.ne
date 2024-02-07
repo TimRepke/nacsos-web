@@ -61,9 +61,9 @@ label_type ->
   | "RESOLUTION"i __  {% (d) => ({ type: 'resolved' }) %}
 
 label_clause_val ->
-    KEY _ COMP     _ uint   {% (d) => ({ value_type: 'int',   key: d[0], value_int:  d[4], comp: d[2] }) %}
-  | KEY _ "="      _ bool   {% (d) => ({ value_type: 'bool',  key: d[0], value_bool: d[4]             }) %}
-  | KEY _ COMP_SET _ uints  {% (d) => ({ value_type: 'multi', key: d[0], multi_int:  d[4], comp: d[2] }) %}
+    KEY _ COMP     _ uint   {% (d) => ({ filter: 'label_int',   value_type: 'int',   key: d[0], value_int:  d[4], comp: d[2] }) %}
+  | KEY _ "="      _ bool   {% (d) => ({ filter: 'label_bool',  value_type: 'bool',  key: d[0], value_bool: d[4]             }) %}
+  | KEY _ COMP_SET _ uints  {% (d) => ({ filter: 'label_multi', value_type: 'multi', key: d[0], multi_int:  d[4], comp: d[2] }) %}
 
 KEY   -> [A-Za-z_-]:+        {% (d) => d[0].join("") %}
 

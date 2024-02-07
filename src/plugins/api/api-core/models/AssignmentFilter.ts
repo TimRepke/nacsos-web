@@ -3,7 +3,7 @@
 /* eslint-disable */
 
 export type AssignmentFilter = {
-  filter: any;
+  filter?: any;
   mode: number;
   scopes?: (Array<string> | null);
 };

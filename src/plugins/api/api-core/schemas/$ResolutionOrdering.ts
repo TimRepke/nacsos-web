@@ -15,10 +15,6 @@ export const $ResolutionOrdering = {
       type: 'string',
       isRequired: true,
     },
-    scope_id: {
-      type: 'string',
-      isRequired: true,
-    },
     key: {
       type: 'string',
       isRequired: true,

@@ -6,7 +6,6 @@ export const $AssignmentFilter = {
     filter: {
       properties: {
       },
-      isRequired: true,
     },
     mode: {
       type: 'number',
