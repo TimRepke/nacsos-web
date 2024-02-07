@@ -3,203 +3,46 @@
     <div class="d-flex" style="height: calc(100vh - var(--topnav-height))">
       <div class="flex-grow-1 border-end overflow-auto" v-if="isOpen">
         <div v-if="projectPermissions" class="list-group rounded-0" style="margin-top: calc(var(--logo-size) / 2)">
-          <router-link
-            to="/project/overview"
-            class="list-group-item list-group-item-action border-end-0"
-            active-class="active"
-            >Overview
-          </router-link>
-
-          <!-- IMPORT -->
-          <router-link
-            v-if="projectPermissions.imports_read"
-            to="/project/imports"
-            class="list-group-item list-group-item-action border-end-0"
-            active-class="active"
-          >
-            Import
-          </router-link>
-          <router-link
-            v-if="projectPermissions.imports_read && isActive('project-imports')"
-            to="/project/imports/list"
-            class="list-group-item list-group-item-action list-group-item-info border-end-0 sub-link"
-            :class="{ active: anyOf(['project-imports-list', 'project-imports-details']) }"
-          >
-            Imports
-          </router-link>
-          <router-link
-            v-if="projectPermissions.annotations_edit && isActive('project-imports')"
-            to="/project/imports/search"
-            class="list-group-item list-group-item-action list-group-item-info border-end-0 sub-link"
-            active-class="active"
-          >
-            OpenAlex Solr
-          </router-link>
-
-          <!-- DATASET -->
-          <router-link
-            v-if="projectPermissions.dataset_read"
-            to="/project/dataset"
-            class="list-group-item list-group-item-action border-end-0"
-            active-class="active"
-          >
-            Dataset
-          </router-link>
-          <router-link
-            v-if="isActive('project-dataset')"
-            to="/project/dataset/list"
-            class="list-group-item list-group-item-action list-group-item-info border-end-0 sub-link"
-            :class="{ active: anyOf(['project-dataset-list']) }"
-          >
-            Explore
-          </router-link>
-          <router-link
-            v-if="isActive('project-dataset')"
-            to="/project/dataset/stats"
-            class="list-group-item list-group-item-action list-group-item-info border-end-0 sub-link"
-            :class="{ active: anyOf(['project-dataset-statistics']) }"
-          >
-            Statistics
-          </router-link>
-          <router-link
-            v-if="projectPermissions.annotations_edit && isActive('project-dataset')"
-            to="/project/dataset/export"
-            class="list-group-item list-group-item-action list-group-item-info border-end-0 sub-link"
-            :class="{ active: anyOf(['project-dataset-export']) }"
-          >
-            Export
-          </router-link>
-
-          <!-- ANNOTATE -->
-          <router-link
-            v-if="projectPermissions.annotations_read"
-            to="/project/annotate"
-            class="list-group-item list-group-item-action border-end-0"
-            :class="{
-              active: anyOf([
-                'project-annotate-assignments',
-                'project-annotate-item',
-                'project-annotate-quality',
-                'project-annotate-progress',
-              ]),
-            }"
-          >
-            Annotation
-          </router-link>
-          <router-link
-            v-if="projectPermissions.annotations_read && isActive('project-annotate')"
-            to="/project/annotate/scopes"
-            class="list-group-item list-group-item-action list-group-item-info border-end-0 sub-link"
-            :class="{
-              active: anyOf(['project-annotate-assignments', 'project-annotate-item']),
-            }"
-          >
-            Assignments
-          </router-link>
-          <router-link
-            v-if="projectPermissions.annotations_read && isActive('project-annotate')"
-            to="/project/annotate/quality"
-            class="list-group-item list-group-item-action list-group-item-info border-end-0 sub-link"
-            exact-active-class="active"
-          >
-            Quality Monitor
-          </router-link>
-          <router-link
-            v-if="projectPermissions.annotations_read && isActive('project-annotate')"
-            to="/project/annotate/progress"
-            class="list-group-item list-group-item-action list-group-item-info border-end-0 sub-link"
-            exact-active-class="active"
-          >
-            Progress Monitor
-          </router-link>
-
-          <!-- ARTEFACTS -->
-          <router-link
-            v-if="projectPermissions.artefacts_read"
-            to="/project/artefacts"
-            class="list-group-item list-group-item-action border-end-0"
-            active-class="active"
-          >
-            Artefacts
-          </router-link>
-
-          <!-- PIPELINES -->
-          <router-link
-            v-if="projectPermissions.pipelines_read"
-            to="/project/pipelines"
-            class="list-group-item list-group-item-action border-end-0"
-            active-class="active"
-          >
-            Pipelines
-          </router-link>
-          <router-link
-            v-if="projectPermissions.annotations_read && isActive('project-pipelines')"
-            to="/project/pipelines/setup"
-            class="list-group-item list-group-item-action list-group-item-info border-end-0 sub-link"
-            exact-active-class="active"
-          >
-            Task Configuration
-          </router-link>
-          <router-link
-            v-if="projectPermissions.annotations_read && isActive('project-pipelines')"
-            to="/project/pipelines/presets"
-            class="list-group-item list-group-item-action list-group-item-info border-end-0 sub-link"
-            exact-active-class="active"
-          >
-            Presets
-          </router-link>
-
-          <!-- ASSIGNMENT/ANNOTATION -->
-          <router-link
-            v-if="projectPermissions.annotations_edit"
-            to="/project/config/annotations"
-            class="list-group-item list-group-item-action border-end-0"
-            active-class="active"
-          >
-            <font-awesome-icon icon="gear" />
-            Annotations
-          </router-link>
-          <router-link
-            v-if="projectPermissions.annotations_edit && isActive('config-annotation-schemes')"
-            to="/project/config/annotations/list"
-            class="list-group-item list-group-item-action list-group-item-info border-end-0 sub-link"
-            :class="{
-              active: anyOf([
-                'config-annotation-scheme-edit',
-                'config-annotation-scheme-scope',
-                'config-annotation-scheme-list',
-              ]),
-            }"
-          >
-            Schemes & Scopes
-          </router-link>
-          <router-link
-            v-if="projectPermissions.annotations_edit && isActive('config-annotation-schemes')"
-            to="/project/config/annotations/resolved"
-            class="list-group-item list-group-item-action list-group-item-info border-end-0 sub-link"
-            :class="{ active: anyOf(['config-annotation-resolve', 'config-resolved-annotations-list']) }"
-          >
-            Label Centre
-          </router-link>
-          <router-link
-            v-if="projectPermissions.annotations_edit && isActive('config-annotation-schemes')"
-            to="/project/config/annotations/highlighters"
-            class="list-group-item list-group-item-action list-group-item-info border-end-0 sub-link"
-            active-class="active"
-          >
-            Highlighters
-          </router-link>
-
-          <!-- PROJECT SETTINGS -->
-          <router-link
-            v-if="projectPermissions.owner"
-            to="/project/settings"
-            class="list-group-item list-group-item-action border-end-0"
-            active-class="active"
-          >
-            <font-awesome-icon icon="gear" />
-            Project
-          </router-link>
+          <div class="d-flex flex-column">
+            <template v-for="(entry, ei) in sideMenu" :key="entry.name">
+              <div
+                v-if="entry.isVisible"
+                class="d-flex flex-row p-2 list-group-item list-group-item-action border-end-0"
+                :class="{ active: entry.isActive }"
+              >
+                <router-link :to="entry.target" custom v-slot="{ navigate }">
+                  <div style="width: 1.5em" class="me-1">
+                    <font-awesome-icon
+                      v-if="(entry.sub || []).length > 0"
+                      :icon="entry.isActive || entry.toggleOpen ? 'angle-down' : 'angle-right'"
+                      role="button"
+                      @click="toggle(ei)"
+                    />
+                  </div>
+                  <div style="width: 1.5em" class="me-2">
+                    <font-awesome-icon v-if="entry.icon" :icon="entry.icon" />
+                  </div>
+                  <div @click.stop="navigate" role="button" class="flex-grow-1 text-start">{{ entry.name }}</div>
+                </router-link>
+              </div>
+              <template v-for="subentry in entry.sub || []" :key="subentry.name">
+                <div
+                  v-if="subentry.isVisible"
+                  class="d-flex flex-row p-2 list-group-item list-group-item-action border-end-0 list-group-item-info sub-link"
+                  :class="{ active: subentry.isActive }"
+                >
+                  <router-link :to="subentry.target" custom v-slot="{ navigate }">
+                    <div style="width: 1.5em" class="me-2">
+                      <font-awesome-icon v-if="subentry.icon" :icon="subentry.icon" />
+                    </div>
+                    <div @click.stop="navigate" role="button" class="flex-grow-1 text-start">
+                      {{ subentry.name }}
+                    </div>
+                  </router-link>
+                </div>
+              </template>
+            </template>
+          </div>
         </div>
       </div>
       <div id="sidebar-toggle" class="border border-start-0 rounded-end mt-5">
@@ -214,15 +57,172 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import type { RouteLocationMatched } from "vue-router";
-import { currentProjectStore, currentUserStore } from "@/stores";
-import type { ProjectPermissionsModel, UserModel } from "@/plugins/api/api-core";
+import { currentProjectStore } from "@/stores";
+import type { ProjectPermissionsModel } from "@/plugins/api/api-core";
+
+interface MenuEntry {
+  name: string;
+  permission: boolean;
+  target: string;
+  routes: Array<string>;
+  icon?: string;
+  toggleOpen?: boolean;
+  sub?: Array<MenuEntry>;
+}
+
+interface SideMenuEntry extends MenuEntry {
+  isActive: boolean;
+  isVisible: boolean;
+  sub?: Array<SideMenuEntry>;
+}
 
 export default defineComponent({
   name: "SideBar",
   data() {
+    const perm: ProjectPermissionsModel | Record<string, never> = currentProjectStore.projectPermissions || {};
     return {
+      menu: [
+        { name: "Overview", permission: true, target: "/project/overview", routes: ["project-overview"] },
+        {
+          name: "Import",
+          permission: perm.imports_read,
+          target: "/project/imports",
+          routes: ["project-imports"],
+          sub: [
+            {
+              name: "Imports",
+              icon: "file-import",
+              permission: perm.imports_read,
+              target: "/project/imports/list",
+              routes: ["project-imports-list", "project-imports-details"],
+            },
+            {
+              name: "OpenAlex Solr",
+              icon: "magnifying-glass",
+              permission: perm.imports_read,
+              target: "/project/imports/search",
+              routes: ["project-imports-search"],
+            },
+          ],
+        },
+        {
+          name: "Dataset",
+          target: "/project/dataset",
+          permission: perm.dataset_read,
+          routes: ["project-dataset"],
+          sub: [
+            {
+              name: "Explore",
+              icon: "map-location-dot",
+              target: "/project/dataset/list",
+              permission: perm.dataset_read,
+              routes: ["project-dataset-list"],
+            },
+            {
+              name: "Statistics",
+              icon: "chart-pie",
+              target: "/project/dataset/stats",
+              permission: perm.dataset_read,
+              routes: ["project-dataset-statistics"],
+            },
+            {
+              name: "Export",
+              icon: "file-export",
+              target: "/project/dataset/export",
+              permission: perm.dataset_read,
+              routes: ["project-dataset-export"],
+            },
+          ],
+        },
+        {
+          name: "Data Annotation",
+          target: "/project/annotate/scopes",
+          permission: perm.annotations_read,
+          routes: ["project-annotate"],
+          sub: [
+            {
+              name: "My Assignments",
+              icon: "user-tag",
+              target: "/project/annotate/scopes",
+              permission: perm.annotations_read,
+              routes: ["project-annotate-assignments", "project-annotate-item"],
+            },
+            {
+              name: "Quality Monitor",
+              target: "/project/annotate/quality",
+              icon: "swatchbook",
+              permission: perm.annotations_read,
+              routes: ["project-annotate-quality"],
+            },
+            {
+              name: "Progress Monitor",
+              icon: "bars-progress",
+              target: "/project/annotate/progress",
+              permission: perm.annotations_read,
+              routes: ["project-annotate-progress"],
+            },
+            {
+              name: "Label Manager",
+              icon: "tags",
+              target: "/project/config/annotations",
+              permission: perm.annotations_edit,
+              routes: [
+                "config-annotation-schemes",
+                "config-annotation-scheme-list",
+                "config-annotation-scheme-edit",
+                "config-annotation-scheme-scope",
+                "config-annotation-resolve",
+              ],
+            },
+            {
+              name: "Highlighters",
+              icon: "highlighter",
+              target: "/project/config/annotations/highlighters",
+              permission: perm.annotations_edit,
+              routes: ["config-annotation-highlighters"],
+            },
+          ],
+        },
+        {
+          name: "Supplemental data",
+          target: "/project/artefacts",
+          permission: perm.artefacts_read || perm.pipelines_read,
+          routes: ["project-artefacts", "project-artefacts-list", "project-artefacts-details"],
+        },
+        {
+          name: "Pipelines",
+          target: "/project/pipelines",
+          permission: perm.pipelines_read,
+          routes: ["project-pipelines"],
+          sub: [
+            {
+              name: "Task Configuration",
+              target: "/project/pipelines/setup",
+              permission: perm.pipelines_read,
+              routes: ["project-pipelines-setup"],
+            },
+            {
+              name: "Presets",
+              target: "/project/pipelines/presets",
+              permission: perm.pipelines_read,
+              routes: ["project-pipelines-presets"],
+            },
+          ],
+        },
+        {
+          name: "Project",
+          icon: "gear",
+          permission: perm.owner,
+          target: "/project/settings",
+          routes: ["project-settings", "project-settings-settings"],
+        },
+      ] as Array<MenuEntry>,
+
       visible: null as boolean | null,
       windowWidth: window.innerWidth,
+      opened: {
+        import: false,
+      },
     };
   },
   computed: {
@@ -236,14 +236,35 @@ export default defineComponent({
     iconButton(): string[] {
       return ["fas", this.isOpen ? "caret-left" : "caret-right"];
     },
+    sideMenu(): Array<SideMenuEntry> {
+      return this.menu.map((entry: MenuEntry) => {
+        let routes: Array<string> = entry.routes;
+        let subEntries: Array<SideMenuEntry> = [];
+        let isActive: boolean;
+        if (entry.sub && entry.sub.length > 0) {
+          routes = entry.sub.reduce((prev: Array<string>, curr: MenuEntry) => prev.concat(curr.routes), routes);
+          isActive = this.anyOf(routes);
+          subEntries = entry.sub.map((sub: MenuEntry) => {
+            return {
+              ...sub,
+              isActive: this.anyOf(sub.routes),
+              isVisible: sub.permission && (isActive || entry.toggleOpen),
+            } as SideMenuEntry;
+          });
+        } else {
+          isActive = this.anyOf(routes);
+        }
+        return { ...entry, isActive: isActive, isVisible: entry.permission, sub: subEntries };
+      });
+    },
     projectPermissions(): ProjectPermissionsModel | Record<string, never> {
       return currentProjectStore.projectPermissions || {};
     },
-    currentUser(): UserModel {
-      return currentUserStore.user as UserModel;
-    },
   },
   methods: {
+    toggle(i: number) {
+      this.menu[i].toggleOpen = !this.menu[i].toggleOpen;
+    },
     isActive(parentName: string): boolean {
       return this.$router.currentRoute.value.matched.some((route: RouteLocationMatched) => route.name === parentName);
     },
