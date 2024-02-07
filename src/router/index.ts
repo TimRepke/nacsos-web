@@ -211,7 +211,7 @@ const routes: Array<RouteRecordRaw> = [
           ),
       },
       {
-        path: "resolve/:bot_annotation_metadata_id?",
+        path: "resolve/:bot_annotation_metadata_id?/:assignment_scope_id?/:annotation_scheme_id?",
         name: "config-annotation-resolve",
         component: () =>
           import(
