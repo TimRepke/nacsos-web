@@ -45,7 +45,12 @@
           </div>
         </div>
       </div>
-      <div id="sidebar-toggle" class="border border-start-0 rounded-end mt-5" @click="toggleVisibility()" @keypress="toggleVisibility()">
+      <div
+        id="sidebar-toggle"
+        class="border border-start-0 rounded-end mt-5"
+        @click="toggleVisibility()"
+        @keypress="toggleVisibility()"
+      >
         <a aria-label="test">
           <font-awesome-icon :icon="iconButton" />
         </a>

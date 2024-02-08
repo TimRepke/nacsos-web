@@ -477,8 +477,8 @@ export default defineComponent({
       if (this.users) {
         // TODO make the search more sophisticated
         //      e.g. by including institution, email, username, substring matches
-        return this.users.filter(
-          (user: UserModel) => user.full_name?.toLowerCase().startsWith(this.userSearch.toLowerCase()),
+        return this.users.filter((user: UserModel) =>
+          user.full_name?.toLowerCase().startsWith(this.userSearch.toLowerCase()),
         );
       }
       return this.users;
