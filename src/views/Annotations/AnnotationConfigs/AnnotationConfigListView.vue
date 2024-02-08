@@ -142,7 +142,10 @@
                     :key="resolution.bot_annotation_metadata_id as string"
                   >
                     <router-link
-                      :to="{ name: 'config-annotation-scheme-scope', params: { scope_id: scope.assignment_scope_id } }"
+                      :to="{
+                        name: 'config-annotation-resolve',
+                        params: { bot_annotation_metadata_id: resolution.bot_annotation_metadata_id },
+                      }"
                       custom
                       v-slot="{ navigate }"
                     >

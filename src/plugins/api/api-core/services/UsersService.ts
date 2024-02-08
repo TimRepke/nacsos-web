@@ -1,6 +1,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+import type { DehydratedUser } from '../models/DehydratedUser';
 import type { UserBaseModel } from '../models/UserBaseModel';
 import type { UserInDBModel } from '../models/UserInDBModel';
 import type { UserModel } from '../models/UserModel';
@@ -23,6 +24,19 @@ export class UsersService {
     return this.httpRequest.request({
       method: 'GET',
       url: '/api/users/list/all',
+      ...options,
+    });
+  }
+
+  /**
+   * Get All Users Dehydrated
+   * @returns DehydratedUser Successful Response
+   * @throws ApiError
+   */
+  public getAllUsersDehydratedApiUsersListAllDehydratedGet(options?: Partial<ApiRequestOptions>): CancelablePromise<Array<DehydratedUser>> {
+    return this.httpRequest.request({
+      method: 'GET',
+      url: '/api/users/list/all/dehydrated',
       ...options,
     });
   }

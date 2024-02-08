@@ -2,7 +2,7 @@
   <tbody>
     <tr>
       <td class="text-muted small">
-        {{ ordering.identifier }} ({{ ordering.scope_id.substring(0, 4) }})
+        {{ ordering.identifier }}
         <font-awesome-icon :icon="['fas', 'file-invoice']" @click="showItem = !showItem" />
       </td>
       <td>

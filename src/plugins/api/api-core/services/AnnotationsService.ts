@@ -740,10 +740,14 @@ export class AnnotationsService {
    */
   public saveResolvedAnnotationsApiAnnotationsConfigResolvePut({
     name,
+    assignmentScopeId,
+    annotationSchemeId,
     xProjectId,
     requestBody,
   }: {
     name: string,
+    assignmentScopeId: string,
+    annotationSchemeId: string,
     xProjectId: string,
     requestBody: Body_save_resolved_annotations_api_annotations_config_resolve__put,
   }, options?: Partial<ApiRequestOptions>): CancelablePromise<string> {
@@ -755,6 +759,8 @@ export class AnnotationsService {
       },
       query: {
         'name': name,
+        'assignment_scope_id': assignmentScopeId,
+        'annotation_scheme_id': annotationSchemeId,
       },
       body: requestBody,
       mediaType: 'application/json',
