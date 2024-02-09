@@ -7,34 +7,15 @@
     <!--    </span>-->
 
     <!-- Annotation Scheme Name -->
-    <template v-if="nameEditMode">
-      <div class="input-group mb-3 w-lg-50">
-        <input
-          type="text"
-          class="form-control"
-          placeholder="Annotation Scheme Name"
-          aria-label="Annotation Scheme Name"
-          aria-describedby="button-addon2"
-          v-model="scheme.name"
-        />
-        <button type="button" class="btn btn-outline-secondary" id="button-addon2" @click="nameEditMode = false">
-          <font-awesome-icon :icon="['fas', 'circle-check']" />
-        </button>
-      </div>
-    </template>
-    <template v-else>
-      <h1>
-        {{ scheme.name }}
-        <sup role="button" style="top: -0.8em; left: 0.2em" tabindex="0" @click="nameEditMode = true">
-          <font-awesome-icon class="fs-6" :icon="['fas', 'pen']" />
-        </sup>
-      </h1>
-    </template>
+    <div class="form-floating me-5 mb-2">
+      <input type="text" class="form-control" id="resolve-name" v-model="scheme.name" placeholder="Name" />
+      <label for="resolve-name">Descriptive name for this annotation scheme</label>
+    </div>
 
     <!-- Annotation Scheme Description -->
     <template v-if="descriptionEditMode">
-      <div class="hstack align-items-start">
-        <div class="form-floating w-lg-50">
+      <div class="hstack align-items-start w-75">
+        <div class="form-floating flex-grow-1">
           <textarea
             id="floatingTextarea2"
             class="form-control"
@@ -50,7 +31,7 @@
       </div>
     </template>
     <template v-else>
-      <div class="hstack mb-2 align-items-start">
+      <div class="hstack mb-2 ms-1 align-items-start">
         <div class="w-lg-50" v-html="htmlDescription" />
         <span role="button" tabindex="0" @click="descriptionEditMode = true">
           <font-awesome-icon class="fs-6" :icon="['fas', 'pen']" />

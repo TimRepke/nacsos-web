@@ -109,12 +109,12 @@
                     <td colspan="10" class="overflow-x-auto">
                       <div class="d-flex justify-content-start small">
                         <div v-for="(base, i) in userMetric.annotations_base" :key="i" class="d-flex flex-column">
-                          <div class="p-1">
+                          <div class="p-1 text-nowrap">
                             {{ prettyAnno(base) }}
                           </div>
                           <div
                             v-if="userMetric.annotations_target"
-                            class="p-1"
+                            class="p-1 text-nowrap"
                             :class="annotationMatchBackground(base, userMetric.annotations_target[i])"
                           >
                             {{ prettyAnno(userMetric.annotations_target[i]) }}

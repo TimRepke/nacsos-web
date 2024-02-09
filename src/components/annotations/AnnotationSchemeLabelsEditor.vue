@@ -16,8 +16,8 @@
           <font-awesome-icon :icon="['fas', 'trash-can']" />
         </div>
         <div>
-          <div class="hstack gap-2 mb-2">
-            <div class="hstack gap-1">
+          <div class="d-flex flex-row gap-2 mb-2">
+            <div class="gap-1 flex-shrink-1">
               <span role="button" class="align-middle" tabindex="0" @click="moveLabelDown(schemeLabelIndex)">
                 <font-awesome-icon :icon="['fas', 'down-long']" />
               </span>
@@ -25,7 +25,7 @@
                 <font-awesome-icon :icon="['fas', 'up-long']" />
               </span>
             </div>
-            <div>
+            <div class="flex-fill">
               <span class="input-group">
                 <span class="input-group-text" id="basic-addon1"><font-awesome-icon :icon="['fas', 'eye']" /></span>
                 <input
@@ -51,7 +51,7 @@
                 />
               </span>
             </div>
-            <div>
+            <div class="flex-fill">
               <div class="input-group">
                 <span id="basic-addon1" class="input-group-text"
                   ><font-awesome-icon :icon="['fas', 'circle-info']"
@@ -147,7 +147,7 @@
                       />
                     </span>
                   </div>
-                  <div class="col-auto">
+                  <div class="col-5">
                     <span class="input-group">
                       <span class="input-group-text" id="basic-addon1">
                         <font-awesome-icon :icon="['fas', 'circle-info']" />
