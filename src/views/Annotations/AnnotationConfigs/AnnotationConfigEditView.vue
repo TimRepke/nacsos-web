@@ -12,6 +12,17 @@
       <label for="resolve-name">Descriptive name for this annotation scheme</label>
     </div>
 
+    <div class="form-floating me-5 mb-2">
+      <input
+        type="text"
+        class="form-control"
+        id="incl-rule"
+        v-model="scheme.inclusion_rule"
+        placeholder="Inclusion rule"
+      />
+      <label for="incl-rule">Inclusion rule</label>
+    </div>
+
     <!-- Annotation Scheme Description -->
     <template v-if="descriptionEditMode">
       <div class="hstack align-items-start w-75">
@@ -64,7 +75,7 @@ export default defineComponent({
   components: { AnnotationSchemeLabelsEditor },
   data() {
     const { projectId } = currentProjectStore;
-    const annotationSchemeId = this.$route.params.annotation_scheme_id;
+    const annotationSchemeId = this.$route.params.annotation_scheme_id as string | undefined;
 
     return {
       annotationSchemeId,
@@ -75,6 +86,7 @@ export default defineComponent({
         project_id: projectId,
         name: "New annotation scheme",
         description: "Description for new scheme.",
+        inclusion_rule: "",
         labels: [],
       } as AnnotationSchemeModel),
     };
@@ -83,7 +95,7 @@ export default defineComponent({
     if (!this.isNewScheme) {
       API.core.annotations
         .getSchemeDefinitionApiAnnotationsSchemesDefinitionAnnotationSchemeIdGet({
-          annotationSchemeId: this.annotationSchemeId,
+          annotationSchemeId: this.annotationSchemeId as string,
           xProjectId: currentProjectStore.projectId as string,
           flat: false,
         })
@@ -135,6 +147,7 @@ export default defineComponent({
   },
   computed: {
     htmlDescription() {
+      if (!this.scheme.description) return "";
       return marked(this.scheme.description);
     },
   },
