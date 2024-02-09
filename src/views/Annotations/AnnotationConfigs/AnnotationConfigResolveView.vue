@@ -201,7 +201,6 @@ export default defineComponent({
   name: "AnnotationConfigResolveView",
   components: { PopOver, FontAwesomeIcon, LabelPathPills, ResolverRow, ToolTip, ItemModal },
   data() {
-    console.log(this.$route.params);
     const { bot_annotation_metadata_id, assignment_scope_id, annotation_scheme_id } = this.$route.params;
     const meta_id = normalise(bot_annotation_metadata_id as string | undefined);
 
@@ -241,12 +240,12 @@ export default defineComponent({
     window.removeEventListener("beforeunload", tabClosePrevent);
   },
   async mounted() {
-    // this.saveReminder = setInterval(() => {
-    //   EventBus.emit(new ToastEvent("INFO", "You might want to click save every now and then..."));
-    // }, 300000) as unknown as number; // called every 5 min
-    //
-    // // Prevent browser page reload and tab closure
-    // window.addEventListener("beforeunload", tabClosePrevent);
+    this.saveReminder = setInterval(() => {
+      EventBus.emit(new ToastEvent("INFO", "You might want to click save every now and then..."));
+    }, 300000) as unknown as number; // called every 5 min
+
+    // Prevent browser page reload and tab closure
+    window.addEventListener("beforeunload", tabClosePrevent);
 
     try {
       if (!this.isNew && this.bot_annotation_metadata_id) {

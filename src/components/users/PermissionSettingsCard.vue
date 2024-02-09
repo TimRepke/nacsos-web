@@ -9,37 +9,41 @@
       </span>
     </template>
     <template v-slot:body>
-      <div class="d-flex justify-content-end mb-3">
-        <div class="me-2">
-          <div class="dropdown">
-            <button
-              class="btn btn-secondary dropdown-toggle btn-sm"
-              type="button"
-              data-bs-toggle="dropdown"
-              aria-expanded="false"
-            >
-              Apply preset
-            </button>
-            <ul class="dropdown-menu">
-              <li v-for="(preset, presetName) in presets" :key="presetName">
-                <button class="dropdown-item" type="button" @click="applyPreset(preset)">
-                  {{ presetName }}
-                </button>
-              </li>
-            </ul>
+      <div class="d-flex mb-3">
+        <div><span class="text-muted">user_id:</span> <code>{{ userPermission.user_id }}</code>
+        <span class="text-muted ms-4">permission_id:</span> <code>{{ userPermission.project_permission_id }}</code></div>
+        <div class="ms-auto d-flex flex-row">
+          <div class="me-2">
+            <div class="dropdown">
+              <button
+                class="btn btn-secondary dropdown-toggle btn-sm"
+                type="button"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+              >
+                Apply preset
+              </button>
+              <ul class="dropdown-menu">
+                <li v-for="(preset, presetName) in presets" :key="presetName">
+                  <button class="dropdown-item" type="button" @click="applyPreset(preset)">
+                    {{ presetName }}
+                  </button>
+                </li>
+              </ul>
+            </div>
           </div>
-        </div>
-        <div class="me-2">
-          <button type="button" class="btn btn-danger btn-sm" @click="removeUser()">
-            <font-awesome-icon :icon="['fas', 'trash-can']" />
-            Remove
-          </button>
-        </div>
-        <div>
-          <button type="button" class="btn btn-success btn-sm" @click="saveUser()">
-            <font-awesome-icon :icon="['fas', 'floppy-disk']" />
-            Save
-          </button>
+          <div class="me-2">
+            <button type="button" class="btn btn-danger btn-sm" @click="removeUser()">
+              <font-awesome-icon :icon="['fas', 'trash-can']" />
+              Remove
+            </button>
+          </div>
+          <div>
+            <button type="button" class="btn btn-success btn-sm" @click="saveUser()">
+              <font-awesome-icon :icon="['fas', 'floppy-disk']" />
+              Save
+            </button>
+          </div>
         </div>
       </div>
       <div class="row gy-3 gx-4">

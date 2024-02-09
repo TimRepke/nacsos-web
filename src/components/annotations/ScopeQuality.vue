@@ -252,7 +252,7 @@ export default defineComponent({
     },
     recomputeMetrics() {
       API.core.evaluation
-        .recomputeIrrApiEvalQualityComputeAssignmentScopeIdGet({
+        .recomputeIrrApiEvalQualityComputeGet({
           assignmentScopeId: this.scope.assignment_scope_id as string,
           xProjectId: currentProjectStore.projectId as string,
         })

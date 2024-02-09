@@ -190,16 +190,16 @@ export default defineComponent({
         },
         {
           name: "Supplemental data",
-          target: "/project/artefacts",
-          permission: perm.artefacts_read || perm.pipelines_read,
-          routes: ["project-artefacts", "project-artefacts-list", "project-artefacts-details"],
-        },
-        {
-          name: "Pipelines",
           target: "/project/pipelines",
           permission: perm.pipelines_read,
           routes: ["project-pipelines"],
           sub: [
+            {
+              name: "Pipeline artefacts",
+              target: "/project/artefacts",
+              permission: perm.artefacts_read || perm.pipelines_read,
+              routes: ["project-artefacts", "project-artefacts-list", "project-artefacts-details"],
+            },
             {
               name: "Task Configuration",
               target: "/project/pipelines/setup",
