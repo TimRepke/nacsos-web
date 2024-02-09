@@ -10,19 +10,24 @@
                 class="d-flex flex-row p-2 list-group-item list-group-item-action border-end-0"
                 :class="{ active: entry.isActive }"
               >
-                <router-link :to="entry.target" custom v-slot="{ navigate }">
-                  <div style="width: 1.5em" class="me-1">
-                    <font-awesome-icon
-                      v-if="(entry.sub || []).length > 0"
-                      :icon="entry.isActive || entry.toggleOpen ? 'angle-down' : 'angle-right'"
-                      role="button"
-                      @click="toggle(ei)"
-                    />
-                  </div>
-                  <div style="width: 1.5em" class="me-2">
+                <div style="width: 1.5em" class="me-1">
+                  <font-awesome-icon
+                    v-if="(entry.sub || []).length > 0"
+                    :icon="entry.isActive || entry.toggleOpen ? 'angle-down' : 'angle-right'"
+                    role="button"
+                    @click="toggle(ei)"
+                  />
+                </div>
+                <router-link
+                  :to="entry.target"
+                  role="button"
+                  class="flex-grow-1 text-start text-decoration-none"
+                  style="color: inherit"
+                >
+                  <span style="width: 1.5em" class="me-2">
                     <font-awesome-icon v-if="entry.icon" :icon="entry.icon" />
-                  </div>
-                  <div @click.stop="navigate" role="button" class="flex-grow-1 text-start">{{ entry.name }}</div>
+                  </span>
+                  <span>{{ entry.name }}</span>
                 </router-link>
               </div>
               <template v-for="subentry in entry.sub || []" :key="subentry.name">
@@ -31,13 +36,18 @@
                   class="d-flex flex-row p-2 list-group-item list-group-item-action border-end-0 list-group-item-info sub-link"
                   :class="{ active: subentry.isActive }"
                 >
-                  <router-link :to="subentry.target" custom v-slot="{ navigate }">
-                    <div style="width: 1.5em" class="me-2">
+                  <router-link
+                    :to="subentry.target"
+                    role="button"
+                    class="flex-grow-1 text-start text-decoration-none"
+                    style="color: inherit"
+                  >
+                    <span style="width: 1.5em" class="me-2">
                       <font-awesome-icon v-if="subentry.icon" :icon="subentry.icon" />
-                    </div>
-                    <div @click.stop="navigate" role="button" class="flex-grow-1 text-start">
+                    </span>
+                    <span>
                       {{ subentry.name }}
-                    </div>
+                    </span>
                   </router-link>
                 </div>
               </template>
