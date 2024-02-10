@@ -39,12 +39,20 @@ export const $AnnotationQualityModel = {
         type: 'null',
       }],
     },
-    user_base: {
+    bot_annotation_metadata_id: {
       type: 'any-of',
       contains: [{
         type: 'string',
         format: 'uuid',
       }, {
+        type: 'string',
+      }, {
+        type: 'null',
+      }],
+    },
+    user_base: {
+      type: 'any-of',
+      contains: [{
         type: 'string',
       }, {
         type: 'null',
@@ -53,20 +61,12 @@ export const $AnnotationQualityModel = {
     annotations_base: {
       type: 'any-of',
       contains: [{
-        type: 'array',
-        contains: {
-          type: 'number',
-        },
-      }, {
         type: 'null',
       }],
     },
     user_target: {
       type: 'any-of',
       contains: [{
-        type: 'string',
-        format: 'uuid',
-      }, {
         type: 'string',
       }, {
         type: 'null',
@@ -75,11 +75,6 @@ export const $AnnotationQualityModel = {
     annotations_target: {
       type: 'any-of',
       contains: [{
-        type: 'array',
-        contains: {
-          type: 'number',
-        },
-      }, {
         type: 'null',
       }],
     },

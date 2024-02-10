@@ -3,6 +3,7 @@
 /* eslint-disable */
 import type { AnnotationQualityModel } from '../models/AnnotationQualityModel';
 import type { AnnotationTrackerModel } from '../models/AnnotationTrackerModel';
+import type { BotAnnotationMetaDataBaseModel } from '../models/BotAnnotationMetaDataBaseModel';
 import type { DehydratedAnnotationTracker } from '../models/DehydratedAnnotationTracker';
 import type { LabelScope } from '../models/LabelScope';
 
@@ -30,6 +31,34 @@ export class EvaluationService {
       url: '/api/eval/tracking/scopes',
       headers: {
         'x-project-id': xProjectId,
+      },
+      errors: {
+        422: `Validation Error`,
+      },
+      ...options,
+    });
+  }
+
+  /**
+   * Get Resolutions For Scope
+   * @returns BotAnnotationMetaDataBaseModel Successful Response
+   * @throws ApiError
+   */
+  public getResolutionsForScopeApiEvalResolutionsGet({
+    assignmentScopeId,
+    xProjectId,
+  }: {
+    assignmentScopeId: string,
+    xProjectId: string,
+  }, options?: Partial<ApiRequestOptions>): CancelablePromise<Array<BotAnnotationMetaDataBaseModel>> {
+    return this.httpRequest.request({
+      method: 'GET',
+      url: '/api/eval/resolutions',
+      headers: {
+        'x-project-id': xProjectId,
+      },
+      query: {
+        'assignment_scope_id': assignmentScopeId,
       },
       errors: {
         422: `Validation Error`,
@@ -187,12 +216,10 @@ export class EvaluationService {
     assignmentScopeId,
     xProjectId,
     botAnnotationMetadataId,
-    relevanceRule,
   }: {
     assignmentScopeId: string,
     xProjectId: string,
     botAnnotationMetadataId?: (string | null),
-    relevanceRule?: (string | null),
   }, options?: Partial<ApiRequestOptions>): CancelablePromise<Array<AnnotationQualityModel>> {
     return this.httpRequest.request({
       method: 'GET',
@@ -203,7 +230,6 @@ export class EvaluationService {
       query: {
         'assignment_scope_id': assignmentScopeId,
         'bot_annotation_metadata_id': botAnnotationMetadataId,
-        'relevance_rule': relevanceRule,
       },
       errors: {
         422: `Validation Error`,

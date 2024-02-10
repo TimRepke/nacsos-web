@@ -115,6 +115,17 @@ export const $ItemAnnotation = {
       }],
       isRequired: true,
     },
+    snippet_id: {
+      type: 'any-of',
+      contains: [{
+        type: 'string',
+      }, {
+        type: 'string',
+        format: 'uuid',
+      }, {
+        type: 'null',
+      }],
+    },
     key: {
       type: 'string',
       isRequired: true,
@@ -129,22 +140,6 @@ export const $ItemAnnotation = {
       }, {
         type: 'string',
         format: 'uuid',
-      }, {
-        type: 'null',
-      }],
-    },
-    text_offset_start: {
-      type: 'any-of',
-      contains: [{
-        type: 'number',
-      }, {
-        type: 'null',
-      }],
-    },
-    text_offset_stop: {
-      type: 'any-of',
-      contains: [{
-        type: 'number',
       }, {
         type: 'null',
       }],

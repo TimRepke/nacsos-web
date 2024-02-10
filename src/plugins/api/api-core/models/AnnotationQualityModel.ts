@@ -11,10 +11,11 @@ export type AnnotationQualityModel = {
   annotation_quality_id?: (string | null);
   project_id?: (string | null);
   assignment_scope_id?: (string | null);
+  bot_annotation_metadata_id?: (string | null);
   user_base?: (string | null);
-  annotations_base?: (Array<number> | null);
+  annotations_base?: null;
   user_target?: (string | null);
-  annotations_target?: (Array<number> | null);
+  annotations_target?: null;
   label_key?: (string | null);
   label_value?: (number | null);
   cohen?: (number | null);

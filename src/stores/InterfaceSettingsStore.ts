@@ -17,9 +17,28 @@ export interface ItemDisplaySettings {
   columns?: number;
 }
 
+// Columns to show in the quality monitor
+export interface QualityColumnsSettings {
+  cohen: boolean;
+  fleiss: boolean;
+  randolph: boolean;
+  krippendorff: boolean;
+  pearson: boolean;
+  kendall: boolean;
+  spearman: boolean;
+  precision: boolean;
+  recall: boolean;
+  f1: boolean;
+  multi_overlap_mean: boolean;
+  multi_overlap_median: boolean;
+  num_overlap: boolean;
+  num_agreement: boolean;
+}
+
 export type InterfaceSettingsState = {
   annotation: RemovableRef<AnnotationSettings>;
   itemDisplay: RemovableRef<ItemDisplaySettings>;
+  qualityColumns: RemovableRef<QualityColumnsSettings>;
 };
 export type InterfaceSettingsActions = Record<string, never>;
 export type InterfaceSettingsGetters = Record<string, never>;
@@ -51,6 +70,27 @@ export const useInterfaceSettingsStore = defineStore("InterfaceSettingsStore", {
         undefined,
         { mergeDefaults: true },
       ),
+      qualityColumns: useStorage<QualityColumnsSettings>(
+        "nacsos:ui-settings:quality-columns",
+        {
+          cohen: true,
+          fleiss: false,
+          randolph: false,
+          krippendorff: false,
+          pearson: true,
+          kendall: false,
+          spearman: false,
+          precision: true,
+          recall: true,
+          f1: false,
+          multi_overlap_mean: true,
+          multi_overlap_median: false,
+          num_overlap: false,
+          num_agreement: true,
+        } as QualityColumnsSettings,
+        undefined,
+        { mergeDefaults: true },
+      ),
     };
   },
   actions: {
@@ -61,7 +101,7 @@ export const useInterfaceSettingsStore = defineStore("InterfaceSettingsStore", {
       return this.annotation.progressBarLabelKey === undefined;
     },
     itemColumnStyle(): Record<string, string> {
-      if (this.itemDisplay.columns > 1) {
+      if (this.itemDisplay.columns && this.itemDisplay.columns > 1) {
         return {
           "column-count": `${this.itemDisplay.columns}`,
           "column-gap": "40px",
