@@ -45,7 +45,7 @@ export const $AssignmentScopeRandomWithNQLConfig = {
       isRequired: true,
     },
     query_parsed: {
-      type: 'any-of',
+      type: 'one-of',
       contains: [{
         type: 'FieldFilter',
       }, {

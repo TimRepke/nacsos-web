@@ -18,11 +18,10 @@ export type ItemAnnotation = {
   user_id: string;
   item_id: string;
   annotation_scheme_id: string;
+  snippet_id?: (string | null);
   key: string;
   repeat?: number;
   parent?: (string | null);
-  text_offset_start?: (number | null);
-  text_offset_stop?: (number | null);
   path: Array<Label>;
   old?: (AnnotationValue | null);
 };

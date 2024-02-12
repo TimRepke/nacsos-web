@@ -39,12 +39,20 @@ export const $AnnotationQualityModel = {
         type: 'null',
       }],
     },
-    user_base: {
+    bot_annotation_metadata_id: {
       type: 'any-of',
       contains: [{
         type: 'string',
         format: 'uuid',
       }, {
+        type: 'string',
+      }, {
+        type: 'null',
+      }],
+    },
+    user_base: {
+      type: 'any-of',
+      contains: [{
         type: 'string',
       }, {
         type: 'null',
@@ -60,9 +68,6 @@ export const $AnnotationQualityModel = {
       type: 'any-of',
       contains: [{
         type: 'string',
-        format: 'uuid',
-      }, {
-        type: 'string',
       }, {
         type: 'null',
       }],
@@ -73,29 +78,18 @@ export const $AnnotationQualityModel = {
         type: 'null',
       }],
     },
-    label_path_key: {
-      type: 'any-of',
-      contains: [{
-        type: 'string',
-      }, {
-        type: 'null',
-      }],
-    },
-    label_path: {
-      type: 'any-of',
-      contains: [{
-        type: 'array',
-        contains: {
-          type: 'Label',
-        },
-      }, {
-        type: 'null',
-      }],
-    },
     label_key: {
       type: 'any-of',
       contains: [{
         type: 'string',
+      }, {
+        type: 'null',
+      }],
+    },
+    label_value: {
+      type: 'any-of',
+      contains: [{
+        type: 'number',
       }, {
         type: 'null',
       }],
@@ -180,6 +174,54 @@ export const $AnnotationQualityModel = {
         type: 'null',
       }],
     },
+    precision: {
+      type: 'any-of',
+      contains: [{
+        type: 'number',
+      }, {
+        type: 'null',
+      }],
+    },
+    recall: {
+      type: 'any-of',
+      contains: [{
+        type: 'number',
+      }, {
+        type: 'null',
+      }],
+    },
+    f1: {
+      type: 'any-of',
+      contains: [{
+        type: 'number',
+      }, {
+        type: 'null',
+      }],
+    },
+    multi_overlap_mean: {
+      type: 'any-of',
+      contains: [{
+        type: 'number',
+      }, {
+        type: 'null',
+      }],
+    },
+    multi_overlap_median: {
+      type: 'any-of',
+      contains: [{
+        type: 'number',
+      }, {
+        type: 'null',
+      }],
+    },
+    multi_overlap_std: {
+      type: 'any-of',
+      contains: [{
+        type: 'number',
+      }, {
+        type: 'null',
+      }],
+    },
     num_items: {
       type: 'any-of',
       contains: [{
@@ -205,6 +247,14 @@ export const $AnnotationQualityModel = {
       }],
     },
     num_disagree: {
+      type: 'any-of',
+      contains: [{
+        type: 'number',
+      }, {
+        type: 'null',
+      }],
+    },
+    perc_agree: {
       type: 'any-of',
       contains: [{
         type: 'number',

@@ -205,11 +205,14 @@
         <div class="col" v-if="trackerDetails">
           <ul>
             <li><strong>Number of items:</strong> {{ trackerDetails.n_items_total }}</li>
-            <li><strong>Number of labels:</strong> {{ (trackerDetails.recall || []).length }}</li>
+            <li>
+              <strong>Number of screened:</strong> {{ numLabels }} ({{ numLabelsPos }} incl,
+              {{ numLabels - numLabelsPos }} excl)
+            </li>
             <li>
               <strong>Coverage:</strong>
               {{
-                ((trackerDetails.recall || []).length / trackerDetails.n_items_total).toLocaleString(undefined, {
+                (numLabels / trackerDetails.n_items_total).toLocaleString(undefined, {
                   style: "percent",
                   minimumFractionDigits: 2,
                 })
@@ -219,6 +222,11 @@
             <li v-if="lastBuscar">
               <strong>Last Buscar score:</strong>
               {{ lastBuscar[1] }}
+              <ToolTip>
+                This is the p-score for the null-hypothesis that we've seen at least
+                {{ trackerDetails.recall_target * 100 }}% of all relevant documents in the corpus. In other words, you
+                could say you've seen {{ (1 - (lastBuscar[1] || 1)) * 100 }}% all all relevant documents.
+              </ToolTip>
             </li>
           </ul>
         </div>
@@ -382,6 +390,14 @@ export default defineComponent({
         return this.trackerDetails.buscar[this.trackerDetails.buscar.length - 1] as [number, number | null];
       }
       return undefined;
+    },
+    numLabels(): number {
+      return (this.trackerDetails?.recall || []).length;
+    },
+    numLabelsPos(): number {
+      return (this.trackerDetails?.labels || []).reduce((countTotal: number, labels: number[]) => {
+        return countTotal + labels.reduce((count: number, label: number) => count + label, 0);
+      }, 0);
     },
   },
 });

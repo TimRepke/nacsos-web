@@ -3,10 +3,6 @@
 /* eslint-disable */
 export const $LabelFilterInt = {
   properties: {
-    filter: {
-      properties: {
-      },
-    },
     scopes: {
       type: 'any-of',
       contains: [{
@@ -44,6 +40,14 @@ export const $LabelFilterInt = {
     type: {
       type: 'Enum',
       isRequired: true,
+    },
+    filter: {
+      properties: {
+      },
+    },
+    value_type: {
+      properties: {
+      },
     },
     value_int: {
       type: 'any-of',

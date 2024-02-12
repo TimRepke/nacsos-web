@@ -3,6 +3,7 @@
 /* eslint-disable */
 
 export type FieldFilter = {
+  filter?: any;
   field: FieldFilter.field;
   value: (string | number);
   comp?: (string | null);

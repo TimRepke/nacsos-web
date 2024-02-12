@@ -1,7 +1,7 @@
 <template>
   <div class="nacsos-tooltip ms-2">
     <font-awesome-icon :icon="['fas', 'circle-question']" class="text-muted" />
-    <span class="nacsos-tooltiptext medium">
+    <span class="nacsos-tooltiptext medium" :class="[size, placement]">
       <slot />
     </span>
   </div>
@@ -18,8 +18,22 @@ TODO: should this always be a question mark or could it also be a lower-cased "i
 */
 import { defineComponent } from "vue";
 
+// type Placement = 'top' | 'left' | 'bottom' | 'right';
+// type Size = 'small' | 'medium' | 'wide';
 export default defineComponent({
   name: "ToolTip",
+  props: {
+    placement: {
+      type: String,
+      required: false,
+      default: "top",
+    },
+    size: {
+      type: String,
+      required: false,
+      default: "small",
+    },
+  },
 });
 </script>
 

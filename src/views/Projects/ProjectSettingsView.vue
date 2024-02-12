@@ -78,7 +78,7 @@
     <div class="row pb-2 mb-2 g-0">
       <h4>User permissions</h4>
       <ul class="list-unstyled">
-        <li v-for="permission in permissions" :key="permission.project_permission_id" class="mb-3">
+        <li v-for="permission in permissions" :key="permission.project_permission_id as string" class="mb-3">
           <PermissionSettingsCard :user-permission="permission" @user-deleted="removeUser($event)" />
         </li>
       </ul>

@@ -5,12 +5,13 @@
 import type { UsersFilter } from './UsersFilter';
 
 export type LabelFilterInt = {
-  filter?: any;
   scopes?: (Array<string> | null);
   users?: (UsersFilter | null);
   repeats?: (Array<number> | null);
   key: string;
   type: LabelFilterInt.type;
+  filter?: any;
+  value_type?: any;
   value_int?: (number | null);
   comp: string;
 };

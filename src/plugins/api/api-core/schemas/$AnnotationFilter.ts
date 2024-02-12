@@ -6,7 +6,6 @@ export const $AnnotationFilter = {
     filter: {
       properties: {
       },
-      isRequired: true,
     },
     incl: {
       type: 'boolean',

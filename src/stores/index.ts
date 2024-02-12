@@ -6,11 +6,13 @@ import { API } from "@/plugins/api";
 import { useRequestsStore } from "@/stores/RequestsStore";
 import { ClearUserStoreEvent } from "@/plugins/events/events/auth";
 import { EventBus } from "@/plugins/events";
+import { usePlatformUsersStore } from "@/stores/PlatformUsersStore";
 
 const pinia = createPinia();
 
 export const currentUserStore = useCurrentUserStore(pinia);
 export const currentProjectStore = useCurrentProjectStore(pinia);
+export const platformUsersStore = usePlatformUsersStore(pinia);
 export const interfaceSettingsStore = useInterfaceSettingsStore(pinia);
 export const requestsStore = useRequestsStore(pinia);
 

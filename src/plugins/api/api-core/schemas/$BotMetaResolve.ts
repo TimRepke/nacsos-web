@@ -7,10 +7,6 @@ export const $BotMetaResolve = {
       type: 'Enum',
       isRequired: true,
     },
-    filters: {
-      type: 'AnnotationFilters',
-      isRequired: true,
-    },
     ignore_hierarchy: {
       type: 'boolean',
       isRequired: true,
@@ -18,17 +14,6 @@ export const $BotMetaResolve = {
     ignore_repeat: {
       type: 'boolean',
       isRequired: true,
-    },
-    trust: {
-      type: 'any-of',
-      contains: [{
-        type: 'dictionary',
-        contains: {
-          type: 'number',
-        },
-      }, {
-        type: 'null',
-      }],
     },
     snapshot: {
       type: 'array',

@@ -57,9 +57,8 @@ export const $BotAnnotationResolution = {
       }, {
         type: 'string',
         format: 'uuid',
-      }, {
-        type: 'null',
       }],
+      isRequired: true,
     },
     annotation_scheme_id: {
       type: 'any-of',
@@ -68,9 +67,8 @@ export const $BotAnnotationResolution = {
       }, {
         type: 'string',
         format: 'uuid',
-      }, {
-        type: 'null',
       }],
+      isRequired: true,
     },
     meta: {
       type: 'BotMetaResolve',

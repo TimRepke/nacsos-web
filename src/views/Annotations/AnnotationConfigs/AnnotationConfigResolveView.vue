@@ -1,205 +1,114 @@
 <template>
   <div>
     <div class="row">
-      <h1>Resolve Annotations</h1>
+      <h1>Annotation resolutions</h1>
     </div>
-    <div class="row mx-auto">
-      <div class="accordion">
-        <div class="accordion-item">
-          <h2 class="accordion-header">
-            <button
-              class="accordion-button"
-              type="button"
-              data-bs-toggle="collapse"
-              data-bs-target="#resolve-config"
-              aria-expanded="true"
-              aria-controls="resolve-config"
-            >
-              Annotation Export Configuration
-            </button>
-          </h2>
-          <div id="resolve-config" class="accordion-collapse collapse show">
-            <div class="accordion-body">
-              <div class="row">
-                <div class="col">
-                  <div class="mb-3">
-                    <div class="form-floating mb-3">
-                      <input type="text" class="form-control" id="resolve-name" v-model="name" placeholder="Name" />
-                      <label for="resolve-name">Descriptive name for this annotation export</label>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div class="row gy-5">
-                <div class="col border-end">
-                  <div class="mb-3">
-                    <label for="schema-selector" class="form-label">Annotation Scheme</label>
-                    <select
-                      :disabled="!isNew"
-                      id="schema-selector"
-                      class="form-select"
-                      aria-label="Schema selector"
-                      v-model="filters.scheme_id"
-                    >
-                      <option :value="undefined" disabled>Please choose...</option>
-                      <option
-                        v-for="scheme in projectAnnotationSchemes"
-                        :key="scheme.annotation_scheme_id as string"
-                        :value="scheme.annotation_scheme_id"
-                      >
-                        {{ scheme.name }}
-                      </option>
-                    </select>
-                  </div>
-                  <div v-if="schemeFlat.length > 0" class="mb-3 border-bottom">
-                    <div class="form-label">
-                      <span class="me-4">Scheme labels to resolve</span>
-                      <span class="text-muted small" role="button" @click="pickAllKeys">
-                        <font-awesome-icon :icon="['fas', 'list-check']" class="me-1" />
-                        All
-                      </span>
-                    </div>
-                    <ul class="list-unstyled ms-lg-2">
-                      <li v-for="label in schemeFlat" :key="label.key">
-                        <input
-                          class="form-check-input me-1"
-                          type="checkbox"
-                          :id="`schema-label-selector-${label.key}`"
-                          :value="label.key"
-                          v-model="filters.key"
-                          :disabled="!isNew"
-                        />
-                        <label class="form-check-label" :for="`schema-label-selector-${label.key}`">
-                          <strong>{{ label.key }}</strong> – {{ label.name }}
-                        </label>
-                      </li>
-                    </ul>
-                  </div>
-                  <div class="mb-3 border-bottom" v-if="filters.key && filters.key.length > 0">
-                    <div class="form-check">
-                      <input
-                        class="form-check-input"
-                        type="checkbox"
-                        v-model="ignoreHierarchy"
-                        id="check-ignore-hierarchy"
-                        :disabled="!isNew"
-                      />
-                      <label class="form-check-label" for="check-ignore-hierarchy">
-                        Ignore scheme hierarchy
-                        <ToolTip>
-                          If you have nested labels in your annotation scheme, we will keep track of all
-                          parents/children. Selecting this option will ignore these relationships and present you with a
-                          "flat" list of labels.
-                        </ToolTip>
-                      </label>
-                    </div>
-                    <div class="form-check">
-                      <input
-                        class="form-check-input"
-                        type="checkbox"
-                        v-model="ignoreRepeat"
-                        id="check-ignore-order"
-                        :disabled="!isNew"
-                      />
-                      <label class="form-check-label" for="check-ignore-order">
-                        Ignore label order (<code>repeat</code>s)
-                        <ToolTip>
-                          Select this if you'd like to ignore the order of labels for those that are repeatable. This
-                          might be useful if you allowed labels to be primary, secondary, ... but now would like to
-                          treat them all the same.
-                        </ToolTip>
-                      </label>
-                    </div>
-                  </div>
-                </div>
-                <div class="col">
-                  <div v-if="(assignmentScopes || []).length > 0" class="mb-3 border-bottom">
-                    <div class="form-label">Source assignment scopes</div>
-                    <ul class="list-unstyled ms-lg-2">
-                      <li v-for="scope in assignmentScopes" :key="scope.assignment_scope_id as string">
-                        <input
-                          class="form-check-input me-1"
-                          type="checkbox"
-                          :id="`scope-selector-${scope.assignment_scope_id}`"
-                          :value="scope.assignment_scope_id"
-                          v-model="filters.scope_id"
-                          :disabled="!isNew"
-                        />
-                        <label class="form-check-label" :for="`scope-selector-${scope.assignment_scope_id}`">{{
-                          scope.name
-                        }}</label>
-                      </li>
-                    </ul>
-                  </div>
-                  <div v-if="(annotators || []).length > 0" class="mb-3 border-bottom">
-                    <div class="form-label">
-                      <span class="me-4">Annotator selector</span>
-                      <span class="text-muted small" role="button" @click="pickAllAnnotators">
-                        <font-awesome-icon :icon="['fas', 'list-check']" class="me-1" />
-                        All
-                      </span>
-                    </div>
-                    <ul class="list-unstyled ms-lg-2">
-                      <li v-for="user in annotators" :key="user.user_id!">
-                        <input
-                          class="form-check-input me-1"
-                          type="checkbox"
-                          :id="`annotator-selector-${user.user_id}`"
-                          :value="user.user_id"
-                          v-model="filters.user_id"
-                          :disabled="!isNew"
-                        />
-                        <label class="form-check-label" :for="`annotator-selector-${user.user_id}`">
-                          <strong>{{ user.username }}</strong> – {{ user.full_name }}
-                        </label>
-                      </li>
-                    </ul>
-                  </div>
-                  <div class="mb-3">
-                    <label for="algorithm-selector" class="form-label">Resolution algorithm</label>
-                    <select
-                      id="algorithm-selector"
-                      class="form-select"
-                      aria-label="Resolution algorithm"
-                      disabled
-                      v-model="algorithm"
-                    >
-                      <!--:disabled="!isNew">-->
-                      <option value="majority">majority vote</option>
-                      <!--<option value="trust" disabled>weighted majority</option>-->
-                      <!--<option value="first" disabled>first annotation</option>-->
-                      <!--<option value="last" disabled>last annotation</option>-->
-                      <!--<option value="??" disabled>sorcery</option>-->
-                    </select>
-                  </div>
-                </div>
-              </div>
-              <div class="row">
-                <div class="col text-start">
-                  <input type="checkbox" name="showText" id="showText-check" v-model="showText" />
-                  <label for="showText-check" class="ms-1">Show text</label>
-                </div>
-                <div class="col text-end">
-                  <button v-if="loadingProposals" class="btn btn-primary" type="button" disabled>
-                    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
-                    Loading...
-                  </button>
-                  <button
-                    v-else
-                    class="btn btn-primary"
-                    type="button"
-                    @click="fetchProposal"
-                    :disabled="!isConfigValid || !isNew"
-                  >
-                    Load
-                  </button>
-                </div>
-              </div>
+
+    <div class="row">
+      <div class="col-12 col-lg-6">
+        <div class="form-floating">
+          <input type="text" class="form-control" id="resolve-name" v-model="name" placeholder="Name" />
+          <label for="resolve-name">Descriptive name for this annotation export</label>
+        </div>
+        <code v-if="bot_annotation_metadata_id" class="ms-1">{{ bot_annotation_metadata_id }}</code>
+        <div class="row mt-3">
+          <div class="col">
+            <div class="form-check">
+              <input
+                class="form-check-input"
+                type="checkbox"
+                v-model="settings.ignore_hierarchy"
+                id="check-ignore-hierarchy"
+                :disabled="!isNew"
+              />
+              <label class="form-check-label" for="check-ignore-hierarchy">
+                Ignore scheme hierarchy
+                <ToolTip>
+                  If you have nested labels in your annotation scheme, we will keep track of all parents/children.
+                  Selecting this option will ignore these relationships and present you with a "flat" list of labels.
+                </ToolTip>
+              </label>
+            </div>
+            <div class="form-check">
+              <input
+                class="form-check-input"
+                type="checkbox"
+                v-model="settings.ignore_repeat"
+                id="check-ignore-order"
+                :disabled="!isNew"
+              />
+              <label class="form-check-label" for="check-ignore-order">
+                Ignore label order (<code>repeat</code>s)
+                <ToolTip>
+                  Select this if you'd like to ignore the order of labels for those that are repeatable. This might be
+                  useful if you allowed labels to be primary, secondary, ... but now would like to treat them all the
+                  same.
+                </ToolTip>
+              </label>
+            </div>
+          </div>
+          <div class="col border-start">
+            <div>
+              <input type="checkbox" name="showText" id="showText-check" v-model="showText" />
+              <label for="showText-check" class="ms-1">Show text</label>
+            </div>
+            <div v-if="isNew" class="text-end">
+              <button class="btn btn-primary" type="button" @click="fetchProposal" :disabled="loadingProposals">
+                <template v-if="loadingProposals">
+                  <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
+                  Loading...
+                </template>
+                <template v-else> Load proposals</template>
+              </button>
             </div>
           </div>
         </div>
       </div>
+
+      <div class="col-12 col-lg-6 order-first order-lg-last mb-2">
+        <div v-if="annotationScheme">
+          Annotation scheme:
+          <span class="fw-bolder me-1">{{ annotationScheme.name }}</span>
+          <pop-over
+            v-if="annotationScheme.description"
+            class="d-inline-block me-2"
+            title="Annotation scheme description"
+            :body-m-d="annotationScheme.description"
+          />
+          <code class="me-1 small">{{ annotationScheme.annotation_scheme_id }}</code>
+          <router-link
+            :to="{
+              name: 'config-annotation-scheme-edit',
+              params: { annotation_scheme_id: annotationScheme.annotation_scheme_id },
+            }"
+            class="small"
+          >
+            <font-awesome-icon icon="up-right-from-square" />
+          </router-link>
+        </div>
+        <div v-if="assignmentScope">
+          Assignment scope:
+          <span class="fw-bolder me-1">{{ assignmentScope.name }}</span>
+          <pop-over
+            v-if="assignmentScope.description"
+            class="d-inline-block me-2"
+            title="Assignment scope description"
+            :body-m-d="assignmentScope.description"
+          />
+          <code class="me-1 small">{{ assignmentScope.assignment_scope_id }}</code>
+          <router-link
+            :to="{
+              name: 'config-annotation-scheme-scope',
+              params: { scope_id: assignmentScope.assignment_scope_id },
+            }"
+            class="small"
+          >
+            <font-awesome-icon icon="up-right-from-square" />
+          </router-link>
+        </div>
+      </div>
     </div>
+
     <div class="row mb-5 mt-2" v-if="isTableReady && proposal">
       <div class="table-responsive-sm position-relative">
         <table class="table" style="width: calc(100% - 1rem)">
@@ -224,44 +133,47 @@
           </thead>
           <ResolverRow
             v-for="orderEntry in proposal.ordering"
-            :key="orderEntry.key"
+            :key="orderEntry.identifier"
             v-show="itemIdSearch === '' || orderEntry.item_id.indexOf(itemIdSearch) >= 0"
             :ordering="orderEntry"
-            :row="proposal.matrix[orderEntry.key]"
+            :row="proposal.matrix[orderEntry.item_id]"
             :user-lookup="userLookup"
             :users="proposal.annotators"
             :label-lookup="labels"
             :labels="proposal.labels"
             :show-text="showText"
-            :bot-annotation-meta-data-id="botAnnotationMetaDataId"
+            :bot-annotation-meta-data-id="bot_annotation_metadata_id"
             @bot-annotation-changed="handleChangedBotAnnotation"
-            @request-focus-item="(val) => (focusItem = val)"
+            @request-focus-item="(val: string) => (focusItem = val)"
           />
         </table>
       </div>
     </div>
+
     <div v-if="isTableReady" class="bg-light p-1" style="position: absolute; right: 2rem; bottom: 1rem">
       <div class="col">
-        <button @click="save" :disabled="!savingAllowed" type="button" class="btn btn-success m-2">Save</button>
+        <button @click="save" :disabled="!savingAllowed || name.length < 3" type="button" class="btn btn-success m-2">
+          Save
+        </button>
       </div>
     </div>
+
     <ItemModal :item-id="focusItem" @dismissed="focusItem = undefined" />
   </div>
 </template>
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import { currentProjectStore } from "@/stores";
+import { currentProjectStore, platformUsersStore } from "@/stores";
 import type {
-  AnnotationSchemeModel,
+  AnnotationSchemeModelFlat,
   FlattenedAnnotationSchemeLabel,
   AssignmentScopeModel,
   BotAnnotationModel,
-  AnnotationFilters,
-  Label,
-  UserModel,
   ResolutionProposal,
   FlatLabel,
+  BotMetaResolveBase,
+  DehydratedUser,
 } from "@/plugins/api/api-core";
 import { BotMetaResolve } from "@/plugins/api/api-core";
 import { API, toastReject } from "@/plugins/api";
@@ -272,6 +184,8 @@ import { ToastEvent } from "@/plugins/events/events/toast";
 import { ConfirmationRequestEvent } from "@/plugins/events/events/confirmation";
 import ResolverRow from "@/components/annotations/resolve/ResolverRow.vue";
 import LabelPathPills from "@/components/annotations/LabelPathPills.vue";
+import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
+import PopOver from "@/components/PopOver.vue";
 
 function tabClosePrevent(e: BeforeUnloadEvent) {
   e.preventDefault();
@@ -279,131 +193,170 @@ function tabClosePrevent(e: BeforeUnloadEvent) {
   e.returnValue = "";
 }
 
+function normalise(str: string | null | undefined): string | undefined {
+  return !str || str.trim().length === 0 ? undefined : str.trim();
+}
+
 export default defineComponent({
   name: "AnnotationConfigResolveView",
-  components: { LabelPathPills, ResolverRow, ToolTip, ItemModal },
+  components: { PopOver, FontAwesomeIcon, LabelPathPills, ResolverRow, ToolTip, ItemModal },
   data() {
-    const botAnnotationMetaDataId: string | undefined = this.$route.params.bot_annotation_metadata_id as
-      | string
-      | undefined;
+    const { bot_annotation_metadata_id, assignment_scope_id, annotation_scheme_id } = this.$route.params;
+    const meta_id = normalise(bot_annotation_metadata_id as string | undefined);
 
     return {
-      botAnnotationMetaDataId,
-      isNew: !botAnnotationMetaDataId,
+      // References
+      bot_annotation_metadata_id: meta_id,
+      assignment_scope_id: normalise(assignment_scope_id as string | undefined),
+      annotation_scheme_id: normalise(annotation_scheme_id as string | undefined),
+
+      // Meta-data
       name: "",
-      filters: {
-        scheme_id: undefined,
-        scope_id: [] as string[],
-        key: [] as string[],
-        user_id: [] as string[],
-      } as Partial<AnnotationFilters>,
-      algorithm: BotMetaResolve.algorithm.MAJORITY,
-      ignoreHierarchy: false,
-      ignoreRepeat: false,
-      focusItem: undefined as string | undefined,
-      projectAnnotationSchemes: [] as AnnotationSchemeModel[],
-      assignmentScopes: [] as AssignmentScopeModel[],
-      annotators: [] as UserModel[],
-      loadingProposals: false,
-      itemIdSearch: "",
-      autoSave: undefined as undefined | number,
-      showText: false,
+      settings: {
+        ignore_hierarchy: false,
+        ignore_repeat: false,
+        algorithm: BotMetaResolve.algorithm.MAJORITY,
+      } as BotMetaResolveBase,
+
+      // Models
+      assignmentScope: undefined as AssignmentScopeModel | undefined,
+      annotationScheme: undefined as AnnotationSchemeModelFlat | undefined,
       proposal: undefined as ResolutionProposal | undefined,
-      schemeFlat: [] as FlattenedAnnotationSchemeLabel[],
+
+      // State
+      isNew: !meta_id,
+      focusItem: undefined as string | undefined,
+      loadingProposals: false,
       savingAllowed: true,
+
+      // Settings
+      showText: false,
+      itemIdSearch: "",
+      saveReminder: undefined as undefined | number,
     };
   },
   unmounted() {
-    clearInterval(this.autoSave);
+    clearInterval(this.saveReminder);
     window.removeEventListener("beforeunload", tabClosePrevent);
   },
-  mounted() {
-    this.fetchProjectSchemas();
-
-    this.autoSave = setInterval(() => {
+  async mounted() {
+    this.saveReminder = setInterval(() => {
       EventBus.emit(new ToastEvent("INFO", "You might want to click save every now and then..."));
     }, 300000) as unknown as number; // called every 5 min
 
     // Prevent browser page reload and tab closure
     window.addEventListener("beforeunload", tabClosePrevent);
 
-    if (!this.isNew && this.botAnnotationMetaDataId !== undefined) {
-      API.core.annotations
-        .getSavedResolvedAnnotationsApiAnnotationsConfigResolvedBotAnnotationMetadataIdGet({
-          botAnnotationMetadataId: this.botAnnotationMetaDataId,
-          xProjectId: currentProjectStore.projectId as string,
-        })
-        .then((response) => {
-          const { meta, proposal } = response.data;
-          this.name = meta.name;
-          this.algorithm = meta.meta.algorithm;
-          this.filters = meta.meta.filters;
-          this.ignoreRepeat = meta.meta.ignore_repeat;
-          this.ignoreHierarchy = meta.meta.ignore_hierarchy;
-          this.proposal = proposal;
-        });
+    try {
+      if (!this.isNew && this.bot_annotation_metadata_id) {
+        const { meta, proposal } = (
+          await API.core.annotations.getSavedResolvedAnnotationsApiAnnotationsConfigResolvedBotAnnotationMetadataIdGet({
+            botAnnotationMetadataId: this.bot_annotation_metadata_id,
+            xProjectId: currentProjectStore.projectId as string,
+          })
+        ).data;
+        this.name = meta.name;
+        this.annotation_scheme_id = meta.annotation_scheme_id;
+        this.assignment_scope_id = meta.assignment_scope_id;
+        this.settings.ignore_repeat = meta.meta.ignore_repeat;
+        this.settings.ignore_hierarchy = meta.meta.ignore_hierarchy;
+        this.proposal = proposal;
+      }
+      if (this.annotation_scheme_id) {
+        this.annotationScheme = (
+          await API.core.annotations.getSchemeDefinitionApiAnnotationsSchemesDefinitionAnnotationSchemeIdGet({
+            annotationSchemeId: this.annotation_scheme_id,
+            xProjectId: currentProjectStore.projectId as string,
+            flat: true,
+          })
+        ).data as AnnotationSchemeModelFlat;
+      }
+      if (this.assignment_scope_id) {
+        this.assignmentScope = (
+          await API.core.annotations.getAssignmentScopeApiAnnotationsAnnotateScopeAssignmentScopeIdGet({
+            assignmentScopeId: this.assignment_scope_id,
+            xProjectId: currentProjectStore.projectId as string,
+          })
+        ).data;
+      }
+
+      await platformUsersStore.maybeRefresh();
+    } catch (e) {
+      console.error(e);
     }
   },
-
-  watch: {
-    "filters.scheme_id": {
-      handler(schemeId: string) {
-        if (schemeId) {
-          // fetch `AssignmentScope`s for the current `AnnotationScheme`
-          API.core.annotations
-            .getAssignmentScopesForSchemeApiAnnotationsConfigScopesSchemeIdGet({
-              schemeId,
-              xProjectId: currentProjectStore.projectId as string,
-            })
-            .then((response) => {
-              const { data } = response;
-              this.assignmentScopes = data;
-            });
-
-          // fetch `Users`s that created annotations linked to the current `AnnotationScheme`
-          API.core.annotations
-            .getAnnotatorsForSchemeApiAnnotationsConfigAnnotatorsSchemeIdGet({
-              schemeId,
-              xProjectId: currentProjectStore.projectId as string,
-            })
-            .then((response) => {
-              const { data } = response;
-              this.annotators = data;
-            });
-
-          // fetch flattened annotation scheme
-          API.core.annotations
-            .getSchemeDefinitionApiAnnotationsSchemesDefinitionAnnotationSchemeIdGet({
-              annotationSchemeId: schemeId,
-              xProjectId: currentProjectStore.projectId as string,
-              flat: true,
-            })
-            .then((response) => {
-              const { data } = response;
-              this.schemeFlat = data.labels as FlattenedAnnotationSchemeLabel[];
-            });
-        }
-      },
-      immediate: true,
-    },
-  },
-
   methods: {
+    save() {
+      if (this.savingAllowed) {
+        this.savingAllowed = false;
+        if (!this.isNew) {
+          this.update();
+        } else {
+          this.saveNew();
+        }
+      }
+    },
+    update() {
+      if (!this.proposal?.matrix) {
+        EventBus.emit(new ToastEvent("WARN", "Nothing to save (yet)!"));
+        this.savingAllowed = true;
+      } else {
+        API.core.annotations
+          .updateResolvedAnnotationsApiAnnotationsConfigResolveUpdatePut({
+            botAnnotationMetadataId: this.bot_annotation_metadata_id as string,
+            name: this.name,
+            xProjectId: currentProjectStore.projectId as string,
+            requestBody: this.proposal.matrix,
+          })
+          .then(() => EventBus.emit(new ToastEvent("SUCCESS", "Updated resolution")))
+          .catch(toastReject)
+          .finally(() => {
+            this.savingAllowed = true;
+          });
+      }
+    },
+    saveNew() {
+      if (!this.proposal || !this.assignment_scope_id || !this.annotation_scheme_id) {
+        EventBus.emit(new ToastEvent("WARN", "Nothing to save (yet)!"));
+        this.savingAllowed = true;
+      } else {
+        API.core.annotations
+          .saveResolvedAnnotationsApiAnnotationsConfigResolvePut({
+            xProjectId: currentProjectStore.projectId as string,
+            assignmentScopeId: this.assignment_scope_id,
+            annotationSchemeId: this.annotation_scheme_id,
+            name: this.name,
+            requestBody: {
+              settings: this.settings,
+              matrix: this.proposal.matrix,
+            },
+          })
+          .then((response) => {
+            const { data } = response;
+            EventBus.emit(new ToastEvent("SUCCESS", `Saved new annotation resolution as ${data}`));
+            this.isNew = false;
+            this.bot_annotation_metadata_id = data;
+            this.$router.replace({ name: "config-annotation-resolve", params: { bot_annotation_metadata_id: data } });
+          })
+          .catch((reason) => {
+            console.error(reason);
+            EventBus.emit(new ToastEvent("ERROR", "Failed to save new annotation resolution!"));
+          })
+          .finally(() => {
+            this.savingAllowed = true;
+          });
+      }
+    },
     fetchProposal() {
       this.loadingProposals = true;
       API.core.annotations
         .getResolvedAnnotationsApiAnnotationsConfigResolvePost({
-          requestBody: {
-            algorithm: this.algorithm,
-            ignore_repeat: this.ignoreRepeat,
-            ignore_hierarchy: this.ignoreHierarchy,
-            filters: {
-              scheme_id: this.filters.scheme_id,
-              scope_id: this.filters.scope_id,
-              user_id: this.filters.user_id,
-              key: this.filters.key,
-            },
-          },
+          assignmentScopeId: this.assignment_scope_id,
+          botAnnotationMetadatId: this.bot_annotation_metadata_id,
+          includeEmpty: true,
+          includeNew: true,
+          updateExisting: false,
+          requestBody: this.settings,
           xProjectId: currentProjectStore.projectId as string,
         })
         .then((response) => {
@@ -426,105 +379,13 @@ export default defineComponent({
           this.loadingProposals = false;
         });
     },
-    fetchProjectSchemas() {
-      API.core.annotations
-        .getSchemeDefinitionsForProjectApiAnnotationsSchemesListProjectIdGet({
-          projectId: currentProjectStore.projectId as string,
-          xProjectId: currentProjectStore.projectId as string,
-        })
-        .then((response) => {
-          const { data } = response;
-          this.projectAnnotationSchemes = data;
-        });
-    },
     handleChangedBotAnnotation(updatedBotAnnotation: BotAnnotationModel) {
       console.log(updatedBotAnnotation);
     },
-    save() {
-      if (this.savingAllowed) {
-        this.savingAllowed = false;
-        if (!this.isNew) {
-          this.update();
-        } else {
-          this.saveNew();
-        }
-      }
-    },
-    update() {
-      if (!this.proposal?.matrix) {
-        EventBus.emit(new ToastEvent("WARN", "Nothing to save (yet)!"));
-        this.savingAllowed = true;
-      } else {
-        API.core.annotations
-          .updateResolvedAnnotationsApiAnnotationsConfigResolveUpdatePut({
-            botAnnotationMetadataId: this.botAnnotationMetaDataId as string,
-            name: this.name,
-            xProjectId: currentProjectStore.projectId as string,
-            requestBody: this.proposal.matrix,
-          })
-          .then(() => EventBus.emit(new ToastEvent("SUCCESS", "Updated resolution")))
-          .catch(toastReject)
-          .finally(() => {
-            this.savingAllowed = true;
-          });
-      }
-    },
-    saveNew() {
-      if (!this.proposal) {
-        EventBus.emit(new ToastEvent("WARN", "Nothing to save (yet)!"));
-        this.savingAllowed = true;
-      } else {
-        API.core.annotations
-          .saveResolvedAnnotationsApiAnnotationsConfigResolvePut({
-            xProjectId: currentProjectStore.projectId as string,
-            name: this.name,
-            requestBody: {
-              settings: {
-                algorithm: this.algorithm,
-                filters: {
-                  scheme_id: this.filters.scheme_id,
-                  scope_id: this.filters.scope_id,
-                  user_id: this.filters.user_id,
-                  key: this.filters.key,
-                },
-                ignore_hierarchy: this.ignoreHierarchy,
-                ignore_repeat: this.ignoreRepeat,
-              },
-              matrix: this.proposal.matrix,
-            },
-          })
-          .then((response) => {
-            const { data } = response;
-            EventBus.emit(new ToastEvent("SUCCESS", `Saved new annotation resolution as ${data}`));
-            this.isNew = false;
-            this.botAnnotationMetaDataId = data;
-            this.$router.replace({ name: "config-annotation-resolve", params: { bot_annotation_metadata_id: data } });
-          })
-          .catch((reason) => {
-            console.error(reason);
-            EventBus.emit(new ToastEvent("ERROR", "Failed to save new annotation resolution!"));
-          })
-          .finally(() => {
-            this.savingAllowed = true;
-          });
-      }
-    },
-    label2string(label: Label[]) {
-      return label.map((label_: Label) => `${label_.key}:${label_.repeat}`).join("-");
-    },
-    pickAllKeys() {
-      this.filters.key = this.schemeFlat.map((label: FlattenedAnnotationSchemeLabel) => label.key);
-    },
-    pickAllAnnotators() {
-      this.filters.user_id = this.annotators.map((user: UserModel) => user.user_id as string);
-    },
   },
   computed: {
-    userLookup(): Record<string, UserModel> {
-      if (!this.annotators) {
-        return {};
-      }
-      return Object.fromEntries(this.annotators.map((user: UserModel) => [user.user_id, user]));
+    userLookup(): Record<string, DehydratedUser> {
+      return platformUsersStore.userLookup;
     },
     labels(): Record<string, FlatLabel> {
       if (!this.proposal) {
@@ -532,16 +393,14 @@ export default defineComponent({
       }
       return Object.fromEntries(this.proposal.labels.map((label: FlatLabel) => [label.path_key, label]));
     },
-    schemeLookup(): Record<string, FlattenedAnnotationSchemeLabel> {
-      if (!this.schemeFlat) return {};
-      return Object.fromEntries(this.schemeFlat.map((label: FlattenedAnnotationSchemeLabel) => [label.key, label]));
-    },
     isTableReady(): boolean {
       return !!this.proposal;
     },
-    isConfigValid(): boolean {
-      // returns true if all necessary data is available to request a resolution proposal
-      return !!this.filters.scheme_id && (this.filters.key || []).length > 0 && (this.filters.user_id || []).length > 0;
+    schemeLookup(): Record<string, FlattenedAnnotationSchemeLabel> {
+      if (!this.annotationScheme || !this.annotationScheme.labels) return {};
+      return Object.fromEntries(
+        this.annotationScheme.labels.map((label: FlattenedAnnotationSchemeLabel) => [label.key, label]),
+      );
     },
   },
   beforeRouteLeave(to, from, next) {
@@ -550,7 +409,7 @@ export default defineComponent({
         'You will loose data if you have not clicked "save".',
         (confirmationResponse) => {
           if (confirmationResponse === "ACCEPT") {
-            clearInterval(this.autoSave);
+            clearInterval(this.saveReminder);
             next(true);
           } else {
             next(false);

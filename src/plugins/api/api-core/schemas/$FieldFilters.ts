@@ -3,6 +3,10 @@
 /* eslint-disable */
 export const $FieldFilters = {
   properties: {
+    filter: {
+      properties: {
+      },
+    },
     field: {
       type: 'Enum',
       isRequired: true,

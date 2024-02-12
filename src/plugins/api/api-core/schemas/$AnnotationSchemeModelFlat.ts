@@ -38,6 +38,14 @@ export const $AnnotationSchemeModelFlat = {
         type: 'null',
       }],
     },
+    inclusion_rule: {
+      type: 'any-of',
+      contains: [{
+        type: 'string',
+      }, {
+        type: 'null',
+      }],
+    },
     time_created: {
       type: 'any-of',
       contains: [{

@@ -3,7 +3,7 @@
 /* eslint-disable */
 
 export type SubQuery = {
-  filter: any;
+  filter?: any;
   and_?: null;
   or_?: null;
 };

@@ -15,9 +15,6 @@ export const $AnnotationModel = {
   If the scheme allows the user to make repeated annotations for the same Label (\`key\`),
   an offset is defined in \`repeat\` (e.g. for primary technology is "natural tech", secondary is "forests").
 
-  Furthermore, in-text annotations refer to a substring in the Item text, for which the optional fields
-  \`text_offset_start\` and \`text_offset_end\` can be used.
-
   Note, that there is no database constraints on the completeness of an Assignment/AnnotationScheme.
   The interface/backend code should be used to make sure, to either not allow partial fulfillment of an
   AnnotationScheme or not display an Assignment as complete.`,
@@ -134,6 +131,17 @@ export const $AnnotationModel = {
       }],
       isRequired: true,
     },
+    snippet_id: {
+      type: 'any-of',
+      contains: [{
+        type: 'string',
+      }, {
+        type: 'string',
+        format: 'uuid',
+      }, {
+        type: 'null',
+      }],
+    },
     key: {
       type: 'string',
       isRequired: true,
@@ -148,22 +156,6 @@ export const $AnnotationModel = {
       }, {
         type: 'string',
         format: 'uuid',
-      }, {
-        type: 'null',
-      }],
-    },
-    text_offset_start: {
-      type: 'any-of',
-      contains: [{
-        type: 'number',
-      }, {
-        type: 'null',
-      }],
-    },
-    text_offset_stop: {
-      type: 'any-of',
-      contains: [{
-        type: 'number',
       }, {
         type: 'null',
       }],

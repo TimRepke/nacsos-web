@@ -203,15 +203,7 @@ const routes: Array<RouteRecordRaw> = [
           ),
       },
       {
-        path: "resolved/",
-        name: "config-resolved-annotations-list",
-        component: () =>
-          import(
-            /* webpackChunkName: "AnnotationConfigResolveView" */ "../views/Annotations/AnnotationConfigs/AnnotationConfigResolvedListView.vue"
-          ),
-      },
-      {
-        path: "resolve/:bot_annotation_metadata_id?",
+        path: "resolve/:bot_annotation_metadata_id?/scope/:assignment_scope_id?/scheme/:annotation_scheme_id?",
         name: "config-annotation-resolve",
         component: () =>
           import(

@@ -12,8 +12,8 @@ export type BotAnnotationResolution = {
   project_id: string;
   time_created?: (string | null);
   time_updated?: (string | null);
-  assignment_scope_id?: (string | null);
-  annotation_scheme_id?: (string | null);
+  assignment_scope_id: string;
+  annotation_scheme_id: string;
   meta: BotMetaResolve;
 };
 
