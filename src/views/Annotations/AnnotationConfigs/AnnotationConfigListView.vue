@@ -82,22 +82,23 @@
             v-for="scope in scopesLookup[scheme.annotation_scheme_id as string] || []"
             :key="scope.assignment_scope_id as string"
           >
-            <tr>
-              <router-link
-                :to="{ name: 'config-annotation-scheme-scope', params: { scope_id: scope.assignment_scope_id } }"
-                custom
-                v-slot="{ navigate }"
-              >
-                <td class="col-2 text-start" @click.stop="navigate" role="button">
+            <tr style="height: 1px">
+              <td class="col-2 text-start p-0" style="height: inherit">
+                <div class="d-flex ps-2 align-items-stretch h-100">
                   <pop-over
                     v-if="scope.description"
-                    class="d-inline-block me-2"
+                    class="d-inline-block me-1"
                     title="Assignment description"
                     :body-m-d="scope.description"
                   />
-                  {{ scope.name }}
-                </td>
-              </router-link>
+                  <router-link
+                    :to="{ name: 'config-annotation-scheme-scope', params: { scope_id: scope.assignment_scope_id } }"
+                    class="link-secondary text-decoration-none flex-grow-1"
+                  >
+                    {{ scope.name }}
+                  </router-link>
+                </div>
+              </td>
               <td class="col text-muted text-start small">{{ $util.dt2str(scope.time_created) }}</td>
               <td>
                 <router-link
@@ -146,15 +147,14 @@
                         name: 'config-annotation-resolve',
                         params: { bot_annotation_metadata_id: resolution.bot_annotation_metadata_id },
                       }"
-                      custom
-                      v-slot="{ navigate }"
+                      class="text-decoration-none flex-grow-1 d-flex text-black"
                     >
-                      <div @click.stop="navigate" role="button" class="me-3 flex-grow-1">
+                      <span @click.stop="navigate" role="button" class="me-3 ms-2">
                         {{ resolution.name }}
-                      </div>
-                      <div class="text-muted text-start small me-3" @click.stop="navigate" role="button">
+                      </span>
+                      <span class="text-muted small me-3 ms-auto" @click.stop="navigate" role="button">
                         {{ $util.dt2str(scope.time_created) }}
-                      </div>
+                      </span>
                     </router-link>
                     <div>
                       <a
