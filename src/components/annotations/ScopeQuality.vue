@@ -33,14 +33,11 @@
 
     <div v-if="inFocus">
       <div class="d-flex justify-content-end">
-        <button type="button" class="btn btn-sm btn-outline-secondary me-2" @click="onlyMean = !onlyMean">
-          <font-awesome-icon :icon="['fas', 'user-tag']" />
-        </button>
-
         <div class="position-relative">
           <button type="button" class="btn btn-sm btn-outline-secondary me-2" @click="pickColumns = !pickColumns">
             <font-awesome-icon icon="table-columns" />
           </button>
+
           <div
             v-show="pickColumns"
             class="popover bs-popover-auto fade show position-absolute"
@@ -81,7 +78,7 @@
         </button>
       </div>
       <template v-if="nestedMetric">
-        <table class="table" style="table-layout: fixed">
+        <table class="table table-sm table-hover" style="table-layout: fixed">
           <thead>
             <tr>
               <th>Label</th>
@@ -102,144 +99,13 @@
             </tr>
           </thead>
           <tbody>
-            <template v-for="(labelMetric, key) in nestedMetric" :key="key">
-              <tr v-if="labelMetric.MEAN" class="table-success">
-                <td>{{ key }}</td>
-                <td v-if="visibleColumns.cohen">{{ prettyNum(labelMetric.MEAN.cohen) }}</td>
-                <td v-if="visibleColumns.fleiss">{{ prettyNum(labelMetric.MEAN.fleiss) }}</td>
-                <td v-if="visibleColumns.randolph">{{ prettyNum(labelMetric.MEAN.randolph) }}</td>
-                <td v-if="visibleColumns.krippendorff">{{ prettyNum(labelMetric.MEAN.krippendorff) }}</td>
-                <td v-if="visibleColumns.pearson">
-                  {{ prettyNum(labelMetric.MEAN.pearson) }}
-                  <span class="text-muted small" v-if="labelMetric.MEAN.pearson_p">
-                    (p={{ prettyNum(labelMetric.MEAN.pearson_p) }})
-                  </span>
-                </td>
-                <td v-if="visibleColumns.kendall">
-                  {{ prettyNum(labelMetric.MEAN.kendall) }}
-                  <span class="text-muted small" v-if="labelMetric.MEAN.kendall_p">
-                    (p={{ prettyNum(labelMetric.MEAN.kendall_p) }})
-                  </span>
-                </td>
-                <td v-if="visibleColumns.spearman">
-                  {{ prettyNum(labelMetric.MEAN.spearman) }}
-                  <span class="text-muted small" v-if="labelMetric.MEAN.spearman">
-                    (p={{ prettyNum(labelMetric.MEAN.spearman) }})
-                  </span>
-                </td>
-                <td v-if="visibleColumns.precision">{{ prettyNum(labelMetric.MEAN.precision) }}</td>
-                <td v-if="visibleColumns.recall">{{ prettyNum(labelMetric.MEAN.recall) }}</td>
-                <td v-if="visibleColumns.f1">{{ prettyNum(labelMetric.MEAN.f1) }}</td>
-                <td v-if="visibleColumns.multi_overlap_mean">
-                  {{ prettyNum(labelMetric.MEAN.multi_overlap_mean) }}
-                  <span class="text-muted small" v-if="labelMetric.MEAN.multi_overlap_std">
-                    (&sigma;={{ prettyNum(labelMetric.MEAN.multi_overlap_std) }})
-                  </span>
-                </td>
-                <td v-if="visibleColumns.multi_overlap_median">
-                  {{ prettyNum(labelMetric.MEAN.multi_overlap_median) }}
-                </td>
-                <td v-if="visibleColumns.num_agreement">
-                  <font-awesome-icon :icon="['far', 'circle-check']" />
-                  {{ prettyNum(labelMetric.MEAN.num_agree) }}
-                  <font-awesome-icon :icon="['far', 'circle-xmark']" class="ms-2" />
-                  {{ prettyNum(labelMetric.MEAN.num_disagree) }}
-                  <span class="text-muted small" v-if="labelMetric.MEAN.perc_agree">
-                    ({{ prettyNum(labelMetric.MEAN.perc_agree) }}%)
-                  </span>
-                </td>
-                <td v-if="visibleColumns.num_overlap">
-                  {{ prettyNum(labelMetric.MEAN.num_overlap) }}/{{ prettyNum(labelMetric.MEAN.num_items) }}
-                </td>
-              </tr>
-              <template v-if="!onlyMean">
-                <template v-for="userMetric in labelMetric.USERS" :key="userMetric.annotation_quality_id as string">
-                  <tr>
-                    <td class="table-success small">
-                      {{ userMetric.user_base }}
-                      &rarr;
-                      {{ userMetric.user_target }}
-                      <span
-                        class="text-muted ms-2 p-1"
-                        :class="{ 'bg-success': userMetric.annotation_quality_id === focusedMetric }"
-                        role="button"
-                        @click="toggleAnnotations(userMetric.annotation_quality_id as string)"
-                      >
-                        <font-awesome-icon :icon="['fas', 'tags']" />
-                      </span>
-                    </td>
-
-                    <td v-if="visibleColumns.cohen">{{ prettyNum(userMetric.cohen) }}</td>
-                    <td v-if="visibleColumns.fleiss">{{ prettyNum(userMetric.fleiss) }}</td>
-                    <td v-if="visibleColumns.randolph">{{ prettyNum(userMetric.randolph) }}</td>
-                    <td v-if="visibleColumns.krippendorff">{{ prettyNum(userMetric.krippendorff) }}</td>
-                    <td v-if="visibleColumns.pearson">
-                      {{ prettyNum(userMetric.pearson) }}
-                      <span class="text-muted small" v-if="userMetric.pearson_p">
-                        (p={{ prettyNum(userMetric.pearson_p) }})
-                      </span>
-                    </td>
-                    <td v-if="visibleColumns.kendall">
-                      {{ prettyNum(userMetric.kendall) }}
-                      <span class="text-muted small" v-if="userMetric.kendall_p">
-                        (p={{ prettyNum(userMetric.kendall_p) }})
-                      </span>
-                    </td>
-                    <td v-if="visibleColumns.spearman">
-                      {{ prettyNum(userMetric.spearman) }}
-                      <span class="text-muted small" v-if="userMetric.spearman">
-                        (p={{ prettyNum(userMetric.spearman) }})
-                      </span>
-                    </td>
-                    <td v-if="visibleColumns.precision">{{ prettyNum(userMetric.precision) }}</td>
-                    <td v-if="visibleColumns.recall">{{ prettyNum(userMetric.recall) }}</td>
-                    <td v-if="visibleColumns.f1">{{ prettyNum(userMetric.f1) }}</td>
-                    <td v-if="visibleColumns.multi_overlap_mean">
-                      {{ prettyNum(userMetric.multi_overlap_mean) }}
-                      <span class="text-muted small" v-if="userMetric.multi_overlap_std">
-                        (&sigma;={{ prettyNum(userMetric.multi_overlap_std) }})
-                      </span>
-                    </td>
-                    <td v-if="visibleColumns.multi_overlap_median">
-                      {{ prettyNum(userMetric.multi_overlap_median) }}
-                    </td>
-                    <td v-if="visibleColumns.num_agreement">
-                      <font-awesome-icon :icon="['far', 'circle-check']" />
-                      {{ prettyNum(userMetric.num_agree) }}
-                      <font-awesome-icon :icon="['far', 'circle-xmark']" class="ms-2" />
-                      {{ prettyNum(userMetric.num_disagree) }}
-                      <span class="text-muted small" v-if="userMetric.perc_agree">
-                        ({{ prettyNum(userMetric.perc_agree) }}%)
-                      </span>
-                    </td>
-                    <td v-if="visibleColumns.num_overlap">
-                      {{ prettyNum(userMetric.num_overlap) }}/{{ prettyNum(userMetric.num_items) }}
-                    </td>
-                  </tr>
-                  <tr v-if="focusedMetric == userMetric.annotation_quality_id">
-                    <td
-                      :colspan="Object.values(visibleColumns).reduce((cnt, c) => cnt + (c ? 1 : 0), 0)"
-                      class="overflow-x-auto"
-                    >
-                      <div class="d-flex justify-content-start small">
-                        <div v-for="(base, i) in userMetric.annotations_base" :key="i" class="d-flex flex-column me-1">
-                          <div class="p-1 text-nowrap">
-                            {{ prettyAnno(base) }}
-                          </div>
-                          <div
-                            v-if="userMetric.annotations_target"
-                            class="p-1 text-nowrap"
-                            :class="annotationMatchBackground(base, userMetric.annotations_target[i])"
-                          >
-                            {{ prettyAnno(userMetric.annotations_target[i]) }}
-                          </div>
-                        </div>
-                      </div>
-                    </td>
-                  </tr>
-                </template>
-              </template>
-            </template>
+            <ScopeQualityEntry
+              v-for="(labelMetric, key) in nestedMetric"
+              :key="key"
+              :quality="labelMetric.MEAN"
+              :user-qualities="labelMetric.USERS"
+              :choice-qualities="labelMetric.LABELS"
+            />
           </tbody>
         </table>
       </template>
@@ -266,18 +132,20 @@ import { currentProjectStore, interfaceSettingsStore } from "@/stores";
 import { API, ignore, toastReject } from "@/plugins/api";
 import type { AssignmentScopeModel } from "@/plugins/api/api-core";
 import AssignmentsVisualiser from "@/components/annotations/assignments/AssignmentsVisualiser.vue";
-import { isArray, isNone, notNone } from '@/util';
+import { isArray, isNone } from "@/util";
+import ScopeQualityRow from "@/components/annotations/ScopeQualityRow.vue";
+import ScopeQualityEntry from "@/components/annotations/ScopeQualityEntry.vue";
 
 type MetricLabelLookup = {
   MEAN: AnnotationQualityModel | null;
   USERS: AnnotationQualityModel[];
-  LABELS: Record<number, AnnotationQualityModel[]> | null;
+  LABELS: Record<number, { MEAN: AnnotationQualityModel | null; USERS: AnnotationQualityModel[] }> | null;
 };
 type MetricLookup = Record<string, MetricLabelLookup>;
 
 export default defineComponent({
   name: "ScopeQuality",
-  components: { AssignmentsVisualiser },
+  components: { ScopeQualityEntry, ScopeQualityRow, AssignmentsVisualiser },
   props: {
     scope: {
       type: Object as PropType<AssignmentScopeModel>,
@@ -412,9 +280,13 @@ export default defineComponent({
               lkpLabels = {};
             }
             if (!(metric.label_value in lkpLabels)) {
-              lkpLabels[metric.label_value as number] = [];
+              lkpLabels[metric.label_value as number] = { MEAN: null, USERS: [] };
             }
-            lkpLabels[metric.label_value as number].push(metric);
+            if (!metric.user_base && !metric.user_target) {
+              lkpLabels[metric.label_value as number].MEAN = metric;
+            } else {
+              lkpLabels[metric.label_value as number].USERS.push(metric);
+            }
             lookup[key].LABELS = lkpLabels;
           } else {
             lookup[key].USERS.push(metric);

@@ -110,5 +110,8 @@ export const useInterfaceSettingsStore = defineStore("InterfaceSettingsStore", {
       }
       return {};
     },
+    numQualityColumns(): number {
+      return Object.values(this.qualityColumns).reduce((cnt, c) => cnt + (c ? 1 : 0), 0);
+    },
   },
 });
