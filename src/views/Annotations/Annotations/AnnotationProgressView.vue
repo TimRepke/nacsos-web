@@ -395,8 +395,8 @@ export default defineComponent({
       return (this.trackerDetails?.recall || []).length;
     },
     numLabelsPos(): number {
-      return (this.trackerDetails?.labels || []).reduce((countTotal, labels) => {
-        return countTotal + labels.reduce((count, label) => count + label, 0);
+      return (this.trackerDetails?.labels || []).reduce((countTotal: number, labels: number[]) => {
+        return countTotal + labels.reduce((count: number, label: number) => count + label, 0);
       }, 0);
     },
   },

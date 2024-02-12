@@ -10,8 +10,10 @@
     </template>
     <template v-slot:body>
       <div class="d-flex mb-3">
-        <div><span class="text-muted">user_id:</span> <code>{{ userPermission.user_id }}</code>
-        <span class="text-muted ms-4">permission_id:</span> <code>{{ userPermission.project_permission_id }}</code></div>
+        <div>
+          <span class="text-muted">user_id:</span> <code>{{ userPermission.user_id }}</code>
+          <span class="text-muted ms-4">permission_id:</span> <code>{{ userPermission.project_permission_id }}</code>
+        </div>
         <div class="ms-auto d-flex flex-row">
           <div class="me-2">
             <div class="dropdown">

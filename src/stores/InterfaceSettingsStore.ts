@@ -111,7 +111,10 @@ export const useInterfaceSettingsStore = defineStore("InterfaceSettingsStore", {
       return {};
     },
     numQualityColumns(): number {
-      return Object.values(this.qualityColumns).reduce((cnt, c) => cnt + (c ? 1 : 0), 0);
+      return Object.values(this.qualityColumns as unknown as Record<string, boolean>).reduce(
+        (cnt: number, c?: boolean) => cnt + (c ? 1 : 0),
+        0,
+      ) as number;
     },
   },
 });

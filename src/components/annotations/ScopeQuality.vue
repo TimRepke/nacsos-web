@@ -133,7 +133,6 @@ import { API, ignore, toastReject } from "@/plugins/api";
 import type { AssignmentScopeModel } from "@/plugins/api/api-core";
 import AssignmentsVisualiser from "@/components/annotations/assignments/AssignmentsVisualiser.vue";
 import { isArray, isNone } from "@/util";
-import ScopeQualityRow from "@/components/annotations/ScopeQualityRow.vue";
 import ScopeQualityEntry from "@/components/annotations/ScopeQualityEntry.vue";
 
 type MetricLabelLookup = {
@@ -145,7 +144,7 @@ type MetricLookup = Record<string, MetricLabelLookup>;
 
 export default defineComponent({
   name: "ScopeQuality",
-  components: { ScopeQualityEntry, ScopeQualityRow, AssignmentsVisualiser },
+  components: { ScopeQualityEntry, AssignmentsVisualiser },
   props: {
     scope: {
       type: Object as PropType<AssignmentScopeModel>,
