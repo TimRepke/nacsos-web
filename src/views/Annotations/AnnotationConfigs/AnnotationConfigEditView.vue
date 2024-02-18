@@ -1,10 +1,37 @@
 <template>
   <div>
-    <!--    <span class="text-warning">-->
-    <!--      <font-awesome-icon :icon="['fas', 'triangle-exclamation']"/>-->
-    <!--      Please note that editing the scheme may break the database if assignments and/or annotations were already made.-->
-    <!--      <font-awesome-icon :icon="['fas', 'triangle-exclamation']"/>-->
-    <!--    </span>-->
+    <h1>Annotation scheme</h1>
+
+    <div class="alert alert-primary d-flex align-items-center me-5" role="alert">
+      <ul class="list-unstyled m-0">
+        <li>
+          <font-awesome-icon icon="circle-exclamation" class="me-2" />
+          Only use positive numbers for choice values (zero included).
+        </li>
+        <li>
+          <font-awesome-icon icon="circle-exclamation" class="me-2" />
+          Make sure to only use <strong>unique</strong> label keys—ideally short.
+        </li>
+        <li>
+          <font-awesome-icon icon="circle-exclamation" class="me-2" />
+          Only use letters, single dashes, or underscores in label keys.
+        </li>
+        <li>
+          <font-awesome-icon icon="circle-exclamation" class="me-2" />
+          Existing assignments/annotations or anything using this annotation scheme will not be updated. Editing the
+          scheme later may lead to database inconsistencies.
+        </li>
+      </ul>
+    </div>
+
+    <div v-if="!keysUnique" class="alert alert-danger d-flex align-items-center me-5" role="alert">
+      <font-awesome-icon icon="circle-exclamation" class="me-2" />
+      Label keys are not unique.
+    </div>
+    <div v-if="!keysValid" class="alert alert-danger d-flex align-items-center me-5" role="alert">
+      <font-awesome-icon icon="circle-exclamation" class="me-2" />
+      Some keys look like they contain invalid characters.
+    </div>
 
     <!-- Annotation Scheme Name -->
     <div class="form-floating me-5 mb-2">
@@ -51,7 +78,6 @@
     </template>
 
     <!-- Annotation Scheme Labels (root level) -->
-    <strong>Note:</strong> Please use positive numbers only for choice values (zero included).
     <AnnotationSchemeLabelsEditor :labels="scheme.labels" />
     <button type="button" class="btn btn-success position-fixed" style="top: 4rem; right: 1rem" @click="save()">
       Save
@@ -67,12 +93,13 @@ import { ToastEvent } from "@/plugins/events/events/toast";
 import { ConfirmationRequestEvent } from "@/plugins/events/events/confirmation";
 import { currentProjectStore } from "@/stores";
 import AnnotationSchemeLabelsEditor from "@/components/annotations/AnnotationSchemeLabelsEditor.vue";
-import type { AnnotationSchemeModel } from "@/plugins/api/api-core";
+import type { AnnotationSchemeLabel, AnnotationSchemeLabelChoice, AnnotationSchemeModel } from "@/plugins/api/api-core";
 import { API } from "@/plugins/api";
+import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 
 export default defineComponent({
   name: "AnnotationConfigEditView",
-  components: { AnnotationSchemeLabelsEditor },
+  components: { FontAwesomeIcon, AnnotationSchemeLabelsEditor },
   data() {
     const { projectId } = currentProjectStore;
     const annotationSchemeId = this.$route.params.annotation_scheme_id as string | undefined;
@@ -149,6 +176,35 @@ export default defineComponent({
     htmlDescription() {
       if (!this.scheme.description) return "";
       return marked(this.scheme.description);
+    },
+    labelKeys(): string[] {
+      function recurse(labels: AnnotationSchemeLabel[]) {
+        return labels.flatMap((label) => {
+          if (label.choices) {
+            return [label.key].concat(
+              label.choices.flatMap((choice: AnnotationSchemeLabelChoice): string[] => {
+                if (choice.children) {
+                  return recurse(choice.children);
+                }
+                return [];
+              }),
+            );
+          }
+          return [label.key];
+        });
+      }
+
+      return recurse(this.scheme.labels);
+    },
+    keysUnique(): boolean {
+      // console.debug(this.labelKeys);
+      return this.labelKeys.length === new Set(this.labelKeys).size;
+    },
+    keysValid(): boolean {
+      const reg = new RegExp("^[a-zA-Z_\-]+$");
+      return this.labelKeys.every((key: string) => {
+        return reg.test(key);
+      });
     },
   },
 });
