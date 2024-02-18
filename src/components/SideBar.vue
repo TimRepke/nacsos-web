@@ -20,6 +20,7 @@
                 </div>
                 <router-link
                   :to="entry.target"
+                  v-if="entry.target"
                   role="button"
                   class="flex-grow-1 text-start text-decoration-none"
                   style="color: inherit"
@@ -29,6 +30,7 @@
                   </span>
                   <span>{{ entry.name }}</span>
                 </router-link>
+                <span v-else>{{ entry.name }}</span>
               </div>
               <template v-for="subentry in entry.sub || []" :key="subentry.name">
                 <div
@@ -200,8 +202,8 @@ export default defineComponent({
         },
         {
           name: "Supplemental data",
-          target: "/project/pipelines",
-          permission: perm.pipelines_read,
+          target: null,
+          permission: perm.pipelines_read || perm.annotations_read,
           routes: ["project-pipelines"],
           sub: [
             {
@@ -221,6 +223,12 @@ export default defineComponent({
               target: "/project/pipelines/presets",
               permission: perm.pipelines_read,
               routes: ["project-pipelines-presets"],
+            },
+            {
+              name: "Bot Annotations",
+              target: "/project/bot-annotations",
+              permission: perm.annotations_read,
+              routes: ["project-bot-annotations", "project-bot-annotations-list"],
             },
           ],
         },

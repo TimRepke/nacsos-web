@@ -82,6 +82,25 @@ const routes: Array<RouteRecordRaw> = [
     ],
   },
   {
+    path: "/project/bot-annotations",
+    name: "project-bot-annotations",
+    component: () =>
+      import(
+        /* webpackChunkName: "BotAnnotationsContainer" */ "../views/Annotations/BotAnnotations/BotAnnotationsContainer.vue"
+      ),
+    children: [
+      {
+        path: "",
+        alias: ["", "list"],
+        name: "project-bot-annotations-list",
+        component: () =>
+          import(
+            /* webpackChunkName: "BotAnnotationsListView" */ "../views/Annotations/BotAnnotations/BotAnnotationsListView.vue"
+          ),
+      },
+    ],
+  },
+  {
     path: "/project/imports",
     name: "project-imports",
     component: () => import(/* webpackChunkName: "ImportsContainer" */ "../views/Imports/ImportsContainer.vue"),

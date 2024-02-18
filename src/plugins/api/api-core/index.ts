@@ -40,6 +40,7 @@ export type { BotAnnotationMetaDataBaseModel } from './models/BotAnnotationMetaD
 export type { BotAnnotationModel } from './models/BotAnnotationModel';
 export type { BotAnnotationResolution } from './models/BotAnnotationResolution';
 export { BotKind } from './models/BotKind';
+export type { BotMetaInfo } from './models/BotMetaInfo';
 export { BotMetaResolve } from './models/BotMetaResolve';
 export { BotMetaResolveBase } from './models/BotMetaResolveBase';
 export type { Cashtag } from './models/Cashtag';
@@ -152,6 +153,7 @@ export { $BotAnnotationMetaDataBaseModel } from './schemas/$BotAnnotationMetaDat
 export { $BotAnnotationModel } from './schemas/$BotAnnotationModel';
 export { $BotAnnotationResolution } from './schemas/$BotAnnotationResolution';
 export { $BotKind } from './schemas/$BotKind';
+export { $BotMetaInfo } from './schemas/$BotMetaInfo';
 export { $BotMetaResolve } from './schemas/$BotMetaResolve';
 export { $BotMetaResolveBase } from './schemas/$BotMetaResolveBase';
 export { $Cashtag } from './schemas/$Cashtag';
