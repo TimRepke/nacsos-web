@@ -12,6 +12,7 @@ import type { AssignmentScopeModel } from '../models/AssignmentScopeModel';
 import type { AssignmentStatus } from '../models/AssignmentStatus';
 import type { Body_save_resolved_annotations_api_annotations_config_resolve__put } from '../models/Body_save_resolved_annotations_api_annotations_config_resolve__put';
 import type { BotAnnotationMetaDataBaseModel } from '../models/BotAnnotationMetaDataBaseModel';
+import type { BotMetaInfo } from '../models/BotMetaInfo';
 import type { BotMetaResolveBase } from '../models/BotMetaResolveBase';
 import type { ItemWithCount } from '../models/ItemWithCount';
 import type { MakeAssignmentsRequestModel } from '../models/MakeAssignmentsRequestModel';
@@ -854,6 +855,34 @@ export class AnnotationsService {
       },
       query: {
         'bot_annotation_metadata_id': botAnnotationMetadataId,
+      },
+      errors: {
+        422: `Validation Error`,
+      },
+      ...options,
+    });
+  }
+
+  /**
+   * Get Bot Annotations
+   * @returns BotMetaInfo Successful Response
+   * @throws ApiError
+   */
+  public getBotAnnotationsApiAnnotationsBotAnnotationsGet({
+    xProjectId,
+    includeResolve = false,
+  }: {
+    xProjectId: string,
+    includeResolve?: boolean,
+  }, options?: Partial<ApiRequestOptions>): CancelablePromise<Array<BotMetaInfo>> {
+    return this.httpRequest.request({
+      method: 'GET',
+      url: '/api/annotations/bot/annotations',
+      headers: {
+        'x-project-id': xProjectId,
+      },
+      query: {
+        'include_resolve': includeResolve,
       },
       errors: {
         422: `Validation Error`,
