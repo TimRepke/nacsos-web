@@ -208,24 +208,28 @@ export default defineComponent({
           sub: [
             {
               name: "Pipeline artefacts",
+              icon: "folder-tree",
               target: "/project/artefacts",
               permission: perm.artefacts_read || perm.pipelines_read,
               routes: ["project-artefacts", "project-artefacts-list", "project-artefacts-details"],
             },
             {
               name: "Task Configuration",
+              icon: "wrench",
               target: "/project/pipelines/setup",
               permission: perm.pipelines_read,
               routes: ["project-pipelines-setup"],
             },
             {
               name: "Presets",
+              icon: "timeline",
               target: "/project/pipelines/presets",
               permission: perm.pipelines_read,
               routes: ["project-pipelines-presets"],
             },
             {
               name: "Bot Annotations",
+              icon: "robot",
               target: "/project/bot-annotations",
               permission: perm.annotations_read,
               routes: ["project-bot-annotations", "project-bot-annotations-list"],
