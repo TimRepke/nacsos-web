@@ -29,15 +29,17 @@
     </div>
 
     <!-- TEXT MODE -->
-    <div class="row" v-if="mode === 'txt'">
+    <div v-if="mode === 'txt'" class="row">
       <textarea
         v-model="queryStr"
         @input="$emit('update:query', $event.target.value)"
         aria-label="NQL query"
         class="form-control"
+        :class="{ 'is-invalid': !isValid }"
         :disabled="!editable"
         :rows="rows"
       />
+      <div class="invalid-feedback">This is not a valid NQL query (yet).</div>
     </div>
 
     <!-- INDENT MODE -->
@@ -53,7 +55,7 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
-import { parse } from "@/util/nql";
+import { type Filter, parse } from "@/util/nql";
 
 type Mode = "txt" | "ind" | "vis";
 
@@ -65,7 +67,7 @@ export default defineComponent({
     query: {
       type: String,
       required: true,
-      default: null as string | null,
+      default: "",
     },
     rows: {
       type: Number,
@@ -82,6 +84,7 @@ export default defineComponent({
     return {
       mode: "txt" as Mode,
       queryStr: this.query,
+      queryParsed: [] as Filter[],
       grammar: "",
       log: [] as Array<string>,
     };
@@ -90,7 +93,9 @@ export default defineComponent({
     // pass
   },
   computed: {
-    // pass
+    isValid(): boolean {
+      return this.queryStr.length === 0 || (this.queryStr.length > 0 && this.queryParsed.length > 0);
+    },
   },
   methods: {
     // pass
@@ -98,6 +103,7 @@ export default defineComponent({
   watch: {
     queryStr(newQuery: string) {
       const queryParsed = parse(newQuery.trim());
+      this.queryParsed = queryParsed;
       this.$emit("update:query-parsed", queryParsed);
       return queryParsed;
     },
