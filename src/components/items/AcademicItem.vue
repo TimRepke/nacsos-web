@@ -30,15 +30,7 @@
           {{ JSON.stringify(item, null, 4) }}
         </pre>
       </div>
-      <template v-if="!item.text">
-        <p class="text-warning">
-          <font-awesome-icon :icon="['fas', 'notdef']" class="me-2" />
-          [Abstract missing]
-        </p>
-      </template>
-      <template v-else>
-        <p class="card-text text-muted" :style="columnStyle" v-html="htmlAbstract" />
-      </template>
+      <TextComponent :text="item.text" :highlighters="highlighters" missing-text="[Abstract missing]" />
     </div>
     <div class="card-footer d-flex justify-content-between">
       <div class="d-flex flex-wrap small text-muted">
@@ -83,10 +75,11 @@ import type {
   HighlighterModel,
 } from "@/plugins/api/api-core";
 import { interfaceSettingsStore } from "@/stores";
+import TextComponent from '@/components/items/TextComponent.vue';
 
 export default defineComponent({
   name: "AcademicItem",
-  components: { InlineToolTip },
+  components: { TextComponent, InlineToolTip },
   props: {
     item: {
       type: Object as PropType<AcademicItemModel>,
