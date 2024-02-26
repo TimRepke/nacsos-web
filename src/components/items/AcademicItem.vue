@@ -75,7 +75,7 @@ import type {
   HighlighterModel,
 } from "@/plugins/api/api-core";
 import { interfaceSettingsStore } from "@/stores";
-import TextComponent from '@/components/items/TextComponent.vue';
+import TextComponent from "@/components/items/TextComponent.vue";
 
 export default defineComponent({
   name: "AcademicItem",
@@ -98,11 +98,6 @@ export default defineComponent({
     };
   },
   computed: {
-    htmlAbstract() {
-      let txt = this.item.text || "";
-      txt = this.applyHighlighters(txt);
-      return txt.replaceAll("\n", "<br />");
-    },
     htmlTitle() {
       let txt = this.item.title || "";
       txt = this.applyHighlighters(txt);
