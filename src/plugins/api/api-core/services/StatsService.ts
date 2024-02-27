@@ -68,7 +68,7 @@ export class StatsService {
   public getPublicationYearHistogramApiStatsHistogramYearsGet({
     xProjectId,
     fromYear = 1990,
-    toYear = 2023,
+    toYear = 2025,
   }: {
     xProjectId: string,
     fromYear?: number,
