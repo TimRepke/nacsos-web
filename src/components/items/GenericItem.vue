@@ -1,7 +1,7 @@
 <template>
   <div class="card m-2 p-0 text-start w-100">
     <div class="card-body">
-      <p class="card-text" v-html="htmlText" />
+      <TextComponent class="card-text" :text="item.text" :highlighters="highlighters" />
     </div>
     <div class="card-footer d-flex justify-content-between small text-muted" v-if="item.meta">
       <div class="position-absolute end-0">
@@ -32,14 +32,15 @@
 </template>
 
 <script lang="ts">
-import { marked } from "marked";
 import { defineComponent } from "vue";
 import type { PropType } from "vue";
 import type { HighlighterModel } from "@/plugins/api/api-core";
 import type { BaseItem as BaseItemModel } from "@/types/items.d";
+import TextComponent from "@/components/items/TextComponent.vue";
 
 export default defineComponent({
   name: "GenericItem",
+  components: { TextComponent },
   props: {
     item: {
       type: Object as PropType<BaseItemModel>,
@@ -58,29 +59,10 @@ export default defineComponent({
     };
   },
   methods: {
-    applyHighlighters(txt: string) {
-      if (this.highlighters) {
-        this.highlighters.forEach((highlighter: HighlighterModel) => {
-          try {
-            const regex = new RegExp(highlighter.keywords.join("|"), "gi");
-            txt = txt.replaceAll(regex, `<span style="${highlighter.style}">$&</span>`);
-          } catch (e) {
-            console.warn("Ignoring illegal regex!");
-            console.error(e);
-          }
-        });
-      }
-      return txt;
-    },
+    // pass
   },
   computed: {
-    htmlText() {
-      let txt = this.item.text || "";
-      txt = txt.replaceAll("`", "'");
-      txt = marked.parse(txt);
-      txt = this.applyHighlighters(txt);
-      return txt.replaceAll("\n", "<br />");
-    },
+    // pass
   },
 });
 </script>

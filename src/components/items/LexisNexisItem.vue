@@ -25,19 +25,11 @@
           {{ author }}
         </span>
       </p>
-      <template v-if="!item.text">
-        <p class="text-warning">
-          <font-awesome-icon :icon="['fas', 'notdef']" class="me-2" />
-          [Text missing]
-        </p>
-      </template>
-      <template v-else>
-        <p class="card-text text-muted" :style="columnStyle" v-html="htmlAbstract" />
-      </template>
+      <TextComponent :text="item.text" :highlighters="highlighters" />
     </div>
     <div class="card-footer d-flex justify-content-between">
       <ul class="list-unstyled" v-if="item.sources">
-        <li v-for="source in item.sources" :key="source.item_source_id">
+        <li v-for="source in item.sources" :key="source.item_source_id as string">
           <div class="small text-muted d-flex flex-nowrap">
             <div class="me-2">
               <font-awesome-icon :icon="['fas', 'bullhorn']" class="me-2" />
@@ -75,11 +67,11 @@ import type { PropType } from "vue";
 import InlineToolTip from "@/components/InlineToolTip.vue";
 import type { FullLexisNexisItemModel, HighlighterModel } from "@/plugins/api/api-core";
 import { interfaceSettingsStore } from "@/stores";
-import { marked } from "marked";
+import TextComponent from "@/components/items/TextComponent.vue";
 
 export default defineComponent({
   name: "LexisNexisItem",
-  components: { InlineToolTip },
+  components: { TextComponent, InlineToolTip },
   props: {
     item: {
       type: Object as PropType<FullLexisNexisItemModel>,
@@ -98,13 +90,6 @@ export default defineComponent({
     };
   },
   computed: {
-    htmlAbstract() {
-      let txt = this.item.text || "";
-      txt = txt.replaceAll("`", "'");
-      txt = marked.parse(txt);
-      txt = this.applyHighlighters(txt);
-      return txt.replaceAll("\n", "<br />");
-    },
     htmlTitle() {
       if (this.item.sources && this.item.sources.length > 0) {
         let txt = this.item.sources[0].title || "";

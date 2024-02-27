@@ -26,23 +26,40 @@ assigned_clause ->
   | "IS ASSIGNED BUT NOT IN"i   __ uuids  {% (d) => ({ filter: "assignment", mode: 3, scopes: d[2] }) %}
   | "IS NOT ASSIGNED"i                    {% (d) => ({ filter: "assignment", mode: 4               }) %}
   | "IS NOT ASSIGNED IGNORING"i __ uuids  {% (d) => ({ filter: "assignment", mode: 5, scopes: d[2] }) %}
+  | "IS ASSIGNED WITH"i         __ UUID   {% (d) => ({ filter: "assignment", mode: 6, scheme: d[2] }) %}
+  | "IS ASSIGNED BUT NOT WITH"i __ UUID   {% (d) => ({ filter: "assignment", mode: 7, scheme: d[2] }) %}
 
 annotation_clause ->
-    "HAS ANNOTATION"i     (__ "IN" __ uuids | null)  {% (d) => ({ filter: "annotation", incl: true,  scopes: (d[1]||[])[3] }) %}
-  | "HAS NO ANNOTATION"i  (__ "IN" __ uuids | null)  {% (d) => ({ filter: "annotation", incl: false, scopes: (d[1]||[])[3] }) %}
+    "HAS ANNOTATION"i     (__ "IN"i __ uuids | null)  (__ "WITH"i __ UUID | null)  {%
+         (d) => ({
+             filter: "annotation",
+             incl: true,
+             scopes: (d[1]||[])[3],
+             scheme: (d[2]||[])[3],
+         })
+    %}
+  | "HAS NO ANNOTATION"i  (__ "IN"i __ uuids | null)  (__ "WITH"i __ UUID | null)  {%
+         (d) => ({
+             filter: "annotation",
+             incl: false,
+             scopes: (d[1]||[])[3],
+             scheme: (d[2]||[])[3],
+         })
+    %}
 
 meta_clause ->
     KEY _  COMP    _  bool      {% (d) => ({ field: d[0], comp: d[2],   value: d[4] }) %}
   | KEY _  COMP    _  uint      {% (d) => ({ field: d[0], comp: d[2],   value: d[4] }) %}
   | KEY __ "LIKE"  __ dqstring  {% (d) => ({ field: d[0], comp: "LIKE", value: d[4] }) %}
 
-label_clause -> label_type label_clause_val (__ "FROM"i __ uuids | null) label_clause_users (__ "REPEATS"i __ uints | null) {%
+label_clause -> label_type label_clause_val (__ "FROM"i __ uuids | null) (__ "WITH"i __ UUID | null) label_clause_users (__ "REPEATS"i __ uints | null) {%
         (d) => ({
             ...d[0],
             ...d[1],
             scopes:   (d[2]||[])[3],
-            users:    d[3],
-            repeats:  (d[4]||[])[3],
+            scheme:   (d[3]||[])[3],
+            users:    d[4],
+            repeats:  (d[5]||[])[3],
         })
     %}
 

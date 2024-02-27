@@ -16,7 +16,7 @@
           <font-awesome-icon :icon="['fa-brands', 'twitter']" />
         </a>
       </p>
-      <p class="card-text" v-html="renderedStatus" />
+      <TextComponent class="card-text" :text="item.text" :html="renderedStatus" :highlighters="highlighters" />
     </div>
     <div class="card-footer d-flex justify-content-between">
       <small class="text-muted">
@@ -41,6 +41,7 @@
 import { defineComponent } from "vue";
 import type { PropType } from "vue";
 import type { HighlighterModel, TwitterItemModel, Hashtag, Mention, URL } from "@/plugins/api/api-core";
+import TextComponent from "@/components/items/TextComponent.vue";
 
 interface Replacement {
   start: number;
@@ -50,6 +51,7 @@ interface Replacement {
 
 export default defineComponent({
   name: "TwitterItem",
+  components: { TextComponent },
   props: {
     item: {
       type: Object as PropType<TwitterItemModel>,
@@ -94,15 +96,19 @@ export default defineComponent({
       }
       let ret = "";
       let prevEnd = 0;
-      replacements
-        .sort((a, b) => a.start - b.start)
-        .forEach((replacement) => {
-          // FIXME: something has to be done with the slicing offsets... sometimes they are off
-          ret += this.item.text.slice(prevEnd, replacement.start);
-          ret += replacement.html;
-          prevEnd = replacement.end;
-        });
-      ret += this.item.text.slice(prevEnd, this.item.text.length);
+      const { text } = this.item;
+      if (text) {
+        replacements
+          .sort((a, b) => a.start - b.start)
+          .forEach((replacement) => {
+            // FIXME: something has to be done with the slicing offsets... sometimes they are off
+            ret += text.slice(prevEnd, replacement.start);
+            ret += replacement.html;
+            prevEnd = replacement.end;
+          });
+
+        ret += text.slice(prevEnd, text.length);
+      }
       return ret;
     },
   },
