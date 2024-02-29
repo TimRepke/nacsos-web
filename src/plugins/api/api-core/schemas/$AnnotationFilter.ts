@@ -21,7 +21,14 @@ export const $AnnotationFilter = {
       }, {
         type: 'null',
       }],
-      isRequired: true,
+    },
+    scheme: {
+      type: 'any-of',
+      contains: [{
+        type: 'string',
+      }, {
+        type: 'null',
+      }],
     },
   },
 } as const;

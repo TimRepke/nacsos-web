@@ -34,7 +34,8 @@
         v-model="queryStr"
         @input="$emit('update:query', $event.target.value)"
         aria-label="NQL query"
-        class="form-control"
+        class="form-control text-muted"
+        style="font-family: monospace"
         :class="{ 'is-invalid': !isValid }"
         :disabled="!editable"
         :rows="rows"
@@ -56,6 +57,7 @@
 import { defineComponent } from "vue";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import { type Filter, parse } from "@/util/nql";
+import { isNone } from "@/util";
 
 type Mode = "txt" | "ind" | "vis";
 
@@ -90,7 +92,9 @@ export default defineComponent({
     };
   },
   mounted() {
-    // pass
+    if (!isNone(this.queryStr) && this.queryStr.length > 0) {
+      this.parseQuery(this.queryStr);
+    }
   },
   computed: {
     isValid(): boolean {
@@ -98,14 +102,16 @@ export default defineComponent({
     },
   },
   methods: {
-    // pass
-  },
-  watch: {
-    queryStr(newQuery: string) {
-      const queryParsed = parse(newQuery.trim());
+    parseQuery(query: string) {
+      const queryParsed = parse(query.trim());
       this.queryParsed = queryParsed;
       this.$emit("update:query-parsed", queryParsed);
       return queryParsed;
+    },
+  },
+  watch: {
+    queryStr(newQuery: string) {
+      return this.parseQuery(newQuery);
     },
   },
 });

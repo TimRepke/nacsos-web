@@ -10,7 +10,9 @@ import type { ImportFilter } from './ImportFilter';
 import type { LabelFilterBool } from './LabelFilterBool';
 import type { LabelFilterInt } from './LabelFilterInt';
 import type { LabelFilterMulti } from './LabelFilterMulti';
-import type { MetaFilter } from './MetaFilter';
+import type { MetaFilterBool } from './MetaFilterBool';
+import type { MetaFilterInt } from './MetaFilterInt';
+import type { MetaFilterStr } from './MetaFilterStr';
 import type { SubQuery } from './SubQuery';
 
 export type AssignmentScopeRandomWithNQLConfig = {
@@ -21,7 +23,7 @@ export type AssignmentScopeRandomWithNQLConfig = {
   max_assignments_per_item: number;
   num_multi_coded_items: number;
   random_seed: number;
-  query_parsed: (FieldFilter | FieldFilters | LabelFilterMulti | LabelFilterBool | LabelFilterInt | AssignmentFilter | AnnotationFilter | ImportFilter | MetaFilter | SubQuery);
+  query_parsed: (FieldFilter | FieldFilters | LabelFilterMulti | LabelFilterBool | LabelFilterInt | AssignmentFilter | AnnotationFilter | ImportFilter | MetaFilterBool | MetaFilterInt | MetaFilterStr | SubQuery);
   query_str: string;
 };
 

@@ -22,5 +22,13 @@ export const $AssignmentFilter = {
         type: 'null',
       }],
     },
+    scheme: {
+      type: 'any-of',
+      contains: [{
+        type: 'string',
+      }, {
+        type: 'null',
+      }],
+    },
   },
 } as const;

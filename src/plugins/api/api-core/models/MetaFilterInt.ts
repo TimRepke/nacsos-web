@@ -2,10 +2,11 @@
 /* tslint:disable */
 /* eslint-disable */
 
-export type MetaFilter = {
-  filter?: any;
+export type MetaFilterInt = {
   field: string;
+  filter?: any;
+  value_type?: any;
   comp: string;
-  value: (string | number | boolean);
+  value: number;
 };
 

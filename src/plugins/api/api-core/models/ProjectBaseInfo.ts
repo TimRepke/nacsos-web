@@ -11,6 +11,5 @@ export type ProjectBaseInfo = {
   scopes: Array<ProjectBaseInfoScopeEntry>;
   bot_scopes: Array<ProjectBaseInfoEntry>;
   labels: Record<string, LabelOptions>;
-  fields: Array<string>;
 };
 

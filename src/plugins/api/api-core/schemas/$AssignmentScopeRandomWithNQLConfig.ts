@@ -63,7 +63,11 @@ export const $AssignmentScopeRandomWithNQLConfig = {
       }, {
         type: 'ImportFilter',
       }, {
-        type: 'MetaFilter',
+        type: 'MetaFilterBool',
+      }, {
+        type: 'MetaFilterInt',
+      }, {
+        type: 'MetaFilterStr',
       }, {
         type: 'SubQuery',
       }],

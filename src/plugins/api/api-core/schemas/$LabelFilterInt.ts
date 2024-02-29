@@ -14,6 +14,14 @@ export const $LabelFilterInt = {
         type: 'null',
       }],
     },
+    scheme: {
+      type: 'any-of',
+      contains: [{
+        type: 'string',
+      }, {
+        type: 'null',
+      }],
+    },
     users: {
       type: 'any-of',
       contains: [{

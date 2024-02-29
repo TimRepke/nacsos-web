@@ -6,5 +6,6 @@ export type AssignmentFilter = {
   filter?: any;
   mode: number;
   scopes?: (Array<string> | null);
+  scheme?: (string | null);
 };
 

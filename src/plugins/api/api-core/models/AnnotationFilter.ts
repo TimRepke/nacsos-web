@@ -5,6 +5,7 @@
 export type AnnotationFilter = {
   filter?: any;
   incl: boolean;
-  scopes: (Array<string> | null);
+  scopes?: (Array<string> | null);
+  scheme?: (string | null);
 };
 

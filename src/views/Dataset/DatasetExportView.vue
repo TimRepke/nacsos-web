@@ -2,8 +2,8 @@
   <div>
     <h1>Download/Export Data</h1>
 
-    <div class="row">
-      <div class="col-lg-2">
+    <div class="row gy-4 gx-5">
+      <div class="col-lg-3">
         <h4>Options</h4>
         <div class="card">
           <div class="card-body">
@@ -33,7 +33,16 @@
           </div>
         </div>
       </div>
-      <div class="col-lg-3">
+
+      <div class="col-lg-5">
+        <h4>NQL item filter</h4>
+        <n-q-l-box
+          :query="nqlQuery"
+          @update:query-parsed="(newFilter: NQLFilter) => (labelExportSettings.nqlFilter = newFilter)"
+        />
+      </div>
+
+      <div class="col-lg-4">
         <h4>Users</h4>
         <p>
           <button type="button" class="btn btn-sm btn-outline-secondary me-2" @click="checkAllUsers">
@@ -56,70 +65,6 @@
             />
             <label :for="`pu-${user.id}`" class="form-check-label stretched-link">
               {{ user.name }}
-            </label>
-          </li>
-        </ul>
-      </div>
-
-      <div class="col-lg-3">
-        <h4>Document fields</h4>
-        <p>
-          <button
-            type="button"
-            class="btn btn-sm btn-outline-secondary me-2"
-            @click="labelExportSettings.itemFields = projectItemFields"
-          >
-            <font-awesome-icon :icon="['fas', 'list-check']" class="me-2" />
-            Select all
-          </button>
-          <button type="button" class="btn btn-sm btn-outline-secondary" @click="labelExportSettings.itemFields = []">
-            <font-awesome-icon :icon="['fas', 'list-ul']" class="me-2" />
-            Unselect all
-          </button>
-        </p>
-        <ul class="list-group">
-          <li v-for="field in projectItemFields" :key="field" class="list-group-item">
-            <input
-              :id="`pif-${field}`"
-              :value="field"
-              v-model="labelExportSettings.itemFields"
-              class="form-check-input me-1"
-              type="checkbox"
-            />
-            <label :for="`pif-${field}`" class="form-check-label stretched-link">
-              {{ field }}
-            </label>
-          </li>
-        </ul>
-      </div>
-
-      <div class="col-lg-3">
-        <h4>Resolved annotations / BotAnnotations</h4>
-        <p>
-          <button type="button" class="btn btn-sm btn-outline-secondary me-2" @click="checkAllBotScopes">
-            <font-awesome-icon :icon="['fas', 'list-check']" class="me-2" />
-            Select all
-          </button>
-          <button
-            type="button"
-            class="btn btn-sm btn-outline-secondary"
-            @click="labelExportSettings.botAnnotationMetadataIds = []"
-          >
-            <font-awesome-icon :icon="['fas', 'list-ul']" class="me-2" />
-            Unselect all
-          </button>
-        </p>
-        <ul class="list-group">
-          <li v-for="scope in projectBotScopes" :key="scope.id" class="list-group-item">
-            <input
-              :id="`pbamd-${scope.id}`"
-              :value="scope.id"
-              v-model="labelExportSettings.botAnnotationMetadataIds"
-              class="form-check-input me-1"
-              type="checkbox"
-            />
-            <label :for="`pbamd-${scope.id}`" class="form-check-label stretched-link">
-              {{ scope.name }}
             </label>
           </li>
         </ul>
@@ -153,6 +98,38 @@
             <label :for="`pas-${scope.id}`" class="form-check-label stretched-link">
               {{ scope.name }}<br />
               <span class="text-muted small">{{ scope.scheme_name }}</span>
+            </label>
+          </li>
+        </ul>
+      </div>
+
+      <div class="col-lg-4">
+        <h4>Resolved annotations / BotAnnotations</h4>
+        <p>
+          <button type="button" class="btn btn-sm btn-outline-secondary me-2" @click="checkAllBotScopes">
+            <font-awesome-icon :icon="['fas', 'list-check']" class="me-2" />
+            Select all
+          </button>
+          <button
+            type="button"
+            class="btn btn-sm btn-outline-secondary"
+            @click="labelExportSettings.botAnnotationMetadataIds = []"
+          >
+            <font-awesome-icon :icon="['fas', 'list-ul']" class="me-2" />
+            Unselect all
+          </button>
+        </p>
+        <ul class="list-group">
+          <li v-for="scope in projectBotScopes" :key="scope.id" class="list-group-item">
+            <input
+              :id="`pbamd-${scope.id}`"
+              :value="scope.id"
+              v-model="labelExportSettings.botAnnotationMetadataIds"
+              class="form-check-input me-1"
+              type="checkbox"
+            />
+            <label :for="`pbamd-${scope.id}`" class="form-check-label stretched-link">
+              {{ scope.name }}
             </label>
           </li>
         </ul>
@@ -243,10 +220,14 @@
       </div>
     </div>
 
-    <button type="button" class="btn btn-outline-secondary" @click="downloadAnnotations">
-      <font-awesome-icon :icon="['fas', 'file-export']" />
-      Download
-    </button>
+    <div class="row mt-5 mb-5">
+      <div class="col-2 ms-auto text-end">
+        <button type="button" class="btn btn-outline-secondary" @click="downloadAnnotations">
+          <font-awesome-icon :icon="['fas', 'file-export']" />
+          Download
+        </button>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -255,21 +236,26 @@ import { defineComponent } from "vue";
 import { API, toastReject } from "@/plugins/api";
 import { currentProjectStore } from "@/stores";
 import type { LabelOptions, ProjectBaseInfoEntry, ProjectBaseInfoScopeEntry } from "@/plugins/api/api-core";
+import NQLBox from "@/components/NQLBox.vue";
+import { type Filter as NQLFilter } from "@/util/nql";
+import { isEmpty } from "@/util";
 
 export default defineComponent({
   name: "DatasetExportView",
+  components: { NQLBox },
   data() {
     return {
       projectUsers: [] as Array<ProjectBaseInfoEntry>,
       projectScopes: [] as Array<ProjectBaseInfoScopeEntry>,
       projectBotScopes: [] as Array<ProjectBaseInfoEntry>,
       projectLabels: {} as Record<string, LabelOptions>,
-      projectItemFields: [] as Array<string>,
+      nqlQuery: "HAS ANNOTATION",
       labelExportSettings: {
         assignmentScopeIds: [] as Array<string>,
         botAnnotationMetadataIds: [] as Array<string>,
         userIds: [] as Array<string>,
         itemFields: [] as Array<string>,
+        nqlFilter: null as null | NQLFilter,
         labels: {} as Record<string, LabelOptions>,
         ignoreHierarchy: true,
         ignoreOrder: true,
@@ -284,7 +270,6 @@ export default defineComponent({
         this.projectUsers = response.data.users;
         this.projectBotScopes = response.data.bot_scopes;
         this.projectLabels = response.data.labels;
-        this.projectItemFields = response.data.fields;
 
         // pre-populate settings and deselect all
         this.labelExportSettings.labels = JSON.parse(JSON.stringify(response.data.labels));
@@ -309,14 +294,16 @@ export default defineComponent({
 
       API.core.export
         .getAnnotationsCsvApiExportAnnotationsCsvPost({
-          botAnnotationMetadataIds: this.labelExportSettings.botAnnotationMetadataIds,
-          assignmentScopeIds: this.labelExportSettings.assignmentScopeIds,
-          userIds: this.labelExportSettings.userIds,
-          itemFields: this.labelExportSettings.itemFields,
           xProjectId: currentProjectStore.projectId as string,
-          ignoreHierarchy: this.labelExportSettings.ignoreHierarchy,
-          ignoreRepeat: this.labelExportSettings.ignoreOrder,
-          requestBody: labels,
+          requestBody: {
+            labels: labels,
+            nql_filter: isEmpty(this.labelExportSettings.nqlFilter) ? null : this.labelExportSettings.nqlFilter[0],
+            ignore_hierarchy: this.labelExportSettings.ignoreHierarchy,
+            ignore_repeat: this.labelExportSettings.ignoreOrder,
+            bot_annotation_metadata_ids: this.labelExportSettings.botAnnotationMetadataIds,
+            assignment_scope_ids: this.labelExportSettings.assignmentScopeIds,
+            user_ids: this.labelExportSettings.userIds,
+          },
         })
         .then((response) => {
           const blob = new Blob([response.data], { type: "application/csv" });

@@ -9,7 +9,9 @@ import type {
   LabelFilterBool,
   LabelFilterInt,
   LabelFilterMulti,
-  MetaFilter,
+  MetaFilterBool,
+  MetaFilterInt,
+  MetaFilterStr,
   SubQuery,
 } from "@/plugins/api/api-core";
 
@@ -22,8 +24,9 @@ export interface Column {
   completed: Record<string, any>;
   process: (nextColumn: Column) => void;
   predict: (exp: any) => void;
-  complete: (left:any, right:any) => void;
+  complete: (left: any, right: any) => void;
 }
+
 //
 // class Parser extends Psr {
 //   table: Array<Column> = [];
@@ -48,7 +51,9 @@ export type Filter =
   | LabelFilterBool
   | LabelFilterInt
   | LabelFilterMulti
-  | MetaFilter
+  | MetaFilterBool
+  | MetaFilterInt
+  | MetaFilterStr
   | SubQuery;
 
 export function parse(query: string): Array<Filter> {
@@ -64,7 +69,7 @@ export function parse(query: string): Array<Filter> {
   return [];
 }
 
-export function parseHist(query: string): Parser & {table: Array<Column>} | undefined {
+export function parseHist(query: string): (Parser & { table: Array<Column> }) | undefined {
   try {
     const parser = new Parser(compiledGrammar, { keepHistory: true });
     parser.feed(query);
