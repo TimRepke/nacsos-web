@@ -6,6 +6,7 @@ import type { UsersFilter } from './UsersFilter';
 
 export type LabelFilterInt = {
   scopes?: (Array<string> | null);
+  scheme?: (string | null);
   users?: (UsersFilter | null);
   repeats?: (Array<number> | null);
   key: string;

@@ -9,7 +9,9 @@ import type { ImportFilter } from '../models/ImportFilter';
 import type { LabelFilterBool } from '../models/LabelFilterBool';
 import type { LabelFilterInt } from '../models/LabelFilterInt';
 import type { LabelFilterMulti } from '../models/LabelFilterMulti';
-import type { MetaFilter } from '../models/MetaFilter';
+import type { MetaFilterBool } from '../models/MetaFilterBool';
+import type { MetaFilterInt } from '../models/MetaFilterInt';
+import type { MetaFilterStr } from '../models/MetaFilterStr';
 import type { QueryResult } from '../models/QueryResult';
 import type { SearchResult } from '../models/SearchResult';
 import type { SubQuery } from '../models/SubQuery';
@@ -119,7 +121,7 @@ export class SearchService {
     limit = 20,
   }: {
     xProjectId: string,
-    requestBody: (FieldFilter | FieldFilters | LabelFilterMulti | LabelFilterBool | LabelFilterInt | AssignmentFilter | AnnotationFilter | ImportFilter | MetaFilter | SubQuery),
+    requestBody: (FieldFilter | FieldFilters | LabelFilterMulti | LabelFilterBool | LabelFilterInt | AssignmentFilter | AnnotationFilter | ImportFilter | MetaFilterBool | MetaFilterInt | MetaFilterStr | SubQuery),
     page?: number,
     limit?: number,
   }, options?: Partial<ApiRequestOptions>): CancelablePromise<QueryResult> {
@@ -152,7 +154,7 @@ export class SearchService {
     requestBody,
   }: {
     xProjectId: string,
-    requestBody: (FieldFilter | FieldFilters | LabelFilterMulti | LabelFilterBool | LabelFilterInt | AssignmentFilter | AnnotationFilter | ImportFilter | MetaFilter | SubQuery),
+    requestBody: (FieldFilter | FieldFilters | LabelFilterMulti | LabelFilterBool | LabelFilterInt | AssignmentFilter | AnnotationFilter | ImportFilter | MetaFilterBool | MetaFilterInt | MetaFilterStr | SubQuery),
   }, options?: Partial<ApiRequestOptions>): CancelablePromise<number> {
     return this.httpRequest.request({
       method: 'POST',

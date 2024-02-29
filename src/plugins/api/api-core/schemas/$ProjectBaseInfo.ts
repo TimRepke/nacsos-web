@@ -31,12 +31,5 @@ export const $ProjectBaseInfo = {
       },
       isRequired: true,
     },
-    fields: {
-      type: 'array',
-      contains: {
-        type: 'string',
-      },
-      isRequired: true,
-    },
   },
 } as const;

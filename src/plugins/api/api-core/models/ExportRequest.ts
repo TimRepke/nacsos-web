@@ -10,14 +10,19 @@ import type { ImportFilter } from './ImportFilter';
 import type { LabelFilterBool } from './LabelFilterBool';
 import type { LabelFilterInt } from './LabelFilterInt';
 import type { LabelFilterMulti } from './LabelFilterMulti';
+import type { LabelOptions } from './LabelOptions';
 import type { MetaFilterBool } from './MetaFilterBool';
 import type { MetaFilterInt } from './MetaFilterInt';
 import type { MetaFilterStr } from './MetaFilterStr';
+import type { SubQuery } from './SubQuery';
 
-export type SubQuery = {
-  filter?: any;
-  and_?: null;
-  or_?: null;
-  not_?: ((FieldFilter | FieldFilters | LabelFilterMulti | LabelFilterBool | LabelFilterInt | AssignmentFilter | AnnotationFilter | ImportFilter | MetaFilterBool | MetaFilterInt | MetaFilterStr | SubQuery) | null);
+export type ExportRequest = {
+  labels: Array<LabelOptions>;
+  nql_filter?: ((FieldFilter | FieldFilters | LabelFilterMulti | LabelFilterBool | LabelFilterInt | AssignmentFilter | AnnotationFilter | ImportFilter | MetaFilterBool | MetaFilterInt | MetaFilterStr | SubQuery) | null);
+  bot_annotation_metadata_ids?: (Array<string> | null);
+  assignment_scope_ids?: (Array<string> | null);
+  user_ids?: (Array<string> | null);
+  ignore_hierarchy?: boolean;
+  ignore_repeat?: boolean;
 };
 

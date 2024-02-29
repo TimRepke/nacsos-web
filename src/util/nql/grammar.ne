@@ -3,21 +3,22 @@
 main -> _ query _ {% (d) => d[1] %}
 
 query ->
-    TITLE    ":" _ dqstring           {% (d) => ({ filter: 'field', field: 'title',       value:  d[3]               }) %}
-  | ABSTRACT ":" _ dqstring           {% (d) => ({ filter: 'field', field: 'abstract',    value:  d[3]               }) %}
-  | PYEAR    ":" _ COMP _ year        {% (d) => ({ filter: 'field', field: 'pub_year',    value:  d[5], comp: d[3]   }) %}
-  | PDATE    ":" _ COMP _ date        {% (d) => ({ filter: 'field', field: 'date',        value:  d[5], comp: d[3]   }) %}
-  | "DOI"i   ":" _ dois               {% (d) => ({ filter: 'field', field: 'doi',         values: d[3]               }) %}
-  | "OA"i    ":" _ oa_ids             {% (d) => ({ filter: 'field', field: 'openalex_id', values: d[3]               }) %}
-  | "ID"i    ":" _ uuids              {% (d) => ({ filter: 'field', field: 'item_id',     values: d[3]               }) %}
-  | SRC      ":" _ dqstring           {% (d) => ({ filter: 'field', field: 'source',      value:  d[3], comp: 'LIKE' }) %}
-  | META     ":" _ meta_clause        {% (d) => ({ filter: 'meta',    ...d[3]                     }) %}
-  | LABEL    ":" _ label_clause       {% (d) => ({ filter: 'label',   ...d[3]                     }) %}
-  | IMPORT   ":" _ ie_uuids           {% (d) => ({ filter: 'import',  import_ids: d[3]            }) %}
+    TITLE    ":" _ dqstring           {% (d) => ({ filter: "field", field: "title",       value:  d[3]               }) %}
+  | ABSTRACT ":" _ dqstring           {% (d) => ({ filter: "field", field: "abstract",    value:  d[3]               }) %}
+  | PYEAR    ":" _ COMP _ year        {% (d) => ({ filter: "field", field: "pub_year",    value:  d[5], comp: d[3]   }) %}
+  | PDATE    ":" _ COMP _ date        {% (d) => ({ filter: "field", field: "date",        value:  d[5], comp: d[3]   }) %}
+  | "DOI"i   ":" _ dois               {% (d) => ({ filter: "field", field: "doi",         values: d[3]               }) %}
+  | "OA"i    ":" _ oa_ids             {% (d) => ({ filter: "field", field: "openalex_id", values: d[3]               }) %}
+  | "ID"i    ":" _ uuids              {% (d) => ({ filter: "field", field: "item_id",     values: d[3]               }) %}
+  | SRC      ":" _ dqstring           {% (d) => ({ filter: "field", field: "source",      value:  d[3], comp: "LIKE" }) %}
+  | META     ":" _ meta_clause        {% (d) => ({ ...d[3]                                        }) %}
+  | LABEL    ":" _ label_clause       {% (d) => ({ filter: "label",   ...d[3]                     }) %}
+  | IMPORT   ":" _ ie_uuids           {% (d) => ({ filter: "import",  import_ids: d[3]            }) %}
   | assigned_clause                   {% id %}
   | annotation_clause                 {% id %}
-  | query __ AND __ query             {% (d) => ({ filter: 'sub', 'and_': [d[0], d[4]]            }) %}
-  | query __ OR  __ query             {% (d) => ({ filter: 'sub', 'or_':  [d[0], d[4]]            }) %}
+  | query __ AND __ query             {% (d) => ({ filter: "sub", "and_": [d[0], d[4]]            }) %}
+  | query __ OR  __ query             {% (d) => ({ filter: "sub", "or_":  [d[0], d[4]]            }) %}
+  | "NOT" __ query                    {% (d) => ({ filter: "sub", "not_": d[2]                    }) %}
   | "(" _ query _ ")"                 {% (d) => d[2]                                                 %}
 
 assigned_clause ->
@@ -48,9 +49,9 @@ annotation_clause ->
     %}
 
 meta_clause ->
-    KEY _  COMP    _  bool      {% (d) => ({ field: d[0], comp: d[2],   value: d[4] }) %}
-  | KEY _  COMP    _  uint      {% (d) => ({ field: d[0], comp: d[2],   value: d[4] }) %}
-  | KEY __ "LIKE"  __ dqstring  {% (d) => ({ field: d[0], comp: "LIKE", value: d[4] }) %}
+    KEY _  "="      _  bool      {% (d) => ({ filter: "meta_bool", value_type: "bool", field: d[0], comp: "=",    value: d[4] }) %}
+  | KEY _  COMP     _  uint      {% (d) => ({ filter: "meta_int",  value_type: "int",  field: d[0], comp: d[2],   value: d[4] }) %}
+  | KEY __ "LIKE"i  __ dqstring  {% (d) => ({ filter: "meta_str",  value_type: "str",  field: d[0], comp: "LIKE", value: d[4] }) %}
 
 label_clause -> label_type label_clause_val (__ "FROM"i __ uuids | null) (__ "WITH"i __ UUID | null) label_clause_users (__ "REPEATS"i __ uints | null) {%
         (d) => ({
@@ -70,17 +71,17 @@ label_clause_users ->
   | __ "BY ALL"i __ uuids  {% (d) => ({ user_ids: d[3], mode: 'ALL' }) %}
 
 label_type ->
-    null              {% (d) => ({ type: 'user'     }) %}
-  | "USER"i       __  {% (d) => ({ type: 'user'     }) %}
-  | "BOT"i        __  {% (d) => ({ type: 'bot'      }) %}
-  | "RES"i        __  {% (d) => ({ type: 'resolved' }) %}
-  | "RESOLVED"i   __  {% (d) => ({ type: 'resolved' }) %}
-  | "RESOLUTION"i __  {% (d) => ({ type: 'resolved' }) %}
+    null              {% (d) => ({ type: "user"     }) %}
+  | "USER"i       __  {% (d) => ({ type: "user"     }) %}
+  | "BOT"i        __  {% (d) => ({ type: "bot"      }) %}
+  | "RES"i        __  {% (d) => ({ type: "resolved" }) %}
+  | "RESOLVED"i   __  {% (d) => ({ type: "resolved" }) %}
+  | "RESOLUTION"i __  {% (d) => ({ type: "resolved" }) %}
 
 label_clause_val ->
-    KEY _ COMP     _ uint   {% (d) => ({ filter: 'label_int',   value_type: 'int',   key: d[0], value_int:  d[4], comp: d[2] }) %}
-  | KEY _ "="      _ bool   {% (d) => ({ filter: 'label_bool',  value_type: 'bool',  key: d[0], value_bool: d[4]             }) %}
-  | KEY _ COMP_SET _ uints  {% (d) => ({ filter: 'label_multi', value_type: 'multi', key: d[0], multi_int:  d[4], comp: d[2] }) %}
+    KEY _ COMP     _ uint   {% (d) => ({ filter: "label_int",   value_type: "int",   key: d[0], value_int:  d[4], comp: d[2] }) %}
+  | KEY _ "="      _ bool   {% (d) => ({ filter: "label_bool",  value_type: "bool",  key: d[0], value_bool: d[4]             }) %}
+  | KEY _ COMP_SET _ uints  {% (d) => ({ filter: "label_multi", value_type: "multi", key: d[0], multi_int:  d[4], comp: d[2] }) %}
 
 KEY   -> [A-Za-z_-]:+        {% (d) => d[0].join("") %}
 

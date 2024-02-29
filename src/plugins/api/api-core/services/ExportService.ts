@@ -1,7 +1,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { LabelOptions } from '../models/LabelOptions';
+import type { ExportRequest } from '../models/ExportRequest';
 import type { ProjectBaseInfo } from '../models/ProjectBaseInfo';
 
 import type { CancelablePromise } from '@/plugins/api/core/CancelablePromise';
@@ -21,35 +21,15 @@ export class ExportService {
   public getAnnotationsCsvApiExportAnnotationsCsvPost({
     xProjectId,
     requestBody,
-    botAnnotationMetadataIds,
-    assignmentScopeIds,
-    userIds,
-    ignoreHierarchy = true,
-    ignoreRepeat = true,
-    itemFields,
   }: {
     xProjectId: string,
-    requestBody: Array<LabelOptions>,
-    botAnnotationMetadataIds?: (Array<string> | null),
-    assignmentScopeIds?: (Array<string> | null),
-    userIds?: (Array<string> | null),
-    ignoreHierarchy?: boolean,
-    ignoreRepeat?: boolean,
-    itemFields?: (Array<string> | null),
+    requestBody: ExportRequest,
   }, options?: Partial<ApiRequestOptions>): CancelablePromise<string> {
     return this.httpRequest.request({
       method: 'POST',
       url: '/api/export/annotations/csv',
       headers: {
         'x-project-id': xProjectId,
-      },
-      query: {
-        'bot_annotation_metadata_ids': botAnnotationMetadataIds,
-        'assignment_scope_ids': assignmentScopeIds,
-        'user_ids': userIds,
-        'ignore_hierarchy': ignoreHierarchy,
-        'ignore_repeat': ignoreRepeat,
-        'item_fields': itemFields,
       },
       body: requestBody,
       mediaType: 'application/json',

@@ -75,7 +75,7 @@ import type {
   HighlighterModel,
 } from "@/plugins/api/api-core";
 import { interfaceSettingsStore } from "@/stores";
-import TextComponent from '@/components/items/TextComponent.vue';
+import TextComponent from "@/components/items/TextComponent.vue";
 
 export default defineComponent({
   name: "AcademicItem",
