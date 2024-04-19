@@ -1,3 +1,4 @@
+export { OpenAPI } from "@/plugins/api/spec/core/OpenAPI";
 import { OpenAPI } from "@/plugins/api/spec/core/OpenAPI";
 import {
   AnnotationsService,
@@ -55,4 +56,5 @@ export function toastReject(reason: ApiResponseReject) {
   );
 }
 
-export type { ApiResult, ApiResponseReject, ErrorDetails, ErrorLevel } from "@/plugins/api/spec/core/ApiResult";
+export type { ApiResult, ApiResponseReject, ErrorDetails } from "@/plugins/api/spec/core/ApiResult";
+export { ErrorLevel } from "@/plugins/api/spec/core/ApiResult";

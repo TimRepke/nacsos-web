@@ -13,7 +13,7 @@ import type {
   MetaFilterInt,
   MetaFilterStr,
   SubQuery,
-} from "@/plugins/api/api-core";
+} from "@/plugins/api/types";
 
 export interface Column {
   grammar: Grammar;

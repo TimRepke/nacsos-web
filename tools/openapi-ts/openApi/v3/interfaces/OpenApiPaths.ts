@@ -1,4 +1,4 @@
-import type { OpenApiPath } from './OpenApiPath';
+import type { OpenApiPath } from "./OpenApiPath";
 
 /**
  * {@link} https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.1.0.md#paths-object

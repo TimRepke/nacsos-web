@@ -1,8 +1,8 @@
-import { unique } from '../../../utils/unique';
-import type { Service } from '../../common/interfaces/client';
-import type { OpenApi } from '../interfaces/OpenApi';
-import { getOperation } from './getOperation';
-import { getOperationParameters } from './getOperationParameters';
+import { unique } from "../../../utils/unique";
+import type { Service } from "../../common/interfaces/client";
+import type { OpenApi } from "../interfaces/OpenApi";
+import { getOperation } from "./getOperation";
+import { getOperationParameters } from "./getOperationParameters";
 
 /**
  * Get the OpenAPI services
@@ -19,27 +19,18 @@ export const getServices = (openApi: OpenApi): Service[] => {
       for (const method in path) {
         if (path.hasOwnProperty(method)) {
           switch (method) {
-            case 'get':
-            case 'put':
-            case 'post':
-            case 'delete':
-            case 'options':
-            case 'head':
-            case 'patch': {
+            case "get":
+            case "put":
+            case "post":
+            case "delete":
+            case "options":
+            case "head":
+            case "patch": {
               // Each method contains an OpenAPI operation, we parse the operation
               const op = path[method]!;
-              const tags = op.tags?.length
-                ? op.tags.filter(unique)
-                : ['Default'];
+              const tags = op.tags?.length ? op.tags.filter(unique) : ["Default"];
               tags.forEach((tag) => {
-                const operation = getOperation(
-                  openApi,
-                  url,
-                  method,
-                  tag,
-                  op,
-                  pathParams,
-                );
+                const operation = getOperation(openApi, url, method, tag, op, pathParams);
 
                 // If we have already declared a service, then we should fetch that and
                 // append the new method to it. Otherwise we should create a new service object.

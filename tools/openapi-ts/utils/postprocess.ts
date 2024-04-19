@@ -1,7 +1,7 @@
-import type { Enum, Model, Operation, Service } from '../openApi';
-import type { Client } from '../types/client';
-import { sort } from './sort';
-import { unique } from './unique';
+import type { Enum, Model, Operation, Service } from "../openApi";
+import type { Client } from "../types/client";
+import { sort } from "./sort";
+import { unique } from "./unique";
 
 /**
  * Post process client
@@ -35,10 +35,7 @@ export function postProcessModel(model: Model): Model {
  * @param model
  */
 export function postProcessModelEnum(model: Model): Enum[] {
-  return model.enum.filter(
-    (property, index, arr) =>
-      arr.findIndex((item) => item.value === property.value) === index,
-  );
+  return model.enum.filter((property, index, arr) => arr.findIndex((item) => item.value === property.value) === index);
 }
 
 /**
@@ -46,10 +43,7 @@ export function postProcessModelEnum(model: Model): Enum[] {
  * @param model The model that is post-processed
  */
 export function postProcessModelEnums(model: Model): Model[] {
-  return model.enums.filter(
-    (property, index, arr) =>
-      arr.findIndex((item) => item.name === property.name) === index,
-  );
+  return model.enums.filter((property, index, arr) => arr.findIndex((item) => item.name === property.name) === index);
 }
 
 /**
@@ -89,9 +83,7 @@ export function postProcessServiceOperations(service: Service): Operation[] {
 
     // Parse the service parameters and results, very similar to how we parse
     // properties of models. These methods will extend the type if needed.
-    clone.imports.push(
-      ...clone.parameters.flatMap((parameter) => parameter.imports),
-    );
+    clone.imports.push(...clone.parameters.flatMap((parameter) => parameter.imports));
     clone.imports.push(...clone.results.flatMap((result) => result.imports));
 
     // Check if the operation name is unique, if not then prefix this with a number

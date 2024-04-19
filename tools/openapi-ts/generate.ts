@@ -3,7 +3,6 @@ import { sync } from "cross-spawn";
 import { getOpenApiSpec } from "./utils/getOpenApiSpec";
 import { postProcessClient } from "./utils/postprocess";
 import { parse } from "./openApi";
-import { registerHandlebarTemplates } from "./utils/handlebars";
 import { writeClient } from "./utils/write/client";
 import { UserConfig } from "./types/config";
 
@@ -31,9 +30,8 @@ const openApi =
     : (config.input as unknown as Awaited<ReturnType<typeof getOpenApiSpec>>);
 
 const client = postProcessClient(parse(openApi));
-const templates = registerHandlebarTemplates();
 
-await writeClient(openApi, client, templates);
+await writeClient(openApi, client);
 
 console.log("✨ Done! Your client is located in:", config.output);
 

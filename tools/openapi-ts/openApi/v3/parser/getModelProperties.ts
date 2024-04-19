@@ -1,15 +1,12 @@
-import { escapeName } from '../../../utils/escape';
-import type { Model } from '../../common/interfaces/client';
-import { getDefault } from '../../common/parser/getDefault';
-import { getPattern } from '../../common/parser/getPattern';
-import { getType } from '../../common/parser/type';
-import type { OpenApi } from '../interfaces/OpenApi';
-import type { OpenApiSchema } from '../interfaces/OpenApiSchema';
-import {
-  findOneOfParentDiscriminator,
-  mapPropertyValue,
-} from './discriminator';
-import type { getModel } from './getModel';
+import { escapeName } from "../../../utils/escape";
+import type { Model } from "../../common/interfaces/client";
+import { getDefault } from "../../common/parser/getDefault";
+import { getPattern } from "../../common/parser/getPattern";
+import { getType } from "../../common/parser/type";
+import type { OpenApi } from "../interfaces/OpenApi";
+import type { OpenApiSchema } from "../interfaces/OpenApiSchema";
+import { findOneOfParentDiscriminator, mapPropertyValue } from "./discriminator";
+import type { getModel } from "./getModel";
 
 // Fix for circular dependency
 export type GetModelFn = typeof getModel;
@@ -20,17 +17,14 @@ export const getAdditionalPropertiesModel = (
   getModel: GetModelFn,
   model: Model,
 ): Model => {
-  const ap =
-    typeof definition.additionalProperties === 'object'
-      ? definition.additionalProperties
-      : {};
+  const ap = typeof definition.additionalProperties === "object" ? definition.additionalProperties : {};
   const apModel = getModel(openApi, ap);
 
   if (ap.$ref) {
     const apType = getType(ap.$ref);
     model.base = apType.base;
     model.default = getDefault(definition, model);
-    model.export = 'dictionary';
+    model.export = "dictionary";
     model.imports.push(...apType.imports);
     model.template = apType.template;
     model.type = apType.type;
@@ -39,15 +33,15 @@ export const getAdditionalPropertiesModel = (
 
   if (definition.additionalProperties && definition.properties) {
     apModel.default = getDefault(definition, model);
-    apModel.export = 'generic';
+    apModel.export = "generic";
     apModel.isRequired = definition.additionalProperties === true;
-    apModel.name = '[key: string]';
+    apModel.name = "[key: string]";
     return apModel;
   }
 
   model.base = apModel.base;
   model.default = getDefault(definition, model);
-  model.export = 'dictionary';
+  model.export = "dictionary";
   model.imports.push(...apModel.imports);
   model.link = apModel;
   model.template = apModel.template;
@@ -70,17 +64,17 @@ export const getModelProperties = (
       const propertyRequired = !!definition.required?.includes(propertyName);
       const propertyValues: Omit<
         Model,
-        | '$refs'
-        | 'base'
-        | 'enum'
-        | 'enums'
-        | 'export'
-        | 'imports'
-        | 'isNullable'
-        | 'link'
-        | 'properties'
-        | 'template'
-        | 'type'
+        | "$refs"
+        | "base"
+        | "enum"
+        | "enums"
+        | "export"
+        | "imports"
+        | "isNullable"
+        | "link"
+        | "properties"
+        | "template"
+        | "type"
       > = {
         default: property.default,
         deprecated: property.deprecated === true,
@@ -112,13 +106,13 @@ export const getModelProperties = (
           base: `'${mapPropertyValue(discriminator, parent)}'`,
           enum: [],
           enums: [],
-          export: 'reference',
+          export: "reference",
           imports: [],
           isNullable: property.nullable === true,
           link: null,
           properties: [],
           template: null,
-          type: 'string',
+          type: "string",
         });
       } else if (property.$ref) {
         const model = getType(property.$ref);
@@ -128,7 +122,7 @@ export const getModelProperties = (
           base: model.base,
           enum: [],
           enums: [],
-          export: 'reference',
+          export: "reference",
           imports: model.imports,
           isNullable: model.isNullable || property.nullable === true,
           link: null,

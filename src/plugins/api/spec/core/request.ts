@@ -11,7 +11,7 @@ import type { OpenAPIConfig } from "./OpenAPI";
 import { useRequestsStore } from "@/stores/RequestsStore";
 import { EventBus } from "@/plugins/events";
 import { ClearUserStoreEvent } from "@/plugins/events/events/auth";
-import { ErrorLevel } from "@/plugins/api_old/core/CancelablePromise";
+import { ErrorLevel } from "./ApiResult";
 
 export const isString = (value: unknown): value is string => {
   return typeof value === "string";

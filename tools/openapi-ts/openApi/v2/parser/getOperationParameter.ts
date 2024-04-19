@@ -1,33 +1,30 @@
-import type { OperationParameter } from '../../common/interfaces/client';
-import { getDefault } from '../../common/parser/getDefault';
-import { getEnums } from '../../common/parser/getEnums';
-import { getPattern } from '../../common/parser/getPattern';
-import { getRef } from '../../common/parser/getRef';
-import { getOperationParameterName } from '../../common/parser/operation';
-import { getType } from '../../common/parser/type';
-import type { OpenApi } from '../interfaces/OpenApi';
-import type { OpenApiParameter } from '../interfaces/OpenApiParameter';
-import type { OpenApiSchema } from '../interfaces/OpenApiSchema';
-import { getModel } from './getModel';
+import type { OperationParameter } from "../../common/interfaces/client";
+import { getDefault } from "../../common/parser/getDefault";
+import { getEnums } from "../../common/parser/getEnums";
+import { getPattern } from "../../common/parser/getPattern";
+import { getRef } from "../../common/parser/getRef";
+import { getOperationParameterName } from "../../common/parser/operation";
+import { getType } from "../../common/parser/type";
+import type { OpenApi } from "../interfaces/OpenApi";
+import type { OpenApiParameter } from "../interfaces/OpenApiParameter";
+import type { OpenApiSchema } from "../interfaces/OpenApiSchema";
+import { getModel } from "./getModel";
 
-export const getOperationParameter = (
-  openApi: OpenApi,
-  parameter: OpenApiParameter,
-): OperationParameter => {
+export const getOperationParameter = (openApi: OpenApi, parameter: OpenApiParameter): OperationParameter => {
   const operationParameter: OperationParameter = {
     $refs: [],
-    base: 'unknown',
+    base: "unknown",
     description: parameter.description || null,
     enum: [],
     enums: [],
     exclusiveMaximum: parameter.exclusiveMaximum,
     exclusiveMinimum: parameter.exclusiveMinimum,
-    export: 'interface',
+    export: "interface",
     format: parameter.format,
     imports: [],
     in: parameter.in,
     isDefinition: false,
-    isNullable: parameter['x-nullable'] === true,
+    isNullable: parameter["x-nullable"] === true,
     isReadOnly: false,
     isRequired: parameter.required === true,
     link: null,
@@ -44,13 +41,13 @@ export const getOperationParameter = (
     prop: parameter.name,
     properties: [],
     template: null,
-    type: 'unknown',
+    type: "unknown",
     uniqueItems: parameter.uniqueItems,
   };
 
   if (parameter.$ref) {
     const definitionRef = getType(parameter.$ref);
-    operationParameter.export = 'reference';
+    operationParameter.export = "reference";
     operationParameter.type = definitionRef.type;
     operationParameter.base = definitionRef.base;
     operationParameter.template = definitionRef.template;
@@ -62,18 +59,18 @@ export const getOperationParameter = (
   if (parameter.enum) {
     const enums = getEnums(parameter, parameter.enum);
     if (enums.length) {
-      operationParameter.base = 'string';
+      operationParameter.base = "string";
       operationParameter.enum.push(...enums);
-      operationParameter.export = 'enum';
-      operationParameter.type = 'string';
+      operationParameter.export = "enum";
+      operationParameter.type = "string";
       operationParameter.default = getDefault(parameter, operationParameter);
       return operationParameter;
     }
   }
 
-  if (parameter.type === 'array' && parameter.items) {
+  if (parameter.type === "array" && parameter.items) {
     const items = getType(parameter.items.type, parameter.items.format);
-    operationParameter.export = 'array';
+    operationParameter.export = "array";
     operationParameter.type = items.type;
     operationParameter.base = items.base;
     operationParameter.template = items.template;
@@ -82,9 +79,9 @@ export const getOperationParameter = (
     return operationParameter;
   }
 
-  if (parameter.type === 'object' && parameter.items) {
+  if (parameter.type === "object" && parameter.items) {
     const items = getType(parameter.items.type, parameter.items.format);
-    operationParameter.export = 'dictionary';
+    operationParameter.export = "dictionary";
     operationParameter.type = items.type;
     operationParameter.base = items.base;
     operationParameter.template = items.template;
@@ -95,12 +92,12 @@ export const getOperationParameter = (
 
   let schema = parameter.schema;
   if (schema) {
-    if (schema.$ref?.startsWith('#/parameters/')) {
+    if (schema.$ref?.startsWith("#/parameters/")) {
       schema = getRef<OpenApiSchema>(openApi, schema);
     }
     if (schema.$ref) {
       const model = getType(schema.$ref);
-      operationParameter.export = 'reference';
+      operationParameter.export = "reference";
       operationParameter.type = model.type;
       operationParameter.base = model.base;
       operationParameter.template = model.template;
@@ -126,7 +123,7 @@ export const getOperationParameter = (
   // If the parameter has a type than it can be a basic or generic type.
   if (parameter.type) {
     const definitionType = getType(parameter.type, parameter.format);
-    operationParameter.export = 'generic';
+    operationParameter.export = "generic";
     operationParameter.type = definitionType.type;
     operationParameter.base = definitionType.base;
     operationParameter.template = definitionType.template;

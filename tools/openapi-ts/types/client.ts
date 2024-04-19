@@ -1,4 +1,4 @@
-import { Model, Service } from '../openApi';
+import { Model, Service } from "../openApi";
 
 export interface Client {
   enumNames: string[];

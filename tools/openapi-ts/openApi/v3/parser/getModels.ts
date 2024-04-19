@@ -1,8 +1,8 @@
-import type { Model } from '../../common/interfaces/client';
-import { reservedWords } from '../../common/parser/reservedWords';
-import { getType } from '../../common/parser/type';
-import type { OpenApi } from '../interfaces/OpenApi';
-import { getModel } from './getModel';
+import type { Model } from "../../common/interfaces/client";
+import { reservedWords } from "../../common/parser/reservedWords";
+import { getType } from "../../common/parser/type";
+import type { OpenApi } from "../interfaces/OpenApi";
+import { getModel } from "./getModel";
 
 export const getModels = (openApi: OpenApi): Model[] => {
   const models: Model[] = [];
@@ -11,12 +11,7 @@ export const getModels = (openApi: OpenApi): Model[] => {
       if (openApi.components.schemas.hasOwnProperty(definitionName)) {
         const definition = openApi.components.schemas[definitionName];
         const definitionType = getType(definitionName);
-        const model = getModel(
-          openApi,
-          definition,
-          true,
-          definitionType.base.replace(reservedWords, '_$1'),
-        );
+        const model = getModel(openApi, definition, true, definitionType.base.replace(reservedWords, "_$1"));
         models.push(model);
       }
     }
@@ -26,12 +21,7 @@ export const getModels = (openApi: OpenApi): Model[] => {
         const definitionType = getType(definitionName);
         const schema = definition.schema;
         if (schema) {
-          const model = getModel(
-            openApi,
-            schema,
-            true,
-            definitionType.base.replace(reservedWords, '_$1'),
-          );
+          const model = getModel(openApi, schema, true, definitionType.base.replace(reservedWords, "_$1"));
           model.description = definition.description || null;
           model.deprecated = definition.deprecated;
           models.push(model);

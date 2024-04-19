@@ -214,20 +214,6 @@ export default defineComponent({
               routes: ["project-artefacts", "project-artefacts-list", "project-artefacts-details"],
             },
             {
-              name: "Task Configuration",
-              icon: "wrench",
-              target: "/project/pipelines/setup",
-              permission: perm.pipelines_read,
-              routes: ["project-pipelines-setup"],
-            },
-            {
-              name: "Presets",
-              icon: "timeline",
-              target: "/project/pipelines/presets",
-              permission: perm.pipelines_read,
-              routes: ["project-pipelines-presets"],
-            },
-            {
               name: "Bot Annotations",
               icon: "robot",
               target: "/project/bot-annotations",

@@ -1,19 +1,15 @@
-import { escapeName } from '../../../utils/escape';
-import type { Model } from '../../common/interfaces/client';
-import { getPattern } from '../../common/parser/getPattern';
-import { getType } from '../../common/parser/type';
-import type { OpenApi } from '../interfaces/OpenApi';
-import type { OpenApiSchema } from '../interfaces/OpenApiSchema';
-import type { getModel } from './getModel';
+import { escapeName } from "../../../utils/escape";
+import type { Model } from "../../common/interfaces/client";
+import { getPattern } from "../../common/parser/getPattern";
+import { getType } from "../../common/parser/type";
+import type { OpenApi } from "../interfaces/OpenApi";
+import type { OpenApiSchema } from "../interfaces/OpenApiSchema";
+import type { getModel } from "./getModel";
 
 // Fix for circular dependency
 export type GetModelFn = typeof getModel;
 
-export const getModelProperties = (
-  openApi: OpenApi,
-  definition: OpenApiSchema,
-  getModel: GetModelFn,
-): Model[] => {
+export const getModelProperties = (openApi: OpenApi, definition: OpenApiSchema, getModel: GetModelFn): Model[] => {
   const models: Model[] = [];
   for (const propertyName in definition.properties) {
     if (definition.properties.hasOwnProperty(propertyName)) {
@@ -29,11 +25,11 @@ export const getModelProperties = (
           enums: [],
           exclusiveMaximum: property.exclusiveMaximum,
           exclusiveMinimum: property.exclusiveMinimum,
-          export: 'reference',
+          export: "reference",
           format: property.format,
           imports: model.imports,
           isDefinition: false,
-          isNullable: property['x-nullable'] === true,
+          isNullable: property["x-nullable"] === true,
           isReadOnly: property.readOnly === true,
           isRequired: propertyRequired,
           link: null,
@@ -67,7 +63,7 @@ export const getModelProperties = (
           format: property.format,
           imports: model.imports,
           isDefinition: false,
-          isNullable: property['x-nullable'] === true,
+          isNullable: property["x-nullable"] === true,
           isReadOnly: property.readOnly === true,
           isRequired: propertyRequired,
           link: model.link,

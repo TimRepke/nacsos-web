@@ -1,6 +1,6 @@
-import ts from 'typescript';
+import ts from "typescript";
 
-import { addLeadingComment, type Comments, isType, ots } from './utils';
+import { addLeadingComment, type Comments, isType, ots } from "./utils";
 
 /**
  * Convert an unknown value to an expression.
@@ -29,21 +29,22 @@ export const toExpression = <T = unknown>({
     return createArrayType({ arr: value });
   }
 
-  if (typeof value === 'object') {
+  if (typeof value === "object") {
     return createObjectType({ identifiers, obj: value, shorthand });
   }
 
-  if (typeof value === 'number') {
+  if (typeof value === "number") {
     return ots.number(value);
   }
 
-  if (typeof value === 'boolean') {
+  if (typeof value === "boolean") {
     return ots.boolean(value);
   }
 
-  if (typeof value === 'string') {
+  if (typeof value === "string") {
     return ots.string(value, unescape);
   }
+  throw new Error();
 };
 
 /**
@@ -62,7 +63,7 @@ export const createArrayType = <T>({
   ts.factory.createArrayLiteralExpression(
     arr.map((value) => toExpression({ value })).filter(isType<ts.Expression>),
     // Multiline if the array contains objects, or if specified by the user.
-    (!Array.isArray(arr[0]) && typeof arr[0] === 'object') || multiLine,
+    (!Array.isArray(arr[0]) && typeof arr[0] === "object") || multiLine,
   );
 
 /**
@@ -103,10 +104,7 @@ export const createObjectType = <T extends object>({
         return undefined;
       }
       // Create a identifier if the current key is one and it is not an object
-      if (
-        identifiers.includes(key) &&
-        !ts.isObjectLiteralExpression(initializer)
-      ) {
+      if (identifiers.includes(key) && !ts.isObjectLiteralExpression(initializer)) {
         initializer = ts.factory.createIdentifier(value as string);
       }
       // Check key value equality before possibly modifying it
@@ -125,10 +123,7 @@ export const createObjectType = <T extends object>({
       return assignment;
     })
     .filter(isType<ts.ShorthandPropertyAssignment | ts.PropertyAssignment>);
-  return ts.factory.createObjectLiteralExpression(
-    properties as any[],
-    multiLine,
-  );
+  return ts.factory.createObjectLiteralExpression(properties as any[], multiLine);
 };
 
 /**

@@ -1,4 +1,4 @@
-import type { WithEnumExtension } from '../../common/interfaces/WithEnumExtension';
+import type { WithEnumExtension } from "../../common/interfaces/WithEnumExtension";
 
 /**
  * {@link} https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#items-object)
@@ -6,19 +6,19 @@ import type { WithEnumExtension } from '../../common/interfaces/WithEnumExtensio
 export interface OpenApiItems extends WithEnumExtension {
   type?: string;
   format?:
-    | 'int32'
-    | 'int64'
-    | 'float'
-    | 'double'
-    | 'string'
-    | 'boolean'
-    | 'byte'
-    | 'binary'
-    | 'date'
-    | 'date-time'
-    | 'password';
+    | "int32"
+    | "int64"
+    | "float"
+    | "double"
+    | "string"
+    | "boolean"
+    | "byte"
+    | "binary"
+    | "date"
+    | "date-time"
+    | "password";
   items?: OpenApiItems;
-  collectionFormat?: 'csv' | 'ssv' | 'tsv' | 'pipes';
+  collectionFormat?: "csv" | "ssv" | "tsv" | "pipes";
   default?: unknown;
   maximum?: number;
   exclusiveMaximum?: number;

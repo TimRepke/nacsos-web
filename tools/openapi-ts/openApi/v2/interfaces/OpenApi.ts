@@ -1,13 +1,13 @@
-import type { Dictionary } from '../../common/interfaces/Dictionary';
-import type { OpenApiExternalDocs } from './OpenApiExternalDocs';
-import type { OpenApiInfo } from './OpenApiInfo';
-import type { OpenApiParameter } from './OpenApiParameter';
-import type { OpenApiPath } from './OpenApiPath';
-import type { OpenApiResponse } from './OpenApiResponse';
-import type { OpenApiSchema } from './OpenApiSchema';
-import type { OpenApiSecurityRequirement } from './OpenApiSecurityRequirement';
-import type { OpenApiSecurityScheme } from './OpenApiSecurityScheme';
-import type { OpenApiTag } from './OpenApiTag';
+import type { Dictionary } from "../../common/interfaces/Dictionary";
+import type { OpenApiExternalDocs } from "./OpenApiExternalDocs";
+import type { OpenApiInfo } from "./OpenApiInfo";
+import type { OpenApiParameter } from "./OpenApiParameter";
+import type { OpenApiPath } from "./OpenApiPath";
+import type { OpenApiResponse } from "./OpenApiResponse";
+import type { OpenApiSchema } from "./OpenApiSchema";
+import type { OpenApiSecurityRequirement } from "./OpenApiSecurityRequirement";
+import type { OpenApiSecurityScheme } from "./OpenApiSecurityScheme";
+import type { OpenApiTag } from "./OpenApiTag";
 
 /**
  * {@link} https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md

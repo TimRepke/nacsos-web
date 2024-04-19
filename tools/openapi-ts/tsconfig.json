@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "esModuleInterop": true,
     "lib": [
       "ESNext",
       "DOM"
@@ -10,12 +11,8 @@
   },
   "module": "ESNext",
   "target": "ESNext",
-  "exclude": [
-    "../**/__tests__"
-  ],
   "extends": "../../tsconfig.node.json",
   "include": [
-    "../",
-    "../client/interfaces"
+    ".",
   ]
 }

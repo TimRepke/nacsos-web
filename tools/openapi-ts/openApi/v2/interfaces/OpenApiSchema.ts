@@ -1,17 +1,14 @@
-import type { Dictionary } from '../../common/interfaces/Dictionary';
-import type { WithEnumExtension } from '../../common/interfaces/WithEnumExtension';
-import type { WithNullableExtension } from './Extensions/WithNullableExtension';
-import type { OpenApiExternalDocs } from './OpenApiExternalDocs';
-import type { OpenApiReference } from './OpenApiReference';
-import type { OpenApiXml } from './OpenApiXml';
+import type { Dictionary } from "../../common/interfaces/Dictionary";
+import type { WithEnumExtension } from "../../common/interfaces/WithEnumExtension";
+import type { WithNullableExtension } from "./Extensions/WithNullableExtension";
+import type { OpenApiExternalDocs } from "./OpenApiExternalDocs";
+import type { OpenApiReference } from "./OpenApiReference";
+import type { OpenApiXml } from "./OpenApiXml";
 
 /**
  * {@link} https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#schema-object
  */
-export interface OpenApiSchema
-  extends OpenApiReference,
-    WithEnumExtension,
-    WithNullableExtension {
+export interface OpenApiSchema extends OpenApiReference, WithEnumExtension, WithNullableExtension {
   title?: string;
   description?: string;
   default?: unknown;
@@ -32,17 +29,17 @@ export interface OpenApiSchema
   enum?: (string | number)[];
   type?: string;
   format?:
-    | 'int32'
-    | 'int64'
-    | 'float'
-    | 'double'
-    | 'string'
-    | 'boolean'
-    | 'byte'
-    | 'binary'
-    | 'date'
-    | 'date-time'
-    | 'password';
+    | "int32"
+    | "int64"
+    | "float"
+    | "double"
+    | "string"
+    | "boolean"
+    | "byte"
+    | "binary"
+    | "date"
+    | "date-time"
+    | "password";
   items?: OpenApiSchema;
   allOf?: OpenApiSchema[];
   properties?: Dictionary<OpenApiSchema>;

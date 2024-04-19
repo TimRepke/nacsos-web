@@ -6,7 +6,7 @@ import { useRequestsStore } from "@/stores/RequestsStore";
 import { ClearUserStoreEvent } from "@/plugins/events/events/auth";
 import { EventBus } from "@/plugins/events";
 import { usePlatformUsersStore } from "@/stores/PlatformUsersStore";
-import { OpenAPI } from "@/plugins/api/spec";
+import { OpenAPI } from "@/plugins/api";
 
 const pinia = createPinia();
 

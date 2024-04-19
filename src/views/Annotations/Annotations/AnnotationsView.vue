@@ -151,7 +151,7 @@ import AnyItemComponent from "@/components/items/AnyItem.vue";
 import AnnotationLabels from "@/components/annotations/AnnotationLabels.vue";
 import { EventBus } from "@/plugins/events";
 import { ToastEvent } from "@/plugins/events/events/toast";
-import type {
+import {
   AnnotationItem,
   AnnotationSchemeModel,
   AssignmentInfo,
@@ -159,10 +159,12 @@ import type {
   AssignmentScopeEntry,
   AssignmentScopeModel,
   HighlighterModel,
+  KindEnum,
+  AssignmentStatus,
+  AnnotationSchemeLabel,
 } from "@/plugins/api/types";
-import { AssignmentStatus, AnnotationSchemeLabel } from "@/plugins/api/types";
-import type { AnyItem } from "@/types/items.d";
 import { API, ignore } from "@/plugins/api";
+import type { AnyItem } from "@/types/items.d";
 import { currentProjectStore, currentUserStore, interfaceSettingsStore } from "@/stores";
 import { lookupMakerBool, lookupMakerChoice, lookupMakerStatus } from "@/types/colours";
 
@@ -275,12 +277,10 @@ export default defineComponent({
         ).data;
       } else {
         response = (
-          await API.annotations.getNextOpenAssignmentForScopeForUserApiAnnotationsAnnotateNextAssignmentScopeIdGet(
-            {
-              xProjectId: currentProjectStore.projectId as string,
-              assignmentScopeId,
-            },
-          )
+          await API.annotations.getNextOpenAssignmentForScopeForUserApiAnnotationsAnnotateNextAssignmentScopeIdGet({
+            xProjectId: currentProjectStore.projectId as string,
+            assignmentScopeId,
+          })
         ).data;
       }
 
@@ -619,7 +619,7 @@ export default defineComponent({
         return indicateStatusMapper;
       }
 
-      if (label.kind === AnnotationSchemeLabel.kind.SINGLE && label.choices) {
+      if (label.kind === KindEnum.SINGLE && label.choices) {
         return lookupMakerChoice<UserAssignmentInfo>(
           label.choices,
           false,
@@ -627,7 +627,7 @@ export default defineComponent({
         );
       }
 
-      if (label.kind === AnnotationSchemeLabel.kind.BOOL) {
+      if (label.kind === KindEnum.BOOL) {
         return lookupMakerBool<UserAssignmentInfo>(
           (indicator: UserAssignmentInfo): boolean | null | undefined => indicator.labels?.[labelKey]?.[0]?.value_bool,
         );

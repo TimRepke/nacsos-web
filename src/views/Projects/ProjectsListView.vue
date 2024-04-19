@@ -154,7 +154,7 @@ export default defineComponent({
       }
     },
     renderMD(txt: string): string {
-      return marked(txt);
+      return marked.parse(txt, { async: false }) as string;
     },
   },
   computed: {

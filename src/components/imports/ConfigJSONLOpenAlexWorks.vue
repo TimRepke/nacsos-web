@@ -43,7 +43,7 @@ import { defineComponent } from "vue";
 import useVuelidate from "@vuelidate/core";
 import { required } from "@vuelidate/validators";
 import type { BaseValidation, ValidationRule } from "@vuelidate/core";
-import { ImportConfigEnum, OpenAlexFileImport } from '@/plugins/api/types';
+import { ImportConfigEnum, OpenAlexFileImport } from "@/plugins/api/types";
 import FilesUploader from "@/components/FilesUploader.vue";
 import type { UploadFile } from "@/components/FilesUploader.vue";
 

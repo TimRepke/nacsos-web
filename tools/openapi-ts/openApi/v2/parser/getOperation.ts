@@ -1,24 +1,17 @@
-import type {
-  Operation,
-  OperationParameters,
-} from '../../common/interfaces/client';
-import {
-  getOperationErrors,
-  getOperationName,
-  getOperationResponseHeader,
-} from '../../common/parser/operation';
-import { getServiceName } from '../../common/parser/service';
-import { toSortedByRequired } from '../../common/parser/sort';
-import type { OpenApi } from '../interfaces/OpenApi';
-import type { OpenApiOperation } from '../interfaces/OpenApiOperation';
-import { getOperationParameters } from './getOperationParameters';
-import { getOperationResponses } from './getOperationResponses';
-import { getOperationResults } from './getOperationResults';
+import type { Operation, OperationParameters } from "../../common/interfaces/client";
+import { getOperationErrors, getOperationName, getOperationResponseHeader } from "../../common/parser/operation";
+import { getServiceName } from "../../common/parser/service";
+import { toSortedByRequired } from "../../common/parser/sort";
+import type { OpenApi } from "../interfaces/OpenApi";
+import type { OpenApiOperation } from "../interfaces/OpenApiOperation";
+import { getOperationParameters } from "./getOperationParameters";
+import { getOperationResponses } from "./getOperationResponses";
+import { getOperationResults } from "./getOperationResults";
 
 export const getOperation = (
   openApi: OpenApi,
   url: string,
-  method: Lowercase<Operation['method']>,
+  method: Lowercase<Operation["method"]>,
   tag: string,
   op: OpenApiOperation,
   pathParams: OperationParameters,
@@ -33,7 +26,7 @@ export const getOperation = (
     description: op.description || null,
     errors: [],
     imports: [],
-    method: method.toUpperCase() as Operation['method'],
+    method: method.toUpperCase() as Operation["method"],
     name,
     parameters: [...pathParams.parameters],
     parametersBody: pathParams.parametersBody,

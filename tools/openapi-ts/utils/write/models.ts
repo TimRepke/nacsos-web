@@ -1,40 +1,35 @@
-import {
-  type Comments,
-  compiler,
-  type Node,
-  TypeScriptFile,
-} from '../../compiler';
-import { addLeadingComment } from '../../compiler/utils';
-import type { Model, OperationParameter, Service } from '../../openApi';
-import { ensureValidTypeScriptJavaScriptIdentifier } from '../../openApi/common/parser/sanitize';
-import type { Client } from '../../types/client';
-import { getConfig } from '../config';
-import { enumKey, enumName, enumUnionType, enumValue } from '../enum';
-import { escapeComment } from '../escape';
-import { sortByName } from '../sort';
-import { transformTypeName } from '../transform';
-import { serviceExportedNamespace } from './services';
-import { toType } from './type';
+import { type Comments, compiler, type Node, TypeScriptFile } from "../../compiler";
+import { addLeadingComment } from "../../compiler/utils";
+import type { Model, OperationParameter, Service } from "../../openApi";
+import { ensureValidTypeScriptJavaScriptIdentifier } from "../../openApi/common/parser/sanitize";
+import type { Client } from "../../types/client";
+import { getConfig } from "../config";
+import { enumKey, enumName, enumUnionType, enumValue } from "../enum";
+import { escapeComment } from "../escape";
+import { sortByName } from "../sort";
+import { transformTypeName } from "../transform";
+import { serviceExportedNamespace } from "./services";
+import { toType } from "./type";
 
-type OnNode = (node: Node, type?: 'enum') => void;
+type OnNode = (node: Node, type?: "enum") => void;
 
 const emptyModel: Model = {
   $refs: [],
-  base: '',
+  base: "",
   description: null,
   enum: [],
   enums: [],
-  export: 'interface',
+  export: "interface",
   imports: [],
   isDefinition: false,
   isNullable: false,
   isReadOnly: false,
   isRequired: false,
   link: null,
-  name: '',
+  name: "",
   properties: [],
   template: null,
-  type: '',
+  type: "",
 };
 
 const processComposition = (client: Client, model: Model, onNode: OnNode) => {
@@ -42,12 +37,7 @@ const processComposition = (client: Client, model: Model, onNode: OnNode) => {
   model.enums.forEach((enumerator) => processEnum(client, enumerator, onNode));
 };
 
-const processEnum = (
-  client: Client,
-  model: Model,
-  onNode: OnNode,
-  exportType = false,
-) => {
+const processEnum = (client: Client, model: Model, onNode: OnNode, exportType = false) => {
   const config = getConfig();
 
   const properties: Record<string | number, unknown> = {};
@@ -68,10 +58,7 @@ const processEnum = (
     return;
   }
 
-  const comment = [
-    model.description && escapeComment(model.description),
-    model.deprecated && '@deprecated',
-  ];
+  const comment = [model.description && escapeComment(model.description), model.deprecated && "@deprecated"];
 
   if (exportType) {
     const node = compiler.typedef.alias(
@@ -82,17 +69,17 @@ const processEnum = (
     onNode(node);
   }
 
-  if (config.enums === 'typescript') {
+  if (config.enums === "typescript") {
     const node = compiler.types.enum({
       comments,
       leadingComment: comment,
       name,
       obj: properties,
     });
-    onNode(node, 'enum');
+    onNode(node, "enum");
   }
 
-  if (config.enums === 'javascript') {
+  if (config.enums === "javascript") {
     const expression = compiler.types.object({
       comments,
       multiLine: true,
@@ -101,31 +88,24 @@ const processEnum = (
     });
     const node = compiler.export.asConst(name, expression);
     addLeadingComment(node, comment);
-    onNode(node, 'enum');
+    onNode(node, "enum");
   }
 };
 
 const processType = (client: Client, model: Model, onNode: OnNode) => {
-  const comment = [
-    model.description && escapeComment(model.description),
-    model.deprecated && '@deprecated',
-  ];
-  const node = compiler.typedef.alias(
-    transformTypeName(model.name),
-    toType(model),
-    comment,
-  );
+  const comment = [model.description && escapeComment(model.description), model.deprecated && "@deprecated"];
+  const node = compiler.typedef.alias(transformTypeName(model.name), toType(model), comment);
   onNode(node);
 };
 
 const processModel = (client: Client, model: Model, onNode: OnNode) => {
   switch (model.export) {
-    case 'all-of':
-    case 'any-of':
-    case 'one-of':
-    case 'interface':
+    case "all-of":
+    case "any-of":
+    case "one-of":
+    case "interface":
       return processComposition(client, model, onNode);
-    case 'enum':
+    case "enum":
       return processEnum(client, model, onNode, true);
     default:
       return processType(client, model, onNode);
@@ -134,8 +114,8 @@ const processModel = (client: Client, model: Model, onNode: OnNode) => {
 
 const processServiceTypes = (services: Service[], onNode: OnNode) => {
   type ResMap = Map<number, Model>;
-  type MethodMap = Map<'req' | 'res', ResMap | OperationParameter[]>;
-  type MethodKey = Service['operations'][number]['method'];
+  type MethodMap = Map<"req" | "res", ResMap | OperationParameter[]>;
+  type MethodKey = Service["operations"][number]["method"];
   type PathMap = Map<MethodKey, MethodMap>;
 
   const pathsMap = new Map<string, PathMap>();
@@ -160,14 +140,14 @@ const processServiceTypes = (services: Service[], onNode: OnNode) => {
         }
 
         if (hasReq) {
-          methodMap.set('req', sortByName([...operation.parameters]));
+          methodMap.set("req", sortByName([...operation.parameters]));
         }
 
         if (hasRes) {
-          let resMap = methodMap.get('res');
+          let resMap = methodMap.get("res");
           if (!resMap) {
-            methodMap.set('res', new Map());
-            resMap = methodMap.get('res')!;
+            methodMap.set("res", new Map());
+            resMap = methodMap.get("res")!;
           }
 
           if (Array.isArray(resMap)) {
@@ -180,10 +160,10 @@ const processServiceTypes = (services: Service[], onNode: OnNode) => {
         }
 
         if (hasErr) {
-          let resMap = methodMap.get('res');
+          let resMap = methodMap.get("res");
           if (!resMap) {
-            methodMap.set('res', new Map());
-            resMap = methodMap.get('res')!;
+            methodMap.set("res", new Map());
+            resMap = methodMap.get("res")!;
           }
 
           if (Array.isArray(resMap)) {
@@ -200,34 +180,32 @@ const processServiceTypes = (services: Service[], onNode: OnNode) => {
 
   const properties = Array.from(pathsMap).map(([path, pathMap]) => {
     const pathParameters = Array.from(pathMap).map(([method, methodMap]) => {
-      const methodParameters = Array.from(methodMap).map(
-        ([name, baseOrResMap]) => {
-          const reqResParameters = Array.isArray(baseOrResMap)
-            ? baseOrResMap
-            : Array.from(baseOrResMap).map(([code, base]) => {
-                // TODO: move query params into separate query key
-                const value: Model = {
-                  ...emptyModel,
-                  ...base,
-                  isRequired: true,
-                  name: String(code),
-                };
-                return value;
-              });
+      const methodParameters = Array.from(methodMap).map(([name, baseOrResMap]) => {
+        const reqResParameters = Array.isArray(baseOrResMap)
+          ? baseOrResMap
+          : Array.from(baseOrResMap).map(([code, base]) => {
+              // TODO: move query params into separate query key
+              const value: Model = {
+                ...emptyModel,
+                ...base,
+                isRequired: true,
+                name: String(code),
+              };
+              return value;
+            });
 
-          const reqResKey: Model = {
-            ...emptyModel,
-            export: 'interface',
-            isRequired: true,
-            name,
-            properties: reqResParameters,
-          };
-          return reqResKey;
-        },
-      );
+        const reqResKey: Model = {
+          ...emptyModel,
+          export: "interface",
+          isRequired: true,
+          name,
+          properties: reqResParameters,
+        };
+        return reqResKey;
+      });
       const methodKey: Model = {
         ...emptyModel,
-        export: 'interface',
+        export: "interface",
         isRequired: true,
         name: method.toLocaleLowerCase(),
         properties: methodParameters,
@@ -236,7 +214,7 @@ const processServiceTypes = (services: Service[], onNode: OnNode) => {
     });
     const pathKey: Model = {
       ...emptyModel,
-      export: 'interface',
+      export: "interface",
       isRequired: true,
       name: `'${path}'`,
       properties: pathParameters,
@@ -246,7 +224,7 @@ const processServiceTypes = (services: Service[], onNode: OnNode) => {
 
   const type = toType({
     ...emptyModel,
-    export: 'interface',
+    export: "interface",
     properties,
   });
   const namespace = serviceExportedNamespace();
@@ -263,7 +241,7 @@ export const processTypesAndEnums = async ({
 }): Promise<void> => {
   for (const model of client.models) {
     processModel(client, model, (node, type) => {
-      if (type === 'enum') {
+      if (type === "enum") {
         files.enums?.add(node);
       } else {
         files.types?.add(node);

@@ -1,23 +1,16 @@
-import camelCase from 'camelcase';
+import camelCase from "camelcase";
 
-import { getConfig } from '../../../utils/config';
-import type { OperationResponse } from '../interfaces/client';
-import { reservedWords } from './reservedWords';
-import {
-  sanitizeNamespaceIdentifier,
-  sanitizeOperationParameterName,
-} from './sanitize';
+import { getConfig } from "../../../utils/config";
+import type { OperationResponse } from "../interfaces/client";
+import { reservedWords } from "./reservedWords";
+import { sanitizeNamespaceIdentifier, sanitizeOperationParameterName } from "./sanitize";
 
 /**
  * Convert the input value to a correct operation (method) class name.
  * This will use the operation ID - if available - and otherwise fallback
  * on a generated name from the URL
  */
-export const getOperationName = (
-  url: string,
-  method: string,
-  operationId?: string,
-): string => {
+export const getOperationName = (url: string, method: string, operationId?: string): string => {
   const config = getConfig();
 
   if (config.services.operationId && operationId) {
@@ -25,9 +18,9 @@ export const getOperationName = (
   }
 
   const urlWithoutPlaceholders = url
-    .replace(/[^/]*?{api-version}.*?\//g, '')
-    .replace(/{(.*?)}/g, 'by-$1')
-    .replace(/\//g, '-');
+    .replace(/[^/]*?{api-version}.*?\//g, "")
+    .replace(/{(.*?)}/g, "by-$1")
+    .replace(/\//g, "-");
 
   return camelCase(`${method}-${urlWithoutPlaceholders}`);
 };
@@ -38,26 +31,20 @@ export const getOperationName = (
  */
 export const getOperationParameterName = (value: string): string => {
   const clean = sanitizeOperationParameterName(value).trim();
-  return camelCase(clean).replace(reservedWords, '_$1');
+  return camelCase(clean).replace(reservedWords, "_$1");
 };
 
-export const getOperationResponseHeader = (
-  operationResponses: OperationResponse[],
-): string | null => {
-  const header = operationResponses.find(
-    (operationResponses) => operationResponses.in === 'header',
-  );
+export const getOperationResponseHeader = (operationResponses: OperationResponse[]): string | null => {
+  const header = operationResponses.find((operationResponses) => operationResponses.in === "header");
   if (header) {
     return header.name;
   }
   return null;
 };
 
-export const getOperationResponseCode = (
-  value: string | 'default',
-): number | null => {
+export const getOperationResponseCode = (value: string | "default"): number | null => {
   // You can specify a "default" response, this is treated as HTTP code 200
-  if (value === 'default') {
+  if (value === "default") {
     return 200;
   }
 
@@ -72,10 +59,5 @@ export const getOperationResponseCode = (
   return null;
 };
 
-export const getOperationErrors = (
-  operationResponses: OperationResponse[],
-): OperationResponse[] =>
-  operationResponses.filter(
-    (operationResponse) =>
-      operationResponse.code >= 300 && operationResponse.description,
-  );
+export const getOperationErrors = (operationResponses: OperationResponse[]): OperationResponse[] =>
+  operationResponses.filter((operationResponse) => operationResponse.code >= 300 && operationResponse.description);

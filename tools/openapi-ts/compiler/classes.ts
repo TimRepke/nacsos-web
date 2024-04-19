@@ -1,10 +1,10 @@
-import ts from 'typescript';
+import ts from "typescript";
 
-import { createTypeNode } from './typedef';
-import { toExpression } from './types';
-import { addLeadingComment, Comments, isType } from './utils';
+import { createTypeNode } from "./typedef";
+import { toExpression } from "./types";
+import { addLeadingComment, Comments, isType } from "./utils";
 
-type AccessLevel = 'public' | 'protected' | 'private';
+type AccessLevel = "public" | "protected" | "private";
 
 export type FunctionParameter = {
   accessLevel?: AccessLevel;
@@ -22,11 +22,11 @@ export type FunctionParameter = {
  */
 const toAccessLevelModifiers = (access?: AccessLevel): ts.ModifierLike[] => {
   const keyword =
-    access === 'public'
+    access === "public"
       ? ts.SyntaxKind.PublicKeyword
-      : access === 'protected'
+      : access === "protected"
         ? ts.SyntaxKind.ProtectedKeyword
-        : access === 'private'
+        : access === "private"
           ? ts.SyntaxKind.PrivateKeyword
           : undefined;
   const modifiers: ts.ModifierLike[] = [];
@@ -51,9 +51,7 @@ const toParameterDeclarations = (parameters: FunctionParameter[]) =>
       modifiers,
       undefined,
       ts.factory.createIdentifier(p.name),
-      p.isRequired !== undefined && !p.isRequired
-        ? ts.factory.createToken(ts.SyntaxKind.QuestionToken)
-        : undefined,
+      p.isRequired !== undefined && !p.isRequired ? ts.factory.createToken(ts.SyntaxKind.QuestionToken) : undefined,
       p.type !== undefined ? createTypeNode(p.type) : undefined,
       p.default !== undefined ? toExpression({ value: p.default }) : undefined,
     );
@@ -164,18 +162,14 @@ export const createClassDeclaration = ({
   members?: ts.ClassElement[];
   name: string;
 }) => {
-  const modifiers: ts.ModifierLike[] = [
-    ts.factory.createModifier(ts.SyntaxKind.ExportKeyword),
-  ];
+  const modifiers: ts.ModifierLike[] = [ts.factory.createModifier(ts.SyntaxKind.ExportKeyword)];
   if (decorator) {
     modifiers.unshift(
       ts.factory.createDecorator(
         ts.factory.createCallExpression(
           ts.factory.createIdentifier(decorator.name),
           undefined,
-          decorator.args
-            .map((arg) => toExpression({ value: arg }))
-            .filter(isType<ts.Expression>),
+          decorator.args.map((arg) => toExpression({ value: arg })).filter(isType<ts.Expression>),
         ),
       ),
     );
@@ -185,15 +179,9 @@ export const createClassDeclaration = ({
   members.forEach((member) => {
     m.push(member);
     // @ts-ignore
-    m.push(ts.factory.createIdentifier('\n'));
+    m.push(ts.factory.createIdentifier("\n"));
   });
-  return ts.factory.createClassDeclaration(
-    modifiers,
-    ts.factory.createIdentifier(name),
-    [],
-    [],
-    m,
-  );
+  return ts.factory.createClassDeclaration(modifiers, ts.factory.createIdentifier(name), [], [], m);
 };
 
 /**
@@ -202,19 +190,11 @@ export const createClassDeclaration = ({
  * @param name - name of the function to call.
  * @returns ts.ReturnStatement
  */
-export const createReturnFunctionCall = ({
-  args = [],
-  name,
-}: {
-  args: any[];
-  name: string;
-}) =>
+export const createReturnFunctionCall = ({ args = [], name }: { args: any[]; name: string }) =>
   ts.factory.createReturnStatement(
     ts.factory.createCallExpression(
       ts.factory.createIdentifier(name),
       undefined,
-      args
-        .map((arg) => ts.factory.createIdentifier(arg))
-        .filter(isType<ts.Identifier>),
+      args.map((arg) => ts.factory.createIdentifier(arg)).filter(isType<ts.Identifier>),
     ),
   );

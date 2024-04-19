@@ -40,3 +40,6 @@ export enum SearchFieldEnum {
 }
 
 export type SearchFieldType = EnumLiteral<SearchFieldEnum>;
+
+// import type { AssignmentStatusEnum } from "@/plugins/api/spec/enums.gen";
+// export type AssignmentStatus = EnumLiteral<AssignmentStatusEnum>;

@@ -1,11 +1,11 @@
-import type { OperationResponse } from '../../common/interfaces/client';
-import { getPattern } from '../../common/parser/getPattern';
-import { getRef } from '../../common/parser/getRef';
-import { getType } from '../../common/parser/type';
-import type { OpenApi } from '../interfaces/OpenApi';
-import type { OpenApiResponse } from '../interfaces/OpenApiResponse';
-import type { OpenApiSchema } from '../interfaces/OpenApiSchema';
-import { getModel } from './getModel';
+import type { OperationResponse } from "../../common/interfaces/client";
+import { getPattern } from "../../common/parser/getPattern";
+import { getRef } from "../../common/parser/getRef";
+import { getType } from "../../common/parser/type";
+import type { OpenApi } from "../interfaces/OpenApi";
+import type { OpenApiResponse } from "../interfaces/OpenApiResponse";
+import type { OpenApiSchema } from "../interfaces/OpenApiSchema";
+import { getModel } from "./getModel";
 
 export const getOperationResponse = (
   openApi: OpenApi,
@@ -14,23 +14,23 @@ export const getOperationResponse = (
 ): OperationResponse => {
   const operationResponse: OperationResponse = {
     $refs: [],
-    base: responseCode !== 204 ? 'unknown' : 'void',
+    base: responseCode !== 204 ? "unknown" : "void",
     code: responseCode,
     description: response.description || null,
     enum: [],
     enums: [],
-    export: 'generic',
+    export: "generic",
     imports: [],
-    in: 'response',
+    in: "response",
     isDefinition: false,
     isNullable: false,
     isReadOnly: false,
     isRequired: false,
     link: null,
-    name: '',
+    name: "",
     properties: [],
     template: null,
-    type: responseCode !== 204 ? 'unknown' : 'void',
+    type: responseCode !== 204 ? "unknown" : "void",
   };
 
   // If this response has a schema, then we need to check two things:
@@ -39,12 +39,12 @@ export const getOperationResponse = (
   // and then we need to parse the schema!
   let schema = response.schema;
   if (schema) {
-    if (schema.$ref?.startsWith('#/responses/')) {
+    if (schema.$ref?.startsWith("#/responses/")) {
       schema = getRef<OpenApiSchema>(openApi, schema);
     }
     if (schema.$ref) {
       const model = getType(schema.$ref);
-      operationResponse.export = 'reference';
+      operationResponse.export = "reference";
       operationResponse.type = model.type;
       operationResponse.base = model.base;
       operationResponse.template = model.template;
@@ -87,10 +87,10 @@ export const getOperationResponse = (
   if (response.headers) {
     for (const name in response.headers) {
       if (response.headers.hasOwnProperty(name)) {
-        operationResponse.in = 'header';
+        operationResponse.in = "header";
         operationResponse.name = name;
-        operationResponse.type = 'string';
-        operationResponse.base = 'string';
+        operationResponse.type = "string";
+        operationResponse.base = "string";
         return operationResponse;
       }
     }

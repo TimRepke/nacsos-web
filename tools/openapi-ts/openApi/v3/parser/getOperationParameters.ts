@@ -1,15 +1,12 @@
-import type { OperationParameters } from '../../common/interfaces/client';
-import { getRef } from '../../common/parser/getRef';
-import type { OpenApi } from '../interfaces/OpenApi';
-import type { OpenApiParameter } from '../interfaces/OpenApiParameter';
-import { getOperationParameter } from './getOperationParameter';
+import type { OperationParameters } from "../../common/interfaces/client";
+import { getRef } from "../../common/parser/getRef";
+import type { OpenApi } from "../interfaces/OpenApi";
+import type { OpenApiParameter } from "../interfaces/OpenApiParameter";
+import { getOperationParameter } from "./getOperationParameter";
 
-const allowedIn = ['cookie', 'formData', 'header', 'path', 'query'] as const;
+const allowedIn = ["cookie", "formData", "header", "path", "query"] as const;
 
-export const getOperationParameters = (
-  openApi: OpenApi,
-  parameters: OpenApiParameter[],
-): OperationParameters => {
+export const getOperationParameters = (openApi: OpenApi, parameters: OpenApiParameter[]): OperationParameters => {
   const operationParameters: OperationParameters = {
     $refs: [],
     imports: [],
@@ -23,65 +20,38 @@ export const getOperationParameters = (
   };
 
   parameters.forEach((parameterOrReference) => {
-    const parameterDef = getRef<OpenApiParameter>(
-      openApi,
-      parameterOrReference,
-    );
+    const parameterDef = getRef<OpenApiParameter>(openApi, parameterOrReference);
     const parameter = getOperationParameter(openApi, parameterDef);
 
     const defIn = parameterDef.in as (typeof allowedIn)[number];
 
     // ignore the "api-version" param since we do not want to add it
     // as the first/default parameter for each of the service calls
-    if (parameter.prop === 'api-version' || !allowedIn.includes(defIn)) {
+    if (parameter.prop === "api-version" || !allowedIn.includes(defIn)) {
       return;
     }
 
     switch (defIn) {
-      case 'cookie':
-        operationParameters.parametersCookie = [
-          ...operationParameters.parametersCookie,
-          parameter,
-        ];
+      case "cookie":
+        operationParameters.parametersCookie = [...operationParameters.parametersCookie, parameter];
         break;
-      case 'formData':
-        operationParameters.parametersForm = [
-          ...operationParameters.parametersForm,
-          parameter,
-        ];
+      case "formData":
+        operationParameters.parametersForm = [...operationParameters.parametersForm, parameter];
         break;
-      case 'header':
-        operationParameters.parametersHeader = [
-          ...operationParameters.parametersHeader,
-          parameter,
-        ];
+      case "header":
+        operationParameters.parametersHeader = [...operationParameters.parametersHeader, parameter];
         break;
-      case 'path':
-        operationParameters.parametersPath = [
-          ...operationParameters.parametersPath,
-          parameter,
-        ];
+      case "path":
+        operationParameters.parametersPath = [...operationParameters.parametersPath, parameter];
         break;
-      case 'query':
-        operationParameters.parametersQuery = [
-          ...operationParameters.parametersQuery,
-          parameter,
-        ];
+      case "query":
+        operationParameters.parametersQuery = [...operationParameters.parametersQuery, parameter];
         break;
     }
 
-    operationParameters.$refs = [
-      ...operationParameters.$refs,
-      ...parameter.$refs,
-    ];
-    operationParameters.imports = [
-      ...operationParameters.imports,
-      ...parameter.imports,
-    ];
-    operationParameters.parameters = [
-      ...operationParameters.parameters,
-      parameter,
-    ];
+    operationParameters.$refs = [...operationParameters.$refs, ...parameter.$refs];
+    operationParameters.imports = [...operationParameters.imports, ...parameter.imports];
+    operationParameters.parameters = [...operationParameters.parameters, parameter];
   });
 
   return operationParameters;

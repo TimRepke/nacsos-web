@@ -1,36 +1,33 @@
-import type { OperationParameter } from '../../common/interfaces/client';
-import { getPattern } from '../../common/parser/getPattern';
-import { getType } from '../../common/parser/type';
-import type { OpenApi } from '../interfaces/OpenApi';
-import type { OpenApiRequestBody } from '../interfaces/OpenApiRequestBody';
-import { getContent } from './getContent';
-import { getModel } from './getModel';
+import type { OperationParameter } from "../../common/interfaces/client";
+import { getPattern } from "../../common/parser/getPattern";
+import { getType } from "../../common/parser/type";
+import type { OpenApi } from "../interfaces/OpenApi";
+import type { OpenApiRequestBody } from "../interfaces/OpenApiRequestBody";
+import { getContent } from "./getContent";
+import { getModel } from "./getModel";
 
-export const getOperationRequestBody = (
-  openApi: OpenApi,
-  body: OpenApiRequestBody,
-): OperationParameter => {
+export const getOperationRequestBody = (openApi: OpenApi, body: OpenApiRequestBody): OperationParameter => {
   const requestBody: OperationParameter = {
     $refs: [],
-    base: 'unknown',
+    base: "unknown",
     default: undefined,
     description: body.description || null,
     enum: [],
     enums: [],
-    export: 'interface',
+    export: "interface",
     imports: [],
-    in: 'body',
+    in: "body",
     isDefinition: false,
     isNullable: body.nullable === true,
     isReadOnly: false,
     isRequired: body.required === true,
     link: null,
     mediaType: null,
-    name: body['x-body-name'] ?? 'requestBody',
-    prop: body['x-body-name'] ?? 'requestBody',
+    name: body["x-body-name"] ?? "requestBody",
+    prop: body["x-body-name"] ?? "requestBody",
     properties: [],
     template: null,
-    type: 'unknown',
+    type: "unknown",
   };
 
   if (body.content) {
@@ -38,16 +35,16 @@ export const getOperationRequestBody = (
     if (content) {
       requestBody.mediaType = content.mediaType;
       switch (requestBody.mediaType) {
-        case 'application/x-www-form-urlencoded':
-        case 'multipart/form-data':
-          requestBody.in = 'formData';
-          requestBody.name = 'formData';
-          requestBody.prop = 'formData';
+        case "application/x-www-form-urlencoded":
+        case "multipart/form-data":
+          requestBody.in = "formData";
+          requestBody.name = "formData";
+          requestBody.prop = "formData";
           break;
       }
       if (content.schema.$ref) {
         const model = getType(content.schema.$ref);
-        requestBody.export = 'reference';
+        requestBody.export = "reference";
         requestBody.type = model.type;
         requestBody.base = model.base;
         requestBody.template = model.template;

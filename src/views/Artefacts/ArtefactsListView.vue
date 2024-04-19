@@ -82,17 +82,16 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import { marked } from "marked";
-import type { TaskModel, FunctionInfo, FileOnDisk, QueueService } from "@/plugins/api/api-pipe";
+import type { TaskModel, FileOnDisk } from "@/plugins/api/types";
 import { EventBus } from "@/plugins/events";
 import { ToastEvent } from "@/plugins/events/events/toast";
 import { API } from "@/plugins/api";
+import type { PipesService } from "@/plugins/api/spec/services.gen";
 import { currentProjectStore, currentUserStore } from "@/stores";
-
-type SearchParams = Parameters<QueueService["searchTasksApiQueueSearchGet"]>[0];
+import { ArgumentTypes } from "@/util";
 
 interface Entry {
   task: TaskModel;
-  info: FunctionInfo;
   showArtefacts: boolean;
   showLog: boolean;
   log: boolean;
@@ -106,6 +105,8 @@ type ArtefactListData = {
   searchByFunctions?: string;
   searchByTags?: string;
 };
+
+type SearchParams = ArgumentTypes<typeof PipesService.searchTasksApiPipesTasksGet>[0];
 
 export default defineComponent({
   name: "ArtefactsListView",
@@ -124,7 +125,7 @@ export default defineComponent({
   methods: {
     async loadEntries() {
       try {
-        const tasks = (await API.pipe.queue.searchTasksApiQueueSearchGet(this.searchObject)).data;
+        const tasks = (await API.pipes.searchTasksApiPipesTasksGet(this.searchObject)).data;
 
         if (!tasks || tasks.length === 0) {
           EventBus.emit(
@@ -133,20 +134,8 @@ export default defineComponent({
           return;
         }
 
-        const funcNames: string[] = Array.from(new Set(tasks.map((task: TaskModel) => task.function_name)));
-        const funcInfos = (await API.pipe.library.getFunctionInfosApiLibraryInfosGet({ funcName: funcNames })).data;
-        if (!funcInfos) {
-          EventBus.emit(new ToastEvent("ERROR", "Failed to load function infos. Please try reloading the page."));
-          return;
-        }
-
-        const funcs = Object.fromEntries(
-          funcInfos.map((func: FunctionInfo) => [`${func.module}.${func.function}`, func]),
-        );
-
         this.entries = tasks.map((task: TaskModel) => ({
           task,
-          info: funcs[task.function_name],
           showArtefacts: false,
           showLog: false,
           log: false,
@@ -157,11 +146,11 @@ export default defineComponent({
       }
     },
     md2html(s: string): string {
-      return marked(s);
+      return marked.parse(s, { async: false }) as string;
     },
     async toggleEntry(entry: Entry) {
       const artefacts = (
-        await API.pipe.artefacts.getArtefactsApiArtefactsListGet({
+        await API.pipes.getArtefactsApiPipesArtefactsListGet({
           xTaskId: entry.task.task_id as string,
           xProjectId: currentProjectStore.projectId as string,
         })

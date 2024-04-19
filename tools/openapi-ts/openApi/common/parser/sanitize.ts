@@ -8,12 +8,11 @@
  * does. The way this is now one could perhaps end up removing all characters, if all are illegal start characters. It
  * would be sort of a breaking change to do so, though, previously generated code might change then.
  *
- * JavaScript identifier regexp pattern retrieved from https://developer.mozilla.org/docs/Web/JavaScript/Reference/Lexical_grammar#identifiers
+ * JavaScript identifier regexp pattern retrieved from
+ * https://developer.mozilla.org/docs/Web/JavaScript/Reference/Lexical_grammar#identifiers
  */
 export const ensureValidTypeScriptJavaScriptIdentifier = (name: string) =>
-  name
-    .replace(/^[^$_\p{ID_Start}]+/u, '')
-    .replace(/[^$\u200c\u200d\p{ID_Continue}]/gu, '_');
+  name.replace(/^[^$_\p{ID_Start}]+/u, "").replace(/[^$\u200c\u200d\p{ID_Continue}]/gu, "_");
 
 /**
  * Sanitizes namespace identifiers so they are valid TypeScript identifiers of a certain form.
@@ -25,17 +24,18 @@ export const ensureValidTypeScriptJavaScriptIdentifier = (name: string) =>
  * does. The way this is now one could perhaps end up removing all characters, if all are illegal start characters. It
  * would be sort of a breaking change to do so, though, previously generated code might change then.
  *
- * JavaScript identifier regexp pattern retrieved from https://developer.mozilla.org/docs/Web/JavaScript/Reference/Lexical_grammar#identifiers
+ * JavaScript identifier regexp pattern retrieved from
+ * https://developer.mozilla.org/docs/Web/JavaScript/Reference/Lexical_grammar#identifiers
  *
  * The output of this is expected to be converted to PascalCase
  */
 export const sanitizeNamespaceIdentifier = (name: string) =>
   name
-    .replace(/^[^\p{ID_Start}]+/u, '')
-    .replace(/[^$\u200c\u200d\p{ID_Continue}]/gu, '-')
-    .replace(/\$/g, '-');
+    .replace(/^[^\p{ID_Start}]+/u, "")
+    .replace(/[^$\u200c\u200d\p{ID_Continue}]/gu, "-")
+    .replace(/\$/g, "-");
 
 export const sanitizeOperationParameterName = (name: string) => {
-  const withoutBrackets = name.replace('[]', 'Array');
+  const withoutBrackets = name.replace("[]", "Array");
   return sanitizeNamespaceIdentifier(withoutBrackets);
 };

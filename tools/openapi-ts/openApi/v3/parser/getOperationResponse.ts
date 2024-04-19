@@ -1,12 +1,12 @@
-import type { OperationResponse } from '../../common/interfaces/client';
-import { getPattern } from '../../common/parser/getPattern';
-import { getRef } from '../../common/parser/getRef';
-import { getType } from '../../common/parser/type';
-import type { OpenApi } from '../interfaces/OpenApi';
-import type { OpenApiResponse } from '../interfaces/OpenApiResponse';
-import type { OpenApiSchema } from '../interfaces/OpenApiSchema';
-import { getContent } from './getContent';
-import { getModel } from './getModel';
+import type { OperationResponse } from "../../common/interfaces/client";
+import { getPattern } from "../../common/parser/getPattern";
+import { getRef } from "../../common/parser/getRef";
+import { getType } from "../../common/parser/type";
+import type { OpenApi } from "../interfaces/OpenApi";
+import type { OpenApiResponse } from "../interfaces/OpenApiResponse";
+import type { OpenApiSchema } from "../interfaces/OpenApiSchema";
+import { getContent } from "./getContent";
+import { getModel } from "./getModel";
 
 export const getOperationResponse = (
   openApi: OpenApi,
@@ -15,40 +15,37 @@ export const getOperationResponse = (
 ): OperationResponse => {
   const operationResponse: OperationResponse = {
     $refs: [],
-    base: responseCode !== 204 ? 'unknown' : 'void',
+    base: responseCode !== 204 ? "unknown" : "void",
     code: responseCode,
     description: response.description || null,
     enum: [],
     enums: [],
-    export: 'generic',
+    export: "generic",
     imports: [],
-    in: 'response',
+    in: "response",
     isDefinition: false,
     isNullable: false,
     isReadOnly: false,
     isRequired: false,
     link: null,
-    name: '',
+    name: "",
     properties: [],
     template: null,
-    type: responseCode !== 204 ? 'unknown' : 'void',
+    type: responseCode !== 204 ? "unknown" : "void",
   };
 
   if (response.content) {
     const content = getContent(openApi, response.content);
     if (content) {
-      if (content.schema.$ref?.startsWith('#/components/responses/')) {
+      if (content.schema.$ref?.startsWith("#/components/responses/")) {
         content.schema = getRef<OpenApiSchema>(openApi, content.schema);
       }
       if (content.schema.$ref) {
         const model = getType(content.schema.$ref);
         operationResponse.base = model.base;
-        operationResponse.export = 'reference';
+        operationResponse.export = "reference";
         operationResponse.$refs = [...operationResponse.$refs, ...model.$refs];
-        operationResponse.imports = [
-          ...operationResponse.imports,
-          ...model.imports,
-        ];
+        operationResponse.imports = [...operationResponse.imports, ...model.imports];
         operationResponse.template = model.template;
         operationResponse.type = model.type;
         return operationResponse;
@@ -77,10 +74,7 @@ export const getOperationResponse = (
         operationResponse.minProperties = model.minProperties;
         operationResponse.pattern = getPattern(model.pattern);
         operationResponse.$refs = [...operationResponse.$refs, ...model.$refs];
-        operationResponse.imports = [
-          ...operationResponse.imports,
-          ...model.imports,
-        ];
+        operationResponse.imports = [...operationResponse.imports, ...model.imports];
         operationResponse.enum.push(...model.enum);
         operationResponse.enums.push(...model.enums);
         operationResponse.properties.push(...model.properties);
@@ -94,10 +88,10 @@ export const getOperationResponse = (
   if (response.headers) {
     for (const name in response.headers) {
       if (response.headers.hasOwnProperty(name)) {
-        operationResponse.in = 'header';
+        operationResponse.in = "header";
         operationResponse.name = name;
-        operationResponse.type = 'string';
-        operationResponse.base = 'string';
+        operationResponse.type = "string";
+        operationResponse.base = "string";
         return operationResponse;
       }
     }

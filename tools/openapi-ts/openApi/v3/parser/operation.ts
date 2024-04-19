@@ -1,37 +1,25 @@
-import type {
-  Operation,
-  OperationParameter,
-  OperationParameters,
-} from '../../common/interfaces/client';
-import { getRef } from '../../common/parser/getRef';
-import {
-  getOperationErrors,
-  getOperationName,
-  getOperationResponseHeader,
-} from '../../common/parser/operation';
-import { getServiceName } from '../../common/parser/service';
-import { toSortedByRequired } from '../../common/parser/sort';
-import type { OpenApi } from '../interfaces/OpenApi';
-import type { OpenApiOperation } from '../interfaces/OpenApiOperation';
-import type { OpenApiRequestBody } from '../interfaces/OpenApiRequestBody';
-import { getOperationParameters } from './getOperationParameters';
-import { getOperationRequestBody } from './getOperationRequestBody';
-import { getOperationResponses } from './getOperationResponses';
-import { getOperationResults } from './getOperationResults';
+import type { Operation, OperationParameter, OperationParameters } from "../../common/interfaces/client";
+import { getRef } from "../../common/parser/getRef";
+import { getOperationErrors, getOperationName, getOperationResponseHeader } from "../../common/parser/operation";
+import { getServiceName } from "../../common/parser/service";
+import { toSortedByRequired } from "../../common/parser/sort";
+import type { OpenApi } from "../interfaces/OpenApi";
+import type { OpenApiOperation } from "../interfaces/OpenApiOperation";
+import type { OpenApiRequestBody } from "../interfaces/OpenApiRequestBody";
+import { getOperationParameters } from "./getOperationParameters";
+import { getOperationRequestBody } from "./getOperationRequestBody";
+import { getOperationResponses } from "./getOperationResponses";
+import { getOperationResults } from "./getOperationResults";
 
 // add global path parameters, skip duplicate names
-const mergeParameters = (
-  opParams: OperationParameter[],
-  globalParams: OperationParameter[],
-): OperationParameter[] => {
+const mergeParameters = (opParams: OperationParameter[], globalParams: OperationParameter[]): OperationParameter[] => {
   let mergedParameters = [...opParams];
   let pendingParameters = [...globalParams];
   while (pendingParameters.length > 0) {
     const pendingParam = pendingParameters[0];
     pendingParameters = pendingParameters.slice(1);
     const canMerge = mergedParameters.every(
-      (param) =>
-        param.in !== pendingParam.in || param.name !== pendingParam.name,
+      (param) => param.in !== pendingParam.in || param.name !== pendingParam.name,
     );
     if (canMerge) {
       mergedParameters = [...mergedParameters, pendingParam];
@@ -43,7 +31,7 @@ const mergeParameters = (
 export const getOperation = (
   openApi: OpenApi,
   data: {
-    method: Lowercase<Operation['method']>;
+    method: Lowercase<Operation["method"]>;
     op: OpenApiOperation;
     pathParams: OperationParameters;
     tag: string;
@@ -60,7 +48,7 @@ export const getOperation = (
     description: op.description || null,
     errors: [],
     imports: [],
-    method: method.toUpperCase() as Operation['method'],
+    method: method.toUpperCase() as Operation["method"],
     name,
     parameters: [],
     parametersBody: pathParams.parametersBody,
@@ -82,26 +70,11 @@ export const getOperation = (
     operation.imports = [...operation.imports, ...parameters.imports];
     operation.parameters = [...operation.parameters, ...parameters.parameters];
     operation.parametersBody = parameters.parametersBody;
-    operation.parametersCookie = [
-      ...operation.parametersCookie,
-      ...parameters.parametersCookie,
-    ];
-    operation.parametersForm = [
-      ...operation.parametersForm,
-      ...parameters.parametersForm,
-    ];
-    operation.parametersHeader = [
-      ...operation.parametersHeader,
-      ...parameters.parametersHeader,
-    ];
-    operation.parametersPath = [
-      ...operation.parametersPath,
-      ...parameters.parametersPath,
-    ];
-    operation.parametersQuery = [
-      ...operation.parametersQuery,
-      ...parameters.parametersQuery,
-    ];
+    operation.parametersCookie = [...operation.parametersCookie, ...parameters.parametersCookie];
+    operation.parametersForm = [...operation.parametersForm, ...parameters.parametersForm];
+    operation.parametersHeader = [...operation.parametersHeader, ...parameters.parametersHeader];
+    operation.parametersPath = [...operation.parametersPath, ...parameters.parametersPath];
+    operation.parametersQuery = [...operation.parametersQuery, ...parameters.parametersQuery];
   }
 
   if (op.requestBody) {
@@ -126,30 +99,12 @@ export const getOperation = (
     });
   }
 
-  operation.parameters = mergeParameters(
-    operation.parameters,
-    pathParams.parameters,
-  );
-  operation.parametersCookie = mergeParameters(
-    operation.parametersCookie,
-    pathParams.parametersCookie,
-  );
-  operation.parametersForm = mergeParameters(
-    operation.parametersForm,
-    pathParams.parametersForm,
-  );
-  operation.parametersHeader = mergeParameters(
-    operation.parametersHeader,
-    pathParams.parametersHeader,
-  );
-  operation.parametersPath = mergeParameters(
-    operation.parametersPath,
-    pathParams.parametersPath,
-  );
-  operation.parametersQuery = mergeParameters(
-    operation.parametersQuery,
-    pathParams.parametersQuery,
-  );
+  operation.parameters = mergeParameters(operation.parameters, pathParams.parameters);
+  operation.parametersCookie = mergeParameters(operation.parametersCookie, pathParams.parametersCookie);
+  operation.parametersForm = mergeParameters(operation.parametersForm, pathParams.parametersForm);
+  operation.parametersHeader = mergeParameters(operation.parametersHeader, pathParams.parametersHeader);
+  operation.parametersPath = mergeParameters(operation.parametersPath, pathParams.parametersPath);
+  operation.parametersQuery = mergeParameters(operation.parametersQuery, pathParams.parametersQuery);
 
   // Sort by required
   operation.parameters = toSortedByRequired(operation.parameters);

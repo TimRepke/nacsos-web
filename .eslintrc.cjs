@@ -46,6 +46,7 @@ module.exports = {
     "prefer-promise-reject-errors": "off",
     "vuejs-accessibility/click-events-have-key-events": "off",
     "vue/no-mutating-props": "off",
+    "@typescript-eslint/no-explicit-any": "off",
     "operator-linebreak": [
       "error",
       "after", // this is horrible, but prettier is refused to do before

@@ -1,19 +1,14 @@
-import ts from 'typescript';
+import ts from "typescript";
 
-import { addLeadingComment, type Comments, tsNodeToString } from './utils';
+import { addLeadingComment, type Comments, tsNodeToString } from "./utils";
 
-export const createTypeNode = (
-  base: any | ts.TypeNode,
-  args?: (any | ts.TypeNode)[],
-): ts.TypeNode => {
+export const createTypeNode = (base: any | ts.TypeNode, args?: (any | ts.TypeNode)[]): ts.TypeNode => {
   if (ts.isTypeNode(base)) {
     return base;
   }
 
-  if (typeof base === 'number') {
-    return ts.factory.createLiteralTypeNode(
-      ts.factory.createNumericLiteral(base),
-    );
+  if (typeof base === "number") {
+    return ts.factory.createLiteralTypeNode(ts.factory.createNumericLiteral(base));
   }
 
   return ts.factory.createTypeReferenceNode(
@@ -61,20 +56,13 @@ export type Property = {
  * @param isNullable - if the whole interface can be nullable
  * @returns ts.TypeLiteralNode | ts.TypeUnionNode
  */
-export const createTypeInterfaceNode = (
-  properties: Property[],
-  isNullable: boolean = false,
-) => {
+export const createTypeInterfaceNode = (properties: Property[], isNullable: boolean = false) => {
   const node = ts.factory.createTypeLiteralNode(
     properties.map((property) => {
       const signature = ts.factory.createPropertySignature(
-        property.isReadOnly
-          ? [ts.factory.createModifier(ts.SyntaxKind.ReadonlyKeyword)]
-          : undefined,
+        property.isReadOnly ? [ts.factory.createModifier(ts.SyntaxKind.ReadonlyKeyword)] : undefined,
         property.name,
-        property.isRequired
-          ? undefined
-          : ts.factory.createToken(ts.SyntaxKind.QuestionToken),
+        property.isRequired ? undefined : ts.factory.createToken(ts.SyntaxKind.QuestionToken),
         createTypeNode(property.type),
       );
       const comment = property.comment;
@@ -87,10 +75,7 @@ export const createTypeInterfaceNode = (
   if (!isNullable) {
     return node;
   }
-  return ts.factory.createUnionTypeNode([
-    node,
-    ts.factory.createTypeReferenceNode('null'),
-  ]);
+  return ts.factory.createUnionTypeNode([node, ts.factory.createTypeReferenceNode("null")]);
 };
 
 /**
@@ -99,13 +84,10 @@ export const createTypeInterfaceNode = (
  * @param isNullable - if the whole type can be null
  * @returns ts.UnionTypeNode
  */
-export const createTypeUnionNode = (
-  types: (any | ts.TypeNode)[],
-  isNullable: boolean = false,
-) => {
+export const createTypeUnionNode = (types: (any | ts.TypeNode)[], isNullable: boolean = false) => {
   const nodes = types.map((t) => createTypeNode(t));
   if (isNullable) {
-    nodes.push(ts.factory.createTypeReferenceNode('null'));
+    nodes.push(ts.factory.createTypeReferenceNode("null"));
   }
   return ts.factory.createUnionTypeNode(nodes);
 };
@@ -116,17 +98,11 @@ export const createTypeUnionNode = (
  * @param isNullable - if the whole type can be null
  * @returns ts.IntersectionTypeNode | ts.UnionTypeNode
  */
-export const createTypeIntersectNode = (
-  types: (any | ts.TypeNode)[],
-  isNullable: boolean = false,
-) => {
+export const createTypeIntersectNode = (types: (any | ts.TypeNode)[], isNullable: boolean = false) => {
   const nodes = types.map((t) => createTypeNode(t));
   const intersect = ts.factory.createIntersectionTypeNode(nodes);
   if (isNullable) {
-    return ts.factory.createUnionTypeNode([
-      intersect,
-      ts.factory.createTypeReferenceNode('null'),
-    ]);
+    return ts.factory.createUnionTypeNode([intersect, ts.factory.createTypeReferenceNode("null")]);
   }
   return intersect;
 };
@@ -137,13 +113,10 @@ export const createTypeIntersectNode = (
  * @param isNullable - if the whole type can be null
  * @returns ts.UnionTypeNode
  */
-export const createTypeTupleNode = (
-  types: (any | ts.TypeNode)[],
-  isNullable: boolean = false,
-) => {
+export const createTypeTupleNode = (types: (any | ts.TypeNode)[], isNullable: boolean = false) => {
   const nodes = types.map((t) => createTypeNode(t));
   if (isNullable) {
-    nodes.push(ts.factory.createTypeReferenceNode('null'));
+    nodes.push(ts.factory.createTypeReferenceNode("null"));
   }
   return ts.factory.createTupleTypeNode(nodes);
 };
@@ -175,10 +148,7 @@ export const createTypeRecordNode = (
   if (!isNullable) {
     return node;
   }
-  return ts.factory.createUnionTypeNode([
-    node,
-    ts.factory.createTypeReferenceNode('null'),
-  ]);
+  return ts.factory.createUnionTypeNode([node, ts.factory.createTypeReferenceNode("null")]);
 };
 
 /**
@@ -187,18 +157,10 @@ export const createTypeRecordNode = (
  * @param isNullable - if the whole type can be null
  * @returns ts.TypeReferenceNode | ts.UnionTypeNode
  */
-export const createTypeArrayNode = (
-  types: (any | ts.TypeNode)[],
-  isNullable: boolean = false,
-) => {
-  const node = ts.factory.createTypeReferenceNode('Array', [
-    createTypeUnionNode(types),
-  ]);
+export const createTypeArrayNode = (types: (any | ts.TypeNode)[], isNullable: boolean = false) => {
+  const node = ts.factory.createTypeReferenceNode("Array", [createTypeUnionNode(types)]);
   if (!isNullable) {
     return node;
   }
-  return ts.factory.createUnionTypeNode([
-    node,
-    ts.factory.createTypeReferenceNode('null'),
-  ]);
+  return ts.factory.createUnionTypeNode([node, ts.factory.createTypeReferenceNode("null")]);
 };

@@ -3,8 +3,8 @@ import { OpenApi } from "./common/interfaces/OpenApi";
 import { parse as parseV2 } from "./v2/index";
 import { parse as parseV3 } from "./v3/index";
 
-export { Enum, Model, Operation, OperationParameter, Service } from "./common/interfaces/client";
-export { OpenApi } from "./common/interfaces/OpenApi";
+export type { Enum, Model, Operation, OperationParameter, Service } from "./common/interfaces/client";
+export type { OpenApi } from "./common/interfaces/OpenApi";
 
 /**
  * Parse the OpenAPI specification to a Client model that contains

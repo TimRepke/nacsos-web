@@ -1,9 +1,9 @@
-import type { Dictionary } from '../../common/interfaces/Dictionary';
-import type { WithEnumExtension } from '../../common/interfaces/WithEnumExtension';
-import type { OpenApiDiscriminator } from './OpenApiDiscriminator';
-import type { OpenApiExternalDocs } from './OpenApiExternalDocs';
-import type { OpenApiReference } from './OpenApiReference';
-import type { OpenApiXml } from './OpenApiXml';
+import type { Dictionary } from "../../common/interfaces/Dictionary";
+import type { WithEnumExtension } from "../../common/interfaces/WithEnumExtension";
+import type { OpenApiDiscriminator } from "./OpenApiDiscriminator";
+import type { OpenApiExternalDocs } from "./OpenApiExternalDocs";
+import type { OpenApiReference } from "./OpenApiReference";
+import type { OpenApiXml } from "./OpenApiXml";
 
 /**
  * {@link} https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.1.0.md#schema-object
@@ -23,17 +23,17 @@ export interface OpenApiSchema extends OpenApiReference, WithEnumExtension {
   exclusiveMinimum?: boolean;
   externalDocs?: OpenApiExternalDocs;
   format?:
-    | 'binary'
-    | 'boolean'
-    | 'byte'
-    | 'date-time'
-    | 'date'
-    | 'double'
-    | 'float'
-    | 'int32'
-    | 'int64'
-    | 'password'
-    | 'string';
+    | "binary"
+    | "boolean"
+    | "byte"
+    | "date-time"
+    | "date"
+    | "double"
+    | "float"
+    | "int32"
+    | "int64"
+    | "password"
+    | "string";
   items?: OpenApiSchema;
   maximum?: number;
   maxItems?: number;

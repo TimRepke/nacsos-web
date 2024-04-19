@@ -7,7 +7,7 @@ export interface UserConfig {
    * The selected HTTP client (fetch, xhr, node or axios)
    * @default 'fetch'
    */
-  client?: 'angular' | 'axios' | 'fetch' | 'node' | 'xhr';
+  client?: "angular" | "axios" | "fetch" | "node" | "xhr";
   /**
    * Run in debug mode?
    * @default false
@@ -22,7 +22,7 @@ export interface UserConfig {
    * Generate enum definitions?
    * @default false
    */
-  enums?: 'javascript' | 'typescript' | false;
+  enums?: "javascript" | "typescript" | false;
   /**
    * Generate core client classes?
    * @default true
@@ -72,7 +72,7 @@ export interface UserConfig {
          * for form validation
          * @default 'json'
          */
-        type?: 'form' | 'json';
+        type?: "form" | "json";
       };
   /**
    * Generate services?
@@ -105,7 +105,7 @@ export interface UserConfig {
          * Define shape of returned value from service calls
          * @default 'body'
          */
-        response?: 'body' | 'response';
+        response?: "body" | "response";
       };
   /**
    * Generate types?
@@ -133,7 +133,7 @@ export interface UserConfig {
          * Use your preferred naming pattern
          * @default 'preserve'
          */
-        name?: 'PascalCase' | 'preserve';
+        name?: "PascalCase" | "preserve";
       };
   /**
    * Use options or arguments functions
@@ -142,12 +142,9 @@ export interface UserConfig {
   useOptions?: boolean;
 }
 
-export type Config = Omit<
-  Required<UserConfig>,
-  'base' | 'name' | 'request' | 'schemas' | 'services' | 'types'
-> &
-  Pick<UserConfig, 'base' | 'name' | 'request'> & {
-    schemas: Extract<Required<UserConfig>['schemas'], object>;
-    services: Extract<Required<UserConfig>['services'], object>;
-    types: Extract<Required<UserConfig>['types'], object>;
+export type Config = Omit<Required<UserConfig>, "base" | "name" | "request" | "schemas" | "services" | "types"> &
+  Pick<UserConfig, "base" | "name" | "request"> & {
+    schemas: Extract<Required<UserConfig>["schemas"], object>;
+    services: Extract<Required<UserConfig>["services"], object>;
+    types: Extract<Required<UserConfig>["types"], object>;
   };

@@ -6,7 +6,7 @@
  * types.
  * @see: build.js for more information
  */
-declare module '*.hbs' {
+declare module "*.hbs" {
   const template: {
     compiler: [number, string];
     useData: true;

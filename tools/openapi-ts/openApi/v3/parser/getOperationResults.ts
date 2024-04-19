@@ -1,17 +1,14 @@
-import type { Model, OperationResponse } from '../../common/interfaces/client';
+import type { Model, OperationResponse } from "../../common/interfaces/client";
 
 const areEqual = (a: Model, b: Model): boolean => {
-  const equal =
-    a.type === b.type && a.base === b.base && a.template === b.template;
+  const equal = a.type === b.type && a.base === b.base && a.template === b.template;
   if (equal && a.link && b.link) {
     return areEqual(a.link, b.link);
   }
   return equal;
 };
 
-export const getOperationResults = (
-  operationResponses: OperationResponse[],
-): OperationResponse[] => {
+export const getOperationResults = (operationResponses: OperationResponse[]): OperationResponse[] => {
   const operationResults: OperationResponse[] = [];
 
   // Filter out success response codes
@@ -23,7 +20,6 @@ export const getOperationResults = (
   });
 
   return operationResults.filter(
-    (operationResult, index, arr) =>
-      arr.findIndex((item) => areEqual(item, operationResult)) === index,
+    (operationResult, index, arr) => arr.findIndex((item) => areEqual(item, operationResult)) === index,
   );
 };

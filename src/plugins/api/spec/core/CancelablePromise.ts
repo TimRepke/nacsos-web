@@ -1,4 +1,4 @@
-import { ErrorLevel } from "@/plugins/api_old/core/CancelablePromise";
+import { ErrorLevel } from "@/plugins/api";
 
 export class CancelError extends Error {
   constructor(message: string) {

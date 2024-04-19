@@ -1,16 +1,9 @@
-import { readFileSync } from "node:fs";
 import path from "node:path";
 
 import { loadConfig } from "c12";
 
-import { parse } from "./openApi";
-import type { Client } from "./types/client";
 import type { Config, UserConfig } from "./types/config";
-import { getConfig, setConfig } from "./utils/config";
-import { getOpenApiSpec } from "./utils/getOpenApiSpec";
-import { registerHandlebarTemplates } from "./utils/handlebars";
-import { postProcessClient } from "./utils/postprocess";
-import { writeClient } from "./utils/write/client";
+import { setConfig } from "./utils/config";
 
 const getSchemas = (userConfig: UserConfig): Config["schemas"] => {
   let schemas: Config["schemas"] = {
