@@ -75,7 +75,7 @@
 import { defineComponent } from "vue";
 import type { RouteLocationMatched } from "vue-router";
 import { currentProjectStore } from "@/stores";
-import type { ProjectPermissionsModel } from "@/plugins/api/api-core";
+import type { ProjectPermissionsModel } from "@/plugins/api/types";
 
 interface MenuEntry {
   name: string;

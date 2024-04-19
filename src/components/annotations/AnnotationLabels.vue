@@ -212,8 +212,8 @@ import { defineComponent } from "vue";
 import type { PropType } from "vue";
 import InlineToolTip from "@/components/InlineToolTip.vue";
 import SearchableSelect from "@/components/SearchableSelect.vue";
-import type { AssignmentModel, AnnotationModel, AnnotationSchemeLabelChoice } from "@/plugins/api/api-core";
-import { AnnotationSchemeLabel } from "@/plugins/api/api-core";
+import type { AssignmentModel, AnnotationModel, AnnotationSchemeLabelChoice } from "@/plugins/api/types";
+import { AnnotationSchemeLabel } from "@/plugins/api/types";
 import ClosablePill from "@/components/ClosablePill.vue";
 import { is } from "@/util";
 

@@ -30,6 +30,7 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: "/parse",
     name: "parse",
+    alias: ["parse", "nql"],
     component: () => import(/* webpackChunkName: "ParseView" */ "../views/ParseView.vue"),
   },
   {
@@ -58,26 +59,6 @@ const routes: Array<RouteRecordRaw> = [
         name: "project-artefacts-details",
         component: () =>
           import(/* webpackChunkName: "ArtefactDetailsView" */ "../views/Artefacts/ArtefactDetailsView.vue"),
-      },
-    ],
-  },
-  {
-    path: "/project/pipelines",
-    name: "project-pipelines",
-    component: () => import(/* webpackChunkName: "PipelinesContainer" */ "../views/Pipelines/PipelinesContainer.vue"),
-    children: [
-      {
-        path: "",
-        alias: ["", "setup"],
-        name: "project-pipelines-setup",
-        component: () =>
-          import(/* webpackChunkName: "PipelinesSetupView" */ "../views/Pipelines/PipelinesSetupView.vue"),
-      },
-      {
-        path: "presets",
-        name: "project-pipelines-presets",
-        component: () =>
-          import(/* webpackChunkName: "PipelinePresetsView" */ "../views/Pipelines/PipelinePresetsView.vue"),
       },
     ],
   },

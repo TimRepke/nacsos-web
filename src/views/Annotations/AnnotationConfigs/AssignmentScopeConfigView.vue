@@ -189,9 +189,14 @@ import type {
   HighlighterModel,
   UserModel,
   UserBaseModel,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   AssignmentScopeRandomWithNQLConfig,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  AssignmentScopeRandomWithExclusionConfig,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  AssignmentScopeRandomConfig,
 } from "@/plugins/api/spec/types.gen";
-import { AssignmentScopeBaseConfigTypes } from "@/plugins/api/types";
+import { type AssignmentScopeBaseConfigTypes } from "@/plugins/api/types";
 import { currentProjectStore } from "@/stores";
 import ScopeQuality from "@/components/annotations/ScopeQuality.vue";
 import RandomAssignmentWithNQLConfig from "@/components/annotations/assignments/RandomAssignmentWithNQL.vue";

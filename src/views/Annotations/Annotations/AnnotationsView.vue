@@ -159,8 +159,8 @@ import type {
   AssignmentScopeEntry,
   AssignmentScopeModel,
   HighlighterModel,
-} from "@/plugins/api/api-core";
-import { AssignmentStatus, AnnotationSchemeLabel } from "@/plugins/api/api-core";
+} from "@/plugins/api/types";
+import { AssignmentStatus, AnnotationSchemeLabel } from "@/plugins/api/types";
 import type { AnyItem } from "@/types/items.d";
 import { API, ignore } from "@/plugins/api";
 import { currentProjectStore, currentUserStore, interfaceSettingsStore } from "@/stores";
@@ -268,14 +268,14 @@ export default defineComponent({
       let response: AnnotationItem;
       if (currentAssignmentId) {
         response = (
-          await API.core.annotations.getAssignmentApiAnnotationsAnnotateAssignmentAssignmentIdGet({
+          await API.annotations.getAssignmentApiAnnotationsAnnotateAssignmentAssignmentIdGet({
             xProjectId: currentProjectStore.projectId as string,
             assignmentId: currentAssignmentId,
           })
         ).data;
       } else {
         response = (
-          await API.core.annotations.getNextOpenAssignmentForScopeForUserApiAnnotationsAnnotateNextAssignmentScopeIdGet(
+          await API.annotations.getNextOpenAssignmentForScopeForUserApiAnnotationsAnnotateNextAssignmentScopeIdGet(
             {
               xProjectId: currentProjectStore.projectId as string,
               assignmentScopeId,
@@ -286,7 +286,7 @@ export default defineComponent({
 
       await this.setCurrentAssignment(response);
 
-      API.core.highlighters
+      API.highlighters
         .getScopeHighlightersApiHighlightersScopeAssignmentScopeIdGet({
           xProjectId: currentProjectStore.projectId as string,
           assignmentScopeId,
@@ -423,7 +423,7 @@ export default defineComponent({
         scheme.labels = removeEmptyAnnotations(labels);
 
         // Send data to the server
-        API.core.annotations
+        API.annotations
           .saveAnnotationApiAnnotationsAnnotateSavePost({
             xProjectId: currentProjectStore.projectId as string,
             requestBody: {
@@ -464,7 +464,7 @@ export default defineComponent({
       this.rerenderCounter += 1;
 
       // update the assignments progress bar
-      API.core.annotations
+      API.annotations
         .getAssignmentIndicatorsForScopeApiAnnotationsAnnotateAssignmentProgressAssignmentScopeIdGet({
           xProjectId: currentProjectStore.projectId as string,
           assignmentScopeId: annotationItem.scope.assignment_scope_id as string,
@@ -486,7 +486,7 @@ export default defineComponent({
     async saveAndGoto(targetAssignmentId: string) {
       await this.save();
 
-      API.core.annotations
+      API.annotations
         .getAssignmentApiAnnotationsAnnotateAssignmentAssignmentIdGet({
           xProjectId: currentProjectStore.projectId as string,
           assignmentId: targetAssignmentId,

@@ -102,8 +102,8 @@ import { defineComponent } from "vue";
 import type { Component } from "vue";
 import { ToastEvent } from "@/plugins/events/events/toast";
 import { EventBus } from "@/plugins/events";
-import { ItemType } from "@/plugins/api/api-core";
-import type { ImportModel, ProjectModel, ProjectPermissionsModel } from "@/plugins/api/api-core";
+import { ItemType } from "@/plugins/api/types";
+import type { ImportModel, ProjectModel, ProjectPermissionsModel } from "@/plugins/api/types";
 import ConfigTwitter from "@/components/imports/ConfigTwitter.vue";
 import ConfigWoS from "@/components/imports/ConfigWoS.vue";
 import ConfigJSONLOpenAlexWorks from "@/components/imports/ConfigJSONLOpenAlexWorks.vue";
@@ -221,7 +221,7 @@ export default defineComponent({
   methods: {
     fetchImportDetails(onDone?: () => void) {
       if (this.importId) {
-        API.core.imports
+        API.imports
           .getImportDetailsApiImportsImportImportIdGet({
             importId: this.importId,
             xProjectId: currentProjectStore.projectId as string,
@@ -258,7 +258,7 @@ export default defineComponent({
       );
     },
     async saveRequest() {
-      API.core.imports
+      API.imports
         .putImportDetailsApiImportsImportPut({
           // @ts-ignore
           requestBody: this.importDetails,
@@ -303,7 +303,7 @@ export default defineComponent({
             "Make sure to **click save before importing**!",
           (response) => {
             if (response === "ACCEPT") {
-              API.core.imports
+              API.imports
                 .triggerImportApiImportsImportImportIdPost({
                   importId: this.importId as string,
                   xProjectId: currentProjectStore.projectId as string,
@@ -327,7 +327,7 @@ export default defineComponent({
       );
     },
     async loadImportStats() {
-      API.core.imports
+      API.imports
         .getImportCountsApiImportsImportImportIdCountGet({
           importId: this.importId as string,
           xProjectId: currentProjectStore.projectId as string,

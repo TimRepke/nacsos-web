@@ -7,7 +7,7 @@ import { defineAsyncComponent, defineComponent, markRaw } from "vue";
 import type { PropType, Component } from "vue";
 import type { AnyItem } from "@/types/items.d";
 import { useCurrentProjectStore } from "@/stores/CurrentProjectStore";
-import type { HighlighterModel, ItemType, ProjectModel } from "@/plugins/api/api-core";
+import type { HighlighterModel, ItemType, ProjectModel } from "@/plugins/api/types";
 
 type TypeMapType = { [key in ItemType]: Component };
 

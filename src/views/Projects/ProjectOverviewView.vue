@@ -35,7 +35,7 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import { marked } from "marked";
-import type { ProjectModel, ProjectPermissionsModel } from "@/plugins/api/api-core";
+import type { ProjectModel, ProjectPermissionsModel } from "@/plugins/api/types";
 import { currentProjectStore } from "@/stores";
 import PermissionSettingsCardReadOnly from "@/components/users/PermissionSettingsCardReadOnly.vue";
 

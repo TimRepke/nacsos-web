@@ -215,7 +215,7 @@
 import { defineComponent } from "vue";
 import type { PropType } from "vue";
 import ToolTip from "@/components/ToolTip.vue";
-import { AnnotationSchemeLabel } from "@/plugins/api/api-core";
+import { type AnnotationSchemeLabel, AnnotationSchemeLabelKindEnum } from "@/plugins/api/types";
 
 type KeyedAnnotationSchemeLabel = AnnotationSchemeLabel & { tmpKey?: string };
 
@@ -234,7 +234,7 @@ export default defineComponent({
   },
   data() {
     return {
-      annotationSchemeLabelKinds: AnnotationSchemeLabel.kind,
+      annotationSchemeLabelKinds: AnnotationSchemeLabelKindEnum,
       schemeLabels: this.labels,
     };
   },

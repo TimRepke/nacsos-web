@@ -23,10 +23,9 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import type { AssignmentCounts, UserBaseModel } from "@/plugins/api/api-core";
-import { currentProjectStore } from "@/stores";
 import { API, ignore } from "@/plugins/api";
-import type { AnnotationSchemeModel, AssignmentScopeModel } from "@/plugins/api/api-core";
+import type { AssignmentCounts, UserBaseModel, AnnotationSchemeModel, AssignmentScopeModel } from "@/plugins/api/types";
+import { currentProjectStore } from "@/stores";
 import ScopeQuality from "@/components/annotations/ScopeQuality.vue";
 
 export default defineComponent({
@@ -41,7 +40,7 @@ export default defineComponent({
     };
   },
   async mounted() {
-    API.core.annotations
+    API.annotations
       .getSchemeDefinitionsForProjectApiAnnotationsSchemesListProjectIdGet({
         projectId: currentProjectStore.projectId as string,
         xProjectId: currentProjectStore.projectId as string,
@@ -50,7 +49,7 @@ export default defineComponent({
         this.schemes = response.data;
       })
       .catch(ignore);
-    API.core.annotations
+    API.annotations
       .getAssignmentScopesForProjectApiAnnotationsAnnotateScopesGet({
         xProjectId: currentProjectStore.projectId as string,
       })
@@ -58,7 +57,7 @@ export default defineComponent({
         this.scopes = response.data;
       })
       .catch(ignore);
-    API.core.users
+    API.users
       .getProjectAnnotatorUsersApiUsersListProjectAnnotatorsProjectIdGet({
         projectId: currentProjectStore.projectId as string,
         xProjectId: currentProjectStore.projectId as string,

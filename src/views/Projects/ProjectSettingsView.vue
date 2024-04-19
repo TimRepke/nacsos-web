@@ -92,7 +92,7 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
-import type { ProjectModel, UserBaseModel, UserPermission } from "@/plugins/api/api-core";
+import type { ProjectModel, UserBaseModel, UserPermission } from "@/plugins/api/types";
 import { currentProjectStore } from "@/stores";
 import { API, logReject } from "@/plugins/api";
 import { EventBus } from "@/plugins/events";
@@ -119,14 +119,14 @@ export default defineComponent({
     };
   },
   mounted() {
-    API.core.project
+    API.project
       .getProjectApiProjectInfoGet({ xProjectId: currentProjectStore.projectId as string })
       .then((response) => {
         const { data } = response;
         this.project = data;
       })
       .catch(logReject);
-    API.core.project
+    API.project
       .getAllUserPermissionsApiProjectPermissionsListUsersGet({
         xProjectId: currentProjectStore.projectId as string,
       })
@@ -165,7 +165,7 @@ export default defineComponent({
     },
     saveProject() {
       if (this.project !== undefined) {
-        API.core.project
+        API.project
           .saveProjectApiProjectInfoPut({
             requestBody: this.project,
             xProjectId: currentProjectStore.projectId as string,

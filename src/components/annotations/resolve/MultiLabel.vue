@@ -56,7 +56,7 @@ import type {
   ResolutionCell,
   ResolutionUserEntry,
   FlatLabelChoice,
-} from "@/plugins/api/api-core";
+} from "@/plugins/api/types";
 import ClosablePill from "@/components/ClosablePill.vue";
 import InlineToolTip from "@/components/InlineToolTip.vue";
 import { is, isNone, notNone } from "@/util";

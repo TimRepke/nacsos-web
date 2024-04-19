@@ -62,7 +62,7 @@ import { Bar } from "vue-chartjs";
 import { Chart as ChartJS, Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale } from "chart.js";
 import { API, ignore } from "@/plugins/api";
 import { currentProjectStore } from "@/stores";
-import type { BasicProjectStats, HistogramEntry, RankEntry } from "@/plugins/api/api-core";
+import type { BasicProjectStats, HistogramEntry, RankEntry } from "@/plugins/api/types";
 
 ChartJS.register(Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale);
 
@@ -77,19 +77,19 @@ export default defineComponent({
     };
   },
   mounted() {
-    API.core.stats
+    API.stats
       .getBasicStatsApiStatsBasicsGet({ xProjectId: currentProjectStore.projectId as string })
       .then((response) => {
         this.basic = response.data;
       })
       .catch(ignore);
-    API.core.stats
+    API.stats
       .getAnnotatorRankingApiStatsRankGet({ xProjectId: currentProjectStore.projectId as string })
       .then((response) => {
         this.leaderboard = response.data;
       })
       .catch(ignore);
-    API.core.stats
+    API.stats
       .getPublicationYearHistogramApiStatsHistogramYearsGet({ xProjectId: currentProjectStore.projectId as string })
       .then((response) => {
         this.histogramYears = response.data;

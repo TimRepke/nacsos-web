@@ -40,7 +40,7 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import type { PropType } from "vue";
-import type { HighlighterModel, TwitterItemModel, Hashtag, Mention, URL } from "@/plugins/api/api-core";
+import type { HighlighterModel, TwitterItemModel, Hashtag, Mention, URL } from "@/plugins/api/types";
 import TextComponent from "@/components/items/TextComponent.vue";
 
 interface Replacement {

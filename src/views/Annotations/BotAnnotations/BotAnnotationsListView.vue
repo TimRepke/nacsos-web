@@ -91,7 +91,7 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import { currentProjectStore } from "@/stores";
-import type { BotMetaInfo } from "@/plugins/api/api-core";
+import type { BotMetaInfo } from "@/plugins/api/types";
 import { API, ignore } from "@/plugins/api";
 
 enum Sort {
@@ -115,7 +115,7 @@ export default defineComponent({
     };
   },
   async mounted() {
-    API.core.annotations
+    API.annotations
       .getBotAnnotationsApiAnnotationsBotAnnotationsGet({
         includeResolve: true,
         xProjectId: currentProjectStore.projectId as string,

@@ -42,14 +42,14 @@
 <script lang="ts">
 import type { PropType } from "vue";
 import { defineComponent } from "vue";
-import { OpenAlexImport } from "@/plugins/api/api-core";
+import { type OpenAlexSolrImport, DefTypeEnum, OpEnum, SearchFieldEnum } from "@/plugins/api/types";
 
 export default defineComponent({
   name: "ConfigOpenAlex",
   emits: ["configChanged"],
   props: {
     existingConfig: {
-      type: Object as PropType<OpenAlexImport>,
+      type: Object as PropType<OpenAlexSolrImport>,
       required: false,
       default: null,
     },
@@ -69,22 +69,16 @@ export default defineComponent({
     },
   },
   data() {
-    const config: OpenAlexImport = this.existingConfig
+    const config: OpenAlexSolrImport = this.existingConfig
       ? this.existingConfig
       : {
-          func_name: "nacsos_lib.academic.import.import_openalex",
           query: "",
-          def_type: OpenAlexImport.def_type.LUCENE,
-          field: OpenAlexImport.field.TITLE_ABSTRACT,
-          op: OpenAlexImport.op.AND,
-          project_id: this.projectId,
-          import_id: this.importId,
+          def_type: DefTypeEnum.LUCENE,
+          field: SearchFieldEnum.TITLE_ABSTRACT,
+          op: OpEnum.AND,
         };
     if (!this.existingConfig) {
       this.$emit("configChanged", config);
-    }
-    if (!config.import_id && !!this.importId) {
-      config.import_id = this.importId;
     }
     return {
       config,
@@ -92,13 +86,13 @@ export default defineComponent({
   },
   watch: {
     config: {
-      handler(newValue: OpenAlexImport) {
+      handler(newValue: OpenAlexSolrImport) {
         this.$emit("configChanged", newValue);
       },
       deep: true,
     },
     existingConfig: {
-      handler(newValue: OpenAlexImport) {
+      handler(newValue: OpenAlexSolrImport) {
         this.config = newValue;
       },
       deep: true,

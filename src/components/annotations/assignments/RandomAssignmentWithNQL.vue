@@ -93,7 +93,11 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import type { PropType } from "vue";
-import type { AssignmentScopeModel, AssignmentScopeRandomWithNQLConfig } from "@/plugins/api/api-core";
+import {
+  AssignmentScopeBaseConfigTypesEnum,
+  AssignmentScopeModel,
+  AssignmentScopeRandomWithNQLConfig,
+} from "@/plugins/api/types";
 import { API } from "@/plugins/api";
 import { currentProjectStore } from "@/stores";
 import NQLBox from "@/components/NQLBox.vue";
@@ -118,7 +122,7 @@ export default defineComponent({
     const config: AssignmentScopeRandomWithNQLConfig = this.existingConfig
       ? this.existingConfig
       : ({
-          config_type: "random_nql",
+          config_type: AssignmentScopeBaseConfigTypesEnum.RANDOM_NQL,
           num_items: 50,
           num_multi_coded_items: 50,
           min_assignments_per_item: 2,
@@ -140,7 +144,7 @@ export default defineComponent({
   methods: {
     getCount() {
       if (this.config.query_parsed)
-        API.core.search
+        API.search
           .nqlQueryCountApiSearchNqlCountPost({
             xProjectId: currentProjectStore.projectId as string,
             requestBody: this.config.query_parsed,
@@ -159,7 +163,7 @@ export default defineComponent({
     },
   },
   mounted() {
-    API.core.annotations
+    API.annotations
       .getAssignmentScopesForProjectApiAnnotationsAnnotateScopesGet({
         xProjectId: currentProjectStore.projectId as string,
       })

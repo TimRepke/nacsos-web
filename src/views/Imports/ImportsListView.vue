@@ -124,7 +124,7 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import type { ImportModel } from "@/plugins/api/api-core";
+import type { ImportModel } from "@/plugins/api/types";
 import InlineToolTip from "@/components/InlineToolTip.vue";
 import { EventBus } from "@/plugins/events";
 import { ToastEvent } from "@/plugins/events/events/toast";
@@ -152,7 +152,7 @@ export default defineComponent({
     };
   },
   async mounted() {
-    API.core.imports
+    API.imports
       .getAllImportsForProjectApiImportsListGet({
         xProjectId: currentProjectStore.projectId as string,
       })
@@ -190,7 +190,7 @@ export default defineComponent({
       // append "copy", so that the user has a chance to distinguish the new entry from the old one
       newImport.name += " copy";
 
-      API.core.imports
+      API.imports
         .putImportDetailsApiImportsImportPut({
           requestBody: newImport,
           xProjectId: currentProjectStore.projectId as string,
@@ -204,7 +204,7 @@ export default defineComponent({
           }
 
           // save again since we changed the config
-          API.core.imports
+          API.imports
             .putImportDetailsApiImportsImportPut({
               requestBody: newImport,
               xProjectId: currentProjectStore.projectId as string,
@@ -237,7 +237,7 @@ export default defineComponent({
             "other imports). Any annotations associated with these items will also be lost.",
           (confirmationResponse) => {
             if (confirmationResponse === "ACCEPT") {
-              API.core.imports
+              API.imports
                 .deleteImportDetailsApiImportsImportDeleteImportIdDelete({
                   // @ts-ignore
                   importId: importDetails.import_id,

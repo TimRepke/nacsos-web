@@ -20,7 +20,7 @@
 <script lang="ts">
 import type { PropType } from "vue";
 import { defineComponent } from "vue";
-import type { ProjectPermissionsModel } from "@/plugins/api/api-core";
+import type { ProjectPermissionsModel } from "@/plugins/api/types";
 import type { PermissionKeys } from "@/types/permissions";
 import { ProjectPermissionHints } from "@/types/permissions";
 

@@ -1,3 +1,6 @@
+/* eslint-disable  @typescript-eslint/no-explicit-any */
+import type { AxiosRequestConfig } from "axios";
+
 export type ApiRequestOptions = {
   readonly method: "GET" | "PUT" | "POST" | "DELETE" | "OPTIONS" | "HEAD" | "PATCH";
   readonly url: string;
@@ -10,4 +13,5 @@ export type ApiRequestOptions = {
   readonly mediaType?: string;
   readonly responseHeader?: string;
   readonly errors?: Record<number, string>;
+  readonly customRequestConfig?: AxiosRequestConfig;
 };

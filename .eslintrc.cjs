@@ -35,12 +35,13 @@ module.exports = {
     //   },
     //   allowChildren: false,
     // }],
-    "object-curly-newline": [
-      "error",
-      {
-        ObjectPattern: "never",
-      },
-    ],
+    "object-curly-newline": "off",
+    // "object-curly-newline": [
+    //   "error",
+    //   {
+    //     ObjectPattern: "never",
+    //   },
+    // ],
     "class-methods-use-this": "off",
     "prefer-promise-reject-errors": "off",
     "vuejs-accessibility/click-events-have-key-events": "off",

@@ -34,8 +34,8 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import type { PropType } from "vue";
-import type { FlatLabelChoice, Label } from "@/plugins/api/api-core";
-import { FlatLabel, FlattenedAnnotationSchemeLabel } from "@/plugins/api/api-core";
+import type { FlatLabelChoice, Label } from "@/plugins/api/types";
+import { FlatLabel, FlattenedAnnotationSchemeLabel } from "@/plugins/api/types";
 
 export default defineComponent({
   name: "LabelPathPills",

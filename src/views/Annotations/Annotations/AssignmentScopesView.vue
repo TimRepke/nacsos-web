@@ -98,7 +98,7 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import { currentProjectStore } from "@/stores";
-import type { UserProjectAssignmentScope } from "@/plugins/api/api-core";
+import type { UserProjectAssignmentScope } from "@/plugins/api/types";
 import { API, ignore } from "@/plugins/api";
 
 enum Sort {
@@ -121,7 +121,7 @@ export default defineComponent({
     };
   },
   async mounted() {
-    API.core.annotations
+    API.annotations
       .getAssignmentScopesForUserApiAnnotationsAnnotateScopesProjectIdGet({
         projectId: currentProjectStore.projectId as string,
         xProjectId: currentProjectStore.projectId as string,

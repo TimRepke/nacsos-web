@@ -90,7 +90,11 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import type { PropType } from "vue";
-import type { AssignmentScopeModel, AssignmentScopeRandomWithExclusionConfig } from "@/plugins/api/api-core";
+import {
+  AssignmentScopeBaseConfigTypesEnum,
+  AssignmentScopeModel,
+  AssignmentScopeRandomWithExclusionConfig,
+} from "@/plugins/api/types";
 import { API } from "@/plugins/api";
 import { currentProjectStore } from "@/stores";
 
@@ -111,7 +115,7 @@ export default defineComponent({
     const config: AssignmentScopeRandomWithExclusionConfig = this.existingConfig
       ? this.existingConfig
       : ({
-          config_type: "random_exclusion",
+          config_type: AssignmentScopeBaseConfigTypesEnum.RANDOM_EXCLUSION,
           num_items: 12,
           num_multi_coded_items: 8,
           min_assignments_per_item: 2,
@@ -128,7 +132,7 @@ export default defineComponent({
     };
   },
   mounted() {
-    API.core.annotations
+    API.annotations
       .getAssignmentScopesForProjectApiAnnotationsAnnotateScopesGet({
         xProjectId: currentProjectStore.projectId as string,
       })

@@ -102,7 +102,7 @@ export default defineComponent({
     ask() {
       const query = debug(this.queryStr);
       this.count = -1;
-      API.core.search
+      API.search
         .nqlQueryApiSearchNqlQueryPost({
           xProjectId: currentProjectStore.projectId as string,
           requestBody: query[0],

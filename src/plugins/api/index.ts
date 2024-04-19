@@ -1,4 +1,4 @@
-import { OpenAPI } from "@/plugins/api/core/OpenAPI";
+import { OpenAPI } from "@/plugins/api/spec/core/OpenAPI";
 import {
   AnnotationsService,
   DefaultService,
@@ -14,8 +14,9 @@ import {
   SearchService,
   StatsService,
   UsersService,
+  PipesService,
 } from "@/plugins/api/spec/services.gen";
-import type { ApiResponseReject } from "@/plugins/api/core/ApiResult";
+import type { ApiResponseReject } from "@/plugins/api/spec/core/ApiResult";
 import { EventBus } from "@/plugins/events";
 import { ToastEvent } from "@/plugins/events/events/toast";
 
@@ -36,6 +37,7 @@ export const API = {
   search: SearchService,
   stats: StatsService,
   users: UsersService,
+  pipes: PipesService,
 };
 
 export function ignore() {}
@@ -53,4 +55,4 @@ export function toastReject(reason: ApiResponseReject) {
   );
 }
 
-export type { ApiResult, ApiResponseReject, ErrorDetails, ErrorLevel } from "@/plugins/api/core/ApiResult";
+export type { ApiResult, ApiResponseReject, ErrorDetails, ErrorLevel } from "@/plugins/api/spec/core/ApiResult";

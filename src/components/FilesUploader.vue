@@ -104,8 +104,7 @@ export default defineComponent({
       }
 
       return new Promise((resolve, reject) => {
-        API.pipe.artefacts
-          .uploadFileApiArtefactsFilesUploadPost(
+        API.pipes.uploadFileApiPipesArtefactsFilesUploadPost(
             {
               xProjectId: currentProjectStore.projectId as string,
               folder,

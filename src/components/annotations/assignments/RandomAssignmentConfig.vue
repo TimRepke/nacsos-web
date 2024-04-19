@@ -69,7 +69,7 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import type { PropType } from "vue";
-import type { AssignmentScopeRandomConfig } from "@/plugins/api/api-core";
+import { AssignmentScopeBaseConfigTypesEnum, AssignmentScopeRandomConfig } from "@/plugins/api/types";
 
 export default defineComponent({
   name: "RandomAssignmentConfig",
@@ -88,7 +88,7 @@ export default defineComponent({
     const config: AssignmentScopeRandomConfig = this.existingConfig
       ? this.existingConfig
       : ({
-          config_type: "random",
+          config_type: AssignmentScopeBaseConfigTypesEnum.RANDOM,
           num_items: 12,
           num_multi_coded_items: 8,
           min_assignments_per_item: 2,

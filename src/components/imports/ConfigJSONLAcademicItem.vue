@@ -43,10 +43,9 @@ import { defineComponent } from "vue";
 import useVuelidate from "@vuelidate/core";
 import { required } from "@vuelidate/validators";
 import type { BaseValidation, ValidationRule } from "@vuelidate/core";
-import type { AcademicItemImport } from "@/plugins/api/api-core";
+import { AcademicItemImport, ImportConfigEnum } from "@/plugins/api/types";
 import FilesUploader from "@/components/FilesUploader.vue";
 import type { UploadFile } from "@/components/FilesUploader.vue";
-import { currentProjectStore } from "@/stores";
 
 const areFilesUploaded: ValidationRule = {
   $validator(value?: UploadFile[]) {
@@ -90,27 +89,17 @@ export default defineComponent({
     };
   },
   data() {
-    const config: AcademicItemImport = this.existingConfig ? this.existingConfig : this.emptyConfig();
-
-    if (!config.import_id && !!this.importId) {
-      config.import_id = this.importId;
-    }
-
     return {
       files: [] as UploadFile[],
-      config,
+      config: this.existingConfig
+        ? this.existingConfig
+        : ({
+            kind: ImportConfigEnum.ACADEMIC,
+            sources: [] as string[],
+          } as AcademicItemImport),
     };
   },
   methods: {
-    emptyConfig(): Partial<AcademicItemImport> | undefined {
-      return {
-        func_name: "nacsos_lib.academic.import.import_academic_db",
-        encoding: "db-academic-item",
-        filenames: [],
-        import_id: this.importId,
-        project_id: currentProjectStore.projectId,
-      };
-    },
     errorsToString(field: BaseValidation): string {
       return field.$errors.map((error) => error.$message).join("; ");
     },

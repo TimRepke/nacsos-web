@@ -127,10 +127,10 @@ import type {
   AssignmentCounts,
   AssignmentScopeEntry,
   BotAnnotationMetaDataBaseModel,
-} from "@/plugins/api/api-core";
+} from "@/plugins/api/types";
 import { currentProjectStore, interfaceSettingsStore } from "@/stores";
 import { API, ignore, toastReject } from "@/plugins/api";
-import type { AssignmentScopeModel } from "@/plugins/api/api-core";
+import type { AssignmentScopeModel } from "@/plugins/api/types";
 import AssignmentsVisualiser from "@/components/annotations/assignments/AssignmentsVisualiser.vue";
 import { isArray, isNone } from "@/util";
 import ScopeQualityEntry from "@/components/annotations/ScopeQualityEntry.vue";
@@ -167,7 +167,7 @@ export default defineComponent({
     };
   },
   async mounted() {
-    API.core.annotations
+    API.annotations
       .getNumAssignmentsForScopeApiAnnotationsAnnotateScopeCountsAssignmentScopeIdGet({
         xProjectId: currentProjectStore.projectId as string,
         assignmentScopeId: this.scope.assignment_scope_id as string,
@@ -206,7 +206,7 @@ export default defineComponent({
           this.loadMetric();
         }
         if (this.resolutions.length === 0) {
-          API.core.evaluation
+          API.evaluation
             .getResolutionsForScopeApiEvalResolutionsGet({
               assignmentScopeId: this.scope.assignment_scope_id as string,
               xProjectId: currentProjectStore.projectId as string,
@@ -220,7 +220,7 @@ export default defineComponent({
       this.inFocus = !this.inFocus;
     },
     loadMetric() {
-      API.core.evaluation
+      API.evaluation
         .getIrrApiEvalQualityLoadAssignmentScopeIdGet({
           assignmentScopeId: this.scope.assignment_scope_id as string,
           xProjectId: currentProjectStore.projectId as string,
@@ -236,7 +236,7 @@ export default defineComponent({
         .catch(toastReject);
     },
     recomputeMetric() {
-      API.core.evaluation
+      API.evaluation
         .recomputeIrrApiEvalQualityComputeGet({
           assignmentScopeId: this.scope.assignment_scope_id as string,
           botAnnotationMetadataId: this.selected_resolution,
@@ -250,7 +250,7 @@ export default defineComponent({
     toggleAssignments() {
       this.assignmentsVisible = !this.assignmentsVisible;
       if (!this.assignments) {
-        API.core.annotations
+        API.annotations
           .getAssignmentIndicatorsForScopeApiAnnotationsAnnotateAssignmentProgressAssignmentScopeIdGet({
             xProjectId: currentProjectStore.projectId as string,
             assignmentScopeId: this.scope.assignment_scope_id as string,

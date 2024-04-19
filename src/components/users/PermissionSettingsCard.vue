@@ -92,14 +92,14 @@
 import { defineComponent } from "vue";
 import type { PropType } from "vue";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
-import type { UserPermission } from "@/plugins/api/api-core";
 import ExpandableBox from "@/components/ExpandableBox.vue";
 import { ProjectPermissionHints, PermissionPresets } from "@/types/permissions";
 import type { Permissions, PermissionKeys } from "@/types/permissions";
-import { EventBus } from "@/plugins/events";
-import { ToastEvent } from "@/plugins/events/events/toast";
 import { currentProjectStore } from "@/stores";
 import { API } from "@/plugins/api";
+import type { UserPermission } from "@/plugins/api/types";
+import { EventBus } from "@/plugins/events";
+import { ToastEvent } from "@/plugins/events/events/toast";
 import { ConfirmationRequestEvent } from "@/plugins/events/events/confirmation";
 
 type PermissionSettingsData = {
@@ -133,7 +133,7 @@ export default defineComponent({
       });
     },
     saveUser() {
-      API.core.project
+      API.project
         .saveProjectPermissionApiProjectPermissionsPermissionPut({
           requestBody: this.permission,
           xProjectId: currentProjectStore.projectId as string,
@@ -152,7 +152,7 @@ export default defineComponent({
           "Do you really want to remove access for this user?",
           (confirmationResponse) => {
             if (confirmationResponse === "ACCEPT") {
-              API.core.project
+              API.project
                 .removeProjectPermissionApiProjectPermissionsPermissionDelete({
                   projectPermissionId: this.permission.project_permission_id as string,
                   xProjectId: currentProjectStore.projectId as string,

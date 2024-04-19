@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+    "lib": [
+      "ESNext",
+      "DOM"
+    ],
+    "stripInternal": true,
+    "module": "esnext",
+    "target": "esnext"
+  },
+  "module": "ESNext",
+  "target": "ESNext",
+  "exclude": [
+    "../**/__tests__"
+  ],
+  "extends": "../../tsconfig.node.json",
+  "include": [
+    "../",
+    "../client/interfaces"
+  ]
+}

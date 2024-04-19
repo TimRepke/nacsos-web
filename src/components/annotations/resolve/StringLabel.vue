@@ -15,7 +15,7 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import type { PropType } from "vue";
-import type { FlatLabel, ResolutionCell, BotAnnotationModel } from "@/plugins/api/api-core";
+import type { FlatLabel, ResolutionCell, BotAnnotationModel } from "@/plugins/api/types";
 import { is, isNone, notNone } from "@/util";
 
 export default defineComponent({
