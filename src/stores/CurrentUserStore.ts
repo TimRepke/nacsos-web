@@ -2,10 +2,11 @@ import { defineStore } from "pinia";
 import type { RemovableRef } from "@vueuse/core";
 import { useStorage } from "@vueuse/core";
 import Serializer from "@/types/serializer";
-import type { AuthTokenModel, UserModel } from "@/plugins/api/api-core";
+import type { AuthTokenModel, UserModel } from "@/plugins/api/spec/types.gen";
 import { API, toastReject } from "@/plugins/api";
 import { EventBus } from "@/plugins/events";
 import { AuthFailedEvent, LoginSuccessEvent, LogoutSuccessEvent } from "@/plugins/events/events/auth";
+import { OpenAPI } from '@/plugins/api/spec';
 
 const UserSerializer = Serializer<UserModel>();
 const AuthtokenSerializer = Serializer<AuthTokenModel>();
@@ -41,9 +42,9 @@ export const useCurrentUserStore = defineStore("CurrentUserStore", {
   actions: {
     async login(username: string, password: string) {
       try {
-        const token = await API.core.oauth.loginForAccessTokenApiLoginTokenPost({ formData: { username, password } });
+        const token = await API.oauth.loginForAccessTokenApiLoginTokenPost({ formData: { username, password } });
         this.setAuthToken(token.data);
-        const me = await API.core.oauth.readUsersMeApiLoginMeGet();
+        const me = await API.oauth.readUsersMeApiLoginMeGet();
         this.setUser(me.data);
         EventBus.emit(new LoginSuccessEvent(me.data));
       } catch (reason) {
@@ -53,12 +54,12 @@ export const useCurrentUserStore = defineStore("CurrentUserStore", {
       }
     },
     async loginWithAuthToken(token: string) {
-      API.core.request.config.TOKEN = token;
+      OpenAPI.TOKEN = token;
       try {
-        const userTokens = (await API.core.oauth.readTokensMeApiLoginMyTokensGet()).data;
+        const userTokens = (await API.oauth.readTokensMeApiLoginMyTokensGet()).data;
         if (userTokens[0].token_id === token) {
           this.setAuthToken(userTokens[0]);
-          const me = await API.core.oauth.readUsersMeApiLoginMeGet();
+          const me = await API.oauth.readUsersMeApiLoginMeGet();
           this.setUser(me.data);
           EventBus.emit(new LoginSuccessEvent(me.data));
         } else {
@@ -73,7 +74,7 @@ export const useCurrentUserStore = defineStore("CurrentUserStore", {
     async logout() {
       try {
         if (this.authToken) {
-          await API.core.oauth.logoutApiLoginLogoutGet();
+          await API.oauth.logoutApiLoginLogoutGet();
         }
       } catch (reason) {
         console.error(reason);
@@ -84,13 +85,11 @@ export const useCurrentUserStore = defineStore("CurrentUserStore", {
     clear() {
       this.authToken = undefined;
       this.user = undefined;
-      API.core.request.config.TOKEN = undefined;
-      API.pipe.request.config.TOKEN = undefined;
+      OpenAPI.TOKEN = undefined;
     },
     setAuthToken(authToken: AuthTokenModel) {
       this.authToken = authToken;
-      API.core.request.config.TOKEN = authToken.token_id;
-      API.pipe.request.config.TOKEN = authToken.token_id;
+      OpenAPI.TOKEN = authToken.token_id;
     },
     setUser(user: UserModel) {
       this.user = user;
@@ -98,7 +97,7 @@ export const useCurrentUserStore = defineStore("CurrentUserStore", {
     async extendAuthTokenValidity() {
       try {
         if (this.authToken) {
-          const newToken = await API.core.oauth.refreshTokenApiLoginTokenTokenIdPut({
+          const newToken = await API.oauth.refreshTokenApiLoginTokenTokenIdPut({
             tokenId: this.authToken.token_id,
           });
           this.authToken = newToken.data;

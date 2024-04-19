@@ -28,7 +28,7 @@ export const usePlatformUsersStore = defineStore("PlatformUsersStore", {
   actions: {
     async refresh() {
       try {
-        this.users = (await API.core.users.getAllUsersDehydratedApiUsersListAllDehydratedGet()).data;
+        this.users = (await API.users.getAllUsersDehydratedApiUsersListAllDehydratedGet()).data;
         this.lastUpdate = Date.now();
       } catch (reason) {
         console.error(reason);

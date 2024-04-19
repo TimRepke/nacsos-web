@@ -15,9 +15,10 @@
     "type-check": "vue-tsc --noEmit -p tsconfig.vitest.json --composite false",
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --ignore-path .gitignore --ignore-pattern tools/*",
     "test:unit": "vitest --environment jsdom --root src/",
+
     "api-core": "node ./tools/openapi-gen/bin/index.js --input $npm_package_config_nacsos_core/openapi.json --output src/plugins/api/api-core --name CoreClient --client axios --indent 2 --useOptions --exportModels true --exportServices true --exportSchemas true --exportCore false --corePathTop @/plugins/api/core --corePathDeep @/plugins/api/core",
-    "api-pipe": "node ./tools/openapi-gen/bin/index.js --input $npm_package_config_nacsos_pipe/openapi.json --output src/plugins/api/api-pipe --name PipelinesClient --client axios --indent 2 --useOptions --exportModels true --exportServices true --exportSchemas true --exportCore false --corePathTop @/plugins/api/core --corePathDeep @/plugins/api/core",
-    "nql": "nearleyc src/util/nql/grammar.ne --out src/util/nql/grammar.ts"
+    "nql": "nearleyc src/util/nql/grammar.ne --out src/util/nql/grammar.ts",
+    "openapi-ts": "openapi-ts"
   },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^6.5.1",
@@ -46,6 +47,7 @@
     "vue-router": "^4.3.0"
   },
   "devDependencies": {
+    "@hey-api/openapi-ts": "^0.40.2",
     "@rushstack/eslint-patch": "^1.7.2",
     "@types/jsdom": "^21.1.6",
     "@types/nearley": "^2.11.5",
