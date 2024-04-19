@@ -10,7 +10,7 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import { currentProjectStore } from "@/stores";
-import type { ProjectPermissionsModel } from "@/plugins/api/api-core";
+import type { ProjectPermissionsModel } from "@/plugins/api/spec/types.gen";
 
 export default defineComponent({
   name: "AnnotationConfigsContainer",

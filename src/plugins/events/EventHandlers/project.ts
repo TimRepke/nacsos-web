@@ -13,8 +13,8 @@ export default () => {
     // set the projectId first, so it can be used during the following requests
     currentProjectStore.projectId = projectId;
     Promise.allSettled([
-      API.core.project.getProjectApiProjectInfoGet({ xProjectId: projectId }),
-      API.core.project.getProjectPermissionsCurrentUserApiProjectPermissionsMeGet({ xProjectId: projectId }),
+      API.project.getProjectApiProjectInfoGet({ xProjectId: projectId }),
+      API.project.getProjectPermissionsCurrentUserApiProjectPermissionsMeGet({ xProjectId: projectId }),
     ]).then((values) => {
       const [projectInfo, projectPermissions] = values;
       if (

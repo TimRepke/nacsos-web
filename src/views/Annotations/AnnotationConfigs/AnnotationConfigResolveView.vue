@@ -174,8 +174,8 @@ import type {
   FlatLabel,
   BotMetaResolveBase,
   DehydratedUser,
-} from "@/plugins/api/api-core";
-import { BotMetaResolve } from "@/plugins/api/api-core";
+} from "@/plugins/api/spec/types.gen";
+import { ResolutionMethodEnum } from "@/plugins/api/spec/enums.gen";
 import { API, toastReject } from "@/plugins/api";
 import ItemModal from "@/components/items/ItemModal.vue";
 import ToolTip from "@/components/ToolTip.vue";
@@ -215,7 +215,7 @@ export default defineComponent({
       settings: {
         ignore_hierarchy: false,
         ignore_repeat: false,
-        algorithm: BotMetaResolve.algorithm.MAJORITY,
+        algorithm: ResolutionMethodEnum.MAJORITY,
       } as BotMetaResolveBase,
 
       // Models
@@ -250,7 +250,7 @@ export default defineComponent({
     try {
       if (!this.isNew && this.bot_annotation_metadata_id) {
         const { meta, proposal } = (
-          await API.core.annotations.getSavedResolvedAnnotationsApiAnnotationsConfigResolvedBotAnnotationMetadataIdGet({
+          await API.annotations.getSavedResolvedAnnotationsApiAnnotationsConfigResolvedBotAnnotationMetadataIdGet({
             botAnnotationMetadataId: this.bot_annotation_metadata_id,
             xProjectId: currentProjectStore.projectId as string,
           })
@@ -264,7 +264,7 @@ export default defineComponent({
       }
       if (this.annotation_scheme_id) {
         this.annotationScheme = (
-          await API.core.annotations.getSchemeDefinitionApiAnnotationsSchemesDefinitionAnnotationSchemeIdGet({
+          await API.annotations.getSchemeDefinitionApiAnnotationsSchemesDefinitionAnnotationSchemeIdGet({
             annotationSchemeId: this.annotation_scheme_id,
             xProjectId: currentProjectStore.projectId as string,
             flat: true,
@@ -273,7 +273,7 @@ export default defineComponent({
       }
       if (this.assignment_scope_id) {
         this.assignmentScope = (
-          await API.core.annotations.getAssignmentScopeApiAnnotationsAnnotateScopeAssignmentScopeIdGet({
+          await API.annotations.getAssignmentScopeApiAnnotationsAnnotateScopeAssignmentScopeIdGet({
             assignmentScopeId: this.assignment_scope_id,
             xProjectId: currentProjectStore.projectId as string,
           })
@@ -301,7 +301,7 @@ export default defineComponent({
         EventBus.emit(new ToastEvent("WARN", "Nothing to save (yet)!"));
         this.savingAllowed = true;
       } else {
-        API.core.annotations
+        API.annotations
           .updateResolvedAnnotationsApiAnnotationsConfigResolveUpdatePut({
             botAnnotationMetadataId: this.bot_annotation_metadata_id as string,
             name: this.name,
@@ -320,7 +320,7 @@ export default defineComponent({
         EventBus.emit(new ToastEvent("WARN", "Nothing to save (yet)!"));
         this.savingAllowed = true;
       } else {
-        API.core.annotations
+        API.annotations
           .saveResolvedAnnotationsApiAnnotationsConfigResolvePut({
             xProjectId: currentProjectStore.projectId as string,
             assignmentScopeId: this.assignment_scope_id,
@@ -349,7 +349,7 @@ export default defineComponent({
     },
     fetchProposal() {
       this.loadingProposals = true;
-      API.core.annotations
+      API.annotations
         .getResolvedAnnotationsApiAnnotationsConfigResolvePost({
           assignmentScopeId: this.assignment_scope_id,
           botAnnotationMetadatId: this.bot_annotation_metadata_id,

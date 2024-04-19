@@ -1,7 +1,7 @@
 import { defineStore } from "pinia";
 import { useStorage } from "@vueuse/core";
 import type { RemovableRef } from "@vueuse/core";
-import type { ProjectModel, ProjectPermissionsModel } from "@/plugins/api/api-core";
+import type { ProjectModel, ProjectPermissionsModel } from "@/plugins/api/spec/types.gen";
 import Serializer from "@/types/serializer";
 
 const ProjectSerializer = Serializer<ProjectModel>();

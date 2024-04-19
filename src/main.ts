@@ -13,7 +13,7 @@ import router from "@/router";
 import util from "@/util";
 import EventBusPlugin from "@/plugins/events";
 import initEventHandlers from "@/plugins/events/EventHandlers";
-import App from "./App2.vue";
+import App from "./App.vue";
 
 // set up font awesome
 library.add(fas);

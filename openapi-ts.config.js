@@ -9,7 +9,7 @@ export default defineConfig({
   schemas: true,
   useOptions: true,
   serviceResponse: "response",
-  // exportCore: true,
+  exportCore: true,
   // request: "src/plugins/api/request.ts",
   // request: "@/plugins/api/request"
 });

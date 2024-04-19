@@ -2,7 +2,7 @@ import { defineStore } from "pinia";
 import type { RemovableRef } from "@vueuse/core";
 import { useStorage } from "@vueuse/core";
 import Serializer from "@/types/serializer";
-import type { DehydratedUser } from "@/plugins/api/api-core";
+import type { DehydratedUser } from "@/plugins/api/spec/types.gen";
 import { API } from "@/plugins/api";
 
 const UsersSerializer = Serializer<Array<DehydratedUser>>();

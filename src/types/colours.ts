@@ -1,5 +1,5 @@
-import { AssignmentStatus } from "@/plugins/api/api-core";
-import type { AnnotationSchemeLabelChoice } from "@/plugins/api/api-core";
+import { AssignmentStatusEnum as AssignmentStatus } from "@/plugins/api/spec/enums.gen";
+import type { AnnotationSchemeLabelChoice } from "@/plugins/api/spec/types.gen";
 
 export const cmap = [
   "#e6194B", // # 0

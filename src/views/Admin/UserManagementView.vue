@@ -1,7 +1,7 @@
 <template>
   <div>
     <ul class="list-group">
-      <li v-for="user in users" :key="user.user_id" class="list-group-item p-4">
+      <li v-for="user in users" :key="user.user_id as string" class="list-group-item p-4">
         <div class="row">
           <div class="col">
             <div class="mb-2 d-flex justify-content-start">
@@ -140,7 +140,7 @@ import { defineComponent } from "vue";
 import { API, toastReject } from "@/plugins/api";
 import { EventBus } from "@/plugins/events";
 import { ToastEvent } from "@/plugins/events/events/toast";
-import type { UserBaseModel } from "@/plugins/api/api-core";
+import type { UserBaseModel } from "@/plugins/api/spec/types.gen";
 
 type UserModel = UserBaseModel & {
   password?: string;
@@ -160,7 +160,7 @@ export default defineComponent({
     };
   },
   mounted() {
-    API.core.users
+    API.users
       .getAllUsersApiUsersListAllGet()
       .then((response) => {
         this.users = response.data;
@@ -183,7 +183,8 @@ export default defineComponent({
         isNew: true,
       });
     },
-    deleteUser() {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    deleteUser(user: UserBaseModel) {
       EventBus.emit(
         new ToastEvent(
           "WARN",
@@ -193,7 +194,7 @@ export default defineComponent({
       );
     },
     saveUser(user: UserBaseModel) {
-      API.core.users
+      API.users
         .saveUserApiUsersDetailsPut({
           requestBody: user,
         })
@@ -213,7 +214,7 @@ export default defineComponent({
       console.log(user);
     },
     resetPasswordMail(user: UserModel) {
-      API.core.mailing
+      API.mailing
         .resetPasswordApiMailResetPasswordUsernamePost({
           username: user.username as string,
         })
@@ -223,7 +224,7 @@ export default defineComponent({
         .catch(toastReject);
     },
     sendWelcome(user: UserModel) {
-      API.core.mailing
+      API.mailing
         .welcomeMailApiMailWelcomePost({
           username: user.username as string,
           password: user.password as string,

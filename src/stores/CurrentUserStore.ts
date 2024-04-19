@@ -6,7 +6,7 @@ import type { AuthTokenModel, UserModel } from "@/plugins/api/spec/types.gen";
 import { API, toastReject } from "@/plugins/api";
 import { EventBus } from "@/plugins/events";
 import { AuthFailedEvent, LoginSuccessEvent, LogoutSuccessEvent } from "@/plugins/events/events/auth";
-import { OpenAPI } from '@/plugins/api/spec';
+import { OpenAPI } from "@/plugins/api/spec";
 
 const UserSerializer = Serializer<UserModel>();
 const AuthtokenSerializer = Serializer<AuthTokenModel>();

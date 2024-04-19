@@ -3191,9 +3191,7 @@ export const $BotMetaInfo = {
 export const $BotMetaResolve = {
   properties: {
     algorithm: {
-      type: "string",
-      enum: ["majority", "first", "last", "trust"],
-      title: "Algorithm",
+      $ref: "#/components/schemas/ResolutionMethod",
     },
     ignore_hierarchy: {
       type: "boolean",
@@ -3226,9 +3224,7 @@ export const $BotMetaResolve = {
 export const $BotMetaResolveBase = {
   properties: {
     algorithm: {
-      type: "string",
-      enum: ["majority", "first", "last", "trust"],
-      title: "Algorithm",
+      $ref: "#/components/schemas/ResolutionMethod",
     },
     ignore_hierarchy: {
       type: "boolean",
@@ -5909,6 +5905,12 @@ export const $ResolutionCell = {
   type: "object",
   required: ["labels", "resolution"],
   title: "ResolutionCell",
+} as const;
+
+export const $ResolutionMethod = {
+  type: "string",
+  enum: ["majority", "first", "first", "first"],
+  title: "ResolutionMethod",
 } as const;
 
 export const $ResolutionOrdering = {

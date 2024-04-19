@@ -75,8 +75,8 @@ import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import { API } from "@/plugins/api";
 import { EventBus } from "@/plugins/events";
 import { ToastEvent } from "@/plugins/events/events/toast";
-import type { ProjectModel } from "@/plugins/api/api-core";
-import { ItemType } from "@/plugins/api/api-core";
+import type { ProjectModel } from "@/plugins/api/spec/types.gen";
+import { ItemTypeEnum as ItemType } from "@/plugins/api/spec/enums.gen";
 import ProjectTypeIcon from "@/components/ProjectTypeIcon.vue";
 import { CurrentProjectSelectedEvent, CurrentProjectSetEvent } from "@/plugins/events/events/projects";
 import { ConfirmationRequestEvent } from "@/plugins/events/events/confirmation";
@@ -98,7 +98,7 @@ export default defineComponent({
   },
   methods: {
     refreshData() {
-      API.core.projects
+      API.projects
         .getAllProjectsApiProjectsListGet()
         .then((response) => {
           this.projects = response.data;
@@ -126,7 +126,7 @@ export default defineComponent({
       }
     },
     saveProject(project: ProjectModelExt) {
-      API.core.projects
+      API.projects
         .createProjectApiProjectsCreatePut({
           requestBody: project,
         })
@@ -151,20 +151,6 @@ export default defineComponent({
           (confirmationResponse) => {
             if (confirmationResponse === "ACCEPT") {
               EventBus.emit(new ToastEvent("WARN", "Not implemented yet, too dangerous."));
-              /*
-            // TODO
-            API.core.projects.delete({
-              projectId: project.project_id,
-            }).then(() => {
-              EventBus.emit(new ToastEvent('SUCCESS', `Deleted ${project.project_id}`));
-              this.refreshData();
-            }).catch(() => {
-              EventBus.emit(new ToastEvent(
-                'ERROR',
-                `Failed to delete ${project.project_id}.`,
-              ));
-            });
-            */
             }
           },
           "Delete project",

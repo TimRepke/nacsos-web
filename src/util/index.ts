@@ -1,6 +1,5 @@
 import type { App } from "vue";
 import type { RouteLocationNormalized, RouteRecordNormalized } from "vue-router";
-import { isFunctionInfo, isArtefactOrSerializedArtefact, type2str } from "@/util/typeChecks";
 // inspired by https://github.com/jashkenas/underscore/blob/master/modules/_shallowProperty.js
 // Internal helper to generate a function to obtain property `key` from `obj`.
 export function shallowProperty<T>(key: string) {
@@ -96,7 +95,18 @@ export function dt2str(datetime: string | null | undefined): string | null {
   }
   return null;
 }
+export type StringValues<T> = {
+  [K in keyof T]: T[K] extends string ? T[K] : never;
+}[keyof T];
 
+export type NumberValues<T> = {
+  [K in keyof T]: T[K] extends number ? T[K] : never;
+}[keyof T];
+
+/**
+ * Usage : type EnumValues = EnumAsUnion<typeof anEnum>
+ */
+export type EnumLiteral<T> = `${StringValues<T>}` | NumberValues<T>;
 export default {
   install(app: App) {
     // eslint-disable-next-line no-param-reassign
@@ -105,9 +115,6 @@ export default {
       range,
       isObject,
       isArray,
-      isFunctionInfo,
-      isArtefactOrSerializedArtefact,
-      type2str,
       isOnRoute,
       notNone,
       isNone,

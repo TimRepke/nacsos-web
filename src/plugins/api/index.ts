@@ -1,4 +1,4 @@
-import { OpenAPI } from "@/plugins/api/spec";
+import { OpenAPI } from "@/plugins/api/core/OpenAPI";
 import {
   AnnotationsService,
   DefaultService,
@@ -15,7 +15,7 @@ import {
   StatsService,
   UsersService,
 } from "@/plugins/api/spec/services.gen";
-import type { ApiResponseReject } from "@/plugins/api/spec/core/ApiResult";
+import type { ApiResponseReject } from "@/plugins/api/core/ApiResult";
 import { EventBus } from "@/plugins/events";
 import { ToastEvent } from "@/plugins/events/events/toast";
 
@@ -53,4 +53,4 @@ export function toastReject(reason: ApiResponseReject) {
   );
 }
 
-export type { ApiResult, ApiResponseReject, ErrorDetails, ErrorLevel } from "@/plugins/api/spec/core/ApiResult";
+export type { ApiResult, ApiResponseReject, ErrorDetails, ErrorLevel } from "@/plugins/api/core/ApiResult";

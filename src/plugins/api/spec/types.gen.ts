@@ -482,7 +482,7 @@ export type BotMetaInfo = {
 };
 
 export type BotMetaResolve = {
-  algorithm: "majority" | "first" | "last" | "trust";
+  algorithm: ResolutionMethod;
   ignore_hierarchy: boolean;
   ignore_repeat: boolean;
   snapshot: Array<SnapshotEntry>;
@@ -490,7 +490,7 @@ export type BotMetaResolve = {
 };
 
 export type BotMetaResolveBase = {
-  algorithm: "majority" | "first" | "last" | "trust";
+  algorithm: ResolutionMethod;
   ignore_hierarchy: boolean;
   ignore_repeat: boolean;
 };
@@ -981,6 +981,8 @@ export type ResolutionCell = {
   resolution: BotAnnotationModel;
   status?: ResolutionStatus;
 };
+
+export type ResolutionMethod = "majority" | "first";
 
 export type ResolutionOrdering = {
   identifier: number;

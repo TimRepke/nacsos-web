@@ -1,7 +1,7 @@
 /* eslint-disable max-classes-per-file, no-useless-constructor */
 
 import { BaseEvent } from "@/plugins/events/baseEvent";
-import type { UserModel } from "@/plugins/api/api-core";
+import type { UserModel } from "@/plugins/api/spec/types.gen";
 
 // FIXME this event seems wrong here...
 export class RequestSubmittedEvent extends BaseEvent {

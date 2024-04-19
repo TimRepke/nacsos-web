@@ -25,13 +25,6 @@ export enum BotKindEnum {
   SCRIPT = "SCRIPT",
 }
 
-export enum AlgorithmEnum {
-  MAJORITY = "majority",
-  FIRST = "first",
-  LAST = "last",
-  TRUST = "trust",
-}
-
 export enum EventEnum {
   EXAMPLE_SUB_EVENT = "ExampleSubEvent",
   EXAMPLE_EVENT = "ExampleEvent",
@@ -73,6 +66,11 @@ export enum DefTypeEnum {
 export enum OpEnum {
   OR = "OR",
   AND = "AND",
+}
+
+export enum ResolutionMethodEnum {
+  MAJORITY = "majority",
+  FIRST = "first",
 }
 
 export enum ResolutionStatusEnum {

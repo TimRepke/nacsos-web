@@ -10,7 +10,7 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import { currentUserStore } from "@/stores";
-import type { UserModel } from "@/plugins/api/api-core";
+import type { UserModel } from "@/plugins/api/spec/types.gen";
 
 type AdminContainerData = {
   user: UserModel;

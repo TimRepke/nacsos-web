@@ -148,6 +148,8 @@
                         params: { bot_annotation_metadata_id: resolution.bot_annotation_metadata_id },
                       }"
                       class="text-decoration-none flex-grow-1 d-flex text-black"
+                      custom
+                      v-slot="{ navigate }"
                     >
                       <span @click.stop="navigate" role="button" class="me-3 ms-2">
                         {{ resolution.name }}
@@ -200,9 +202,8 @@ import type {
   AnnotationSchemeModel,
   AssignmentScopeModel,
   BotAnnotationMetaDataBaseModel,
-} from "@/plugins/api/api-core";
-import { type ApiResponseReject } from "@/plugins/api";
-import { API } from "@/plugins/api";
+} from "@/plugins/api/spec/types.gen";
+import { type ApiResponseReject, API } from "@/plugins/api";
 import PopOver from "@/components/PopOver.vue";
 
 export default defineComponent({
@@ -222,20 +223,20 @@ export default defineComponent({
     async refreshData() {
       try {
         this.projectSchemes = (
-          await API.core.annotations.getSchemeDefinitionsForProjectApiAnnotationsSchemesListProjectIdGet({
+          await API.annotations.getSchemeDefinitionsForProjectApiAnnotationsSchemesListProjectIdGet({
             projectId: currentProjectStore.projectId as string,
             xProjectId: currentProjectStore.projectId as string,
           })
         ).data;
 
         this.projectScopes = (
-          await API.core.annotations.getAssignmentScopesForProjectApiAnnotationsAnnotateScopesGet({
+          await API.annotations.getAssignmentScopesForProjectApiAnnotationsAnnotateScopesGet({
             xProjectId: currentProjectStore.projectId as string,
           })
         ).data;
 
         this.projectResolutions = (
-          await API.core.annotations.listSavedResolvedAnnotationsApiAnnotationsConfigResolvedListGet({
+          await API.annotations.listSavedResolvedAnnotationsApiAnnotationsConfigResolvedListGet({
             xProjectId: currentProjectStore.projectId as string,
           })
         ).data;
@@ -254,7 +255,7 @@ export default defineComponent({
       copy.name = `[COPY] ${scheme.name}`;
 
       try {
-        const copyId = await API.core.annotations.putAnnotationSchemeApiAnnotationsSchemesDefinitionPut({
+        const copyId = await API.annotations.putAnnotationSchemeApiAnnotationsSchemesDefinitionPut({
           xProjectId: currentProjectStore.projectId as string,
           requestBody: copy,
         });
@@ -262,7 +263,7 @@ export default defineComponent({
           new ToastEvent("SUCCESS", `Created copy of the annotation scheme "${scheme.name}" with ID ${copyId.data}.`),
         );
 
-        const schemes = await API.core.annotations.getSchemeDefinitionsForProjectApiAnnotationsSchemesListProjectIdGet({
+        const schemes = await API.annotations.getSchemeDefinitionsForProjectApiAnnotationsSchemesListProjectIdGet({
           projectId: currentProjectStore.projectId as string,
           xProjectId: currentProjectStore.projectId as string,
         });
@@ -280,7 +281,7 @@ export default defineComponent({
             "This may result in deletion of all associated assignments and annotations or at least make them meaningless!",
           (confirmationResponse) => {
             if (confirmationResponse === "ACCEPT") {
-              API.core.annotations
+              API.annotations
                 .removeAnnotationSchemeApiAnnotationsSchemesDefinitionSchemeIdDelete({
                   xProjectId: currentProjectStore.projectId as string,
                   annotationSchemeId: scheme.annotation_scheme_id as string,
@@ -307,7 +308,7 @@ export default defineComponent({
             "This may result in deletion of all associated assignments and annotations or at least make them meaningless!",
           (confirmationResponse) => {
             if (confirmationResponse === "ACCEPT") {
-              API.core.annotations
+              API.annotations
                 .removeAssignmentScopeApiAnnotationsAnnotateScopeAssignmentScopeIdDelete({
                   xProjectId: currentProjectStore.projectId as string,
                   assignmentScopeId: scope.assignment_scope_id as string,
@@ -333,7 +334,7 @@ export default defineComponent({
             `- ID: ${meta.bot_annotation_metadata_id}`,
           (confirmationResponse) => {
             if (confirmationResponse === "ACCEPT") {
-              API.core.annotations
+              API.annotations
                 .deleteSavedResolvedAnnotationsApiAnnotationsConfigResolvedBotAnnotationMetaIdDelete({
                   botAnnotationMetadataId: meta.bot_annotation_metadata_id!,
                   xProjectId: currentProjectStore.projectId as string,
