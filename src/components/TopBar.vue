@@ -38,15 +38,21 @@
             </h6>
           </li>
           <li>
-            <router-link to="/admin/projects" class="dropdown-item"> Manage projects</router-link>
+            <router-link to="/admin/projects" class="dropdown-item">Manage projects</router-link>
           </li>
           <li>
-            <router-link to="/admin/users" class="dropdown-item"> Manage users</router-link>
+            <router-link to="/admin/users" class="dropdown-item">Manage users</router-link>
+          </li>
+          <li>
+            <router-link to="/admin/celery" class="dropdown-item">Celery</router-link>
           </li>
           <li>
             <hr class="dropdown-divider" />
           </li>
         </template>
+        <li>
+          <router-link to="/nql" class="dropdown-item">NQL toolkit</router-link>
+        </li>
         <li>
           <router-link to="/user/profile" class="dropdown-item">
             <font-awesome-icon :icon="['fas', 'user-pen']" class="me-2" />

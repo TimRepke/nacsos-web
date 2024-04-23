@@ -30,7 +30,7 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: "/parse",
     name: "parse",
-    alias: ["parse", "nql"],
+    alias: ["/nql"],
     component: () => import(/* webpackChunkName: "ParseView" */ "../views/ParseView.vue"),
   },
   {
@@ -247,15 +247,20 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import(/* webpackChunkName: "OverviewView" */ "../views/Admin/OverviewView.vue"),
       },
       {
-        path: "users/",
+        path: "users",
         name: "admin-users",
         component: () => import(/* webpackChunkName: "OverviewView" */ "../views/Admin/UserManagementView.vue"),
       },
       {
-        path: "projects/",
+        path: "projects",
         name: "admin-projects",
         component: () =>
           import(/* webpackChunkName: "ProjectManagementView" */ "../views/Admin/ProjectManagementView.vue"),
+      },
+      {
+        path: "celery",
+        name: "admin-celery",
+        component: () => import(/* webpackChunkName: "CeleryView" */ "../views/Admin/CeleryView.vue"),
       },
     ],
   },

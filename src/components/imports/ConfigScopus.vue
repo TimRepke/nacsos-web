@@ -29,7 +29,7 @@
         <template v-else>
           <h4>Uploaded files</h4>
           <ul>
-            <li v-for="file in config.filenames" :key="file">
+            <li v-for="file in config.sources" :key="file">
               {{ file }}
             </li>
           </ul>
@@ -48,6 +48,7 @@ import type { BaseValidation, ValidationRule } from "@vuelidate/core";
 import { ImportConfigEnum, type ScopusImport } from "@/plugins/api/types";
 import FilesUploader from "@/components/FilesUploader.vue";
 import type { UploadFile } from "@/components/FilesUploader.vue";
+import { isEmpty } from "@/util";
 
 const areFilesUploaded: ValidationRule = {
   $validator(value?: UploadFile[]) {
@@ -107,17 +108,13 @@ export default defineComponent({
     },
     onFilesChange(files: UploadFile[]) {
       this.files = files;
-      const filenames = files.map((file) => file.serverPath).filter((filename) => !!filename);
-      this.config.filenames = filenames.length === 0 ? undefined : filenames;
+      const sources = files.map((file) => file.serverPath).filter((source) => !!source);
+      this.config.sources = sources.length === 0 ? undefined : sources;
     },
   },
   computed: {
     uploadsEnabled(): boolean {
-      return (
-        this.editable &&
-        this.config &&
-        (this.config.filenames === undefined || this.config.filenames === null || this.config.filenames.length === 0)
-      );
+      return this.editable && this.config && isEmpty(this.config.sources);
     },
   },
   watch: {

@@ -45,7 +45,7 @@
                       class="link-secondary me-2"
                       aria-label="Copy import"
                       tabindex="0"
-                      @click="copyImport(importDetails)"
+                      @click.stop="copyImport(importDetails)"
                     >
                       <InlineToolTip info="Copy">
                         <font-awesome-icon :icon="['far', 'clone']" />
@@ -56,7 +56,7 @@
                       class="link-secondary me-2"
                       aria-label="Delete import"
                       tabindex="0"
-                      @click="removeImport(importDetails)"
+                      @click.stop="removeImport(importDetails)"
                     >
                       <InlineToolTip info="Delete">
                         <font-awesome-icon :icon="['fas', 'trash-can']" />
