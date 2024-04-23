@@ -1,22 +1,60 @@
-import type { App } from "vue";
-import { CoreClient } from "./api-core";
-import { PipelinesClient } from "./api-pipe";
+export { OpenAPI } from "@/plugins/api/spec/core/OpenAPI";
+import { OpenAPI } from "@/plugins/api/spec/core/OpenAPI";
+import {
+  AnnotationsService,
+  DefaultService,
+  EvaluationService,
+  EventsService,
+  ExportService,
+  HighlightersService,
+  ImportsService,
+  MailingService,
+  OauthService,
+  ProjectService,
+  ProjectsService,
+  SearchService,
+  StatsService,
+  UsersService,
+  PipesService,
+} from "@/plugins/api/spec/services.gen";
+import type { ApiResponseReject } from "@/plugins/api/spec/core/ApiResult";
+import { EventBus } from "@/plugins/events";
+import { ToastEvent } from "@/plugins/events/events/toast";
 
-const API = {
-  pipe: new PipelinesClient({
-    BASE: import.meta.env.VITE_NACSOS_PIPE_URL,
-  }),
-  core: new CoreClient({
-    BASE: import.meta.env.VITE_NACSOS_CORE_URL,
-  }),
+OpenAPI.BASE = import.meta.env.VITE_NACSOS_CORE_URL;
+
+export const API = {
+  annotations: AnnotationsService,
+  ping: DefaultService,
+  evaluation: EvaluationService,
+  events: EventsService,
+  export: ExportService,
+  highlighters: HighlightersService,
+  imports: ImportsService,
+  mailing: MailingService,
+  oauth: OauthService,
+  project: ProjectService,
+  projects: ProjectsService,
+  search: SearchService,
+  stats: StatsService,
+  users: UsersService,
+  pipes: PipesService,
 };
 
-export default {
-  install(app: App) {
-    // eslint-disable-next-line no-param-reassign
-    app.config.globalProperties.$API = API;
-  },
-};
-export { API };
-export type { ApiResponse, ApiResponseReject, ErrorDetails, ErrorLevel } from "@/plugins/api/core/CancelablePromise";
-export { ignore, toastReject, logReject } from "@/plugins/api/core/CancelablePromise";
+export function ignore() {}
+
+export function logReject(reason: ApiResponseReject) {
+  console.error(reason);
+}
+
+export function toastReject(reason: ApiResponseReject) {
+  EventBus.emit(
+    new ToastEvent(
+      "WARN",
+      `Request failed ${reason.error.detail.level}[${reason.status}] ${reason.error.detail.type}(${reason.error.detail.message})`,
+    ),
+  );
+}
+
+export type { ApiResult, ApiResponseReject, ErrorDetails } from "@/plugins/api/spec/core/ApiResult";
+export { ErrorLevel } from "@/plugins/api/spec/core/ApiResult";

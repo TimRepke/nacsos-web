@@ -75,7 +75,7 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import type { PropType } from "vue";
-import type { AnnotationQualityModel } from "@/plugins/api/api-core";
+import type { AnnotationQualityModel } from "@/plugins/api/types";
 import { interfaceSettingsStore } from "@/stores";
 import { isArray, isNone } from "@/util";
 

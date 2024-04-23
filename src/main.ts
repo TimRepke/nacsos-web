@@ -13,7 +13,6 @@ import router from "@/router";
 import util from "@/util";
 import EventBusPlugin from "@/plugins/events";
 import initEventHandlers from "@/plugins/events/EventHandlers";
-import RequestGatewayPlugin from "@/plugins/api";
 import App from "./App.vue";
 
 // set up font awesome
@@ -28,7 +27,6 @@ initEventHandlers();
 const app = createApp(App)
   .use(util)
   .use(pinia)
-  .use(RequestGatewayPlugin)
   .use(EventBusPlugin)
   .use(router)
   .component("font-awesome-icon", FontAwesomeIcon)

@@ -17,18 +17,9 @@ npm install
 ### Update API clients  
 When changes were made to the API(s), the respective client(s) need to be adapted  via
 ```
-# update code in src/plugins/api/api-core for NACSOS Core FastAPI endpoint
-npm run api-core
-# update code in src/plugins/api/api-pipe for NACSOS Pipelines FastAPI endpoint
-npm run api-pipe
+# update code in src/plugins/api/spec for NACSOS backend
+npm run api
 ```
-
-This operation assumes that you have [*openapi-typescript-codegen*](https://www.npmjs.com/package/openapi-typescript-codegen) installed. 
-Note, that the "official" version is does not expose a way to set `AxiosRequestConfig` by the caller.
-Hence, we need an adapted version of the project, which is hosted [in our GitLab](https://gitlab.pik-potsdam.de/mcc-apsis/nacsos/openapi-typescript-codegen).
-The most recent build should be committed to this repository in `tools/openapi-gen/`.
-
-We should probably clean up this change and submit a PR to the original maintainer.
 
 ### Update NQL Grammar
 The grammar should be kept up-to-date with that used in the backend.

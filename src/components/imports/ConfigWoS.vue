@@ -46,10 +46,9 @@ import { defineComponent } from "vue";
 import useVuelidate from "@vuelidate/core";
 import { required } from "@vuelidate/validators";
 import type { BaseValidation, ValidationRule } from "@vuelidate/core";
-import type { WOSImport } from "@/plugins/api/api-core";
+import { ImportConfigEnum, type WoSImport } from "@/plugins/api/types";
 import FilesUploader from "@/components/FilesUploader.vue";
 import type { UploadFile } from "@/components/FilesUploader.vue";
-import { currentProjectStore } from "@/stores";
 
 const areFilesUploaded: ValidationRule = {
   $validator(value?: UploadFile[]) {
@@ -68,7 +67,7 @@ export default defineComponent({
   emits: ["configChanged"],
   props: {
     existingConfig: {
-      type: Object as PropType<WOSImport>,
+      type: Object as PropType<WoSImport>,
       required: false,
       default: null,
     },
@@ -93,26 +92,17 @@ export default defineComponent({
     };
   },
   data() {
-    const config: WOSImport = this.existingConfig ? this.existingConfig : this.emptyConfig();
-
-    if (!config.import_id && !!this.importId) {
-      config.import_id = this.importId;
-    }
-
     return {
       files: [] as UploadFile[],
-      config,
+      config: this.existingConfig
+        ? this.existingConfig
+        : ({
+            kind: ImportConfigEnum.WOS,
+            sources: [] as string[],
+          } as WoSImport),
     };
   },
   methods: {
-    emptyConfig(): Partial<WOSImport> | undefined {
-      return {
-        func_name: "nacsos_lib.academic.import.import_wos_file",
-        filenames: [],
-        import_id: this.importId,
-        project_id: currentProjectStore.projectId,
-      };
-    },
     errorsToString(field: BaseValidation): string {
       return field.$errors.map((error) => error.$message).join("; ");
     },
@@ -133,13 +123,13 @@ export default defineComponent({
   },
   watch: {
     config: {
-      handler(newValue: WOSImport) {
+      handler(newValue: WoSImport) {
         this.$emit("configChanged", newValue);
       },
       deep: true,
     },
     existingConfig: {
-      handler(newValue: WOSImport) {
+      handler(newValue: WoSImport) {
         this.config = newValue;
       },
       deep: true,

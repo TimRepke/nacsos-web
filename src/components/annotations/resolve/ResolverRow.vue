@@ -87,7 +87,7 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import type { PropType } from "vue";
-import type { UserModel, ResolutionCell, FlatLabel, ResolutionOrdering } from "@/plugins/api/api-core";
+import type { UserModel, ResolutionCell, FlatLabel, ResolutionOrdering } from "@/plugins/api/types";
 import BoolLabel from "@/components/annotations/resolve/BoolLabel.vue";
 import ChoiceLabel from "@/components/annotations/resolve/ChoiceLabel.vue";
 import MultiLabel from "@/components/annotations/resolve/MultiLabel.vue";
@@ -197,7 +197,7 @@ export default defineComponent({
     },
     showItem(newValue: boolean) {
       if (newValue && !this.item) {
-        API.core.project
+        API.project
           .getDetailForItemApiProjectItemsDetailItemIdGet({
             xProjectId: currentProjectStore.projectId as string,
             itemId: this.ordering.item_id,

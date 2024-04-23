@@ -82,7 +82,7 @@ export default defineComponent({
     },
     async reset() {
       this.error = false;
-      API.core.mailing
+      API.mailing
         .resetPasswordApiMailResetPasswordUsernamePost({
           username: this.username as string,
         })

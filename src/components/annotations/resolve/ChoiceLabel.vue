@@ -74,7 +74,7 @@ import type {
   ResolutionUserEntry,
   UserModel,
   FlatLabelChoice,
-} from "@/plugins/api/api-core";
+} from "@/plugins/api/types";
 import InlineToolTip from "@/components/InlineToolTip.vue";
 import { cmap } from "@/types/colours";
 import { is, isNone } from "@/util";

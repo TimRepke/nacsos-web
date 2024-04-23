@@ -36,8 +36,7 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import type { PropType } from "vue";
-import "core-js/modules/es.array.to-sorted";
-import type { BotAnnotationModel, FlatLabel, ResolutionCell, UserModel } from "@/plugins/api/api-core";
+import type { BotAnnotationModel, FlatLabel, ResolutionCell, UserModel } from "@/plugins/api/types";
 import InlineToolTip from "@/components/InlineToolTip.vue";
 import { is, isNone } from "@/util";
 

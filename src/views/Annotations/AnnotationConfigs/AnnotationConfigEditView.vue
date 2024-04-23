@@ -93,7 +93,11 @@ import { ToastEvent } from "@/plugins/events/events/toast";
 import { ConfirmationRequestEvent } from "@/plugins/events/events/confirmation";
 import { currentProjectStore } from "@/stores";
 import AnnotationSchemeLabelsEditor from "@/components/annotations/AnnotationSchemeLabelsEditor.vue";
-import type { AnnotationSchemeLabel, AnnotationSchemeLabelChoice, AnnotationSchemeModel } from "@/plugins/api/api-core";
+import type {
+  AnnotationSchemeLabel,
+  AnnotationSchemeLabelChoice,
+  AnnotationSchemeModel,
+} from "@/plugins/api/spec/types.gen";
 import { API } from "@/plugins/api";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 
@@ -120,14 +124,14 @@ export default defineComponent({
   },
   async mounted() {
     if (!this.isNewScheme) {
-      API.core.annotations
+      API.annotations
         .getSchemeDefinitionApiAnnotationsSchemesDefinitionAnnotationSchemeIdGet({
           annotationSchemeId: this.annotationSchemeId as string,
           xProjectId: currentProjectStore.projectId as string,
           flat: false,
         })
         .then((response) => {
-          this.scheme = ref(response.data);
+          this.scheme = ref(response.data as AnnotationSchemeModel);
         })
         .catch(() => {
           EventBus.emit(new ToastEvent("ERROR", "Failed to load assignment scope info. Please try reloading."));
@@ -143,7 +147,7 @@ export default defineComponent({
             "can lead to very unexpected behaviour. Are you sure you want to proceed?",
           (response) => {
             if (response === "ACCEPT") {
-              API.core.annotations
+              API.annotations
                 .putAnnotationSchemeApiAnnotationsSchemesDefinitionPut({
                   xProjectId: currentProjectStore.projectId as string,
                   requestBody: this.scheme,

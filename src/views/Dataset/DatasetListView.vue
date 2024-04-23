@@ -143,7 +143,7 @@ export default defineComponent({
     };
   },
   async mounted() {
-    API.core.project
+    API.project
       .countProjectItemsApiProjectItemsCountGet({
         xProjectId: currentProjectStore.projectId as string,
       })
@@ -168,7 +168,7 @@ export default defineComponent({
     },
     fetchData({ currentPage, currentPageSize }: UseOffsetPaginationReturn): void {
       if (this.queryParsed.length > 0) {
-        API.core.search
+        API.search
           .nqlQueryApiSearchNqlQueryPost({
             xProjectId: currentProjectStore.projectId as string,
             requestBody: this.queryParsed[0],
@@ -183,7 +183,7 @@ export default defineComponent({
           })
           .catch(toastReject);
       } else {
-        API.core.project
+        API.project
           .listProjectDataPagedApiProjectItemsItemTypeListPagePageSizeGet({
             xProjectId: currentProjectStore.projectId as string,
             page: this.pagination.currentPage,

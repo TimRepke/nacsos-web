@@ -235,7 +235,7 @@
 import { defineComponent } from "vue";
 import { API, toastReject } from "@/plugins/api";
 import { currentProjectStore } from "@/stores";
-import type { LabelOptions, ProjectBaseInfoEntry, ProjectBaseInfoScopeEntry } from "@/plugins/api/api-core";
+import type { LabelOptions, ProjectBaseInfoEntry, ProjectBaseInfoScopeEntry } from "@/plugins/api/types";
 import NQLBox from "@/components/NQLBox.vue";
 import { type Filter as NQLFilter } from "@/util/nql";
 import { isEmpty } from "@/util";
@@ -263,7 +263,7 @@ export default defineComponent({
     };
   },
   async mounted() {
-    API.core.export
+    API.export
       .getExportBaseinfoApiExportProjectBaseinfoGet({ xProjectId: currentProjectStore.projectId as string })
       .then((response) => {
         this.projectScopes = response.data.scopes;
@@ -292,7 +292,7 @@ export default defineComponent({
           }) as LabelOptions,
       );
 
-      API.core.export
+      API.export
         .getAnnotationsCsvApiExportAnnotationsCsvPost({
           xProjectId: currentProjectStore.projectId as string,
           requestBody: {

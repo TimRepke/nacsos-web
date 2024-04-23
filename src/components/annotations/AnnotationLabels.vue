@@ -212,8 +212,13 @@ import { defineComponent } from "vue";
 import type { PropType } from "vue";
 import InlineToolTip from "@/components/InlineToolTip.vue";
 import SearchableSelect from "@/components/SearchableSelect.vue";
-import type { AssignmentModel, AnnotationModel, AnnotationSchemeLabelChoice } from "@/plugins/api/api-core";
-import { AnnotationSchemeLabel } from "@/plugins/api/api-core";
+import type {
+  AssignmentModel,
+  AnnotationModel,
+  AnnotationSchemeLabelChoice,
+  AnnotationSchemeLabel,
+} from "@/plugins/api/types";
+import { KindEnum } from "@/plugins/api/types";
 import ClosablePill from "@/components/ClosablePill.vue";
 import { is } from "@/util";
 
@@ -411,10 +416,7 @@ const AnnotationLabels = defineComponent({
     },
     clearAnnotation(label: AnnotationSchemeLabel) {
       // recurse clearance to children (if present)
-      if (
-        (label.kind === AnnotationSchemeLabel.kind.SINGLE || label.kind === AnnotationSchemeLabel.kind.MULTI) &&
-        label.choices
-      ) {
+      if ((label.kind === KindEnum.SINGLE || label.kind === KindEnum.MULTI) && label.choices) {
         label.choices.forEach((choice: AnnotationSchemeLabelChoice) => {
           choice.children?.forEach((childLabel: AnnotationSchemeLabel) => {
             this.clearAnnotation(childLabel);

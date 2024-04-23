@@ -68,12 +68,7 @@
 import { defineComponent } from "vue";
 import type { PropType } from "vue";
 import InlineToolTip from "@/components/InlineToolTip.vue";
-import type {
-  AcademicAuthorModel,
-  AcademicItemModel,
-  AffiliationModel,
-  HighlighterModel,
-} from "@/plugins/api/api-core";
+import type { AcademicAuthorModel, AcademicItemModel, AffiliationModel, HighlighterModel } from "@/plugins/api/types";
 import { interfaceSettingsStore } from "@/stores";
 import TextComponent from "@/components/items/TextComponent.vue";
 

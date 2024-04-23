@@ -181,18 +181,24 @@ import RandomAssignmentWithExclusionConfig from "@/components/annotations/assign
 import { EventBus } from "@/plugins/events";
 import { ToastEvent } from "@/plugins/events/events/toast";
 import { ConfirmationRequestEvent } from "@/plugins/events/events/confirmation";
-import { API, ignore, logReject, toastReject } from "@/plugins/api";
-import type { ApiResponseReject } from "@/plugins/api";
+import { API, ignore, logReject, toastReject, type ApiResponseReject } from "@/plugins/api";
 import type {
   AssignmentCounts,
   AssignmentScopeEntry,
   AssignmentScopeModel,
   HighlighterModel,
   UserModel,
-} from "@/plugins/api/api-core";
+  UserBaseModel,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  AssignmentScopeRandomWithNQLConfig,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  AssignmentScopeRandomWithExclusionConfig,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  AssignmentScopeRandomConfig,
+} from "@/plugins/api/spec/types.gen";
+import { type AssignmentScopeBaseConfigTypes } from "@/plugins/api/types";
 import { currentProjectStore } from "@/stores";
 import ScopeQuality from "@/components/annotations/ScopeQuality.vue";
-import type { UserBaseModel } from "@/plugins/api/api-core";
 import RandomAssignmentWithNQLConfig from "@/components/annotations/assignments/RandomAssignmentWithNQL.vue";
 
 type AssignmentScopeConfigData = {
@@ -205,7 +211,7 @@ type AssignmentScopeConfigData = {
   // users selected to be in the query pool
   selectedUsers: UserModel[];
   // assignment strategy type
-  strategyConfigType?: "random";
+  strategyConfigType?: AssignmentScopeBaseConfigTypes;
   // indicates whether this is (or will be) a newly created scope
   isNewScope: boolean;
   // holds the assignment counts (or undefined if none exist)
@@ -253,7 +259,7 @@ export default defineComponent({
     };
   },
   async mounted() {
-    API.core.highlighters
+    API.highlighters
       .getProjectHighlightersApiHighlightersProjectGet({
         xProjectId: currentProjectStore.projectId as string,
       })
@@ -265,11 +271,11 @@ export default defineComponent({
       });
     if (!this.isNewScope) {
       Promise.allSettled([
-        API.core.annotations.getAssignmentScopeApiAnnotationsAnnotateScopeAssignmentScopeIdGet({
+        API.annotations.getAssignmentScopeApiAnnotationsAnnotateScopeAssignmentScopeIdGet({
           xProjectId: currentProjectStore.projectId as string,
           assignmentScopeId: this.scopeId as string,
         }),
-        API.core.annotations.getNumAssignmentsForScopeApiAnnotationsAnnotateScopeCountsAssignmentScopeIdGet({
+        API.annotations.getNumAssignmentsForScopeApiAnnotationsAnnotateScopeCountsAssignmentScopeIdGet({
           xProjectId: currentProjectStore.projectId as string,
           assignmentScopeId: this.scopeId as string,
         }),
@@ -287,7 +293,7 @@ export default defineComponent({
 
         if ((this.assignmentScope.config?.users || []).length > 0) {
           this.strategyConfigType = this.assignmentScope.config!.config_type;
-          API.core.users
+          API.users
             .getUsersByIdsApiUsersDetailsGet({
               xProjectId: currentProjectStore.projectId as string,
               userId: this.assignmentScope.config!.users as string[],
@@ -327,7 +333,7 @@ export default defineComponent({
                 };
                 payload.config.users = this.selectedUserIds;
 
-                API.core.annotations
+                API.annotations
                   .makeAssignmentsApiAnnotationsConfigAssignmentsPost({
                     xProjectId: currentProjectStore.projectId as string,
                     requestBody: payload,
@@ -364,7 +370,7 @@ export default defineComponent({
               if (!scope.highlighter_ids || scope.highlighter_ids.length === 0) {
                 scope.highlighter_ids = undefined;
               }
-              API.core.annotations
+              API.annotations
                 .putAssignmentScopeApiAnnotationsAnnotateScopePut({
                   xProjectId: currentProjectStore.projectId as string,
                   requestBody: scope,
@@ -395,7 +401,7 @@ export default defineComponent({
     },
     loadResults() {
       if (this.assignmentScope.assignment_scope_id) {
-        API.core.annotations
+        API.annotations
           .getNumAssignmentsForScopeApiAnnotationsAnnotateScopeCountsAssignmentScopeIdGet({
             xProjectId: currentProjectStore.projectId as string,
             assignmentScopeId: this.assignmentScope.assignment_scope_id,
@@ -407,7 +413,7 @@ export default defineComponent({
             EventBus.emit(new ToastEvent("ERROR", "Failed to load assignment counts."));
           });
 
-        API.core.annotations
+        API.annotations
           .getAssignmentIndicatorsForScopeApiAnnotationsAnnotateAssignmentProgressAssignmentScopeIdGet({
             xProjectId: currentProjectStore.projectId as string,
             assignmentScopeId: this.assignmentScope.assignment_scope_id,
@@ -417,7 +423,7 @@ export default defineComponent({
           })
           .catch(toastReject);
 
-        API.core.users
+        API.users
           .getProjectAnnotatorUsersApiUsersListProjectAnnotatorsProjectIdGet({
             projectId: currentProjectStore.projectId as string,
             xProjectId: currentProjectStore.projectId as string,
@@ -430,7 +436,7 @@ export default defineComponent({
     },
     async loadListOfUsers() {
       this.users = [];
-      API.core.users
+      API.users
         .getProjectUsersApiUsersListProjectProjectIdGet({
           xProjectId: currentProjectStore.projectId as string,
           projectId: currentProjectStore.projectId as string,
@@ -444,7 +450,7 @@ export default defineComponent({
     },
     async sendReminders() {
       EventBus.emit(new ToastEvent("INFO", "Please only click the button once. Sending emails may take a while."));
-      API.core.mailing
+      API.mailing
         .remindUsersAssigmentApiMailAssignmentReminderPost({
           assignmentScopeId: this.assignmentScope.assignment_scope_id as string,
           xProjectId: currentProjectStore.projectId as string,

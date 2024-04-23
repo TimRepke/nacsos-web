@@ -231,7 +231,7 @@ import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import { Bar } from "vue-chartjs";
 import { BarElement, CategoryScale, Chart as ChartJS, Legend, LinearScale, Title, Tooltip } from "chart.js";
 import type { ChartOptions, ChartData } from "chart.js";
-import type { AcademicItemModel, TermStats } from "@/plugins/api/api-core";
+import type { AcademicItemModel, TermStats } from "@/plugins/api/types";
 import { currentProjectStore } from "@/stores";
 import { EventBus } from "@/plugins/events";
 import { ToastEvent } from "@/plugins/events/events/toast";
@@ -285,7 +285,7 @@ export default defineComponent({
       }
     },
     runSearch() {
-      API.core.search
+      API.search
         .searchOpenalexApiSearchOpenalexSelectPost({
           query: this.query,
           xProjectId: currentProjectStore.projectId as string,
@@ -311,7 +311,7 @@ export default defineComponent({
         });
     },
     expandTokens() {
-      API.core.search
+      API.search
         .termExpansionApiSearchOpenalexTermsGet({
           xProjectId: currentProjectStore.projectId as string,
           termPrefix: this.tokenSearchPrefix,

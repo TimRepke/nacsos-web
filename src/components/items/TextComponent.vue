@@ -15,7 +15,7 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import type { PropType } from "vue";
-import type { HighlighterModel } from "@/plugins/api/api-core";
+import type { HighlighterModel } from "@/plugins/api/types";
 import { interfaceSettingsStore } from "@/stores";
 import { marked } from "marked";
 

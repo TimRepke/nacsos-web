@@ -151,7 +151,7 @@ import AnyItemComponent from "@/components/items/AnyItem.vue";
 import AnnotationLabels from "@/components/annotations/AnnotationLabels.vue";
 import { EventBus } from "@/plugins/events";
 import { ToastEvent } from "@/plugins/events/events/toast";
-import type {
+import {
   AnnotationItem,
   AnnotationSchemeModel,
   AssignmentInfo,
@@ -159,10 +159,12 @@ import type {
   AssignmentScopeEntry,
   AssignmentScopeModel,
   HighlighterModel,
-} from "@/plugins/api/api-core";
-import { AssignmentStatus, AnnotationSchemeLabel } from "@/plugins/api/api-core";
-import type { AnyItem } from "@/types/items.d";
+  KindEnum,
+  AssignmentStatus,
+  AnnotationSchemeLabel,
+} from "@/plugins/api/types";
 import { API, ignore } from "@/plugins/api";
+import type { AnyItem } from "@/types/items.d";
 import { currentProjectStore, currentUserStore, interfaceSettingsStore } from "@/stores";
 import { lookupMakerBool, lookupMakerChoice, lookupMakerStatus } from "@/types/colours";
 
@@ -268,25 +270,23 @@ export default defineComponent({
       let response: AnnotationItem;
       if (currentAssignmentId) {
         response = (
-          await API.core.annotations.getAssignmentApiAnnotationsAnnotateAssignmentAssignmentIdGet({
+          await API.annotations.getAssignmentApiAnnotationsAnnotateAssignmentAssignmentIdGet({
             xProjectId: currentProjectStore.projectId as string,
             assignmentId: currentAssignmentId,
           })
         ).data;
       } else {
         response = (
-          await API.core.annotations.getNextOpenAssignmentForScopeForUserApiAnnotationsAnnotateNextAssignmentScopeIdGet(
-            {
-              xProjectId: currentProjectStore.projectId as string,
-              assignmentScopeId,
-            },
-          )
+          await API.annotations.getNextOpenAssignmentForScopeForUserApiAnnotationsAnnotateNextAssignmentScopeIdGet({
+            xProjectId: currentProjectStore.projectId as string,
+            assignmentScopeId,
+          })
         ).data;
       }
 
       await this.setCurrentAssignment(response);
 
-      API.core.highlighters
+      API.highlighters
         .getScopeHighlightersApiHighlightersScopeAssignmentScopeIdGet({
           xProjectId: currentProjectStore.projectId as string,
           assignmentScopeId,
@@ -423,7 +423,7 @@ export default defineComponent({
         scheme.labels = removeEmptyAnnotations(labels);
 
         // Send data to the server
-        API.core.annotations
+        API.annotations
           .saveAnnotationApiAnnotationsAnnotateSavePost({
             xProjectId: currentProjectStore.projectId as string,
             requestBody: {
@@ -464,7 +464,7 @@ export default defineComponent({
       this.rerenderCounter += 1;
 
       // update the assignments progress bar
-      API.core.annotations
+      API.annotations
         .getAssignmentIndicatorsForScopeApiAnnotationsAnnotateAssignmentProgressAssignmentScopeIdGet({
           xProjectId: currentProjectStore.projectId as string,
           assignmentScopeId: annotationItem.scope.assignment_scope_id as string,
@@ -486,7 +486,7 @@ export default defineComponent({
     async saveAndGoto(targetAssignmentId: string) {
       await this.save();
 
-      API.core.annotations
+      API.annotations
         .getAssignmentApiAnnotationsAnnotateAssignmentAssignmentIdGet({
           xProjectId: currentProjectStore.projectId as string,
           assignmentId: targetAssignmentId,
@@ -619,7 +619,7 @@ export default defineComponent({
         return indicateStatusMapper;
       }
 
-      if (label.kind === AnnotationSchemeLabel.kind.SINGLE && label.choices) {
+      if (label.kind === KindEnum.SINGLE && label.choices) {
         return lookupMakerChoice<UserAssignmentInfo>(
           label.choices,
           false,
@@ -627,7 +627,7 @@ export default defineComponent({
         );
       }
 
-      if (label.kind === AnnotationSchemeLabel.kind.BOOL) {
+      if (label.kind === KindEnum.BOOL) {
         return lookupMakerBool<UserAssignmentInfo>(
           (indicator: UserAssignmentInfo): boolean | null | undefined => indicator.labels?.[labelKey]?.[0]?.value_bool,
         );

@@ -1,14 +1,17 @@
 {
-  "extends": "./tsconfig.app.json",
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "src/**/__tests__/*"
   ],
   "include": [
     "src/**/*.ts",
     "src/**/*.tsx",
     "src/**/*.vue",
     "tests/**/*.ts",
-    "tests/**/*.tsx"
+    "tests/**/*.tsx",
+    "env.d.ts",
+    "src/**/*",
+    "src/**/*.vue"
   ],
   "compilerOptions": {
     "composite": false,

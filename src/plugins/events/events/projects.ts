@@ -1,6 +1,6 @@
 /* eslint-disable max-classes-per-file, no-useless-constructor */
 
-import type { ProjectModel, ProjectPermissionsModel } from "@/plugins/api/api-core";
+import type { ProjectModel, ProjectPermissionsModel } from "@/plugins/api/spec/types.gen";
 import { BaseEvent } from "@/plugins/events/baseEvent";
 
 export class CurrentProjectSelectedEvent extends BaseEvent {

@@ -34,7 +34,7 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import type { PropType } from "vue";
-import type { HighlighterModel } from "@/plugins/api/api-core";
+import type { HighlighterModel } from "@/plugins/api/types";
 import type { BaseItem as BaseItemModel } from "@/types/items.d";
 import TextComponent from "@/components/items/TextComponent.vue";
 

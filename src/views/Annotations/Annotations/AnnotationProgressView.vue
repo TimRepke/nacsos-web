@@ -242,7 +242,7 @@ import type {
   DehydratedAnnotationTracker,
   LabelScope,
   ProjectPermissionsModel,
-} from "@/plugins/api/api-core";
+} from "@/plugins/api/types";
 import { currentProjectStore } from "@/stores";
 import { API, ignore } from "@/plugins/api";
 import ExpandableBox from "@/components/ExpandableBox.vue";
@@ -265,7 +265,7 @@ export default defineComponent({
     };
   },
   async mounted() {
-    API.core.evaluation
+    API.evaluation
       .getProjectTrackersApiEvalTrackingTrackersGet({
         xProjectId: currentProjectStore.projectId as string,
       })
@@ -274,7 +274,7 @@ export default defineComponent({
       })
       .catch(ignore);
 
-    API.core.evaluation
+    API.evaluation
       .getProjectScopesApiEvalTrackingScopesGet({
         xProjectId: currentProjectStore.projectId as string,
       })
@@ -301,7 +301,7 @@ export default defineComponent({
     },
     saveTracker() {
       if (this.trackerDetails) {
-        API.core.evaluation
+        API.evaluation
           .saveTrackerApiEvalTrackingTrackerPut({
             xProjectId: currentProjectStore.projectId as string,
             requestBody: this.trackerDetails,
@@ -322,7 +322,7 @@ export default defineComponent({
     },
     refreshTracker(reset: boolean) {
       if (this.trackerDetails) {
-        API.core.evaluation
+        API.evaluation
           .updateTrackerApiEvalTrackingRefreshPost({
             xProjectId: this.trackerDetails.project_id as string,
             trackerId: this.trackerDetails.annotation_tracking_id as string,
@@ -352,7 +352,7 @@ export default defineComponent({
       }
     },
     focus(tracker: DehydratedAnnotationTracker) {
-      API.core.evaluation
+      API.evaluation
         .getTrackerApiEvalTrackingTrackerTrackerIdGet({
           xProjectId: currentProjectStore.projectId as string,
           trackerId: tracker.annotation_tracking_id as string,
@@ -364,7 +364,7 @@ export default defineComponent({
     },
     refresh() {
       if (this.trackerDetails) {
-        API.core.evaluation
+        API.evaluation
           .getTrackerApiEvalTrackingTrackerTrackerIdGet({
             xProjectId: currentProjectStore.projectId as string,
             trackerId: this.trackerDetails.annotation_tracking_id as string,

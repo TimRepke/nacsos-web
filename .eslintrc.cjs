@@ -3,7 +3,7 @@ require("@rushstack/eslint-patch/modern-module-resolution");
 
 module.exports = {
   root: true,
-  ignorePatterns: ["src/util/filesaver.js", "src/util/nql/*", "src/views/ParseView.vue"],
+  ignorePatterns: ["src/util/filesaver.js", "src/util/nql/*", "src/views/ParseView.vue", "*.gen.ts"],
   extends: [
     "plugin:vue/vue3-essential",
     "@vue/eslint-config-typescript/recommended",
@@ -35,16 +35,18 @@ module.exports = {
     //   },
     //   allowChildren: false,
     // }],
-    "object-curly-newline": [
-      "error",
-      {
-        ObjectPattern: "never",
-      },
-    ],
+    "object-curly-newline": "off",
+    // "object-curly-newline": [
+    //   "error",
+    //   {
+    //     ObjectPattern: "never",
+    //   },
+    // ],
     "class-methods-use-this": "off",
     "prefer-promise-reject-errors": "off",
     "vuejs-accessibility/click-events-have-key-events": "off",
     "vue/no-mutating-props": "off",
+    "@typescript-eslint/no-explicit-any": "off",
     "operator-linebreak": [
       "error",
       "after", // this is horrible, but prettier is refused to do before

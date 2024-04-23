@@ -1,7 +1,4 @@
 <template>
-  <!--  <ScopeQualityRow quality="" label="" />-->
-  <!--  <ScopeQualityRow v-for="userQuality in userQualities" :key="userQuality.annotation_quality_id" quality="" label="" />-->
-
   <ScopeQualityRow :quality="quality" :col-class="[bgClass]" :first-col-class="[bgClass]">
     <template v-if="isChoice">
       <font-awesome-icon icon="angle-right" class="text-muted ms-1 me-1" />
@@ -59,7 +56,7 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import type { PropType } from "vue";
-import type { AnnotationQualityModel } from "@/plugins/api/api-core";
+import type { AnnotationQualityModel } from "@/plugins/api/types";
 import { interfaceSettingsStore } from "@/stores";
 import { isArray, isNone } from "@/util";
 import ScopeQualityRow from "@/components/annotations/ScopeQualityRow.vue";

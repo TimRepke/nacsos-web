@@ -18,7 +18,7 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import type { PropType } from "vue";
-import type { AssignmentInfo, AssignmentScopeEntry } from "@/plugins/api/api-core";
+import type { AssignmentInfo, AssignmentScopeEntry } from "@/plugins/api/types";
 
 type User = { user_id: string; username: string };
 export default defineComponent({

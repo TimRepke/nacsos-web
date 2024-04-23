@@ -1,4 +1,4 @@
-import type { UserPermission } from "@/plugins/api/api-core";
+import type { UserPermission } from "@/plugins/api/spec/types.gen";
 
 // https://github.com/typescript-eslint/typescript-eslint/issues/1824
 export type PermissionKeys =

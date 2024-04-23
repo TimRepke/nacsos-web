@@ -81,13 +81,13 @@
         </div>
       </div>
     </template>
-    <template v-else> Loading... </template>
+    <template v-else> Loading...</template>
   </div>
 </template>
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import type { FileOnDisk, TaskModel } from "@/plugins/api/api-pipe";
+import type { FileOnDisk, TaskModel } from "@/plugins/api/types";
 import { API, toastReject } from "@/plugins/api";
 import { currentProjectStore } from "@/stores";
 // @ts-ignore
@@ -107,9 +107,9 @@ export default defineComponent({
     };
   },
   mounted() {
-    API.pipe.queue
-      .getTaskApiQueueTaskTaskIdGet({
-        taskId: this.taskId as string,
+    API.pipes
+      .getTaskApiPipesTaskGet({
+        xTaskId: this.taskId as string,
         xProjectId: currentProjectStore.projectId as string,
       })
       .then((response) => {
@@ -117,8 +117,8 @@ export default defineComponent({
       })
       .catch(toastReject);
 
-    API.pipe.artefacts
-      .getArtefactsApiArtefactsListGet({
+    API.pipes
+      .getArtefactsApiPipesArtefactsListGet({
         xTaskId: this.taskId as string,
         xProjectId: currentProjectStore.projectId as string,
       })
@@ -129,13 +129,13 @@ export default defineComponent({
   },
   methods: {
     downloadArchive() {
-      API.pipe.artefacts
-        .getArchiveApiArtefactsFilesGet({
+      API.pipes
+        .getArchiveApiPipesArtefactsFilesGet({
           xTaskId: this.taskId,
           xProjectId: currentProjectStore.projectId as string,
         })
         .then((response) => {
-          const file = new File([response.data], "archive.zip", { type: "application/zip;charset=utf-8" });
+          const file = new File([response.data as Blob], "archive.zip", { type: "application/zip;charset=utf-8" });
           // FileSaver.saveAs(file);
           saveAs(file);
         })
@@ -143,22 +143,22 @@ export default defineComponent({
     },
     downloadFile(filename: string) {
       const parts = filename.split("/");
-      API.pipe.artefacts
-        .getFileApiArtefactsFileGet({
+      API.pipes
+        .getFileApiPipesArtefactsFileGet({
           filename,
           xTaskId: this.taskId,
           xProjectId: currentProjectStore.projectId as string,
         })
         .then((response) => {
-          const file = new File([response.data], parts[parts.length - 1]);
+          const file = new File([response.data as Blob], parts[parts.length - 1]);
           // FileSaver.saveAs(file);
           saveAs(file);
         })
         .catch(toastReject);
     },
     loadLog() {
-      API.pipe.artefacts
-        .getTaskLogApiArtefactsLogGet({
+      API.pipes
+        .getTaskLogApiPipesArtefactsLogGet({
           xTaskId: this.taskId,
           xProjectId: currentProjectStore.projectId as string,
         })

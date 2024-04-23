@@ -30,10 +30,10 @@
 </template>
 
 <script lang="ts">
-import { marked } from "marked";
 import { defineComponent } from "vue";
 import { ToastEvent } from "@/plugins/events/events/toast";
 import type { ToastType } from "@/plugins/events/events/toast";
+import { md2html } from "@/util";
 
 interface Toast {
   key: number;
@@ -64,7 +64,7 @@ export default defineComponent({
         key: this.runningCount,
         level: event.level,
         message: event.message,
-        htmlMessage: marked(event.message),
+        htmlMessage: md2html(event.message),
         bg: backgroundClass[event.level],
         col: textColorClass[event.level],
       };

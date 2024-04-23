@@ -117,7 +117,7 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import { currentProjectStore, currentUserStore } from "@/stores";
-import type { AuthTokenModel, UserModel } from "@/plugins/api/api-core";
+import type { AuthTokenModel, UserModel } from "@/plugins/api/types";
 import { API, toastReject } from "@/plugins/api";
 import ToolTip from "@/components/ToolTip.vue";
 import { EventBus } from "@/plugins/events";
@@ -147,7 +147,7 @@ export default defineComponent({
     currentProjectStore.clear();
 
     // load user data
-    API.core.oauth
+    API.oauth
       .readUsersMeApiLoginMeGet()
       .then((response) => {
         this.user = response.data;
@@ -162,7 +162,7 @@ export default defineComponent({
       if (this.invalidPassword) {
         EventBus.emit(new ToastEvent("WARN", "Something is not right with your password!"));
       } else {
-        API.core.users
+        API.users
           .saveUserSelfApiUsersMyDetailsPut({
             requestBody: this.user,
           })
@@ -178,7 +178,7 @@ export default defineComponent({
       }
     },
     refreshAuthTokens() {
-      API.core.oauth
+      API.oauth
         .readTokensMeApiLoginMyTokensGet()
         .then((response) => {
           this.tokens = response.data;
@@ -186,7 +186,7 @@ export default defineComponent({
         .catch(toastReject);
     },
     revoke(token: AuthTokenModel) {
-      API.core.oauth
+      API.oauth
         .revokeTokenApiLoginTokenTokenIdDelete({
           tokenId: token.token_id,
         })
@@ -197,7 +197,7 @@ export default defineComponent({
       if (token.token_id === currentUserStore.authToken?.token_id) {
         currentUserStore.extendAuthTokenValidity();
       } else {
-        API.core.oauth
+        API.oauth
           .refreshTokenApiLoginTokenTokenIdPut({
             tokenId: token.token_id,
           })

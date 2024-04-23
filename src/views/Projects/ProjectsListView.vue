@@ -80,9 +80,9 @@ import { marked } from "marked";
 import "core-js/modules/es.array.to-sorted";
 import { EventBus } from "@/plugins/events";
 import { CurrentProjectSelectedEvent, CurrentProjectSetEvent } from "@/plugins/events/events/projects";
-import type { ProjectInfo } from "@/plugins/api/api-core";
+import type { ProjectInfo } from "@/plugins/api/types";
 import { API, toastReject } from "@/plugins/api";
-import { ItemType } from "@/plugins/api/api-core";
+import { ItemTypeEnum as ItemType } from "@/plugins/api/types";
 import ProjectTypeIcon from "@/components/ProjectTypeIcon.vue";
 
 enum Sort {
@@ -120,7 +120,7 @@ export default defineComponent({
     // clear the currentProjectStore to prevent side effects
     // currentProjectStore.clear();
     // get all projects from the server (that we have permission to access)
-    API.core.projects
+    API.projects
       .getAllProjectsApiProjectsListGet()
       .then((response) => {
         this.projectList = response.data;
@@ -154,7 +154,7 @@ export default defineComponent({
       }
     },
     renderMD(txt: string): string {
-      return marked(txt);
+      return marked.parse(txt, { async: false }) as string;
     },
   },
   computed: {

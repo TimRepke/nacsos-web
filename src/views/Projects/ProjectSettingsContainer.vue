@@ -10,7 +10,7 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import { currentProjectStore } from "@/stores";
-import type { ProjectPermissionsModel } from "@/plugins/api/api-core";
+import type { ProjectPermissionsModel } from "@/plugins/api/types";
 
 export default defineComponent({
   name: "ProjectSettingsContainer",

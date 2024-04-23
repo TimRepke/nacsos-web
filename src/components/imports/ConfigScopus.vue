@@ -29,7 +29,7 @@
         <template v-else>
           <h4>Uploaded files</h4>
           <ul>
-            <li v-for="file in config.filenames" :key="file">
+            <li v-for="file in config.sources" :key="file">
               {{ file }}
             </li>
           </ul>
@@ -45,10 +45,10 @@ import { defineComponent } from "vue";
 import useVuelidate from "@vuelidate/core";
 import { required } from "@vuelidate/validators";
 import type { BaseValidation, ValidationRule } from "@vuelidate/core";
-import type { ScopusCSVImport } from "@/plugins/api/api-core";
+import { ImportConfigEnum, type ScopusImport } from "@/plugins/api/types";
 import FilesUploader from "@/components/FilesUploader.vue";
 import type { UploadFile } from "@/components/FilesUploader.vue";
-import { currentProjectStore } from "@/stores";
+import { isEmpty } from "@/util";
 
 const areFilesUploaded: ValidationRule = {
   $validator(value?: UploadFile[]) {
@@ -67,7 +67,7 @@ export default defineComponent({
   emits: ["configChanged"],
   props: {
     existingConfig: {
-      type: Object as PropType<ScopusCSVImport>,
+      type: Object as PropType<ScopusImport>,
       required: false,
       default: null,
     },
@@ -92,53 +92,40 @@ export default defineComponent({
     };
   },
   data() {
-    const config: ScopusCSVImport = this.existingConfig ? this.existingConfig : this.emptyConfig();
-
-    if (!config.import_id && !!this.importId) {
-      config.import_id = this.importId;
-    }
-
     return {
       files: [] as UploadFile[],
-      config,
+      config: this.existingConfig
+        ? this.existingConfig
+        : ({
+            kind: ImportConfigEnum.SCOPUS,
+            sources: [] as string[],
+          } as ScopusImport),
     };
   },
   methods: {
-    emptyConfig(): Partial<ScopusCSVImport> | undefined {
-      return {
-        func_name: "nacsos_lib.academic.import.import_scopus_csv_file",
-        filenames: [],
-        import_id: this.importId,
-        project_id: currentProjectStore.projectId,
-      };
-    },
     errorsToString(field: BaseValidation): string {
       return field.$errors.map((error) => error.$message).join("; ");
     },
     onFilesChange(files: UploadFile[]) {
       this.files = files;
-      const filenames = files.map((file) => file.serverPath).filter((filename) => !!filename);
-      this.config.filenames = filenames.length === 0 ? undefined : filenames;
+      const sources = files.map((file) => file.serverPath).filter((source) => !!source);
+      this.config.sources = sources.length === 0 ? undefined : sources;
     },
   },
   computed: {
     uploadsEnabled(): boolean {
-      return (
-        this.editable &&
-        this.config &&
-        (this.config.filenames === undefined || this.config.filenames === null || this.config.filenames.length === 0)
-      );
+      return this.editable && this.config && isEmpty(this.config.sources);
     },
   },
   watch: {
     config: {
-      handler(newValue: ScopusCSVImport) {
+      handler(newValue: ScopusImport) {
         this.$emit("configChanged", newValue);
       },
       deep: true,
     },
     existingConfig: {
-      handler(newValue: ScopusCSVImport) {
+      handler(newValue: ScopusImport) {
         this.config = newValue;
       },
       deep: true,

@@ -122,8 +122,7 @@ import { defineComponent } from "vue";
 import { currentProjectStore } from "@/stores";
 import { EventBus } from "@/plugins/events";
 import { ToastEvent } from "@/plugins/events/events/toast";
-import type { HighlighterModel } from "@/plugins/api/api-core";
-
+import type { HighlighterModel } from "@/plugins/api/types";
 import { API, toastReject } from "@/plugins/api";
 import ClosablePill from "@/components/ClosablePill.vue";
 
@@ -146,7 +145,7 @@ export default defineComponent({
     };
   },
   async mounted() {
-    API.core.highlighters
+    API.highlighters
       .getProjectHighlightersApiHighlightersProjectGet({
         xProjectId: currentProjectStore.projectId as string,
       })
@@ -169,13 +168,13 @@ export default defineComponent({
         keywords: [],
         keywordsStr: "",
         style: "",
-      } as HighlighterModel);
+      } as Highlighter);
     },
     saveHighlighter(highlighter: HighlighterModel) {
       const highlighterCopy = JSON.parse(JSON.stringify(highlighter));
       delete highlighterCopy.keywordsStr;
       delete highlighterCopy.error;
-      API.core.highlighters
+      API.highlighters
         .upsertHighlighterApiHighlightersProjectPut({
           xProjectId: currentProjectStore.projectId as string,
           requestBody: highlighter,

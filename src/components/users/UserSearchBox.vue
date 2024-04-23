@@ -34,7 +34,7 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
-import type { UserBaseModel } from "@/plugins/api/api-core";
+import type { UserBaseModel } from "@/plugins/api/types";
 import { currentProjectStore } from "@/stores";
 import { API } from "@/plugins/api";
 import { EventBus } from "@/plugins/events";
@@ -66,7 +66,7 @@ export default defineComponent({
   },
   mounted() {
     if (this.projectId) {
-      API.core.users
+      API.users
         .getProjectUsersApiUsersListProjectProjectIdGet({
           xProjectId: currentProjectStore.projectId as string,
           projectId: currentProjectStore.projectId as string,
@@ -78,7 +78,7 @@ export default defineComponent({
           EventBus.emit(new ToastEvent("WARN", "Failed to load list of users."));
         });
     } else {
-      API.core.users
+      API.users
         .getAllUsersApiUsersListAllGet()
         .then((response) => {
           this.users = response.data;

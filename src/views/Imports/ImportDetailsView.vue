@@ -102,14 +102,11 @@ import { defineComponent } from "vue";
 import type { Component } from "vue";
 import { ToastEvent } from "@/plugins/events/events/toast";
 import { EventBus } from "@/plugins/events";
-import { ItemType } from "@/plugins/api/api-core";
-import type { ImportModel, ProjectModel, ProjectPermissionsModel } from "@/plugins/api/api-core";
-import ConfigTwitter from "@/components/imports/ConfigTwitter.vue";
+import { ItemType } from "@/plugins/api/types";
+import type { ImportModel, ProjectModel, ProjectPermissionsModel } from "@/plugins/api/types";
 import ConfigWoS from "@/components/imports/ConfigWoS.vue";
 import ConfigJSONLOpenAlexWorks from "@/components/imports/ConfigJSONLOpenAlexWorks.vue";
 import ConfigJSONLAcademicItem from "@/components/imports/ConfigJSONLAcademicItem.vue";
-import ConfigJSONLTwitterAPI from "@/components/imports/ConfigJSONLTwitterAPI.vue";
-import ConfigJSONLTwitterDb from "@/components/imports/ConfigJSONLTwitterDb.vue";
 import ConfigScopus from "@/components/imports/ConfigScopus.vue";
 import { currentProjectStore, currentUserStore } from "@/stores";
 import { ConfirmationRequestEvent } from "@/plugins/events/events/confirmation";
@@ -144,23 +141,12 @@ const configs: Record<string, ConfigOption> = {
     component: ConfigJSONLAcademicItem,
     name: "Upload JSONl file (AcademicItemModel)",
   },
-  twitterApi: {
-    component: ConfigTwitter,
-    name: "Twitter Search API",
-  },
-  twitterDbFile: {
-    component: ConfigJSONLTwitterDb,
-    name: "Import JSONl file (TwitterItemModel)",
-  },
-  twitterApiFile: {
-    component: ConfigJSONLTwitterAPI,
-    name: "Import JSONl file (API dump)",
-  },
 };
 
 export const projectTypeImportTypeCompatibility: { [key in ProjectModel["type"]]: string[] } = {
   academic: ["academicFile", "oaFile", "oa", "scopusCSV", "wos"],
-  twitter: ["twitterApi", "twitterApiFile", "twitterDbFile"],
+  // twitter: ["twitterApi", "twitterApiFile", "twitterDbFile"],
+  twitter: [],
   lexis: [],
   generic: [],
   patents: [],
@@ -183,11 +169,8 @@ type ImportDetails = {
 export default defineComponent({
   name: "ImportDetailsView",
   components: {
-    ConfigJSONLTwitterDb,
     ConfigScopus,
     ConfigWoS,
-    ConfigJSONLTwitterAPI,
-    ConfigTwitter,
     ConfigJSONLAcademicItem,
     ConfigJSONLOpenAlexWorks,
     ConfigOpenAlex,
@@ -221,7 +204,7 @@ export default defineComponent({
   methods: {
     fetchImportDetails(onDone?: () => void) {
       if (this.importId) {
-        API.core.imports
+        API.imports
           .getImportDetailsApiImportsImportImportIdGet({
             importId: this.importId,
             xProjectId: currentProjectStore.projectId as string,
@@ -258,7 +241,7 @@ export default defineComponent({
       );
     },
     async saveRequest() {
-      API.core.imports
+      API.imports
         .putImportDetailsApiImportsImportPut({
           // @ts-ignore
           requestBody: this.importDetails,
@@ -303,7 +286,7 @@ export default defineComponent({
             "Make sure to **click save before importing**!",
           (response) => {
             if (response === "ACCEPT") {
-              API.core.imports
+              API.imports
                 .triggerImportApiImportsImportImportIdPost({
                   importId: this.importId as string,
                   xProjectId: currentProjectStore.projectId as string,
@@ -327,7 +310,7 @@ export default defineComponent({
       );
     },
     async loadImportStats() {
-      API.core.imports
+      API.imports
         .getImportCountsApiImportsImportImportIdCountGet({
           importId: this.importId as string,
           xProjectId: currentProjectStore.projectId as string,
