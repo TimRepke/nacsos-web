@@ -155,7 +155,7 @@
                         {{ resolution.name }}
                       </span>
                       <span class="text-muted small me-3 ms-auto" @click.stop="navigate" role="button">
-                        {{ $util.dt2str(scope.time_created) }}
+                        {{ $util.dt2str(resolution.time_created) }}
                       </span>
                     </router-link>
                     <div>
