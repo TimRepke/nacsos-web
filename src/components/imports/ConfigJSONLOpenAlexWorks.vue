@@ -27,7 +27,7 @@
         <template v-else>
           <h4>Uploaded files</h4>
           <ul>
-            <li v-for="file in config.filenames" :key="file">
+            <li v-for="file in config.sources" :key="file">
               {{ file }}
             </li>
           </ul>
