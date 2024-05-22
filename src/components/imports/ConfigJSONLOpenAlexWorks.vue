@@ -27,7 +27,7 @@
         <template v-else>
           <h4>Uploaded files</h4>
           <ul>
-            <li v-for="file in config.filenames" :key="file">
+            <li v-for="file in config.sources" :key="file">
               {{ file }}
             </li>
           </ul>
@@ -105,8 +105,8 @@ export default defineComponent({
     },
     onFilesChange(files: UploadFile[]) {
       this.files = files;
-      const filenames = files.map((file) => file.serverPath).filter((filename) => !!filename);
-      this.config.filenames = filenames.length === 0 ? undefined : filenames;
+      const sources = files.map((file) => file.serverPath).filter((filename) => !!filename);
+      this.config.sources = sources.length === 0 ? undefined : sources;
     },
   },
   computed: {
@@ -114,7 +114,7 @@ export default defineComponent({
       return (
         this.editable &&
         this.config &&
-        (this.config.filenames === undefined || this.config.filenames === null || this.config.filenames.length === 0)
+        (this.config.sources === undefined || this.config.sources === null || this.config.sources.length === 0)
       );
     },
   },
