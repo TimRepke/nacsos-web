@@ -109,7 +109,7 @@ export default defineComponent({
     onFilesChange(files: UploadFile[]) {
       this.files = files;
       const filenames = files.map((file) => file.serverPath).filter((filename) => !!filename);
-      this.config.filenames = filenames.length === 0 ? undefined : filenames;
+      this.config.sources = filenames.length === 0 ? undefined : filenames;
     },
   },
   computed: {
@@ -117,7 +117,7 @@ export default defineComponent({
       return (
         this.editable &&
         this.config &&
-        (this.config.filenames === undefined || this.config.filenames === null || this.config.filenames.length === 0)
+        (this.config.sources === undefined || this.config.sources === null || this.config.sources.length === 0)
       );
     },
   },
