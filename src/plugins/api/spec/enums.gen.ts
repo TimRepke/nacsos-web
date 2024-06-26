@@ -2,13 +2,15 @@
 /* eslint-disable  @typescript-eslint/no-unused-vars */
 
 export enum KindEnum {
-  BOOL = "bool",
-  STR = "str",
-  FLOAT = "float",
-  INT = "int",
-  SINGLE = "single",
-  MULTI = "multi",
-  INTEXT = "intext",
+  ACADEMIC = "academic",
+}
+
+export enum FilterEnum {
+  ANNOTATION = "annotation",
+}
+
+export enum ConfigTypeEnum {
+  RANDOM = "random",
 }
 
 export enum AssignmentStatusEnum {
@@ -51,6 +53,14 @@ export enum TypeEnum {
   USER = "user",
   BOT = "bot",
   RESOLVED = "resolved",
+}
+
+export enum ValueTypeEnum {
+  BOOL = "bool",
+}
+
+export enum CompEnum {
+  _ = "=",
 }
 
 export enum ScopeTypeEnum {

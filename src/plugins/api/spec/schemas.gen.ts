@@ -104,6 +104,8 @@ export const $AcademicItemImport = {
       title: "Sources",
     },
     kind: {
+      type: "string",
+      enum: ["academic"],
       const: "academic",
       title: "Kind",
       default: "academic",
@@ -393,6 +395,8 @@ export const $AnnotatedItem = {
 export const $AnnotationFilter = {
   properties: {
     filter: {
+      type: "string",
+      enum: ["annotation"],
       const: "annotation",
       title: "Filter",
       default: "annotation",
@@ -1839,6 +1843,8 @@ export const $AssignmentCounts = {
 export const $AssignmentFilter = {
   properties: {
     filter: {
+      type: "string",
+      enum: ["assignment"],
       const: "assignment",
       title: "Filter",
       default: "assignment",
@@ -2242,6 +2248,8 @@ AnnotationScheme -> [AssignmentScope] -> Assignment -> Annotation`,
 export const $AssignmentScopeRandomConfig = {
   properties: {
     config_type: {
+      type: "string",
+      enum: ["random"],
       const: "random",
       title: "Config Type",
       default: "random",
@@ -2302,6 +2310,8 @@ export const $AssignmentScopeRandomConfig = {
 export const $AssignmentScopeRandomWithExclusionConfig = {
   properties: {
     config_type: {
+      type: "string",
+      enum: ["random_exclusion"],
       const: "random_exclusion",
       title: "Config Type",
       default: "random_exclusion",
@@ -2381,6 +2391,8 @@ export const $AssignmentScopeRandomWithExclusionConfig = {
 export const $AssignmentScopeRandomWithNQLConfig = {
   properties: {
     config_type: {
+      type: "string",
+      enum: ["random_nql"],
       const: "random_nql",
       title: "Config Type",
       default: "random_nql",
@@ -3575,6 +3587,8 @@ export const $ExportRequest = {
 export const $FieldFilter = {
   properties: {
     filter: {
+      type: "string",
+      enum: ["field"],
       const: "field",
       title: "Filter",
       default: "field",
@@ -3615,6 +3629,8 @@ export const $FieldFilter = {
 export const $FieldFilters = {
   properties: {
     filter: {
+      type: "string",
+      enum: ["field_mul"],
       const: "field_mul",
       title: "Filter",
       default: "field_mul",
@@ -4151,6 +4167,8 @@ export const $IEUUID = {
 export const $ImportFilter = {
   properties: {
     filter: {
+      type: "string",
+      enum: ["import"],
       const: "import",
       title: "Filter",
       default: "import",
@@ -4657,16 +4675,22 @@ export const $LabelFilterBool = {
       title: "Type",
     },
     filter: {
+      type: "string",
+      enum: ["label_bool"],
       const: "label_bool",
       title: "Filter",
       default: "label_bool",
     },
     value_type: {
+      type: "string",
+      enum: ["bool"],
       const: "bool",
       title: "Value Type",
       default: "bool",
     },
     comp: {
+      type: "string",
+      enum: ["="],
       const: "=",
       title: "Comp",
       default: "=",
@@ -4749,11 +4773,15 @@ export const $LabelFilterInt = {
       title: "Type",
     },
     filter: {
+      type: "string",
+      enum: ["label_int"],
       const: "label_int",
       title: "Filter",
       default: "label_int",
     },
     value_type: {
+      type: "string",
+      enum: ["int"],
       const: "int",
       title: "Value Type",
       default: "int",
@@ -4840,11 +4868,15 @@ export const $LabelFilterMulti = {
       title: "Type",
     },
     filter: {
+      type: "string",
+      enum: ["label_multi"],
       const: "label_multi",
       title: "Filter",
       default: "label_multi",
     },
     value_type: {
+      type: "string",
+      enum: ["multi"],
       const: "multi",
       title: "Value Type",
       default: "multi",
@@ -5264,16 +5296,22 @@ export const $MetaFilterBool = {
       title: "Field",
     },
     filter: {
+      type: "string",
+      enum: ["meta_bool"],
       const: "meta_bool",
       title: "Filter",
       default: "meta_bool",
     },
     value_type: {
+      type: "string",
+      enum: ["bool"],
       const: "bool",
       title: "Value Type",
       default: "bool",
     },
     comp: {
+      type: "string",
+      enum: ["="],
       const: "=",
       title: "Comp",
       default: "=",
@@ -5295,11 +5333,15 @@ export const $MetaFilterInt = {
       title: "Field",
     },
     filter: {
+      type: "string",
+      enum: ["meta_int"],
       const: "meta_int",
       title: "Filter",
       default: "meta_int",
     },
     value_type: {
+      type: "string",
+      enum: ["int"],
       const: "int",
       title: "Value Type",
       default: "int",
@@ -5325,16 +5367,22 @@ export const $MetaFilterStr = {
       title: "Field",
     },
     filter: {
+      type: "string",
+      enum: ["meta_str"],
       const: "meta_str",
       title: "Filter",
       default: "meta_str",
     },
     value_type: {
+      type: "string",
+      enum: ["str"],
       const: "str",
       title: "Value Type",
       default: "str",
     },
     comp: {
+      type: "string",
+      enum: ["LIKE"],
       const: "LIKE",
       title: "Comp",
       default: "LIKE",
@@ -5360,6 +5408,8 @@ export const $OpenAlexFileImport = {
       title: "Sources",
     },
     kind: {
+      type: "string",
+      enum: ["oa-file"],
       const: "oa-file",
       title: "Kind",
       default: "oa-file",
@@ -5373,6 +5423,8 @@ export const $OpenAlexFileImport = {
 export const $OpenAlexSolrImport = {
   properties: {
     kind: {
+      type: "string",
+      enum: ["oa-solr"],
       const: "oa-solr",
       title: "Kind",
       default: "oa-solr",
@@ -6062,6 +6114,8 @@ export const $ScopusImport = {
       title: "Sources",
     },
     kind: {
+      type: "string",
+      enum: ["scopus"],
       const: "scopus",
       title: "Kind",
       default: "scopus",
@@ -6070,6 +6124,61 @@ export const $ScopusImport = {
   type: "object",
   required: ["sources"],
   title: "ScopusImport",
+} as const;
+
+export const $SearchPayload = {
+  properties: {
+    query: {
+      type: "string",
+      title: "Query",
+    },
+    limit: {
+      type: "integer",
+      title: "Limit",
+      default: 20,
+    },
+    offset: {
+      type: "integer",
+      title: "Offset",
+      default: 0,
+    },
+    def_type: {
+      type: "string",
+      enum: ["edismax", "lucene", "dismax"],
+      title: "Def Type",
+      default: "lucene",
+    },
+    field: {
+      type: "string",
+      enum: ["title", "abstract", "title_abstract"],
+      title: "Field",
+      default: "title_abstract",
+    },
+    histogram: {
+      type: "boolean",
+      title: "Histogram",
+      default: false,
+    },
+    op: {
+      type: "string",
+      enum: ["OR", "AND"],
+      title: "Op",
+      default: "AND",
+    },
+    histogram_from: {
+      type: "integer",
+      title: "Histogram From",
+      default: 1990,
+    },
+    histogram_to: {
+      type: "integer",
+      title: "Histogram To",
+      default: 2024,
+    },
+  },
+  type: "object",
+  required: ["query"],
+  title: "SearchPayload",
 } as const;
 
 export const $SearchResult = {
@@ -6198,6 +6307,8 @@ export const $SnapshotEntry = {
 export const $SubQuery = {
   properties: {
     filter: {
+      type: "string",
+      enum: ["sub"],
       const: "sub",
       title: "Filter",
       default: "sub",
@@ -6459,7 +6570,7 @@ export const $TaskModel = {
       ],
       title: "Project Id",
     },
-    celery_id: {
+    message_id: {
       anyOf: [
         {
           type: "string",
@@ -6472,7 +6583,7 @@ export const $TaskModel = {
           type: "null",
         },
       ],
-      title: "Celery Id",
+      title: "Message Id",
     },
     comment: {
       anyOf: [
@@ -7555,6 +7666,8 @@ export const $WoSImport = {
       title: "Sources",
     },
     kind: {
+      type: "string",
+      enum: ["wos"],
       const: "wos",
       title: "Kind",
       default: "wos",

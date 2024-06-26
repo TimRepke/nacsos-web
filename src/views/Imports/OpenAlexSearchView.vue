@@ -153,7 +153,7 @@
         <template v-if="results && results.length > 0">
           <AcademicItemComponent v-for="item in results" :key="item.item_id" :item="item" />
         </template>
-        <template v-else> No results (yet). </template>
+        <template v-else> No results (yet).</template>
       </div>
     </div>
 
@@ -287,15 +287,17 @@ export default defineComponent({
     runSearch() {
       API.search
         .searchOpenalexApiSearchOpenalexSelectPost({
-          query: this.query,
+          requestBody: {
+            query: this.query,
+            limit: this.limit,
+            offset: this.offset,
+            field: this.field,
+            def_type: this.defType,
+            histogram: this.hist,
+            histogram_from: this.histStart,
+            histogram_to: this.histEnd,
+          },
           xProjectId: currentProjectStore.projectId as string,
-          limit: this.limit,
-          offset: this.offset,
-          field: this.field,
-          defType: this.defType,
-          histogram: this.hist,
-          histogramFrom: this.histStart,
-          histogramTo: this.histEnd,
         })
         .then((response) => {
           const { data } = response;

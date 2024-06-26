@@ -159,7 +159,7 @@ import {
   AssignmentScopeEntry,
   AssignmentScopeModel,
   HighlighterModel,
-  KindEnum,
+  AnnotationSchemeLabelKindEnum as KindEnum,
   AssignmentStatus,
   AnnotationSchemeLabel,
 } from "@/plugins/api/types";

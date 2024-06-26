@@ -218,7 +218,7 @@ import type {
   AnnotationSchemeLabelChoice,
   AnnotationSchemeLabel,
 } from "@/plugins/api/types";
-import { KindEnum } from "@/plugins/api/types";
+import { AnnotationSchemeLabelKindEnum as KindEnum } from "@/plugins/api/types";
 import ClosablePill from "@/components/ClosablePill.vue";
 import { is } from "@/util";
 

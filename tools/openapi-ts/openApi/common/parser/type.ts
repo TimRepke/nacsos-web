@@ -39,7 +39,16 @@ export const getMappedType = (type: string, format?: string): string | undefined
     case "void":
       return "void";
   }
-  throw new Error();
+
+  if (type.indexOf("#") >= 0) {
+    return type.split("/").reverse()[0];
+  }
+
+  //console.error(type);
+  //console.error(format);
+  //throw new Error();
+
+  return type;
 };
 
 /**

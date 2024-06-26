@@ -28,7 +28,7 @@ export enum ImportConfigEnum {
   SCOPUS = "scopus",
   ACADEMIC = "academic",
   OA_FILE = "oa-file",
-  OA_SOLR = "oa_solr",
+  OA_SOLR = "oa-solr",
 }
 
 export type ImportConfigTypes = EnumLiteral<ImportConfigEnum>;

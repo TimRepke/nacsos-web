@@ -1027,6 +1027,18 @@ export type ScopusImport = {
   kind?: "scopus";
 };
 
+export type SearchPayload = {
+  query: string;
+  limit?: number;
+  offset?: number;
+  def_type?: "edismax" | "lucene" | "dismax";
+  field?: "title" | "abstract" | "title_abstract";
+  histogram?: boolean;
+  op?: "OR" | "AND";
+  histogram_from?: number;
+  histogram_to?: number;
+};
+
 export type SearchResult = {
   query_time: number;
   num_found: number;
@@ -1100,7 +1112,7 @@ export type TaskModel = {
   function_name: string;
   user_id?: string | null;
   project_id?: string | null;
-  celery_id?: string | null;
+  message_id?: string | null;
   comment?: string | null;
   params?:
     | {
@@ -1274,6 +1286,40 @@ export type WoSImport = {
 };
 
 export type $OpenApiTs = {
+  "/api/ping/tracked-sleep-task": {
+    get: {
+      req: {
+        sleepTime?: number;
+      };
+      res: {
+        /**
+         * Successful Response
+         */
+        200: unknown;
+        /**
+         * Validation Error
+         */
+        422: HTTPValidationError;
+      };
+    };
+  };
+  "/api/ping/sleep-task": {
+    get: {
+      req: {
+        sleepTime?: number;
+      };
+      res: {
+        /**
+         * Successful Response
+         */
+        200: unknown;
+        /**
+         * Validation Error
+         */
+        422: HTTPValidationError;
+      };
+    };
+  };
   "/api/ping/": {
     get: {
       res: {
@@ -2398,7 +2444,7 @@ export type $OpenApiTs = {
         /**
          * Successful Response
          */
-        200: string;
+        200: unknown;
         /**
          * Validation Error
          */
@@ -2637,15 +2683,7 @@ export type $OpenApiTs = {
   "/api/search/openalex/select": {
     post: {
       req: {
-        defType?: "edismax" | "lucene" | "dismax";
-        field?: "title" | "abstract" | "title_abstract";
-        histogram?: boolean;
-        histogramFrom?: number;
-        histogramTo?: number;
-        limit?: number;
-        offset?: number;
-        op?: "OR" | "AND";
-        query: string;
+        requestBody: SearchPayload;
         xProjectId: string;
       };
       res: {
@@ -3104,6 +3142,43 @@ export type $OpenApiTs = {
          * Validation Error
          */
         422: HTTPValidationError;
+      };
+    };
+  };
+  "/api/pipes/dramatiq/task": {
+    delete: {
+      req: {
+        messageId: string;
+      };
+      res: {
+        /**
+         * Successful Response
+         */
+        200: unknown;
+        /**
+         * Validation Error
+         */
+        422: HTTPValidationError;
+      };
+    };
+  };
+  "/api/pipes/dramatiq/workers": {
+    get: {
+      res: {
+        /**
+         * Successful Response
+         */
+        200: unknown;
+      };
+    };
+  };
+  "/api/pipes/dramatiq/tasks": {
+    get: {
+      res: {
+        /**
+         * Successful Response
+         */
+        200: unknown;
       };
     };
   };
