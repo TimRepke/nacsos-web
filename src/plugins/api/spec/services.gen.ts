@@ -9,6 +9,42 @@ import type { AxiosRequestConfig } from "axios";
 import type { $OpenApiTs } from "./types.gen";
 
 export class DefaultService {
+  public static trackedTaskApiPingTrackedSleepTaskGet(
+    data: $OpenApiTs["/api/ping/tracked-sleep-task"]["get"]["req"] = {},
+    options?: Partial<AxiosRequestConfig>,
+  ): CancelablePromise<ApiResult<$OpenApiTs["/api/ping/tracked-sleep-task"]["get"]["res"][200]>> {
+    const { sleepTime } = data;
+    return __request(OpenAPI, {
+      method: "GET",
+      url: "/api/ping/tracked-sleep-task",
+      query: {
+        sleep_time: sleepTime,
+      },
+      errors: {
+        422: "Validation Error",
+      },
+      customRequestConfig: options,
+    });
+  }
+
+  public static taskApiPingSleepTaskGet(
+    data: $OpenApiTs["/api/ping/sleep-task"]["get"]["req"] = {},
+    options?: Partial<AxiosRequestConfig>,
+  ): CancelablePromise<ApiResult<$OpenApiTs["/api/ping/sleep-task"]["get"]["res"][200]>> {
+    const { sleepTime } = data;
+    return __request(OpenAPI, {
+      method: "GET",
+      url: "/api/ping/sleep-task",
+      query: {
+        sleep_time: sleepTime,
+      },
+      errors: {
+        422: "Validation Error",
+      },
+      customRequestConfig: options,
+    });
+  }
+
   public static pongApiPingGet(
     options?: Partial<AxiosRequestConfig>,
   ): CancelablePromise<ApiResult<$OpenApiTs["/api/ping/"]["get"]["res"][200]>> {
@@ -1597,24 +1633,15 @@ export class SearchService {
     data: $OpenApiTs["/api/search/openalex/select"]["post"]["req"],
     options?: Partial<AxiosRequestConfig>,
   ): CancelablePromise<ApiResult<$OpenApiTs["/api/search/openalex/select"]["post"]["res"][200]>> {
-    const { query, xProjectId, limit, offset, defType, field, histogram, op, histogramFrom, histogramTo } = data;
+    const { xProjectId, requestBody } = data;
     return __request(OpenAPI, {
       method: "POST",
       url: "/api/search/openalex/select",
       headers: {
         "x-project-id": xProjectId,
       },
-      query: {
-        query,
-        limit,
-        offset,
-        def_type: defType,
-        field,
-        histogram,
-        op,
-        histogram_from: histogramFrom,
-        histogram_to: histogramTo,
-      },
+      body: requestBody,
+      mediaType: "application/json",
       errors: {
         422: "Validation Error",
       },
@@ -2101,6 +2128,44 @@ export class PipesService {
       errors: {
         422: "Validation Error",
       },
+      customRequestConfig: options,
+    });
+  }
+
+  public static terminateTaskApiPipesDramatiqTaskDelete(
+    data: $OpenApiTs["/api/pipes/dramatiq/task"]["delete"]["req"],
+    options?: Partial<AxiosRequestConfig>,
+  ): CancelablePromise<ApiResult<$OpenApiTs["/api/pipes/dramatiq/task"]["delete"]["res"][200]>> {
+    const { messageId } = data;
+    return __request(OpenAPI, {
+      method: "DELETE",
+      url: "/api/pipes/dramatiq/task",
+      query: {
+        message_id: messageId,
+      },
+      errors: {
+        422: "Validation Error",
+      },
+      customRequestConfig: options,
+    });
+  }
+
+  public static getDWorkersApiPipesDramatiqWorkersGet(
+    options?: Partial<AxiosRequestConfig>,
+  ): CancelablePromise<ApiResult<$OpenApiTs["/api/pipes/dramatiq/workers"]["get"]["res"][200]>> {
+    return __request(OpenAPI, {
+      method: "GET",
+      url: "/api/pipes/dramatiq/workers",
+      customRequestConfig: options,
+    });
+  }
+
+  public static getDTasksApiPipesDramatiqTasksGet(
+    options?: Partial<AxiosRequestConfig>,
+  ): CancelablePromise<ApiResult<$OpenApiTs["/api/pipes/dramatiq/tasks"]["get"]["res"][200]>> {
+    return __request(OpenAPI, {
+      method: "GET",
+      url: "/api/pipes/dramatiq/tasks",
       customRequestConfig: options,
     });
   }

@@ -42,7 +42,7 @@
 <script lang="ts">
 import type { PropType } from "vue";
 import { defineComponent } from "vue";
-import { type OpenAlexSolrImport, DefTypeEnum, OpEnum, SearchFieldEnum } from "@/plugins/api/types";
+import { type OpenAlexSolrImport, DefTypeEnum, OpEnum, SearchFieldEnum, ImportConfigEnum } from '@/plugins/api/types';
 
 export default defineComponent({
   name: "ConfigOpenAlex",
@@ -72,6 +72,7 @@ export default defineComponent({
     const config: OpenAlexSolrImport = this.existingConfig
       ? this.existingConfig
       : {
+          kind: ImportConfigEnum.OA_SOLR,
           query: "",
           def_type: DefTypeEnum.LUCENE,
           field: SearchFieldEnum.TITLE_ABSTRACT,
