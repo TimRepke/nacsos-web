@@ -25,6 +25,11 @@
                 <font-awesome-icon :icon="['fas', 'up-long']" />
               </span>
             </div>
+            <div class="ms-2">
+              <span role="button" tabindex="0" @click="removeLabel(schemeLabelIndex)">
+                <font-awesome-icon :icon="['fas', 'trash-can']" /> </span
+              >&nbsp;
+            </div>
             <div class="flex-fill">
               <span class="input-group">
                 <span class="input-group-text" id="basic-addon1"><font-awesome-icon :icon="['fas', 'eye']" /></span>
