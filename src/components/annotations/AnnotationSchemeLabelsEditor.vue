@@ -286,9 +286,6 @@ export default defineComponent({
     removeChoice(schemeLabelIndex: number, choiceIndex: number) {
       this.schemeLabels[schemeLabelIndex].choices.splice(choiceIndex, 1);
     },
-    removeLabel(schemeLabelIndex: number) {
-      this.schemeLabels.choices.splice(schemeLabelIndex, 1);
-    },
     moveChoiceUp(schemeLabelIndex: number, currentChoiceIndex: number) {
       if (currentChoiceIndex > 0) {
         // This looks like sorcery, but it essentially just swaps two elements in an array.
