@@ -172,10 +172,10 @@
                     <font-awesome-icon :icon="['fas', 'rotate']" />
                     Reset
                   </button>
-                  <button type="button" class="btn btn-outline-success btn-sm" @click="refreshTracker(false)">
-                    <font-awesome-icon :icon="['fas', 'rotate-right']" />
-                    Update
-                  </button>
+                  <!--<button type="button" class="btn btn-outline-success btn-sm" @click="refreshTracker(false)">-->
+                  <!--  <font-awesome-icon :icon="['fas', 'rotate-right']" />-->
+                  <!--  Update-->
+                  <!--</button>-->
                 </div>
               </div>
             </div>

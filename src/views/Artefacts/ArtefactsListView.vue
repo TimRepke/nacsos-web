@@ -26,7 +26,7 @@
                       />
                     </div>
                     <div>
-                      {{ entry.info?.name || "DEPRECATED" }}<br />
+                      <template v-if="entry.info?.name">{{ entry.info?.name }}<br /></template>
                       <code class="small">{{ entry.task.function_name }}(&sdot;)</code><br />
                       <span class="text-muted small">{{ entry.task.comment }}</span>
                     </div>
@@ -43,8 +43,17 @@
                   <span class="text-muted small"><strong>Finished:</strong>{{ entry.task.time_finished }}</span>
                 </td>
                 <td :class="noBorderIfOpen(entry)">
-                  <font-awesome-icon role="button" class="text-muted me-1" :icon="['fas', 'circle-info']" />
-                  <font-awesome-icon role="button" class="text-muted me-1" :icon="['fas', 'file-lines']" />
+                  <router-link
+                    role="button"
+                    class="link-secondary me-2"
+                    aria-label="Task details"
+                    :to="{
+                      name: 'project-artefacts-details',
+                      params: { taskId: entry.task.task_id },
+                    }"
+                  >
+                    <font-awesome-icon role="button" class="text-muted me-1" :icon="['fas', 'vault']" />
+                  </router-link>
                 </td>
               </tr>
               <tr class="collapse show" v-if="entry.showArtefacts && entry.artefacts">

@@ -121,6 +121,32 @@ export type EnumLiteral<T> = `${StringValues<T>}` | NumberValues<T>;
 // eslint-disable-next-line @typescript-eslint/ban-types
 export type ArgumentTypes<F extends Function> = F extends (...args: infer A) => any ? A : never;
 
+export function useDelay<T extends Array<any>, U>(fn: (...args: T) => U, delay: number) {
+  let _delay: number | null = null;
+
+  function clear() {
+    if (_delay) clearTimeout(_delay);
+    _delay = null;
+  }
+
+  function call(...args: T): U {
+    clear();
+    return fn(...args);
+  }
+
+  async function delayedCall(...args: T): Promise<U> {
+    clear();
+    return new Promise((resolve) => {
+      // @ts-ignore
+      _delay = setTimeout(() => {
+        resolve(call(...args));
+      }, delay);
+    });
+  }
+
+  return { call, delayedCall, clear };
+}
+
 export default {
   install(app: App) {
     // eslint-disable-next-line no-param-reassign
@@ -133,6 +159,7 @@ export default {
       isNone,
       is,
       md2html,
+      useDelay,
       dt2str,
       isOnRoute,
     };

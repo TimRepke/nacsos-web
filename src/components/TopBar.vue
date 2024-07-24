@@ -44,7 +44,13 @@
             <router-link to="/admin/users" class="dropdown-item">Manage users</router-link>
           </li>
           <li>
+            <hr class="dropdown-divider" />
+          </li>
+          <li>
             <router-link to="/admin/celery" class="dropdown-item">Celery</router-link>
+          </li>
+          <li>
+            <a href="http://10.10.13.45:8085/" class="dropdown-item" target="_blank">Dramatiq Dash</a>
           </li>
           <li>
             <hr class="dropdown-divider" />
