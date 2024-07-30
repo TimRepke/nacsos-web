@@ -96,7 +96,13 @@
                   calculated after each batch of annotations (assignment scope or resolution).
                 </ToolTip>
               </label>
-              <input id="batch-size" v-model="batchSize" type="number" class="form-control" placeholder="Batch size" />
+              <input
+                id="batch-size"
+                v-model="trackerDetails.batch_size"
+                type="number"
+                class="form-control"
+                placeholder="Batch size"
+              />
             </div>
             <div class="col-3">
               <label for="inclusion-rule" class="form-label">
@@ -120,7 +126,7 @@
           <div class="row mb-2">
             <div class="col">
               Project scopes
-              <ul style="max-height: 10rem" class="list-group overflow-auto">
+              <ul style="max-height: 15rem" class="list-group overflow-auto">
                 <li
                   v-for="scope in availableScopes"
                   :key="scope.scope_id"
@@ -139,8 +145,8 @@
             <div class="col">
               Selected scopes
               <ToolTip>The order of scopes does matter!</ToolTip>
-              <ul style="max-height: 10rem" class="list-group overflow-auto">
-                <template v-for="source in trackerDetails.source_ids" :key="source">
+              <ul style="max-height: 15rem" class="list-group overflow-auto">
+                <template v-for="(source, si) in trackerDetails.source_ids" :key="source">
                   <li
                     v-if="scopesLookup[source]"
                     class="list-group-item d-flex justify-content-between align-items-start text-muted"
@@ -151,6 +157,12 @@
                       />
                       {{ scopesLookup[source].name }}
                     </div>
+                    <span role="button" class="link-secondary" tabindex="0" @click="moveScopeUp(si)">
+                      <font-awesome-icon :icon="['fas', 'arrow-up']" />
+                    </span>
+                    <span role="button" class="link-secondary me-2" tabindex="0" @click="moveScopeDown(si)">
+                      <font-awesome-icon :icon="['fas', 'arrow-down']" />
+                    </span>
                     <span role="button" class="link-secondary" tabindex="0" @click="dropScope(scopesLookup[source])">
                       <font-awesome-icon :icon="['fas', 'file-circle-minus']" />
                     </span>
@@ -261,7 +273,6 @@ export default defineComponent({
       scopes: [] as LabelScope[],
       trackers: [] as DehydratedAnnotationTracker[],
       trackerDetails: null as AnnotationTrackerModel | null,
-      batchSize: -1,
     };
   },
   async mounted() {
@@ -293,6 +304,7 @@ export default defineComponent({
         majority: true,
         n_items_total: 0,
         recall_target: 0.95,
+        batch_size: 100,
         source_ids: [] as string[],
         labels: null,
         recall: null,
@@ -326,7 +338,6 @@ export default defineComponent({
           .updateTrackerApiEvalTrackingRefreshPost({
             xProjectId: this.trackerDetails.project_id as string,
             trackerId: this.trackerDetails.annotation_tracking_id as string,
-            batchSize: this.batchSize > 0 ? this.batchSize : null,
             reset,
           })
           .then((response) => {
@@ -349,6 +360,20 @@ export default defineComponent({
       if (this.trackerDetails && this.trackerDetails.source_ids) {
         const scopeIndex = this.trackerDetails.source_ids.findIndex((sid: string) => sid === scope.scope_id);
         this.trackerDetails.source_ids.splice(scopeIndex, 1);
+      }
+    },
+    moveScopeUp(si: number) {
+      if (this.trackerDetails && this.trackerDetails.source_ids && si > 0) {
+        const tmp = this.trackerDetails.source_ids[si];
+        this.trackerDetails.source_ids[si] = this.trackerDetails.source_ids[si - 1];
+        this.trackerDetails.source_ids[si - 1] = tmp;
+      }
+    },
+    moveScopeDown(si: number) {
+      if (this.trackerDetails && this.trackerDetails.source_ids && si < this.trackerDetails.source_ids.length - 1) {
+        const tmp = this.trackerDetails.source_ids[si];
+        this.trackerDetails.source_ids[si] = this.trackerDetails.source_ids[si + 1];
+        this.trackerDetails.source_ids[si + 1] = tmp;
       }
     },
     focus(tracker: DehydratedAnnotationTracker) {

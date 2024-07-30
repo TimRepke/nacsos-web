@@ -1819,7 +1819,7 @@ export class EvaluationService {
     data: $OpenApiTs["/api/eval/tracking/refresh"]["post"]["req"],
     options?: Partial<AxiosRequestConfig>,
   ): CancelablePromise<ApiResult<$OpenApiTs["/api/eval/tracking/refresh"]["post"]["res"][200]>> {
-    const { trackerId, xProjectId, batchSize, reset } = data;
+    const { trackerId, xProjectId, reset } = data;
     return __request(OpenAPI, {
       method: "POST",
       url: "/api/eval/tracking/refresh",
@@ -1828,7 +1828,6 @@ export class EvaluationService {
       },
       query: {
         tracker_id: trackerId,
-        batch_size: batchSize,
         reset,
       },
       errors: {
@@ -1970,6 +1969,25 @@ export class PipesService {
     return __request(OpenAPI, {
       method: "GET",
       url: "/api/pipes/artefacts/log",
+      headers: {
+        "x-task-id": xTaskId,
+        "x-project-id": xProjectId,
+      },
+      errors: {
+        422: "Validation Error",
+      },
+      customRequestConfig: options,
+    });
+  }
+
+  public static streamTaskLogApiPipesArtefactsLogStreamGet(
+    data: $OpenApiTs["/api/pipes/artefacts/log-stream"]["get"]["req"],
+    options?: Partial<AxiosRequestConfig>,
+  ): CancelablePromise<ApiResult<$OpenApiTs["/api/pipes/artefacts/log-stream"]["get"]["res"][200]>> {
+    const { xTaskId, xProjectId } = data;
+    return __request(OpenAPI, {
+      method: "GET",
+      url: "/api/pipes/artefacts/log-stream",
       headers: {
         "x-task-id": xTaskId,
         "x-project-id": xProjectId,

@@ -77,6 +77,11 @@
       </div>
       <div class="row">
         <div class="col">
+          <pre class="border rounded-2 ps-1 logwindow"><code>{{ slog }}</code></pre>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col">
           <pre class="border rounded-2 ps-1 logwindow" v-if="log"><code>{{ log }}</code></pre>
         </div>
       </div>
@@ -104,9 +109,21 @@ export default defineComponent({
       task: undefined as TaskModel | undefined,
       artefacts: [] as FileOnDisk[],
       log: undefined as string | undefined,
+      slog: "",
     };
   },
   mounted() {
+    // TODO stream log
+    // API.pipes
+    //   .streamTaskLogApiPipesArtefactsLogStreamGet({
+    //     xTaskId: this.taskId,
+    //     xProjectId: currentProjectStore.projectId as string,
+    //   })
+    //   .then((response) => {
+    //     this.log = response.data;
+    //   })
+    //   .catch(toastReject);
+
     API.pipes
       .getTaskApiPipesTaskGet({
         xTaskId: this.taskId as string,
