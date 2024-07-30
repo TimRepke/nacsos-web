@@ -1623,6 +1623,10 @@ export const $AnnotationTrackerModel = {
       type: "integer",
       title: "N Items Total",
     },
+    batch_size: {
+      type: "integer",
+      title: "Batch Size",
+    },
     recall_target: {
       type: "number",
       title: "Recall Target",
@@ -1743,7 +1747,7 @@ export const $AnnotationTrackerModel = {
     },
   },
   type: "object",
-  required: ["name", "project_id", "inclusion_rule", "majority", "n_items_total", "recall_target"],
+  required: ["name", "project_id", "inclusion_rule", "majority", "n_items_total", "batch_size", "recall_target"],
   title: "AnnotationTrackerModel",
   description: `Tracker for annotation statistics.
 This includes the latest stopping criterion (buscar) metrics and more.
@@ -4264,30 +4268,6 @@ export const $ImportModel = {
         },
       ],
       title: "Time Created",
-    },
-    time_started: {
-      anyOf: [
-        {
-          type: "string",
-          format: "date-time",
-        },
-        {
-          type: "null",
-        },
-      ],
-      title: "Time Started",
-    },
-    time_finished: {
-      anyOf: [
-        {
-          type: "string",
-          format: "date-time",
-        },
-        {
-          type: "null",
-        },
-      ],
-      title: "Time Finished",
     },
     config: {
       anyOf: [

@@ -96,7 +96,7 @@
                   calculated after each batch of annotations (assignment scope or resolution).
                 </ToolTip>
               </label>
-              <input id="batch-size" v-model="batchSize" type="number" class="form-control" placeholder="Batch size" />
+              <input id="batch-size" v-model="trackerDetails.batch_size" type="number" class="form-control" placeholder="Batch size" />
             </div>
             <div class="col-3">
               <label for="inclusion-rule" class="form-label">
@@ -261,7 +261,6 @@ export default defineComponent({
       scopes: [] as LabelScope[],
       trackers: [] as DehydratedAnnotationTracker[],
       trackerDetails: null as AnnotationTrackerModel | null,
-      batchSize: -1,
     };
   },
   async mounted() {
@@ -293,6 +292,7 @@ export default defineComponent({
         majority: true,
         n_items_total: 0,
         recall_target: 0.95,
+        batch_size: 100,
         source_ids: [] as string[],
         labels: null,
         recall: null,
@@ -326,7 +326,6 @@ export default defineComponent({
           .updateTrackerApiEvalTrackingRefreshPost({
             xProjectId: this.trackerDetails.project_id as string,
             trackerId: this.trackerDetails.annotation_tracking_id as string,
-            batchSize: this.batchSize > 0 ? this.batchSize : null,
             reset,
           })
           .then((response) => {

@@ -231,6 +231,7 @@ export type AnnotationTrackerModel = {
   inclusion_rule: string;
   majority: boolean;
   n_items_total: number;
+  batch_size: number;
   recall_target: number;
   source_ids?: Array<string> | null;
   labels?: Array<Array<number>> | null;
@@ -700,8 +701,6 @@ export type ImportModel = {
   description: string;
   type: string;
   time_created?: string | null;
-  time_started?: string | null;
-  time_finished?: string | null;
   config?: ScopusImport | AcademicItemImport | OpenAlexFileImport | OpenAlexSolrImport | WoSImport | null;
 };
 
@@ -2870,7 +2869,6 @@ export type $OpenApiTs = {
   "/api/eval/tracking/refresh": {
     post: {
       req: {
-        batchSize?: number | null;
         reset?: boolean;
         trackerId: string;
         xProjectId: string;
