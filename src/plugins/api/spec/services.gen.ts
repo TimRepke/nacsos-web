@@ -1980,6 +1980,25 @@ export class PipesService {
     });
   }
 
+  public static streamTaskLogApiPipesArtefactsLogStreamGet(
+    data: $OpenApiTs["/api/pipes/artefacts/log-stream"]["get"]["req"],
+    options?: Partial<AxiosRequestConfig>,
+  ): CancelablePromise<ApiResult<$OpenApiTs["/api/pipes/artefacts/log-stream"]["get"]["res"][200]>> {
+    const { xTaskId, xProjectId } = data;
+    return __request(OpenAPI, {
+      method: "GET",
+      url: "/api/pipes/artefacts/log-stream",
+      headers: {
+        "x-task-id": xTaskId,
+        "x-project-id": xProjectId,
+      },
+      errors: {
+        422: "Validation Error",
+      },
+      customRequestConfig: options,
+    });
+  }
+
   public static getFileApiPipesArtefactsFileGet(
     data: $OpenApiTs["/api/pipes/artefacts/file"]["get"]["req"],
     options?: Partial<AxiosRequestConfig>,

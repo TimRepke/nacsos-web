@@ -52,12 +52,7 @@
           :import-id="importId"
           @config-changed="updateConfig($event)"
         />
-        <button
-          type="button"
-          v-if="!importDetails.time_finished && !importDetails.time_started"
-          class="btn btn-primary mt-3"
-          @click="triggerImport"
-        >
+        <button type="button" v-if="canTrigger" class="btn btn-primary mt-3" @click="triggerImport">
           Initiate import
         </button>
       </div>
@@ -66,8 +61,6 @@
       <h4>Import progress</h4>
       <ul>
         <li><strong>Import created:</strong> {{ importDetails.time_created || "[not yet]" }}</li>
-        <li><strong>Import started:</strong> {{ importDetails.time_started || "[not yet]" }}</li>
-        <li><strong>Import finished:</strong> {{ importDetails.time_finished || "[not yet]" }}</li>
         <li v-if="importDetails.pipeline_task_id">
           <router-link
             :to="{
@@ -211,7 +204,7 @@ export default defineComponent({
           })
           .then((response) => {
             this.importDetails = response.data;
-            this.importStarted = !!this.importDetails.time_started;
+            this.importStarted = !!this.importDetails.pipeline_task_id;
             if (onDone) {
               onDone();
             }
@@ -278,6 +271,7 @@ export default defineComponent({
         });
     },
     triggerImport() {
+      if (!this.canTrigger) return;
       EventBus.emit(
         new ConfirmationRequestEvent(
           "Importing data may allocate a lot of resources (storage, quality checks, deduplication, " +
@@ -322,6 +316,9 @@ export default defineComponent({
     },
   },
   computed: {
+    canTrigger(): boolean {
+      return !this.importDetails.pipeline_task_id && !this.importStarted && this.importDetails.import_id;
+    },
     importConfigComponent(): Component | undefined {
       if (this.importDetails.type !== undefined && this.importDetails.type in this.compatibleImportTypes) {
         return this.compatibleImportTypes[this.importDetails.type].component;

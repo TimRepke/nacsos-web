@@ -538,8 +538,8 @@ export type DehydratedUser = {
 };
 
 export type Event = {
-  event: "ExampleSubEvent" | "ExampleEvent";
-  payload: ExampleSubEvent | ExampleEvent;
+  event: "ExampleEvent" | "ExampleSubEvent";
+  payload: ExampleEvent | ExampleSubEvent;
 };
 
 export type ExampleEvent = {
@@ -3004,6 +3004,24 @@ export type $OpenApiTs = {
          * Successful Response
          */
         200: string;
+        /**
+         * Validation Error
+         */
+        422: HTTPValidationError;
+      };
+    };
+  };
+  "/api/pipes/artefacts/log-stream": {
+    get: {
+      req: {
+        xProjectId: string;
+        xTaskId: string;
+      };
+      res: {
+        /**
+         * Successful Response
+         */
+        200: unknown;
         /**
          * Validation Error
          */

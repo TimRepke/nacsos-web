@@ -3412,16 +3412,16 @@ export const $Event = {
   properties: {
     event: {
       type: "string",
-      enum: ["ExampleSubEvent", "ExampleEvent"],
+      enum: ["ExampleEvent", "ExampleSubEvent"],
       title: "Event",
     },
     payload: {
       anyOf: [
         {
-          $ref: "#/components/schemas/ExampleSubEvent",
+          $ref: "#/components/schemas/ExampleEvent",
         },
         {
-          $ref: "#/components/schemas/ExampleEvent",
+          $ref: "#/components/schemas/ExampleSubEvent",
         },
       ],
       title: "Payload",
