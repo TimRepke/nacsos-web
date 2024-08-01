@@ -241,7 +241,7 @@ export default defineComponent({
   },
   async mounted() {
     this.saveReminder = setInterval(() => {
-      EventBus.emit(new ToastEvent("INFO", "You might want to click save every now and then. Remember, we will only let you save if you have entered a valid description..."));
+      EventBus.emit(new ToastEvent("INFO", "You might want to click save every now and then."));
     }, 300000) as unknown as number; // called every 5 min
 
     // Prevent browser page reload and tab closure
@@ -278,6 +278,7 @@ export default defineComponent({
             xProjectId: currentProjectStore.projectId as string,
           })
         ).data;
+        this.name = this.assignmentScope.name;
       }
 
       await platformUsersStore.maybeRefresh();
@@ -406,7 +407,7 @@ export default defineComponent({
   beforeRouteLeave(to, from, next) {
     EventBus.emit(
       new ConfirmationRequestEvent(
-        'You will loose data if you have not clicked "save".',
+        'You will lose data if you have not clicked "save".',
         (confirmationResponse) => {
           if (confirmationResponse === "ACCEPT") {
             clearInterval(this.saveReminder);
