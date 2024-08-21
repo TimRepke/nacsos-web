@@ -278,6 +278,10 @@ export default defineComponent({
             xProjectId: currentProjectStore.projectId as string,
           })
         ).data;
+
+        if (this.isNew) {
+          this.name = `Resolved_${this.assignmentScope.name}`;
+        }
       }
 
       await platformUsersStore.maybeRefresh();
