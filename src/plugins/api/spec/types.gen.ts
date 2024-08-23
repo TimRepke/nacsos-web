@@ -256,6 +256,14 @@ export type AssignmentCounts = {
   num_full: number;
 };
 
+export type AssignmentEditInfo = {
+  scope_id: string;
+  scheme_id: string;
+  item_id: string;
+  user_id: string;
+  order: number;
+};
+
 export type AssignmentFilter = {
   filter?: "assignment";
   mode: number;
@@ -538,8 +546,8 @@ export type DehydratedUser = {
 };
 
 export type Event = {
-  event: "ExampleEvent" | "ExampleSubEvent";
-  payload: ExampleEvent | ExampleSubEvent;
+  event: "ExampleSubEvent" | "ExampleEvent";
+  payload: ExampleSubEvent | ExampleEvent;
 };
 
 export type ExampleEvent = {
@@ -1752,14 +1760,10 @@ export type $OpenApiTs = {
       };
     };
   };
-  "/api/annotations/config/assignments/edit": {
-    get: {
+  "/api/annotations/config/assignments/edit/": {
+    put: {
       req: {
-        itemId: string;
-        order?: number | null;
-        schemeId: string;
-        scopeId: string;
-        userId: string;
+        requestBody: AssignmentEditInfo;
         xProjectId: string;
       };
       res: {

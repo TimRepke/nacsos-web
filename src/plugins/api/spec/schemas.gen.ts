@@ -1844,6 +1844,34 @@ export const $AssignmentCounts = {
   title: "AssignmentCounts",
 } as const;
 
+export const $AssignmentEditInfo = {
+  properties: {
+    scope_id: {
+      type: "string",
+      title: "Scope Id",
+    },
+    scheme_id: {
+      type: "string",
+      title: "Scheme Id",
+    },
+    item_id: {
+      type: "string",
+      title: "Item Id",
+    },
+    user_id: {
+      type: "string",
+      title: "User Id",
+    },
+    order: {
+      type: "integer",
+      title: "Order",
+    },
+  },
+  type: "object",
+  required: ["scope_id", "scheme_id", "item_id", "user_id", "order"],
+  title: "AssignmentEditInfo",
+} as const;
+
 export const $AssignmentFilter = {
   properties: {
     filter: {
@@ -3412,16 +3440,16 @@ export const $Event = {
   properties: {
     event: {
       type: "string",
-      enum: ["ExampleEvent", "ExampleSubEvent"],
+      enum: ["ExampleSubEvent", "ExampleEvent"],
       title: "Event",
     },
     payload: {
       anyOf: [
         {
-          $ref: "#/components/schemas/ExampleEvent",
+          $ref: "#/components/schemas/ExampleSubEvent",
         },
         {
-          $ref: "#/components/schemas/ExampleSubEvent",
+          $ref: "#/components/schemas/ExampleEvent",
         },
       ],
       title: "Payload",

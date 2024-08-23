@@ -564,24 +564,19 @@ export class AnnotationsService {
     });
   }
 
-  public static editAssignmentApiAnnotationsConfigAssignmentsEditGet(
-    data: $OpenApiTs["/api/annotations/config/assignments/edit"]["get"]["req"],
+  public static editAssignmentApiAnnotationsConfigAssignmentsEditPut(
+    data: $OpenApiTs["/api/annotations/config/assignments/edit/"]["put"]["req"],
     options?: Partial<AxiosRequestConfig>,
-  ): CancelablePromise<ApiResult<$OpenApiTs["/api/annotations/config/assignments/edit"]["get"]["res"][200]>> {
-    const { scopeId, schemeId, itemId, userId, xProjectId, order } = data;
+  ): CancelablePromise<ApiResult<$OpenApiTs["/api/annotations/config/assignments/edit/"]["put"]["res"][200]>> {
+    const { xProjectId, requestBody } = data;
     return __request(OpenAPI, {
-      method: "GET",
-      url: "/api/annotations/config/assignments/edit",
+      method: "PUT",
+      url: "/api/annotations/config/assignments/edit/",
       headers: {
         "x-project-id": xProjectId,
       },
-      query: {
-        scope_id: scopeId,
-        scheme_id: schemeId,
-        item_id: itemId,
-        user_id: userId,
-        order,
-      },
+      body: requestBody,
+      mediaType: "application/json",
       errors: {
         422: "Validation Error",
       },
