@@ -1734,6 +1734,46 @@ export type $OpenApiTs = {
       };
     };
   };
+  "/api/annotations/config/scopes/clear/{scheme_id}": {
+    post: {
+      req: {
+        scopeId: string;
+        xProjectId: string;
+      };
+      res: {
+        /**
+         * Successful Response
+         */
+        200: unknown;
+        /**
+         * Validation Error
+         */
+        422: HTTPValidationError;
+      };
+    };
+  };
+  "/api/annotations/config/assignments/edit": {
+    get: {
+      req: {
+        itemId: string;
+        order?: number | null;
+        schemeId: string;
+        scopeId: string;
+        userId: string;
+        xProjectId: string;
+      };
+      res: {
+        /**
+         * Successful Response
+         */
+        200: AssignmentModel;
+        /**
+         * Validation Error
+         */
+        422: HTTPValidationError;
+      };
+    };
+  };
   "/api/annotations/config/scopes/{scheme_id}": {
     get: {
       req: {
