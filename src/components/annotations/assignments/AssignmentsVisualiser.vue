@@ -44,8 +44,8 @@ import { AssignmentInfo, AssignmentScopeEntry } from "@/plugins/api/types";
 import { API, toastReject } from "@/plugins/api";
 import { currentProjectStore } from "@/stores";
 import { EventBus } from "@/plugins/events";
-import { ConfirmationRequestEvent } from "@/plugins/events/events/confirmation.ts";
-import { ToastEvent } from "@/plugins/events/events/toast.ts";
+import { ConfirmationRequestEvent } from "@/plugins/events/events/confirmation";
+import { ToastEvent } from "@/plugins/events/events/toast";
 import InlineToolTip from "@/components/InlineToolTip.vue";
 
 type User = { user_id: string; username: string };
