@@ -16,6 +16,7 @@ query ->
   | IMPORT   ":" _ ie_uuids           {% (d) => ({ filter: "import",  import_ids: d[3]            }) %}
   | assigned_clause                   {% id %}
   | annotation_clause                 {% id %}
+  | abstract_clause                   {% id %}
   | query __ AND __ query             {% (d) => ({ filter: "sub", "and_": [d[0], d[4]]            }) %}
   | query __ OR  __ query             {% (d) => ({ filter: "sub", "or_":  [d[0], d[4]]            }) %}
   | "NOT" __ query                    {% (d) => ({ filter: "sub", "not_": d[2]                    }) %}
@@ -47,6 +48,16 @@ annotation_clause ->
              scheme: (d[2]||[])[3],
          })
     %}
+
+abstract_clause ->
+    "HAS ABSTRACT"i (__ COMP __ uint | null)  {%
+        (d) => ({
+            filter: "abstract",
+            comp: (d[1]||[])[1],
+            size: (d[1]||[])[3]
+        })
+    %}
+  | "HAS NO ABSTRACT"i {% (d) => ({ filter: "abstract", empty: true }) %}
 
 meta_clause ->
     KEY _  "="      _  bool      {% (d) => ({ filter: "meta_bool", value_type: "bool", field: d[0], comp: "=",    value: d[4] }) %}
