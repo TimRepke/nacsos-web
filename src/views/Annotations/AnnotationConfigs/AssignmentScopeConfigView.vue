@@ -165,7 +165,7 @@
             Remind users per email
           </button>
         </div>
-        <ScopeQuality :users="annotators" :scope="assignmentScope" />
+        <ScopeQuality :users="annotators" :scope="assignmentScope" :edit-mode="true" />
       </div>
     </div>
     <button type="button" class="btn btn-success position-fixed" style="top: 4rem; right: 1rem" @click="save()">

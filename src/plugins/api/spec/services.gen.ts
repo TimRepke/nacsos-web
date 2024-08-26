@@ -543,6 +543,47 @@ export class AnnotationsService {
     });
   }
 
+  public static clearEmptyAssignmentsApiAnnotationsConfigScopesClearSchemeIdPost(
+    data: $OpenApiTs["/api/annotations/config/scopes/clear/{scheme_id}"]["post"]["req"],
+    options?: Partial<AxiosRequestConfig>,
+  ): CancelablePromise<ApiResult<$OpenApiTs["/api/annotations/config/scopes/clear/{scheme_id}"]["post"]["res"][200]>> {
+    const { scopeId, xProjectId } = data;
+    return __request(OpenAPI, {
+      method: "POST",
+      url: "/api/annotations/config/scopes/clear/{scheme_id}",
+      headers: {
+        "x-project-id": xProjectId,
+      },
+      query: {
+        scope_id: scopeId,
+      },
+      errors: {
+        422: "Validation Error",
+      },
+      customRequestConfig: options,
+    });
+  }
+
+  public static editAssignmentApiAnnotationsConfigAssignmentsEditPut(
+    data: $OpenApiTs["/api/annotations/config/assignments/edit/"]["put"]["req"],
+    options?: Partial<AxiosRequestConfig>,
+  ): CancelablePromise<ApiResult<$OpenApiTs["/api/annotations/config/assignments/edit/"]["put"]["res"][200]>> {
+    const { xProjectId, requestBody } = data;
+    return __request(OpenAPI, {
+      method: "PUT",
+      url: "/api/annotations/config/assignments/edit/",
+      headers: {
+        "x-project-id": xProjectId,
+      },
+      body: requestBody,
+      mediaType: "application/json",
+      errors: {
+        422: "Validation Error",
+      },
+      customRequestConfig: options,
+    });
+  }
+
   public static getAssignmentScopesForSchemeApiAnnotationsConfigScopesSchemeIdGet(
     data: $OpenApiTs["/api/annotations/config/scopes/{scheme_id}"]["get"]["req"],
     options?: Partial<AxiosRequestConfig>,

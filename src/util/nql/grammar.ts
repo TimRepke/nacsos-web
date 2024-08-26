@@ -51,6 +51,7 @@ const grammar: Grammar = {
     {"name": "query", "symbols": ["IMPORT", {"literal":":"}, "_", "ie_uuids"], "postprocess": (d) => ({ filter: "import",  import_ids: d[3]            })},
     {"name": "query", "symbols": ["assigned_clause"], "postprocess": id},
     {"name": "query", "symbols": ["annotation_clause"], "postprocess": id},
+    {"name": "query", "symbols": ["abstract_clause"], "postprocess": id},
     {"name": "query", "symbols": ["query", "__", "AND", "__", "query"], "postprocess": (d) => ({ filter: "sub", "and_": [d[0], d[4]]            })},
     {"name": "query", "symbols": ["query", "__", "OR", "__", "query"], "postprocess": (d) => ({ filter: "sub", "or_":  [d[0], d[4]]            })},
     {"name": "query$string$1", "symbols": [{"literal":"N"}, {"literal":"O"}, {"literal":"T"}], "postprocess": (d) => d.join('')},
@@ -100,6 +101,18 @@ const grammar: Grammar = {
             scheme: (d[2]||[])[3],
         })
             },
+    {"name": "abstract_clause$subexpression$1", "symbols": [/[hH]/, /[aA]/, /[sS]/, {"literal":" "}, /[aA]/, /[bB]/, /[sS]/, /[tT]/, /[rR]/, /[aA]/, /[cC]/, /[tT]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "abstract_clause$subexpression$2", "symbols": ["__", "COMP", "__", "uint"]},
+    {"name": "abstract_clause$subexpression$2", "symbols": []},
+    {"name": "abstract_clause", "symbols": ["abstract_clause$subexpression$1", "abstract_clause$subexpression$2"], "postprocess": 
+        (d) => ({
+            filter: "abstract",
+            comp: (d[1]||[])[1],
+            size: (d[1]||[])[3]
+        })
+            },
+    {"name": "abstract_clause$subexpression$3", "symbols": [/[hH]/, /[aA]/, /[sS]/, {"literal":" "}, /[nN]/, /[oO]/, {"literal":" "}, /[aA]/, /[bB]/, /[sS]/, /[tT]/, /[rR]/, /[aA]/, /[cC]/, /[tT]/], "postprocess": function(d) {return d.join(""); }},
+    {"name": "abstract_clause", "symbols": ["abstract_clause$subexpression$3"], "postprocess": (d) => ({ filter: "abstract", empty: true })},
     {"name": "meta_clause", "symbols": ["KEY", "_", {"literal":"="}, "_", "bool"], "postprocess": (d) => ({ filter: "meta_bool", value_type: "bool", field: d[0], comp: "=",    value: d[4] })},
     {"name": "meta_clause", "symbols": ["KEY", "_", "COMP", "_", "uint"], "postprocess": (d) => ({ filter: "meta_int",  value_type: "int",  field: d[0], comp: d[2],   value: d[4] })},
     {"name": "meta_clause$subexpression$1", "symbols": [/[lL]/, /[iI]/, /[kK]/, /[eE]/], "postprocess": function(d) {return d.join(""); }},

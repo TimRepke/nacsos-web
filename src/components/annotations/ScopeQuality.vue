@@ -28,7 +28,12 @@
     </div>
 
     <div v-if="assignmentsVisible && assignments">
-      <AssignmentsVisualiser :assignment-entries="assignments" />
+      <AssignmentsVisualiser
+        :assignment-entries="assignments"
+        :edit-mode="editMode"
+        :annotation-scheme-id="scope.annotation_scheme_id"
+        :assignment-scope-id="scope.assignment_scope_id"
+      />
     </div>
 
     <div v-if="inFocus">
@@ -149,6 +154,11 @@ export default defineComponent({
     scope: {
       type: Object as PropType<AssignmentScopeModel>,
       required: true,
+    },
+    editMode: {
+      type: Boolean,
+      required: false,
+      default: false,
     },
   },
   data() {
