@@ -426,6 +426,11 @@ export type Body_login_for_access_token_api_login_token_post = {
   client_secret?: string | null;
 };
 
+export type Body_news_mail_api_mail_news_post = {
+  subject: string;
+  body: string;
+};
+
 export type Body_save_resolved_annotations_api_annotations_config_resolve__put = {
   settings: BotMetaResolveBase;
   matrix: {
@@ -1228,6 +1233,7 @@ export type UserBaseModel = {
   affiliation?: string | null;
   is_superuser?: boolean | null;
   is_active?: boolean | null;
+  setting_newsletter?: boolean | null;
   time_created?: string | null;
   time_updated?: string | null;
 };
@@ -1240,6 +1246,7 @@ export type UserInDBModel = {
   affiliation?: string | null;
   is_superuser?: boolean | null;
   is_active?: boolean | null;
+  setting_newsletter?: boolean | null;
   time_created?: string | null;
   time_updated?: string | null;
   password?: string | null;
@@ -1253,6 +1260,7 @@ export type UserModel = {
   affiliation?: string | null;
   is_superuser?: boolean | null;
   is_active?: boolean | null;
+  setting_newsletter?: boolean | null;
   time_created?: string | null;
   time_updated?: string | null;
 };
@@ -1370,6 +1378,16 @@ export type $OpenApiTs = {
     };
   };
   "/api/ping/permission": {
+    get: {
+      res: {
+        /**
+         * Successful Response
+         */
+        200: unknown;
+      };
+    };
+  };
+  "/api/ping/database": {
     get: {
       res: {
         /**
@@ -3020,6 +3038,25 @@ export type $OpenApiTs = {
       req: {
         assignmentScopeId: string;
         xProjectId: string;
+      };
+      res: {
+        /**
+         * Successful Response
+         */
+        200: Array<string>;
+        /**
+         * Validation Error
+         */
+        422: HTTPValidationError;
+      };
+    };
+  };
+  "/api/mail/news": {
+    post: {
+      req: {
+        isActive?: boolean | null;
+        isSubscribed?: boolean | null;
+        requestBody: Body_news_mail_api_mail_news_post;
       };
       res: {
         /**
