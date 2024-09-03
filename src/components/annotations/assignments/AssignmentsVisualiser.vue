@@ -20,7 +20,7 @@
     <div class="table-responsive">
       <table class="table table-bordered table-sm">
         <tbody>
-          <tr v-for="username in usernames" :key="username" :class="{ 'edit-mode': assiEditMode }">
+          <tr v-for="username in shownUsernames" :key="username" :class="{ 'edit-mode': assiEditMode }">
             <th>{{ username }}</th>
             <td
               v-for="(itemId, i) in itemIds"
@@ -48,7 +48,8 @@ import { ConfirmationRequestEvent } from "@/plugins/events/events/confirmation";
 import { ToastEvent } from "@/plugins/events/events/toast";
 import InlineToolTip from "@/components/InlineToolTip.vue";
 
-type User = { user_id: string; username: string };
+type Indexed<T> = T & { index: number };
+
 export default defineComponent({
   name: "AssignmentsVisualiser",
   components: { InlineToolTip },
@@ -72,31 +73,15 @@ export default defineComponent({
     },
   },
   data() {
+    currentProjectStore.projectUsers.ensureLoaded();
+
     return {
       assiEditMode: false,
       entries: JSON.parse(JSON.stringify(this.assignmentEntries)),
     };
   },
   computed: {
-    users(): Array<User> {
-      return [
-        ...new Set(
-          this.entries.flatMap((entry: AssignmentScopeEntry) =>
-            entry.assignments.map((assignment: AssignmentInfo) => ({
-              user_id: assignment.user_id,
-              username: assignment.username,
-            })),
-          ),
-        ),
-      ] as User[];
-    },
-    userIdLookup(): Record<string, string> {
-      return Object.fromEntries(this.users.map((user: User) => [user.username, user.user_id]));
-    },
-    usernameLookup(): Record<string, string> {
-      return Object.fromEntries(this.users.map((user: User) => [user.user_id, user.username]));
-    },
-    usernames(): Array<string> {
+    assignedUsers(): Array<string> {
       return [
         ...new Set(
           this.entries.flatMap((entry: AssignmentScopeEntry) =>
@@ -105,10 +90,16 @@ export default defineComponent({
         ),
       ] as string[];
     },
+    shownUsernames(): Array<string> {
+      if (this.assiEditMode) {
+        return currentProjectStore.projectUsers.usernames;
+      }
+      return this.assignedUsers;
+    },
     itemIds(): Array<string> {
       return [...new Set(this.entries.map((entry: AssignmentScopeEntry) => entry.item_id))] as string[];
     },
-    lookup() {
+    lookup(): Record<string, Indexed<AssignmentScopeEntry> & { assignments: Record<string, Indexed<AssignmentInfo>> }> {
       return Object.fromEntries(
         this.entries.map((entry: AssignmentScopeEntry, i: number) => [
           entry.item_id,
@@ -128,7 +119,7 @@ export default defineComponent({
   },
   methods: {
     getBackgroundColourClass(username: string, itemId: string): string[] {
-      const assignment = this.lookup[itemId].assignments[username];
+      const assignment: (AssignmentInfo & { index: number }) | undefined = this.lookup[itemId]?.assignments[username];
       switch (assignment?.status) {
         case "OPEN":
           return ["table-info", "edit-droppable"];
@@ -174,7 +165,7 @@ export default defineComponent({
             .editAssignmentApiAnnotationsConfigAssignmentsEditPut({
               requestBody: {
                 item_id: itemId,
-                user_id: this.userIdLookup[username],
+                user_id: currentProjectStore.projectUsers.name2id[username],
                 order,
                 scheme_id: this.annotationSchemeId,
                 scope_id: this.assignmentScopeId,
@@ -187,7 +178,7 @@ export default defineComponent({
               } else {
                 this.entries[item.index].assignments.push({
                   user_id: res.data.user_id,
-                  username: this.usernameLookup[res.data.user_id],
+                  username: currentProjectStore.projectUsers.id2name[res.data.user_id],
                   order: res.data.order,
                   assignment_id: res.data.assignment_id,
                   status: res.data.status,
