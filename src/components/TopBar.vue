@@ -38,6 +38,9 @@
             </h6>
           </li>
           <li>
+            <router-link to="/admin/news" class="dropdown-item">Message users</router-link>
+          </li>
+          <li>
             <router-link to="/admin/projects" class="dropdown-item">Manage projects</router-link>
           </li>
           <li>
