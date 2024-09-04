@@ -63,6 +63,25 @@
               type="checkbox"
               role="switch"
               :aria-checked="undefined"
+              id="news-edit"
+              v-model="user.setting_newsletter"
+            />
+            <label class="form-check-label ms-2" for="news-edit">
+              I want to receive email updates about the platform
+              <font-awesome-icon :icon="['fas', 'message']" />
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div class="row mb-2">
+        <div class="col text-start">
+          <div class="form-switch">
+            <input
+              class="form-check-input"
+              type="checkbox"
+              role="switch"
+              :aria-checked="undefined"
               id="pw-edit"
               v-model="editPassword"
             />
