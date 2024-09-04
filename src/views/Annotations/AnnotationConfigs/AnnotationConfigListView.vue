@@ -142,12 +142,12 @@
                     v-for="resolution in resolutionLookup[scope.assignment_scope_id as string]"
                     :key="resolution.bot_annotation_metadata_id as string"
                   >
+                    <!--                      class="text-decoration-none flex-grow-1 d-flex text-black"-->
                     <router-link
                       :to="{
                         name: 'config-annotation-resolve',
                         params: { bot_annotation_metadata_id: resolution.bot_annotation_metadata_id },
                       }"
-                      class="text-decoration-none flex-grow-1 d-flex text-black"
                       custom
                       v-slot="{ navigate }"
                     >

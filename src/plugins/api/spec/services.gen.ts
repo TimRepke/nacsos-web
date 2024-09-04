@@ -85,6 +85,16 @@ export class DefaultService {
     });
   }
 
+  public static dbTestApiPingDatabaseGet(
+    options?: Partial<AxiosRequestConfig>,
+  ): CancelablePromise<ApiResult<$OpenApiTs["/api/ping/database"]["get"]["res"][200]>> {
+    return __request(OpenAPI, {
+      method: "GET",
+      url: "/api/ping/database",
+      customRequestConfig: options,
+    });
+  }
+
   public static pingApiPingNamePost(
     data: $OpenApiTs["/api/ping/{name}"]["post"]["req"],
     options?: Partial<AxiosRequestConfig>,
@@ -1974,6 +1984,27 @@ export class MailingService {
       query: {
         assignment_scope_id: assignmentScopeId,
       },
+      errors: {
+        422: "Validation Error",
+      },
+      customRequestConfig: options,
+    });
+  }
+
+  public static newsMailApiMailNewsPost(
+    data: $OpenApiTs["/api/mail/news"]["post"]["req"],
+    options?: Partial<AxiosRequestConfig>,
+  ): CancelablePromise<ApiResult<$OpenApiTs["/api/mail/news"]["post"]["res"][200]>> {
+    const { requestBody, isActive, isSubscribed } = data;
+    return __request(OpenAPI, {
+      method: "POST",
+      url: "/api/mail/news",
+      query: {
+        is_active: isActive,
+        is_subscribed: isSubscribed,
+      },
+      body: requestBody,
+      mediaType: "application/json",
       errors: {
         422: "Validation Error",
       },

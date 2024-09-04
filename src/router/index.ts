@@ -262,6 +262,11 @@ const routes: Array<RouteRecordRaw> = [
         name: "admin-celery",
         component: () => import(/* webpackChunkName: "CeleryView" */ "../views/Admin/CeleryView.vue"),
       },
+      {
+        path: "news",
+        name: "admin-news",
+        component: () => import(/* webpackChunkName: "CeleryView" */ "../views/Admin/NewsletterView.vue"),
+      },
     ],
   },
   {

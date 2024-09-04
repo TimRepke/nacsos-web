@@ -48,10 +48,11 @@ export function logReject(reason: ApiResponseReject) {
 }
 
 export function toastReject(reason: ApiResponseReject) {
+  console.log(reason);
   EventBus.emit(
     new ToastEvent(
       "WARN",
-      `Request failed ${reason.error.detail.level}[${reason.status}] ${reason.error.detail.type}(${reason.error.detail.message})`,
+      `Request failed ${reason.error.detail.level}[${reason.status}] ${reason.error?.detail?.type}(${reason.error?.detail?.message})`,
     ),
   );
 }

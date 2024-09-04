@@ -3,6 +3,7 @@ import { useStorage } from "@vueuse/core";
 import type { RemovableRef } from "@vueuse/core";
 import type { ProjectModel, ProjectPermissionsModel } from "@/plugins/api/spec/types.gen";
 import Serializer from "@/types/serializer";
+import { type ProjectUsers, useProjectUsers } from "@/stores/CurrentProjectStore/projectUsers";
 
 const ProjectSerializer = Serializer<ProjectModel>();
 const ProjectPermissionSerializer = Serializer<ProjectPermissionsModel>();
@@ -11,14 +12,14 @@ export type CurrentProjectStoreType = {
   projectId: RemovableRef<string | undefined>;
   project: RemovableRef<ProjectModel | undefined>;
   projectPermissions: RemovableRef<ProjectPermissionsModel | undefined>;
+  projectUsers: ProjectUsers;
 };
 
 export const useCurrentProjectStore = defineStore("CurrentProjectStore", {
   state(): CurrentProjectStoreType {
     // When a user logs out, also clear the current project to prevent side effects
     // EventBus.on(LoggedOutEvent, this.clear); // FIXME: may not be the desired behaviour
-
-    return {
+    const state = {
       projectId: useStorage<string>("nacsos:ProjectStore:currentProjectId", null, undefined),
       project: useStorage<ProjectModel>("nacsos:ProjectStore:currentProject", null, undefined, {
         serializer: ProjectSerializer,
@@ -29,7 +30,10 @@ export const useCurrentProjectStore = defineStore("CurrentProjectStore", {
         undefined,
         { serializer: ProjectPermissionSerializer },
       ),
+      projectUsers: useProjectUsers(),
     };
+
+    return state;
   },
   actions: {
     clear() {

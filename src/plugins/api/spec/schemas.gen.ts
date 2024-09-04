@@ -2750,6 +2750,22 @@ export const $Body_login_for_access_token_api_login_token_post = {
   title: "Body_login_for_access_token_api_login_token_post",
 } as const;
 
+export const $Body_news_mail_api_mail_news_post = {
+  properties: {
+    subject: {
+      type: "string",
+      title: "Subject",
+    },
+    body: {
+      type: "string",
+      title: "Body",
+    },
+  },
+  type: "object",
+  required: ["subject", "body"],
+  title: "Body_news_mail_api_mail_news_post",
+} as const;
+
 export const $Body_save_resolved_annotations_api_annotations_config_resolve__put = {
   properties: {
     settings: {
@@ -7244,6 +7260,18 @@ export const $UserBaseModel = {
       title: "Is Active",
       default: true,
     },
+    setting_newsletter: {
+      anyOf: [
+        {
+          type: "boolean",
+        },
+        {
+          type: "null",
+        },
+      ],
+      title: "Setting Newsletter",
+      default: false,
+    },
     time_created: {
       anyOf: [
         {
@@ -7361,6 +7389,18 @@ export const $UserInDBModel = {
       ],
       title: "Is Active",
       default: true,
+    },
+    setting_newsletter: {
+      anyOf: [
+        {
+          type: "boolean",
+        },
+        {
+          type: "null",
+        },
+      ],
+      title: "Setting Newsletter",
+      default: false,
     },
     time_created: {
       anyOf: [
@@ -7487,6 +7527,18 @@ export const $UserModel = {
       ],
       title: "Is Active",
       default: true,
+    },
+    setting_newsletter: {
+      anyOf: [
+        {
+          type: "boolean",
+        },
+        {
+          type: "null",
+        },
+      ],
+      title: "Setting Newsletter",
+      default: false,
     },
     time_created: {
       anyOf: [
