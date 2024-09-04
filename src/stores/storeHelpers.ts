@@ -1,4 +1,4 @@
-import { Ref, ref, toRef } from 'vue';
+import { Ref, ref, toRef, UnwrapRef } from 'vue';
 import { ignore, toastReject } from "@/plugins/api";
 
 export interface LoadStatus {
@@ -15,12 +15,12 @@ export interface DeferredValue<T> {
   ensureLoaded: () => void;
 }
 
-export function useDeferredValue<T>(fallback: T, request: Promise<T>) {
-  const value = ref<T>(fallback);
+export function useDeferredValue<T>(fallback: T, request: () => Promise<T>) {
+  const value = ref<T>(fallback) as Ref<T>;
   const status = ref<LoadStatus>({
     loaded: false,
     loading: false,
-  });
+  }) as Ref<LoadStatus>;
 
   function clear() {
     value.value = fallback;
@@ -30,10 +30,11 @@ export function useDeferredValue<T>(fallback: T, request: Promise<T>) {
 
   async function reload(): Promise<T> {
     status.value.loading = true;
-    value.value = await request();
+    const ret = await request();
+    value.value = ret;
     status.value.loaded = true;
     status.value.loading = false;
-    return value.value;
+    return ret;
   }
 
   async function awaitLoaded() {

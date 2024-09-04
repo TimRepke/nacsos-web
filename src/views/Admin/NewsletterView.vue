@@ -17,14 +17,7 @@
         <label class="form-check-label" for="isActive2">Yes</label>
       </div>
       <div class="form-check form-check-inline">
-        <input
-          class="form-check-input"
-          type="radio"
-          name="isActive"
-          id="isActive3"
-          :value="false"
-          v-model="isActive"
-        />
+        <input class="form-check-input" type="radio" name="isActive" id="isActive3" :value="false" v-model="isActive" />
         <label class="form-check-label" for="isActive3">No</label>
       </div>
     </div>

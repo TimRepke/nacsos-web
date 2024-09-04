@@ -1,7 +1,7 @@
 import type { UserModel } from "@/plugins/api/spec";
 import { API } from "@/plugins/api";
 import { currentProjectStore } from "@/stores";
-import { DeferredValue, useDeferredValue } from "@/stores/storeHelpers.ts";
+import { DeferredValue, useDeferredValue } from "@/stores/storeHelpers";
 import { computed, ComputedRef } from "vue";
 
 export interface ProjectUsers extends DeferredValue<UserModel[]> {
@@ -17,8 +17,8 @@ export function useProjectUsers(): ProjectUsers {
   async function request(): Promise<UserModel[]> {
     return (
       await API.users.getProjectUsersApiUsersListProjectProjectIdGet({
-        projectId: currentProjectStore.projectId,
-        xProjectId: currentProjectStore.projectId,
+        projectId: currentProjectStore.projectId as string,
+        xProjectId: currentProjectStore.projectId as string,
       })
     ).data;
   }
@@ -40,10 +40,10 @@ export function useProjectUsers(): ProjectUsers {
       return Object.fromEntries(base.value.value.map((user: UserModel) => [user.user_id, user]));
     }),
     usernames: computed(() => {
-      return base.value.value.map((user: UserModel) => user.username);
+      return base.value.value.map((user: UserModel) => user.username as string);
     }),
     userIds: computed(() => {
-      return base.value.value.map((user: UserModel) => user.user_id);
+      return base.value.value.map((user: UserModel) => user.user_id as string);
     }),
   };
 }

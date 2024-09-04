@@ -3,7 +3,7 @@ import { useStorage } from "@vueuse/core";
 import type { RemovableRef } from "@vueuse/core";
 import type { ProjectModel, ProjectPermissionsModel } from "@/plugins/api/spec/types.gen";
 import Serializer from "@/types/serializer";
-import { type ProjectUsers, useProjectUsers } from "@/stores/CurrentProjectStore/projectUsers.ts";
+import { type ProjectUsers, useProjectUsers } from "@/stores/CurrentProjectStore/projectUsers";
 
 const ProjectSerializer = Serializer<ProjectModel>();
 const ProjectPermissionSerializer = Serializer<ProjectPermissionsModel>();
