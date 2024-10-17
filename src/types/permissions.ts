@@ -70,7 +70,7 @@ export const PermissionPresets: Record<string, Permissions> = {
     artefacts_read: false,
     artefacts_edit: false,
     search_dimensions: false,
-    search_oa: false,
+    search_oa: true,
     import_limit_oa: 0,
   },
   "Full Access": {
@@ -86,7 +86,7 @@ export const PermissionPresets: Record<string, Permissions> = {
     artefacts_read: true,
     artefacts_edit: true,
     search_dimensions: false,
-    search_oa: false,
+    search_oa: true,
     import_limit_oa: 0,
   },
   Owner: {
@@ -102,7 +102,7 @@ export const PermissionPresets: Record<string, Permissions> = {
     artefacts_read: true,
     artefacts_edit: true,
     search_dimensions: false,
-    search_oa: false,
+    search_oa: true,
     import_limit_oa: 0,
   },
 };
