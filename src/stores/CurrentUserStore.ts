@@ -49,7 +49,7 @@ export const useCurrentUserStore = defineStore("CurrentUserStore", {
       } catch (reason) {
         this.clear();
         console.error(reason);
-        EventBus.emit(new AuthFailedEvent());
+        EventBus.emit(new AuthFailedEvent(reason.error?.detail));
       }
     },
     async loginWithAuthToken(token: string) {

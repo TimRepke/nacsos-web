@@ -21,7 +21,7 @@
                 class="flex-shrink-0 me-2 mt-2"
                 style="font-size: 1.5em; vertical-align: middle"
               />
-              <div class="text-start ms-3">Computer says no. <br />Please double-check username and password.</div>
+              <div class="text-start ms-3">{{ error }} <br />Please double-check username and password.</div>
             </div>
             <div>
               <button type="button" class="btn btn-outline-dark w-100" @click="reset">
@@ -54,7 +54,7 @@ import { defineComponent } from "vue";
 import NacsosLogo from "@/components/NacsosLogo.vue";
 import { EventBus } from "@/plugins/events";
 import { AuthFailedEvent, UserLoginEvent, LoginSuccessEvent } from "@/plugins/events/events/auth";
-import { API, toastReject } from "@/plugins/api";
+import { API, ErrorDetails, toastReject } from "@/plugins/api";
 import { ToastEvent } from "@/plugins/events/events/toast";
 
 export default defineComponent({
@@ -64,24 +64,24 @@ export default defineComponent({
     return {
       username: "",
       password: "",
-      error: false,
+      error: null,
     };
   },
   mounted() {
-    EventBus.on(AuthFailedEvent, () => {
-      this.error = true;
+    EventBus.on(AuthFailedEvent, (reason: { reason: ErrorDetails }) => {
+      this.error = reason?.reason.type === "KeyError" ? "Username not in the system." : (this.error = "Login failed.");
     });
   },
   methods: {
     async login() {
-      this.error = false;
+      this.error = null;
       EventBus.emit(new UserLoginEvent(this.username, this.password));
       EventBus.once(LoginSuccessEvent, () => {
         this.$router.push({ name: "project-list" });
       });
     },
     async reset() {
-      this.error = false;
+      this.error = null;
       API.mailing
         .resetPasswordApiMailResetPasswordUsernamePost({
           username: this.username as string,
