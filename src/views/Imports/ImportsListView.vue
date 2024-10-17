@@ -1,7 +1,8 @@
 <template>
   <div>
-    <div class="row mb-2">
-      <h2>Data import and query manager</h2>
+    <div class="d-flex flex-row mb-2">
+      <h2 class="flex-grow-1">Data import and query manager</h2>
+      <ImportMutexStatus />
     </div>
     <div class="row mb-2" v-if="Object.keys(imports).length > 0">
       <div class="col">
@@ -130,6 +131,7 @@ import { currentProjectStore } from "@/stores";
 import { API, toastReject } from "@/plugins/api";
 import { ConfirmationRequestEvent } from "@/plugins/events/events/confirmation";
 import PopOver from "@/components/PopOver.vue";
+import ImportMutexStatus from '@/components/imports/ImportMutexStatus.vue';
 
 enum Sort {
   sort = "sort", // ignored
@@ -139,7 +141,7 @@ enum Sort {
 
 export default defineComponent({
   name: "ProjectListView",
-  components: { PopOver, InlineToolTip },
+  components: { ImportMutexStatus, PopOver, InlineToolTip },
   data() {
     return {
       sorting: {
