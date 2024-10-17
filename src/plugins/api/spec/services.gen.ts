@@ -1454,6 +1454,27 @@ export class ImportsService {
     });
   }
 
+  public static getImportRevisionsApiImportsImportImportIdRevisionsGet(
+    data: $OpenApiTs["/api/imports/import/{import_id}/revisions"]["get"]["req"],
+    options?: Partial<AxiosRequestConfig>,
+  ): CancelablePromise<ApiResult<$OpenApiTs["/api/imports/import/{import_id}/revisions"]["get"]["res"][200]>> {
+    const { importId, xProjectId } = data;
+    return __request(OpenAPI, {
+      method: "GET",
+      url: "/api/imports/import/{import_id}/revisions",
+      path: {
+        import_id: importId,
+      },
+      headers: {
+        "x-project-id": xProjectId,
+      },
+      errors: {
+        422: "Validation Error",
+      },
+      customRequestConfig: options,
+    });
+  }
+
   public static putImportDetailsApiImportsImportPut(
     data: $OpenApiTs["/api/imports/import"]["put"]["req"],
     options?: Partial<AxiosRequestConfig>,

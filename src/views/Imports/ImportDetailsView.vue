@@ -1,110 +1,21 @@
-<template>
-  <div class="container-fluid">
-    <div class="row pb-2 mb-2 border-bottom g-0">
-      <div class="col-md-8">
-        <h1 v-if="isNewImport">Create new data import</h1>
-        <h1 v-else>Data import overview</h1>
-        <h6>
-          An "import" provides the scope for how data enters a project. You can either configure a query to import from
-          external scholarly databases, Twitter, or upload files directly. Please note, that only one "type" of data can
-          exist in a project. This project is configured for <strong>{{ currentProject.type }}</strong
-          >.
-        </h6>
-      </div>
-    </div>
-
-    <div class="row pb-2 mb-2 border-bottom g-0">
-      <div class="col-md-6">
-        <h4>Basic information</h4>
-        <div class="mb-3">
-          <label for="importName" class="form-label">Name for this import</label>
-          <input
-            type="text"
-            class="form-control"
-            id="importName"
-            v-model="importDetails.name"
-            placeholder="Import name"
-          />
-        </div>
-        <div>
-          <label for="importDescription" class="form-label">Description of this import</label>
-          <textarea class="form-control" id="importDescription" rows="3" v-model="importDetails.description" />
-        </div>
-      </div>
-    </div>
-
-    <div class="row pb-2 mb-2 border-bottom g-0" v-if="!importDetails.config || !importStarted">
-      <div class="col">
-        <h4>Select import type</h4>
-        <select v-model="importDetails.type" aria-label="Import Config Option" :disabled="importStarted">
-          <option disabled :value="undefined">Select import type</option>
-          <option v-for="(info, type) in compatibleImportTypes" :key="type" :value="type">{{ info.name }}</option>
-        </select>
-      </div>
-    </div>
-    <div class="row pb-2 mb-2 border-bottom g-0" v-if="importConfigComponent !== undefined">
-      <div class="col">
-        <component
-          :is="importConfigComponent"
-          :existing-config="importDetails.config"
-          :editable="!importStarted"
-          :project-id="importDetails.project_id"
-          :import-id="importId"
-          @config-changed="updateConfig($event)"
-        />
-        <button type="button" v-if="canTrigger" class="btn btn-primary mt-3" @click="triggerImport">
-          Initiate import
-        </button>
-      </div>
-    </div>
-    <div class="row pb-2 mb-2 border-bottom g-0">
-      <h4>Import progress</h4>
-      <ul>
-        <li><strong>Import created:</strong> {{ importDetails.time_created || "[not yet]" }}</li>
-        <li v-if="importDetails.pipeline_task_id">
-          <router-link
-            :to="{
-              name: 'project-artefacts-details',
-              params: { taskId: importDetails.pipeline_task_id },
-            }"
-          >
-            &rrarr; Pipeline Task
-          </router-link>
-        </li>
-      </ul>
-    </div>
-    <div class="row pb-2 mb-2 border-bottom g-0">
-      <h4>Import stats</h4>
-      <div class="col">
-        <button type="button" class="btn btn-outline-secondary" @click="loadImportStats">load</button>
-        <ul>
-          <li v-if="importStats.numItems !== undefined">
-            <strong>Number of items:</strong> {{ importStats.numItems }}
-          </li>
-        </ul>
-      </div>
-    </div>
-    <button type="button" class="btn btn-success position-fixed" style="top: 4rem; right: 1rem" @click="save()">
-      Save
-    </button>
-  </div>
-</template>
-
-<script lang="ts">
-import { defineComponent } from "vue";
+<script setup lang="ts">
+import type { ImportModel, ImportRevisionDetails, ProjectModel } from "@/plugins/api/spec";
+import { computed, onMounted, ref } from "vue";
 import type { Component } from "vue";
-import { ToastEvent } from "@/plugins/events/events/toast";
-import { EventBus } from "@/plugins/events";
-import { ItemType } from "@/plugins/api/types";
-import type { ImportModel, ProjectModel, ProjectPermissionsModel } from "@/plugins/api/types";
 import ConfigWoS from "@/components/imports/ConfigWoS.vue";
+import ConfigScopus from "@/components/imports/ConfigScopus.vue";
+import ConfigOpenAlex from "@/components/imports/ConfigOpenAlex.vue";
 import ConfigJSONLOpenAlexWorks from "@/components/imports/ConfigJSONLOpenAlexWorks.vue";
 import ConfigJSONLAcademicItem from "@/components/imports/ConfigJSONLAcademicItem.vue";
-import ConfigScopus from "@/components/imports/ConfigScopus.vue";
 import { currentProjectStore, currentUserStore } from "@/stores";
-import { ConfirmationRequestEvent } from "@/plugins/events/events/confirmation";
-import { API, logReject, toastReject } from "@/plugins/api";
-import ConfigOpenAlex from "@/components/imports/ConfigOpenAlex.vue";
+import { useRoute, useRouter } from "vue-router";
+import { API, ignore, logReject, toastReject } from "@/plugins/api";
+import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
+import ImportCount from "@/components/imports/ImportCount.vue";
+import InlineToolTip from "@/components/InlineToolTip.vue";
+import { EventBus } from "@/plugins/events";
+import { ConfirmationRequestEvent } from "@/plugins/events/events/confirmation.ts";
+import { ToastEvent } from "@/plugins/events/events/toast.ts";
 
 type ImportConfig = ImportModel["config"];
 
@@ -113,231 +24,305 @@ interface ConfigOption {
   name: string;
 }
 
-const configs: Record<string, ConfigOption> = {
-  wos: {
-    component: ConfigWoS,
-    name: "Upload Web of Science text file(s)",
+const configs: { [key in ProjectModel["type"]]: Record<string, ConfigOption> } = {
+  academic: {
+    wos: {
+      component: ConfigWoS,
+      name: "Upload Web of Science text file(s)",
+    },
+    scopusCSV: {
+      component: ConfigScopus,
+      name: "Upload Scopus CSV file(s)",
+    },
+    oa: {
+      component: ConfigOpenAlex,
+      name: "Import from OpenAlex (Solr)",
+    },
+    oaFile: {
+      component: ConfigJSONLOpenAlexWorks,
+      name: "Upload OpenAlex file",
+    },
+    academicFile: {
+      component: ConfigJSONLAcademicItem,
+      name: "Upload JSONl file (AcademicItemModel)",
+    },
   },
-  scopusCSV: {
-    component: ConfigScopus,
-    name: "Upload Scopus CSV file(s)",
-  },
-  oa: {
-    component: ConfigOpenAlex,
-    name: "Import from OpenAlex (Solr)",
-  },
-  oaFile: {
-    component: ConfigJSONLOpenAlexWorks,
-    name: "Upload OpenAlex file",
-  },
-  academicFile: {
-    component: ConfigJSONLAcademicItem,
-    name: "Upload JSONl file (AcademicItemModel)",
-  },
+  twitter: {},
+  lexis: {},
+  generic: {},
+  patents: {},
 };
 
-export const projectTypeImportTypeCompatibility: { [key in ProjectModel["type"]]: string[] } = {
-  academic: ["academicFile", "oaFile", "oa", "scopusCSV", "wos"],
-  // twitter: ["twitterApi", "twitterApiFile", "twitterDbFile"],
-  twitter: [],
-  lexis: [],
-  generic: [],
-  patents: [],
-};
+const route = useRoute();
+const router = useRouter();
 
-type ImportDetails = {
-  importId?: string;
-  // indicates whether this is (or will be) a newly created import
-  isNewImport: boolean;
-  // indicates, whether this import was already performed (or started)
-  importStarted: boolean;
-  currentProject: ProjectModel;
-  projectPermissions: ProjectPermissionsModel;
-  importDetails: Omit<ImportModel, "type"> & { type?: string };
-  importStats: {
-    numItems?: number;
-  };
-};
-
-export default defineComponent({
-  name: "ImportDetailsView",
-  components: {
-    ConfigScopus,
-    ConfigWoS,
-    ConfigJSONLAcademicItem,
-    ConfigJSONLOpenAlexWorks,
-    ConfigOpenAlex,
-  },
-  data(): ImportDetails {
-    const importId = this.$route.params.import_id;
-    const userId = currentUserStore.user?.user_id;
-
-    return {
-      importId: importId as string | undefined,
-      isNewImport: !importId,
-      importStarted: false,
-      currentProject: currentProjectStore.project as ProjectModel,
-      projectPermissions: currentProjectStore.projectPermissions as ProjectPermissionsModel,
-      importDetails: {
-        project_id: currentProjectStore.projectId,
-        user_id: userId,
-        type: undefined,
-        name: "New import",
-        description: "",
-        config: undefined,
-      } as Omit<ImportModel, "type"> & { type?: string },
-      importStats: {
-        numItems: undefined,
-      },
-    };
-  },
-  async mounted() {
-    this.fetchImportDetails();
-  },
-  methods: {
-    fetchImportDetails(onDone?: () => void) {
-      if (this.importId) {
-        API.imports
-          .getImportDetailsApiImportsImportImportIdGet({
-            importId: this.importId,
-            xProjectId: currentProjectStore.projectId as string,
-          })
-          .then((response) => {
-            this.importDetails = response.data;
-            this.importStarted = !!this.importDetails.pipeline_task_id;
-            if (onDone) {
-              onDone();
-            }
-          })
-          .catch(toastReject);
-      }
-    },
-    updateConfig(eventPayload: ImportConfig) {
-      this.importDetails.config = eventPayload;
-    },
-    save() {
-      EventBus.emit(
-        new ConfirmationRequestEvent(
-          "Saving does not actually import data, so if you are ready, click the import button after saving.  \n" +
-            "In case the import has already started, you can not change the configuration (only the description).",
-          (confirmationResponse) => {
-            if (confirmationResponse === "ACCEPT") {
-              this.saveRequest();
-            } else {
-              EventBus.emit(new ToastEvent("WARN", "Did not save your import config."));
-            }
-          },
-          "Save import job",
-          "OK, save!",
-          "Cancel",
-        ),
-      );
-    },
-    async saveRequest() {
-      API.imports
-        .putImportDetailsApiImportsImportPut({
-          // @ts-ignore
-          requestBody: this.importDetails,
-          xProjectId: currentProjectStore.projectId as string,
-        })
-        .then((response) => {
-          EventBus.emit(new ToastEvent("SUCCESS", `Saved import settings.  \n**ID:** ${response.data}`));
-          if (this.isNewImport) {
-            this.isNewImport = false;
-
-            const newImportId = response.data;
-            this.importId = newImportId;
-            this.$router.replace({ name: "project-imports-details", params: { import_id: response.data } });
-
-            // Some configs include the import_id, which we get after saving.
-            // Thus, we save it again to update the config in the database.
-            this.importDetails = {
-              project_id: currentProjectStore.projectId,
-              user_id: "userId",
-              type: undefined,
-              name: "New import",
-              description: "",
-              config: undefined,
-            } as Omit<ImportModel, "type"> & { type?: string };
-            this.fetchImportDetails(() => {
-              this.importId = undefined;
-              this.importId = newImportId;
-              this.saveRequest();
-            });
-          }
-        })
-        .catch((reason) => {
-          EventBus.emit(new ToastEvent("ERROR", `Failed to save your import settings. (${reason.error?.type})`));
-        });
-    },
-    triggerImport() {
-      if (!this.canTrigger) return;
-      EventBus.emit(
-        new ConfirmationRequestEvent(
-          "Importing data may allocate a lot of resources (storage, quality checks, deduplication, " +
-            "data provider costs or limits,...) and/or simply take a long time to complete.  \n" +
-            "Please only proceed if you are sure about the implications.\n\n" +
-            "Make sure to **click save before importing**!",
-          (response) => {
-            if (response === "ACCEPT") {
-              API.imports
-                .triggerImportApiImportsImportImportIdPost({
-                  importId: this.importId as string,
-                  xProjectId: currentProjectStore.projectId as string,
-                })
-                .then(() => {
-                  this.importStarted = true;
-                  EventBus.emit(new ToastEvent("SUCCESS", "Probably submitted an import job, may now take a while."));
-                })
-                .catch((reason) => {
-                  console.error(reason);
-                  EventBus.emit(new ToastEvent("ERROR", "Did not start importing data."));
-                });
-            } else {
-              EventBus.emit(new ToastEvent("WARN", "Did not start importing data."));
-            }
-          },
-          "Initiating import job",
-          "Yes, proceed!",
-          "Cancel",
-        ),
-      );
-    },
-    async loadImportStats() {
-      API.imports
-        .getImportCountsApiImportsImportImportIdCountGet({
-          importId: this.importId as string,
-          xProjectId: currentProjectStore.projectId as string,
-        })
-        .then((response) => {
-          this.importStats.numItems = response.data;
-        })
-        .catch(logReject);
-    },
-  },
-  computed: {
-    canTrigger(): boolean {
-      return !this.importDetails.pipeline_task_id && !this.importStarted && this.importDetails.import_id;
-    },
-    importConfigComponent(): Component | undefined {
-      if (this.importDetails.type !== undefined && this.importDetails.type in this.compatibleImportTypes) {
-        return this.compatibleImportTypes[this.importDetails.type].component;
-      }
-      return undefined;
-    },
-    compatibleImportTypes(): Record<string, ConfigOption> {
-      const projectType: ProjectModel["type"] = this.currentProject.type as ItemType;
-      const compatibleTypes = projectTypeImportTypeCompatibility[projectType];
-
-      // @ts-ignore FIXME
-      return Object.fromEntries(
-        compatibleTypes
-          .filter((importType: string) => importType in configs)
-          .map((importType: string) => [importType, configs[importType]]),
-      );
-    },
-  },
+const importInfo = ref<ImportModel>({
+  import_id: route.params.import_id || crypto.randomUUID().toString(),
+  name: "New import",
+  description: "",
+  project_id: currentProjectStore.projectId,
+  user_id: currentUserStore.user?.user_id,
+  type: "oa",
+  config: null,
 });
+const wasSaved = ref<boolean>(false);
+const _settingsEditable = ref<boolean>(true); // FIXME: should default really be true?
+const importRevisions = ref<ImportRevisionDetails[]>([]);
+const settingsEditable = computed(
+  () =>
+    _settingsEditable &&
+    (importRevisions.value.length === 0 ||
+      (importRevisions.value[importRevisions.value.length - 1].task?.status !== "RUNNING" &&
+        importRevisions.value[importRevisions.value.length - 1].task?.status !== "PENDING")),
+);
+const isTypeChangeable = computed(() => importRevisions.value.length === 0);
+const isConfigured = computed(() => !!importInfo.value.config);
+const canBeInitiated = computed(() => !currentProjectStore.hasRunningImport && isConfigured.value && wasSaved.value);
+
+function updateConfig(eventPayload: ImportConfig) {
+  importInfo.value.config = eventPayload;
+}
+
+function reloadInfo() {
+  API.imports
+    .getImportDetailsApiImportsImportImportIdGet({
+      importId: importInfo.value.import_id as string,
+      xProjectId: currentProjectStore.projectId as string,
+    })
+    .then((response) => {
+      importInfo.value = response.data;
+      wasSaved.value = true;
+    })
+    .catch(ignore);
+  API.imports
+    .getImportRevisionsApiImportsImportImportIdRevisionsGet({
+      importId: importInfo.value.import_id as string,
+      xProjectId: currentProjectStore.projectId as string,
+    })
+    .then((response) => {
+      importRevisions.value = response.data;
+    })
+    .catch(toastReject);
+}
+
+function initiateRevision() {
+  if (!canBeInitiated.value) return;
+  EventBus.emit(
+    new ConfirmationRequestEvent(
+      "Importing data may allocate a lot of resources (storage, quality checks, deduplication, " +
+        "data provider costs or limits,...) and/or simply take a long time to complete.  \n" +
+        "Please only proceed if you are sure about the implications.\n\n" +
+        "Make sure to **click save before importing**!",
+      (response) => {
+        if (response === "ACCEPT") {
+          API.imports
+            .triggerImportApiImportsImportImportIdPost({
+              importId: importInfo.value.import_id as string,
+              xProjectId: currentProjectStore.projectId as string,
+            })
+            .then(() => {
+              _settingsEditable.value = false;
+              currentProjectStore.project.import_mutex = true;
+              EventBus.emit(new ToastEvent("SUCCESS", "Probably submitted an import job, may now take a while. Wait and press F5 to check status."));
+            })
+            .catch((reason) => {
+              console.error(reason);
+              EventBus.emit(new ToastEvent("ERROR", "Did not start importing data."));
+            });
+        } else {
+          EventBus.emit(new ToastEvent("WARN", "Did not start importing data."));
+        }
+      },
+      "Initiating import job",
+      "Yes, proceed!",
+      "Cancel",
+    ),
+  );
+}
+
+function save() {
+  EventBus.emit(
+    new ConfirmationRequestEvent(
+      "Saving does not actually import data, so if you are ready, click the 'initiate' button after saving.  \n" +
+        "In case the import has already started, you should not change the settings (name and description should be fine though).",
+      (confirmationResponse) => {
+        if (confirmationResponse === "ACCEPT") {
+          API.imports
+            .putImportDetailsApiImportsImportPut({
+              // @ts-ignore
+              requestBody: importInfo.value,
+              xProjectId: currentProjectStore.projectId as string,
+            })
+            .then((response) => {
+              EventBus.emit(new ToastEvent("SUCCESS", `Saved import settings.  \n**ID:** ${response.data}`));
+              router.replace({ name: "project-imports-details", params: { import_id: response.data } });
+              wasSaved.value = true;
+              reloadInfo();
+            })
+            .catch((reason) => {
+              EventBus.emit(new ToastEvent("ERROR", `Failed to save your import settings. (${reason.error?.type})`));
+            });
+        } else {
+          EventBus.emit(new ToastEvent("WARN", "Did not save your import config."));
+        }
+      },
+      "Save import job",
+      "OK, save!",
+      "Cancel",
+    ),
+  );
+}
+
+const importConfigComponent = computed(() => {
+  return configs[currentProjectStore.project.type]?.[importInfo.value.type]?.component;
+});
+
+onMounted(reloadInfo);
 </script>
 
-<style scoped></style>
+<template>
+  <div>
+    <div class="row pb-2 mb-2">
+      <div class="col-11 col-md-8">
+        <h1>
+          <font-awesome-icon icon="cloud-arrow-up" />
+          Data import
+        </h1>
+        <h6>
+          An "import" provides the scope for how data enters a project. The system creates a "revision" for each time an
+          import is run (assuming with the same query and settings, but at a later time). You can only run a single
+          import at a time per project.
+        </h6>
+      </div>
+      <div class="col text-end">
+        <button type="button" class="btn btn-success" @click="save">Save</button>
+      </div>
+    </div>
+
+    <div class="row g-2 mb-4">
+      <div class="col-lg-4">
+        <div class="p-2 card">
+          <h4>Import info</h4>
+          <div class="mb-3">
+            <label for="importName" class="form-label">Name for this import</label>
+            <input
+              type="text"
+              class="form-control"
+              id="importName"
+              v-model="importInfo.name"
+              placeholder="Import name"
+            />
+          </div>
+          <div class="mb-3">
+            <label for="importDescription" class="form-label">Description of this import</label>
+            <textarea class="form-control" id="importDescription" rows="3" v-model="importInfo.description" />
+          </div>
+          <div>
+            <strong>Import created:</strong>&nbsp;
+            {{ importInfo.time_created || "[not yet]" }}
+          </div>
+          <div>
+            <strong>Number of items:</strong>&nbsp;
+            <ImportCount :import-id="importInfo.import_id" />
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-8">
+        <div class="p-2 card">
+          <h4>Settings</h4>
+
+          <div class="row pb-2 mb-2 border-bottom g-0" v-if="isTypeChangeable">
+            <div class="col">
+              <h5>Select import type</h5>
+              <select v-model="importInfo.type" aria-label="Import Config Option" :disabled="!settingsEditable">
+                <option disabled :value="undefined">Select import type</option>
+                <option v-for="(info, type) in configs[currentProjectStore.project.type]" :key="type" :value="type">
+                  {{ info.name }}
+                </option>
+              </select>
+            </div>
+          </div>
+
+          <component
+            v-if="importConfigComponent"
+            :is="importConfigComponent"
+            :existing-config="importInfo.config"
+            :editable="settingsEditable"
+            :import-id="importInfo.import_id"
+            @config-changed="updateConfig($event)"
+          />
+        </div>
+      </div>
+    </div>
+
+    <div class="row mb-2">
+      <div class="col">
+        <h3>Revisions</h3>
+      </div>
+      <div class="col text-end">
+        <button type="button" :disabled="!canBeInitiated" class="btn btn-outline-primary" @click="initiateRevision">
+          <font-awesome-icon icon="play" class="me-1" />
+          Initiate import revision
+        </button>
+      </div>
+    </div>
+
+    <div>
+      <table class="table table-hover">
+        <thead>
+          <tr>
+            <th>Counter</th>
+            <th>Timestamp</th>
+            <th>Query size</th>
+            <th>Import size</th>
+            <th># New</th>
+            <th># updated</th>
+            <th># removed</th>
+            <th>Pipeline</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="revision in importRevisions">
+            <td>{{ revision.import_revision_counter }}</td>
+            <td>{{ revision.time_created }}</td>
+            <td>{{ revision.num_items_retrieved }}</td>
+            <td>{{ revision.num_items }}</td>
+            <td>{{ revision.num_items_new }}</td>
+            <td>{{ revision.num_items_updated }}</td>
+            <td>{{ revision.num_items_removed }}</td>
+            <td>
+              <template v-if="revision.task">
+                <InlineToolTip :info="revision.task.status">
+                  <span
+                    class="fs-3 me-2"
+                    :class="{
+                      'text-tertiary': revision.task.status === 'PENDING',
+                      'text-warning': revision.task.status === 'RUNNING',
+                      'text-success': revision.task.status === 'COMPLETED',
+                      'text-error': revision.task.status === 'FAILED',
+                      'text-secondary': revision.task.status === 'CANCELLED',
+                    }"
+                    >●</span
+                  >
+                </InlineToolTip>
+                <router-link
+                  role="button"
+                  class="link-secondary me-2"
+                  aria-label="Pipeline task"
+                  :to="{
+                    name: 'project-artefacts-details',
+                    params: { taskId: revision.pipeline_task_id },
+                  }"
+                >
+                  <InlineToolTip :info="`Pipeline task: ${revision.pipeline_task_id}`">
+                    <font-awesome-icon :icon="['fas', 'vault']" />
+                  </InlineToolTip>
+                </router-link>
+              </template>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</template>

@@ -2,7 +2,7 @@
   <div class="m-2">
     <div class="row">
       <div class="col-xxl-7">
-        <h4>Web of Science import</h4>
+        <h5>Web of Science import</h5>
         <p class="text-muted">
           Import method for Web of Science text files. These can be obtained by querying web of science, clicking
           "export" and selecting "Plain text file". Please consult
@@ -28,7 +28,7 @@
           </div>
         </template>
         <template v-else>
-          <h4>Uploaded files</h4>
+          <h5>Uploaded files</h5>
           <ul>
             <li v-for="file in config.sources" :key="file">
               {{ file }}

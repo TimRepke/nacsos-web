@@ -2,7 +2,7 @@
   <div class="m-2">
     <div class="row">
       <div class="col-xxl-7">
-        <h4>OpenAlex import</h4>
+        <h5>OpenAlex import</h5>
         <p class="text-muted">Import directly from our self-hosted OpenAlex solr database.</p>
       </div>
     </div>

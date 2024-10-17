@@ -559,8 +559,8 @@ export type DehydratedUser = {
 };
 
 export type Event = {
-  event: "ExampleEvent" | "ExampleSubEvent";
-  payload: ExampleEvent | ExampleSubEvent;
+  event: "ExampleSubEvent" | "ExampleEvent";
+  payload: ExampleSubEvent | ExampleEvent;
 };
 
 export type ExampleEvent = {
@@ -714,16 +714,42 @@ export type ImportFilter = {
   import_ids: Array<IEUUID>;
 };
 
-export type ImportModel = {
+export type ImportInfo = {
   import_id?: string | null;
   user_id?: string | null;
   project_id: string;
-  pipeline_task_id?: string | null;
   name: string;
   description: string;
   type: string;
   time_created?: string | null;
   config?: ScopusImport | AcademicItemImport | OpenAlexFileImport | OpenAlexSolrImport | WoSImport | null;
+  num_revisions: number;
+  num_items: number;
+};
+
+export type ImportModel = {
+  import_id?: string | null;
+  user_id?: string | null;
+  project_id: string;
+  name: string;
+  description: string;
+  type: string;
+  time_created?: string | null;
+  config?: ScopusImport | AcademicItemImport | OpenAlexFileImport | OpenAlexSolrImport | WoSImport | null;
+};
+
+export type ImportRevisionDetails = {
+  import_revision_id?: string | null;
+  import_revision_counter: number;
+  time_created: string;
+  pipeline_task_id?: string | null;
+  import_id?: string | null;
+  num_items_retrieved?: number | null;
+  num_items?: number | null;
+  num_items_new?: number | null;
+  num_items_updated?: number | null;
+  num_items_removed?: number | null;
+  task?: TaskModel | null;
 };
 
 export type ItemAnnotation = {
@@ -2502,7 +2528,7 @@ export type $OpenApiTs = {
         /**
          * Successful Response
          */
-        200: Array<ImportModel>;
+        200: Array<ImportInfo>;
         /**
          * Validation Error
          */
@@ -2555,6 +2581,24 @@ export type $OpenApiTs = {
          * Successful Response
          */
         200: number;
+        /**
+         * Validation Error
+         */
+        422: HTTPValidationError;
+      };
+    };
+  };
+  "/api/imports/import/{import_id}/revisions": {
+    get: {
+      req: {
+        importId: string;
+        xProjectId: string;
+      };
+      res: {
+        /**
+         * Successful Response
+         */
+        200: Array<ImportRevisionDetails>;
         /**
          * Validation Error
          */

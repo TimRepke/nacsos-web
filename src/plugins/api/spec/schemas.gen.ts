@@ -3503,16 +3503,16 @@ export const $Event = {
   properties: {
     event: {
       type: "string",
-      enum: ["ExampleEvent", "ExampleSubEvent"],
+      enum: ["ExampleSubEvent", "ExampleEvent"],
       title: "Event",
     },
     payload: {
       anyOf: [
         {
-          $ref: "#/components/schemas/ExampleEvent",
+          $ref: "#/components/schemas/ExampleSubEvent",
         },
         {
-          $ref: "#/components/schemas/ExampleSubEvent",
+          $ref: "#/components/schemas/ExampleEvent",
         },
       ],
       title: "Payload",
@@ -4277,7 +4277,7 @@ export const $ImportFilter = {
   title: "ImportFilter",
 } as const;
 
-export const $ImportModel = {
+export const $ImportInfo = {
   properties: {
     import_id: {
       anyOf: [
@@ -4321,8 +4321,89 @@ export const $ImportModel = {
       ],
       title: "Project Id",
     },
-    pipeline_task_id: {
+    name: {
+      type: "string",
+      title: "Name",
+    },
+    description: {
+      type: "string",
+      title: "Description",
+    },
+    type: {
+      type: "string",
+      title: "Type",
+    },
+    time_created: {
       anyOf: [
+        {
+          type: "string",
+          format: "date-time",
+        },
+        {
+          type: "null",
+        },
+      ],
+      title: "Time Created",
+    },
+    config: {
+      anyOf: [
+        {
+          oneOf: [
+            {
+              $ref: "#/components/schemas/ScopusImport",
+            },
+            {
+              $ref: "#/components/schemas/AcademicItemImport",
+            },
+            {
+              $ref: "#/components/schemas/OpenAlexFileImport",
+            },
+            {
+              $ref: "#/components/schemas/OpenAlexSolrImport",
+            },
+            {
+              $ref: "#/components/schemas/WoSImport",
+            },
+          ],
+          discriminator: {
+            propertyName: "kind",
+            mapping: {
+              academic: "#/components/schemas/AcademicItemImport",
+              "oa-file": "#/components/schemas/OpenAlexFileImport",
+              "oa-solr": "#/components/schemas/OpenAlexSolrImport",
+              scopus: "#/components/schemas/ScopusImport",
+              wos: "#/components/schemas/WoSImport",
+            },
+          },
+        },
+        {
+          type: "null",
+        },
+      ],
+      title: "Config",
+    },
+    num_revisions: {
+      type: "integer",
+      title: "Num Revisions",
+    },
+    num_items: {
+      type: "integer",
+      title: "Num Items",
+    },
+  },
+  type: "object",
+  required: ["project_id", "name", "description", "type", "num_revisions", "num_items"],
+  title: "ImportInfo",
+} as const;
+
+export const $ImportModel = {
+  properties: {
+    import_id: {
+      anyOf: [
+        {
+          type: "string",
+          format: "uuid",
+        },
         {
           type: "string",
         },
@@ -4330,7 +4411,34 @@ export const $ImportModel = {
           type: "null",
         },
       ],
-      title: "Pipeline Task Id",
+      title: "Import Id",
+    },
+    user_id: {
+      anyOf: [
+        {
+          type: "string",
+          format: "uuid",
+        },
+        {
+          type: "string",
+        },
+        {
+          type: "null",
+        },
+      ],
+      title: "User Id",
+    },
+    project_id: {
+      anyOf: [
+        {
+          type: "string",
+          format: "uuid",
+        },
+        {
+          type: "string",
+        },
+      ],
+      title: "Project Id",
     },
     name: {
       type: "string",
@@ -4397,6 +4505,129 @@ export const $ImportModel = {
   type: "object",
   required: ["project_id", "name", "description", "type"],
   title: "ImportModel",
+} as const;
+
+export const $ImportRevisionDetails = {
+  properties: {
+    import_revision_id: {
+      anyOf: [
+        {
+          type: "string",
+          format: "uuid",
+        },
+        {
+          type: "string",
+        },
+        {
+          type: "null",
+        },
+      ],
+      title: "Import Revision Id",
+    },
+    import_revision_counter: {
+      type: "integer",
+      title: "Import Revision Counter",
+    },
+    time_created: {
+      type: "string",
+      format: "date-time",
+      title: "Time Created",
+    },
+    pipeline_task_id: {
+      anyOf: [
+        {
+          type: "string",
+        },
+        {
+          type: "null",
+        },
+      ],
+      title: "Pipeline Task Id",
+    },
+    import_id: {
+      anyOf: [
+        {
+          type: "string",
+          format: "uuid",
+        },
+        {
+          type: "string",
+        },
+        {
+          type: "null",
+        },
+      ],
+      title: "Import Id",
+    },
+    num_items_retrieved: {
+      anyOf: [
+        {
+          type: "integer",
+        },
+        {
+          type: "null",
+        },
+      ],
+      title: "Num Items Retrieved",
+    },
+    num_items: {
+      anyOf: [
+        {
+          type: "integer",
+        },
+        {
+          type: "null",
+        },
+      ],
+      title: "Num Items",
+    },
+    num_items_new: {
+      anyOf: [
+        {
+          type: "integer",
+        },
+        {
+          type: "null",
+        },
+      ],
+      title: "Num Items New",
+    },
+    num_items_updated: {
+      anyOf: [
+        {
+          type: "integer",
+        },
+        {
+          type: "null",
+        },
+      ],
+      title: "Num Items Updated",
+    },
+    num_items_removed: {
+      anyOf: [
+        {
+          type: "integer",
+        },
+        {
+          type: "null",
+        },
+      ],
+      title: "Num Items Removed",
+    },
+    task: {
+      anyOf: [
+        {
+          $ref: "#/components/schemas/TaskModel",
+        },
+        {
+          type: "null",
+        },
+      ],
+    },
+  },
+  type: "object",
+  required: ["import_revision_counter", "time_created"],
+  title: "ImportRevisionDetails",
 } as const;
 
 export const $ItemAnnotation = {
