@@ -559,8 +559,8 @@ export type DehydratedUser = {
 };
 
 export type Event = {
-  event: "ExampleSubEvent" | "ExampleEvent";
-  payload: ExampleSubEvent | ExampleEvent;
+  event: "ExampleEvent" | "ExampleSubEvent";
+  payload: ExampleEvent | ExampleSubEvent;
 };
 
 export type ExampleEvent = {
@@ -926,6 +926,7 @@ export type ProjectInfo = {
   description?: string | null;
   time_created?: string | null;
   type: "generic" | "twitter" | "academic" | "patents" | "lexis" | ItemType;
+  import_mutex?: boolean | null;
   setting_motivational_quotes?: boolean;
   owners: Array<UserBaseModel>;
 };
@@ -944,6 +945,7 @@ export type ProjectModel = {
   description?: string | null;
   time_created?: string | null;
   type: "generic" | "twitter" | "academic" | "patents" | "lexis" | ItemType;
+  import_mutex?: boolean | null;
   setting_motivational_quotes?: boolean;
 };
 
@@ -2242,6 +2244,23 @@ export type $OpenApiTs = {
          * Successful Response
          */
         200: string;
+        /**
+         * Validation Error
+         */
+        422: HTTPValidationError;
+      };
+    };
+  };
+  "/api/project/import_mutex": {
+    put: {
+      req: {
+        xProjectId: string;
+      };
+      res: {
+        /**
+         * Successful Response
+         */
+        200: unknown;
         /**
          * Validation Error
          */

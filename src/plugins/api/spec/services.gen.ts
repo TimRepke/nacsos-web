@@ -1102,6 +1102,24 @@ export class ProjectService {
     });
   }
 
+  public static resetImportMutexApiProjectImportMutexPut(
+    data: $OpenApiTs["/api/project/import_mutex"]["put"]["req"],
+    options?: Partial<AxiosRequestConfig>,
+  ): CancelablePromise<ApiResult<$OpenApiTs["/api/project/import_mutex"]["put"]["res"][200]>> {
+    const { xProjectId } = data;
+    return __request(OpenAPI, {
+      method: "PUT",
+      url: "/api/project/import_mutex",
+      headers: {
+        "x-project-id": xProjectId,
+      },
+      errors: {
+        422: "Validation Error",
+      },
+      customRequestConfig: options,
+    });
+  }
+
   public static getProjectPermissionsCurrentUserApiProjectPermissionsMeGet(
     data: $OpenApiTs["/api/project/permissions/me"]["get"]["req"],
     options?: Partial<AxiosRequestConfig>,

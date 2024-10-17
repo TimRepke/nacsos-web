@@ -196,11 +196,7 @@ export const $AcademicItemModel = {
       title: "Project Id",
     },
     type: {
-      allOf: [
-        {
-          $ref: "#/components/schemas/ItemType",
-        },
-      ],
+      $ref: "#/components/schemas/ItemType",
       default: "academic",
     },
     text: {
@@ -3507,16 +3503,16 @@ export const $Event = {
   properties: {
     event: {
       type: "string",
-      enum: ["ExampleSubEvent", "ExampleEvent"],
+      enum: ["ExampleEvent", "ExampleSubEvent"],
       title: "Event",
     },
     payload: {
       anyOf: [
         {
-          $ref: "#/components/schemas/ExampleSubEvent",
+          $ref: "#/components/schemas/ExampleEvent",
         },
         {
-          $ref: "#/components/schemas/ExampleEvent",
+          $ref: "#/components/schemas/ExampleSubEvent",
         },
       ],
       title: "Payload",
@@ -4014,11 +4010,7 @@ export const $FullLexisNexisItemModel = {
       title: "Project Id",
     },
     type: {
-      allOf: [
-        {
-          $ref: "#/components/schemas/ItemType",
-        },
-      ],
+      $ref: "#/components/schemas/ItemType",
       default: "lexis",
     },
     text: {
@@ -4109,11 +4101,7 @@ export const $GenericItemModel = {
       title: "Project Id",
     },
     type: {
-      allOf: [
-        {
-          $ref: "#/components/schemas/ItemType",
-        },
-      ],
+      $ref: "#/components/schemas/ItemType",
       default: "generic",
     },
     text: {
@@ -5103,11 +5091,7 @@ export const $LexisNexisItemModel = {
       title: "Project Id",
     },
     type: {
-      allOf: [
-        {
-          $ref: "#/components/schemas/ItemType",
-        },
-      ],
+      $ref: "#/components/schemas/ItemType",
       default: "lexis",
     },
     text: {
@@ -5692,6 +5676,17 @@ export const $ProjectInfo = {
       ],
       title: "Type",
     },
+    import_mutex: {
+      anyOf: [
+        {
+          type: "boolean",
+        },
+        {
+          type: "null",
+        },
+      ],
+      title: "Import Mutex",
+    },
     setting_motivational_quotes: {
       type: "boolean",
       title: "Setting Motivational Quotes",
@@ -5765,6 +5760,17 @@ export const $ProjectModel = {
         },
       ],
       title: "Type",
+    },
+    import_mutex: {
+      anyOf: [
+        {
+          type: "boolean",
+        },
+        {
+          type: "null",
+        },
+      ],
+      title: "Import Mutex",
     },
     setting_motivational_quotes: {
       type: "boolean",
@@ -6026,11 +6032,7 @@ export const $ResolutionCell = {
       $ref: "#/components/schemas/BotAnnotationModel",
     },
     status: {
-      allOf: [
-        {
-          $ref: "#/components/schemas/ResolutionStatus",
-        },
-      ],
+      $ref: "#/components/schemas/ResolutionStatus",
       default: "UNCHANGED",
     },
   },
@@ -6156,11 +6158,7 @@ export const $ResolutionUserEntry = {
       ],
     },
     status: {
-      allOf: [
-        {
-          $ref: "#/components/schemas/ResolutionStatus",
-        },
-      ],
+      $ref: "#/components/schemas/ResolutionStatus",
       default: "UNCHANGED",
     },
   },
@@ -6754,11 +6752,7 @@ export const $TaskModel = {
       title: "Rec Expunge",
     },
     status: {
-      allOf: [
-        {
-          $ref: "#/components/schemas/TaskStatus",
-        },
-      ],
+      $ref: "#/components/schemas/TaskStatus",
       default: "PENDING",
     },
   },
@@ -6826,11 +6820,7 @@ export const $TwitterItemModel = {
       title: "Project Id",
     },
     type: {
-      allOf: [
-        {
-          $ref: "#/components/schemas/ItemType",
-        },
-      ],
+      $ref: "#/components/schemas/ItemType",
       default: "twitter",
     },
     text: {
