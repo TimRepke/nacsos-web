@@ -49,6 +49,7 @@ export const useCurrentUserStore = defineStore("CurrentUserStore", {
       } catch (reason) {
         this.clear();
         console.error(reason);
+        // @ts-ignore
         EventBus.emit(new AuthFailedEvent(reason.error?.detail));
       }
     },
@@ -67,7 +68,8 @@ export const useCurrentUserStore = defineStore("CurrentUserStore", {
       } catch (reason) {
         this.clear();
         console.error(reason);
-        EventBus.emit(new AuthFailedEvent());
+        // @ts-ignore
+        EventBus.emit(new AuthFailedEvent(reason.error?.detail));
       }
     },
     async logout() {

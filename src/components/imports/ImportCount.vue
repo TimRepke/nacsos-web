@@ -8,7 +8,7 @@ const props = defineProps({
   importId: { type: String, required: true },
 });
 
-const numItems = ref<string | null>(null);
+const numItems = ref<number | null>(null);
 const isLoading = ref<boolean>(false);
 
 function refreshCount() {

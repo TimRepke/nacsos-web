@@ -56,6 +56,9 @@ export const useCurrentProjectStore = defineStore("CurrentProjectStore", {
   getters: {
     projectSelected: (state): boolean => !!state.project && !!state.projectId && !!state.projectPermissions,
     hasRunningImport: (state): boolean => !!state.project?.import_mutex,
-    userCanResetImportMutex: (state): boolean => state.projectPermissions.imports_edit && state.hasRunningImport,
+
+    // FIXME
+    // @ts-ignore
+    userCanResetImportMutex: (state): boolean => state.projectPermissions?.imports_edit && state.hasRunningImport,
   },
 });

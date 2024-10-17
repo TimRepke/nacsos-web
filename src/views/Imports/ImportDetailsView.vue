@@ -14,8 +14,8 @@ import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import ImportCount from "@/components/imports/ImportCount.vue";
 import InlineToolTip from "@/components/InlineToolTip.vue";
 import { EventBus } from "@/plugins/events";
-import { ConfirmationRequestEvent } from "@/plugins/events/events/confirmation.ts";
-import { ToastEvent } from "@/plugins/events/events/toast.ts";
+import { ConfirmationRequestEvent } from "@/plugins/events/events/confirmation";
+import { ToastEvent } from "@/plugins/events/events/toast";
 
 type ImportConfig = ImportModel["config"];
 
@@ -57,10 +57,10 @@ const route = useRoute();
 const router = useRouter();
 
 const importInfo = ref<ImportModel>({
-  import_id: route.params.import_id || crypto.randomUUID().toString(),
+  import_id: (route.params.import_id as string) || crypto.randomUUID().toString(),
   name: "New import",
   description: "",
-  project_id: currentProjectStore.projectId,
+  project_id: currentProjectStore.projectId as string,
   user_id: currentUserStore.user?.user_id,
   type: "oa",
   config: null,
@@ -122,7 +122,7 @@ function initiateRevision() {
             })
             .then(() => {
               _settingsEditable.value = false;
-              currentProjectStore.project.import_mutex = true;
+              currentProjectStore.project!.import_mutex = true;
               EventBus.emit(new ToastEvent("SUCCESS", "Probably submitted an import job, may now take a while. Wait and press F5 to check status."));
             })
             .catch((reason) => {
@@ -174,7 +174,7 @@ function save() {
 }
 
 const importConfigComponent = computed(() => {
-  return configs[currentProjectStore.project.type]?.[importInfo.value.type]?.component;
+  return configs[currentProjectStore.project!.type]?.[importInfo.value.type]?.component;
 });
 
 onMounted(reloadInfo);

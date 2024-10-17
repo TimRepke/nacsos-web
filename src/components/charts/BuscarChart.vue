@@ -174,7 +174,7 @@ export default defineComponent({
         .attr("class", "bar")
         .attr("x", (_: number, i: number) => this.xScale(i) ?? 0)
         .attr("y", 0)
-        .attr("width", this.xScale(1) - this.xScale(0) ?? 1)
+        .attr("width", this.xScale(1) - (this.xScale(0) ?? 1))
         .attr("height", this.yScale(0) - this.yScale(this.totalRelDocs))
         .attr("fill", (d: number) => (d > 0 ? "green" : "red"))
         .attr("opacity", 1);
