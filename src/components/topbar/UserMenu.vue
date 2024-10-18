@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { EventBus } from "@/plugins/events";
-import { LoggedOutEvent, LogoutSuccessEvent } from "@/plugins/events/events/auth.ts";
+import { LoggedOutEvent, LogoutSuccessEvent } from "@/plugins/events/events/auth";
 import { currentUserStore } from "@/stores";
 
 function logout() {

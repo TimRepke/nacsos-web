@@ -1,5 +1,5 @@
 <template>
-  <component :is="component" :item="item" :highlighters="highlighters" />
+  <component :is="component" :item="item" />
 </template>
 
 <script lang="ts">
@@ -7,7 +7,7 @@ import { defineAsyncComponent, defineComponent, markRaw } from "vue";
 import type { PropType, Component } from "vue";
 import type { AnyItem } from "@/types/items.d";
 import { useCurrentProjectStore } from "@/stores/CurrentProjectStore";
-import type { HighlighterModel, ItemType, ProjectModel } from "@/plugins/api/types";
+import type { ItemType, ProjectModel } from "@/plugins/api/types";
 
 type TypeMapType = { [key in ItemType]: Component };
 
@@ -18,11 +18,6 @@ export default defineComponent({
       type: Object as PropType<AnyItem>,
       required: true,
       default: null,
-    },
-    highlighters: {
-      type: Object as PropType<Array<HighlighterModel>>,
-      required: false,
-      default: undefined,
     },
   },
   data() {

@@ -22,15 +22,12 @@
       </div>
     </div>
     <div class="card-body position-relative">
-      <div class="text-muted small position-absolute" role="button" style="top: 0; right: 0" @click="iterateColumns">
-        <font-awesome-icon :icon="['fas', 'table-columns']" class="me-2" />
-      </div>
       <div v-if="showRaw">
         <pre>
           {{ JSON.stringify(item, null, 4) }}
         </pre>
       </div>
-      <TextComponent :text="item.text" :highlighters="highlighters" missing-text="[Abstract missing]" />
+      <TextComponent :text="item.text" missing-text="[Abstract missing]" />
     </div>
     <div class="card-footer d-flex justify-content-between">
       <div class="d-flex flex-wrap small text-muted">
@@ -68,8 +65,8 @@
 import { defineComponent } from "vue";
 import type { PropType } from "vue";
 import InlineToolTip from "@/components/InlineToolTip.vue";
-import type { AcademicAuthorModel, AcademicItemModel, AffiliationModel, HighlighterModel } from "@/plugins/api/types";
-import { interfaceSettingsStore } from "@/stores";
+import type { AcademicAuthorModel, AcademicItemModel, AffiliationModel } from "@/plugins/api/types";
+import { currentProjectStore, interfaceSettingsStore } from "@/stores";
 import TextComponent from "@/components/items/TextComponent.vue";
 
 export default defineComponent({
@@ -81,11 +78,6 @@ export default defineComponent({
       required: true,
       default: null,
     },
-    highlighters: {
-      type: Object as PropType<Array<HighlighterModel>>,
-      required: false,
-      default: undefined,
-    },
   },
   data() {
     return {
@@ -93,49 +85,18 @@ export default defineComponent({
     };
   },
   computed: {
-    htmlAbstract() {
-      let txt = this.item.text || "";
-      txt = this.applyHighlighters(txt);
-      return txt.replaceAll("\n", "<br />");
-    },
     htmlTitle() {
-      let txt = this.item.title || "";
-      txt = this.applyHighlighters(txt);
-      return txt;
+      return currentProjectStore.projectHighlighters.applyActiveHighlighters(this.item.title) ?? "[Missing title]";
     },
     columnStyle(): Record<string, string> {
       return interfaceSettingsStore.itemColumnStyle;
     },
   },
   methods: {
-    applyHighlighters(txt: string) {
-      if (this.highlighters) {
-        this.highlighters.forEach((highlighter: HighlighterModel) => {
-          try {
-            const regex = new RegExp(highlighter.keywords.join("|"), "gi");
-            txt = txt.replaceAll(regex, `<span style="${highlighter.style}">$&</span>`);
-          } catch (e) {
-            console.warn("Ignoring illegal regex!");
-            console.error(e);
-          }
-        });
-      }
-      return txt;
-    },
     authorInstitutions(author: AcademicAuthorModel): string | undefined {
       return author.affiliations
         ?.map((affiliation: AffiliationModel) => `${affiliation.name}, ${affiliation.country}`)
         .join(";");
-    },
-    iterateColumns() {
-      if (!interfaceSettingsStore.itemDisplay.columns) {
-        interfaceSettingsStore.itemDisplay.columns = 0;
-      }
-      interfaceSettingsStore.itemDisplay.columns += 1;
-
-      if (interfaceSettingsStore.itemDisplay.columns > 4) {
-        interfaceSettingsStore.itemDisplay.columns = 1;
-      }
     },
   },
 });

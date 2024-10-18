@@ -2,9 +2,6 @@
   <div class="card m-2 p-0 text-start w-100">
     <div class="card-header d-flex">
       <div style="line-height: 2rem" class="fw-bold me-auto" v-html="htmlTitle" />
-      <div class="text-muted" role="button" style="top: 0; right: 0" @click="iterateColumns">
-        <font-awesome-icon :icon="['fas', 'table-columns']" class="me-2" />
-      </div>
       <div>
         <inline-tool-tip info="Raw data" placement="left">
           <font-awesome-icon :icon="['far', 'circle-question']" class="me-2" @click="showRaw = !showRaw" />
@@ -25,7 +22,7 @@
           {{ author }}
         </span>
       </p>
-      <TextComponent :text="item.text" :highlighters="highlighters" />
+      <TextComponent :text="item.text" />
     </div>
     <div class="card-footer d-flex justify-content-between">
       <ul class="list-unstyled" v-if="item.sources">
@@ -65,9 +62,9 @@
 import { defineComponent } from "vue";
 import type { PropType } from "vue";
 import InlineToolTip from "@/components/InlineToolTip.vue";
-import type { FullLexisNexisItemModel, HighlighterModel } from "@/plugins/api/types";
-import { interfaceSettingsStore } from "@/stores";
+import type { FullLexisNexisItemModel } from "@/plugins/api/types";
 import TextComponent from "@/components/items/TextComponent.vue";
+import { currentProjectStore } from "@/stores";
 
 export default defineComponent({
   name: "LexisNexisItem",
@@ -78,11 +75,6 @@ export default defineComponent({
       required: true,
       default: null,
     },
-    highlighters: {
-      type: Object as PropType<Array<HighlighterModel>>,
-      required: false,
-      default: undefined,
-    },
   },
   data() {
     return {
@@ -91,49 +83,12 @@ export default defineComponent({
   },
   computed: {
     htmlTitle() {
-      if (this.item.sources && this.item.sources.length > 0) {
-        let txt = this.item.sources[0].title || "";
-        txt = this.applyHighlighters(txt);
-        return txt;
-      }
-      return "[MISSING]";
+      return (
+        currentProjectStore.projectHighlighters.applyActiveHighlighters(this.item.sources?.[0]?.title) ?? "[MISSING]"
+      );
     },
-    htmlTeaser(): string | undefined {
-      if (this.item.teaser) {
-        let txt = this.item.teaser || "";
-        txt = this.applyHighlighters(txt);
-        return txt;
-      }
-      return undefined;
-    },
-    columnStyle(): Record<string, string> {
-      return interfaceSettingsStore.itemColumnStyle;
-    },
-  },
-  methods: {
-    applyHighlighters(txt: string) {
-      if (this.highlighters) {
-        this.highlighters.forEach((highlighter: HighlighterModel) => {
-          try {
-            const regex = new RegExp(highlighter.keywords.join("|"), "gi");
-            txt = txt.replaceAll(regex, `<span style="${highlighter.style}">$&</span>`);
-          } catch (e) {
-            console.warn("Ignoring illegal regex!");
-            console.error(e);
-          }
-        });
-      }
-      return txt;
-    },
-    iterateColumns() {
-      if (!interfaceSettingsStore.itemDisplay.columns) {
-        interfaceSettingsStore.itemDisplay.columns = 0;
-      }
-      interfaceSettingsStore.itemDisplay.columns += 1;
-
-      if (interfaceSettingsStore.itemDisplay.columns > 4) {
-        interfaceSettingsStore.itemDisplay.columns = 1;
-      }
+    htmlTeaser(): string | null {
+      return currentProjectStore.projectHighlighters.applyActiveHighlighters(this.item.teaser);
     },
   },
 });

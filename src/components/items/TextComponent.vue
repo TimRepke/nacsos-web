@@ -7,6 +7,10 @@
       </p>
     </template>
     <template v-else>
+      <div class="text-muted small position-absolute" role="button" style="top: 0; right: 0" @click="iterateColumns">
+        <font-awesome-icon :icon="['fas', 'table-columns']" class="me-2" />
+      </div>
+
       <p class="card-text text-muted" :style="columnStyle" v-html="htmlText" />
     </template>
   </div>
@@ -14,9 +18,7 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import type { PropType } from "vue";
-import type { HighlighterModel } from "@/plugins/api/types";
-import { interfaceSettingsStore } from "@/stores";
+import { currentProjectStore, interfaceSettingsStore } from "@/stores";
 import { marked } from "marked";
 
 export default defineComponent({
@@ -32,11 +34,6 @@ export default defineComponent({
       required: false,
       default: null,
     },
-    highlighters: {
-      type: Object as PropType<Array<HighlighterModel>>,
-      required: false,
-      default: undefined,
-    },
     missingText: {
       type: String,
       required: false,
@@ -50,12 +47,14 @@ export default defineComponent({
   },
   computed: {
     htmlText() {
+      // Provided html trumps internal parsing
       if (this.html) return this.html;
-
-      let txt = this.text || "";
+      // Return placeholder for missing texts
+      if (!this.text) return this.missingText;
+      let txt = this.text;
       txt = txt.replaceAll("`", "'");
       txt = marked.parse(txt);
-      txt = this.applyHighlighters(txt);
+      txt = currentProjectStore.projectHighlighters.applyActiveHighlighters(txt);
       return txt.replaceAll("\n", "<br />");
     },
     columnStyle(): Record<string, string> {
@@ -63,20 +62,6 @@ export default defineComponent({
     },
   },
   methods: {
-    applyHighlighters(txt: string) {
-      if (this.highlighters) {
-        this.highlighters.forEach((highlighter: HighlighterModel) => {
-          try {
-            const regex = new RegExp(highlighter.keywords.join("|"), "gi");
-            txt = txt.replaceAll(regex, `<span style="${highlighter.style}">$&</span>`);
-          } catch (e) {
-            console.warn("Ignoring illegal regex!");
-            console.error(e);
-          }
-        });
-      }
-      return txt;
-    },
     iterateColumns() {
       if (!interfaceSettingsStore.itemDisplay.columns) {
         interfaceSettingsStore.itemDisplay.columns = 0;

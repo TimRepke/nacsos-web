@@ -2,9 +2,9 @@
 import { currentProjectStore, interfaceSettingsStore } from "@/stores";
 import RefreshIcon from "@/components/RefreshIcon.vue";
 
-if (!interfaceSettingsStore.highlighters.active[currentProjectStore.projectId]) {
+if (!interfaceSettingsStore.highlighters.active[currentProjectStore.projectId as string]) {
   // make sure that we at least have an empty list for the project
-  interfaceSettingsStore.highlighters.active[currentProjectStore.projectId] = [];
+  interfaceSettingsStore.highlighters.active[currentProjectStore.projectId as string] = [];
 }
 </script>
 
