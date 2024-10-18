@@ -18,7 +18,7 @@ async function refreshCount() {
         xProjectId: currentProjectStore.projectId as string,
       })
     ).data;
-  } finally {
+  } catch {
     numItems.value = null;
   }
 }

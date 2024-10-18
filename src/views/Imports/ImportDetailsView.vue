@@ -226,6 +226,10 @@ onMounted(reloadInfo);
             <textarea class="form-control" id="importDescription" rows="3" v-model="importInfo.description" />
           </div>
           <div>
+            <strong>Import ID:</strong>&nbsp;
+            <code>{{ importInfo.import_id }}</code>
+          </div>
+          <div>
             <strong>Import created:</strong>&nbsp;
             {{ importInfo.time_created || "[not yet]" }}
           </div>
