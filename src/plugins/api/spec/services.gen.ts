@@ -1537,27 +1537,6 @@ export class EventsService {
 }
 
 export class HighlightersService {
-  public static getScopeHighlightersApiHighlightersScopeAssignmentScopeIdGet(
-    data: $OpenApiTs["/api/highlighters/scope/{assignment_scope_id}"]["get"]["req"],
-    options?: Partial<AxiosRequestConfig>,
-  ): CancelablePromise<ApiResult<$OpenApiTs["/api/highlighters/scope/{assignment_scope_id}"]["get"]["res"][200]>> {
-    const { assignmentScopeId, xProjectId } = data;
-    return __request(OpenAPI, {
-      method: "GET",
-      url: "/api/highlighters/scope/{assignment_scope_id}",
-      path: {
-        assignment_scope_id: assignmentScopeId,
-      },
-      headers: {
-        "x-project-id": xProjectId,
-      },
-      errors: {
-        422: "Validation Error",
-      },
-      customRequestConfig: options,
-    });
-  }
-
   public static getProjectHighlightersApiHighlightersProjectGet(
     data: $OpenApiTs["/api/highlighters/project"]["get"]["req"],
     options?: Partial<AxiosRequestConfig>,

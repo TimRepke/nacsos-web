@@ -5,6 +5,7 @@ import type { ProjectModel, ProjectPermissionsModel } from "@/plugins/api/spec/t
 import Serializer from "@/types/serializer";
 import { type ProjectUsers, useProjectUsers } from "@/stores/CurrentProjectStore/projectUsers";
 import { API } from "@/plugins/api";
+import { type ProjectHighlighterStore, useProjectHighlighters } from "@/stores/CurrentProjectStore/projectHighlighters";
 
 const ProjectSerializer = Serializer<ProjectModel>();
 const ProjectPermissionSerializer = Serializer<ProjectPermissionsModel>();
@@ -14,6 +15,7 @@ export type CurrentProjectStoreType = {
   project: RemovableRef<ProjectModel | undefined>;
   projectPermissions: RemovableRef<ProjectPermissionsModel | undefined>;
   projectUsers: ProjectUsers;
+  projectHighlighters: ProjectHighlighterStore;
 };
 
 export const useCurrentProjectStore = defineStore("CurrentProjectStore", {
@@ -32,6 +34,7 @@ export const useCurrentProjectStore = defineStore("CurrentProjectStore", {
         { serializer: ProjectPermissionSerializer },
       ),
       projectUsers: useProjectUsers(),
+      projectHighlighters: useProjectHighlighters(),
     };
   },
   actions: {

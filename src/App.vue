@@ -49,7 +49,7 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import NacsosLogo from "@/components/NacsosLogo.vue";
-import TopBar from "@/components/TopBar.vue";
+import TopBar from "@/components/topbar/TopBar.vue";
 import SideBar from "@/components/SideBar.vue";
 import ToastsViewer from "@/components/ToastsViewer.vue";
 import ConfirmationModal from "@/components/ConfirmationModal.vue";

@@ -349,7 +349,6 @@ export type AssignmentScopeModel = {
     | AssignmentScopeRandomWithNQLConfig
     | AssignmentScopeRandomConfig
     | null;
-  highlighter_ids?: Array<string> | null;
 };
 
 export type AssignmentScopeRandomConfig = {
@@ -559,8 +558,8 @@ export type DehydratedUser = {
 };
 
 export type Event = {
-  event: "ExampleSubEvent" | "ExampleEvent";
-  payload: ExampleSubEvent | ExampleEvent;
+  event: "ExampleEvent" | "ExampleSubEvent";
+  payload: ExampleEvent | ExampleSubEvent;
 };
 
 export type ExampleEvent = {
@@ -724,7 +723,7 @@ export type ImportInfo = {
   time_created?: string | null;
   config?: ScopusImport | AcademicItemImport | OpenAlexFileImport | OpenAlexSolrImport | WoSImport | null;
   num_revisions: number;
-  num_items: number;
+  num_items?: number | null;
 };
 
 export type ImportModel = {
@@ -2652,24 +2651,6 @@ export type $OpenApiTs = {
          * Successful Response
          */
         200: unknown;
-        /**
-         * Validation Error
-         */
-        422: HTTPValidationError;
-      };
-    };
-  };
-  "/api/highlighters/scope/{assignment_scope_id}": {
-    get: {
-      req: {
-        assignmentScopeId: string;
-        xProjectId: string;
-      };
-      res: {
-        /**
-         * Successful Response
-         */
-        200: Array<HighlighterModel> | null;
         /**
          * Validation Error
          */

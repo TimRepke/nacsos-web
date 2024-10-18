@@ -2286,27 +2286,6 @@ export const $AssignmentScopeModel = {
       ],
       title: "Config",
     },
-    highlighter_ids: {
-      anyOf: [
-        {
-          items: {
-            type: "string",
-          },
-          type: "array",
-        },
-        {
-          items: {
-            type: "string",
-            format: "uuid",
-          },
-          type: "array",
-        },
-        {
-          type: "null",
-        },
-      ],
-      title: "Highlighter Ids",
-    },
   },
   type: "object",
   required: ["annotation_scheme_id", "name"],
@@ -3503,16 +3482,16 @@ export const $Event = {
   properties: {
     event: {
       type: "string",
-      enum: ["ExampleSubEvent", "ExampleEvent"],
+      enum: ["ExampleEvent", "ExampleSubEvent"],
       title: "Event",
     },
     payload: {
       anyOf: [
         {
-          $ref: "#/components/schemas/ExampleSubEvent",
+          $ref: "#/components/schemas/ExampleEvent",
         },
         {
-          $ref: "#/components/schemas/ExampleEvent",
+          $ref: "#/components/schemas/ExampleSubEvent",
         },
       ],
       title: "Payload",
@@ -4387,12 +4366,19 @@ export const $ImportInfo = {
       title: "Num Revisions",
     },
     num_items: {
-      type: "integer",
+      anyOf: [
+        {
+          type: "integer",
+        },
+        {
+          type: "null",
+        },
+      ],
       title: "Num Items",
     },
   },
   type: "object",
-  required: ["project_id", "name", "description", "type", "num_revisions", "num_items"],
+  required: ["project_id", "name", "description", "type", "num_revisions"],
   title: "ImportInfo",
 } as const;
 
