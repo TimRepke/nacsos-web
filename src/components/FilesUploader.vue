@@ -97,7 +97,6 @@ export default defineComponent({
       );
     },
     upload(uploadFile: UploadFile, folder?: string) {
-      this.isUploading = true;
       uploadFile.status = "UPLOADING";
       if (!folder) {
         folder = crypto.randomUUID();
@@ -131,10 +130,12 @@ export default defineComponent({
     },
     uploadFiles() {
       if (this.selectedFiles && this.selectedFiles.length > 0) {
+        this.isUploading = true;
         const folder = crypto.randomUUID();
         const uploads = this.selectedFiles.map((file: UploadFile) => this.upload(file, folder));
         Promise.allSettled(uploads).then(() => {
           this.$emit("filesUpdated", this.selectedFiles);
+          this.isUploading = false;
         });
       }
     },

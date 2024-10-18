@@ -66,16 +66,19 @@ const importInfo = ref<ImportModel>({
   config: null,
 });
 const wasSaved = ref<boolean>(false);
-const _settingsEditable = ref<boolean>(true); // FIXME: should default really be true?
 const importRevisions = ref<ImportRevisionDetails[]>([]);
+
+// Config type can only be changed before the first revision
+const isTypeChangeable = computed(() => importRevisions.value.length === 0);
+
+// Settings should only be editable while no task is running (or the forceful flag was set)
+const _settingsEditable = ref<boolean>(true); // FIXME: should default really be true?
 const settingsEditable = computed(
   () =>
     _settingsEditable.value &&
-    (importRevisions.value.length === 0 ||
-      (importRevisions.value[importRevisions.value.length - 1].task?.status !== "RUNNING" &&
-        importRevisions.value[importRevisions.value.length - 1].task?.status !== "PENDING")),
+    importRevisions.value[0]?.task?.status !== "RUNNING" &&
+    importRevisions.value[0]?.task?.status !== "PENDING",
 );
-const isTypeChangeable = computed(() => importRevisions.value.length === 0);
 const isConfigured = computed(() => !!importInfo.value.config);
 const canBeInitiated = computed(() => !currentProjectStore.hasRunningImport && isConfigured.value && wasSaved.value);
 
