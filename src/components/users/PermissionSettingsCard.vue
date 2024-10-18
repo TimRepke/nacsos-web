@@ -128,7 +128,6 @@ export default defineComponent({
   methods: {
     applyPreset(preset: Permissions) {
       Object.entries(preset).forEach(([key, value]) => {
-        // eslint-disable-next-line no-param-reassign
         this.permission[key as PermissionKeys] = value;
       });
     },

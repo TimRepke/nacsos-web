@@ -128,7 +128,6 @@ export default defineComponent({
     addLabel(value: number) {
       const anno = this.proposal.resolution;
       if (is<BotAnnotationModel>(anno)) {
-        // eslint-disable-next-line @typescript-eslint/naming-convention
         const { multi_int } = anno;
         if (is<number[]>(multi_int)) {
           const pos: number = multi_int.indexOf(value);
@@ -148,7 +147,6 @@ export default defineComponent({
     removeLabel(value: number) {
       const anno = this.proposal.resolution;
       if (is<BotAnnotationModel>(anno)) {
-        // eslint-disable-next-line @typescript-eslint/naming-convention
         const { multi_int } = anno;
         if (is<number[]>(multi_int)) {
           const pos: number = multi_int.indexOf(value);
@@ -206,7 +204,6 @@ export default defineComponent({
       return entries.reduce((accu: Record<number, UserModel[]>, entry: [number, UserModel]) => {
         const [choice, user] = entry;
 
-        // eslint-disable-next-line no-param-reassign
         if (!accu[choice]) accu[choice] = [];
         accu[choice].push(user);
         return accu;

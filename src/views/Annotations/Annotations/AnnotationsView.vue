@@ -369,7 +369,6 @@ export default defineComponent({
     populateEmptyAnnotations(labels: AnnotationSchemeLabel[]) {
       return labels.map((label: AnnotationSchemeLabel) => {
         if (!label.annotation && !!this.assignment) {
-          // eslint-disable-next-line no-param-reassign
           label.annotation = {
             assignment_id: this.assignment.assignment_id as string,
             user_id: this.assignment.user_id,
@@ -383,7 +382,6 @@ export default defineComponent({
         if (label.choices) {
           label.choices.forEach((choice) => {
             if (choice.children) {
-              // eslint-disable-next-line no-param-reassign
               choice.children = this.populateEmptyAnnotations(choice.children);
             }
           });
@@ -407,13 +405,11 @@ export default defineComponent({
               label.annotation?.value_float === undefined &&
               label.annotation?.multi_int === undefined
             ) {
-              // eslint-disable-next-line no-param-reassign
               delete label.annotation;
             }
             if (label.choices) {
               label.choices.forEach((choice) => {
                 if (choice.children) {
-                  // eslint-disable-next-line no-param-reassign
                   choice.children = removeEmptyAnnotations(choice.children);
                 }
               });

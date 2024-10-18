@@ -17,12 +17,8 @@
                 Created
                 <font-awesome-icon :icon="['fas', sorting.date]" />
               </th>
-              <th scope="col" class="col-1">
-                Number of revisions
-              </th>
-              <th scope="col" class="col-1">
-                Number of items
-              </th>
+              <th scope="col" class="col-1">Number of revisions</th>
+              <th scope="col" class="col-1">Number of items</th>
               <th scope="col" class="col-1 text-start"></th>
             </tr>
           </thead>
@@ -45,7 +41,7 @@
                   </td>
                   <td class="col-2 text-muted text-start small">{{ $util.dt2str(importDetails.time_created) }}</td>
                   <td class="col-2 text-muted text-start small">{{ importDetails.num_revisions }}</td>
-                  <td class="col-2 text-muted text-start small">{{ importDetails.num_items ?? '--' }}</td>
+                  <td class="col-2 text-muted text-start small">{{ importDetails.num_items ?? "--" }}</td>
                   <td class="col-1 text-end">
                     <a
                       role="button"
@@ -103,7 +99,7 @@ import { currentProjectStore } from "@/stores";
 import { API, toastReject } from "@/plugins/api";
 import { ConfirmationRequestEvent } from "@/plugins/events/events/confirmation";
 import PopOver from "@/components/PopOver.vue";
-import ImportMutexStatus from '@/components/imports/ImportMutexStatus.vue';
+import ImportMutexStatus from "@/components/imports/ImportMutexStatus.vue";
 
 enum Sort {
   sort = "sort", // ignored

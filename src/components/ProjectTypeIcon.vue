@@ -9,12 +9,7 @@ import { defineComponent } from "vue";
 import type { PropType } from "vue";
 import InlineToolTip from "@/components/InlineToolTip.vue";
 
-type ProjectType =
-  | "generic"
-  | "twitter" // eslint-disable-line @typescript-eslint/indent
-  | "academic" // eslint-disable-line @typescript-eslint/indent
-  | "lexis" // eslint-disable-line @typescript-eslint/indent
-  | "patents"; // eslint-disable-line @typescript-eslint/indent
+type ProjectType = "generic" | "twitter" | "academic" | "lexis" | "patents";
 
 export default defineComponent({
   name: "ProjectTypeIcon",

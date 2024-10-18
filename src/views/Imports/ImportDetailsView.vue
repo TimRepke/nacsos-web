@@ -9,7 +9,7 @@ import ConfigJSONLOpenAlexWorks from "@/components/imports/ConfigJSONLOpenAlexWo
 import ConfigJSONLAcademicItem from "@/components/imports/ConfigJSONLAcademicItem.vue";
 import { currentProjectStore, currentUserStore } from "@/stores";
 import { useRoute, useRouter } from "vue-router";
-import { API, ignore, logReject, toastReject } from "@/plugins/api";
+import { API, ignore, toastReject } from "@/plugins/api";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import ImportCount from "@/components/imports/ImportCount.vue";
 import InlineToolTip from "@/components/InlineToolTip.vue";
@@ -70,7 +70,7 @@ const _settingsEditable = ref<boolean>(true); // FIXME: should default really be
 const importRevisions = ref<ImportRevisionDetails[]>([]);
 const settingsEditable = computed(
   () =>
-    _settingsEditable &&
+    _settingsEditable.value &&
     (importRevisions.value.length === 0 ||
       (importRevisions.value[importRevisions.value.length - 1].task?.status !== "RUNNING" &&
         importRevisions.value[importRevisions.value.length - 1].task?.status !== "PENDING")),
@@ -123,7 +123,12 @@ function initiateRevision() {
             .then(() => {
               _settingsEditable.value = false;
               currentProjectStore.project!.import_mutex = true;
-              EventBus.emit(new ToastEvent("SUCCESS", "Probably submitted an import job, may now take a while. Wait and press F5 to check status."));
+              EventBus.emit(
+                new ToastEvent(
+                  "SUCCESS",
+                  "Probably submitted an import job, may now take a while. Wait and press F5 to check status.",
+                ),
+              );
             })
             .catch((reason) => {
               console.error(reason);
@@ -282,7 +287,7 @@ onMounted(reloadInfo);
           </tr>
         </thead>
         <tbody>
-          <tr v-for="revision in importRevisions">
+          <tr v-for="revision in importRevisions" v-bind:key="revision.import_revision_id">
             <td>{{ revision.import_revision_counter }}</td>
             <td>{{ revision.time_created }}</td>
             <td>{{ revision.num_items_retrieved }}</td>

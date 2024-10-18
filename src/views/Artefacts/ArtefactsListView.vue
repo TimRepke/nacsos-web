@@ -167,9 +167,7 @@ export default defineComponent({
       if (!artefacts) {
         EventBus.emit(new ToastEvent("WARN", `Failed to load additional info for task ${entry.task.task_id}`));
       } else {
-        // eslint-disable-next-line no-param-reassign
         entry.artefacts = artefacts;
-        // eslint-disable-next-line no-param-reassign
         entry.showArtefacts = !entry.showArtefacts;
       }
     },

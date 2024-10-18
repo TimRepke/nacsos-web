@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
-import { API, logReject } from "@/plugins/api";
+import { API } from "@/plugins/api";
 import { currentProjectStore } from "@/stores";
 import { ref } from "vue";
 

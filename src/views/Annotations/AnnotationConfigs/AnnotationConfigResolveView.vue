@@ -189,7 +189,6 @@ import PopOver from "@/components/PopOver.vue";
 
 function tabClosePrevent(e: BeforeUnloadEvent) {
   e.preventDefault();
-  // eslint-disable-next-line no-param-reassign
   e.returnValue = "";
 }
 

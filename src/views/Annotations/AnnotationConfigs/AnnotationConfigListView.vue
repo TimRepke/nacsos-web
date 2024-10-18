@@ -268,7 +268,7 @@ export default defineComponent({
           xProjectId: currentProjectStore.projectId as string,
         });
         this.projectSchemes = schemes.data;
-      } catch (e) {
+      } catch {
         EventBus.emit(new ToastEvent("ERROR", "Failed to copy or refresh data, try reloading the page."));
       }
     },
@@ -358,7 +358,6 @@ export default defineComponent({
       return this.projectScopes.reduce(
         (ret: { [key: string]: AssignmentScopeModel[] }, scope: AssignmentScopeModel) => {
           if (!(scope.annotation_scheme_id in ret)) {
-            // eslint-disable-next-line no-param-reassign
             ret[scope.annotation_scheme_id] = [];
           }
           ret[scope.annotation_scheme_id].push(scope);
@@ -371,7 +370,6 @@ export default defineComponent({
       return this.projectResolutions.reduce(
         (ret: { [key: string]: BotAnnotationMetaDataBaseModel[] }, bam: BotAnnotationMetaDataBaseModel) => {
           if (!((bam.assignment_scope_id as string) in ret)) {
-            // eslint-disable-next-line no-param-reassign
             ret[bam.assignment_scope_id as string] = [];
           }
           ret[bam.assignment_scope_id as string].push(bam);
