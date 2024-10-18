@@ -1,7 +1,7 @@
 <template>
   <div class="card m-2 p-0 text-start w-100">
     <div class="card-body">
-      <TextComponent class="card-text" :text="item.text" :highlighters="highlighters" />
+      <TextComponent class="card-text" :text="item.text" />
     </div>
     <div class="card-footer d-flex justify-content-between small text-muted" v-if="item.meta">
       <div class="position-absolute end-0">
@@ -34,7 +34,6 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import type { PropType } from "vue";
-import type { HighlighterModel } from "@/plugins/api/types";
 import type { BaseItem as BaseItemModel } from "@/types/items.d";
 import TextComponent from "@/components/items/TextComponent.vue";
 
@@ -47,22 +46,11 @@ export default defineComponent({
       required: true,
       default: null,
     },
-    highlighters: {
-      type: Object as PropType<Array<HighlighterModel>>,
-      required: false,
-      default: undefined,
-    },
   },
   data() {
     return {
       showAll: false,
     };
-  },
-  methods: {
-    // pass
-  },
-  computed: {
-    // pass
   },
 });
 </script>

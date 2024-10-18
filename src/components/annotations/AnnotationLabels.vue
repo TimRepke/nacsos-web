@@ -509,7 +509,6 @@ const AnnotationLabels = defineComponent({
         const labelCopy = JSON.parse(JSON.stringify(label)) as AnnotationSchemeLabel;
         if (labelCopy.annotation) this.clearAnnotation(labelCopy);
 
-        // eslint-disable-next-line vue/no-mutating-props
         this.labels.splice(labelIndex + 1, 0, labelCopy);
 
         // update all repeat counts as things may have been reordered
@@ -518,7 +517,6 @@ const AnnotationLabels = defineComponent({
     },
     deleteLabel(label: AnnotationSchemeLabel, labelIndex: number) {
       if (this.keyCounts[label.key] > 1) {
-        // eslint-disable-next-line vue/no-mutating-props
         this.labels.splice(labelIndex, 1);
 
         // update all repeat counts as things may have been reordered

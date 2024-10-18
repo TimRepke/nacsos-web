@@ -196,11 +196,7 @@ export const $AcademicItemModel = {
       title: "Project Id",
     },
     type: {
-      allOf: [
-        {
-          $ref: "#/components/schemas/ItemType",
-        },
-      ],
+      $ref: "#/components/schemas/ItemType",
       default: "academic",
     },
     text: {
@@ -2290,27 +2286,6 @@ export const $AssignmentScopeModel = {
       ],
       title: "Config",
     },
-    highlighter_ids: {
-      anyOf: [
-        {
-          items: {
-            type: "string",
-          },
-          type: "array",
-        },
-        {
-          items: {
-            type: "string",
-            format: "uuid",
-          },
-          type: "array",
-        },
-        {
-          type: "null",
-        },
-      ],
-      title: "Highlighter Ids",
-    },
   },
   type: "object",
   required: ["annotation_scheme_id", "name"],
@@ -3507,16 +3482,16 @@ export const $Event = {
   properties: {
     event: {
       type: "string",
-      enum: ["ExampleSubEvent", "ExampleEvent"],
+      enum: ["ExampleEvent", "ExampleSubEvent"],
       title: "Event",
     },
     payload: {
       anyOf: [
         {
-          $ref: "#/components/schemas/ExampleSubEvent",
+          $ref: "#/components/schemas/ExampleEvent",
         },
         {
-          $ref: "#/components/schemas/ExampleEvent",
+          $ref: "#/components/schemas/ExampleSubEvent",
         },
       ],
       title: "Payload",
@@ -4014,11 +3989,7 @@ export const $FullLexisNexisItemModel = {
       title: "Project Id",
     },
     type: {
-      allOf: [
-        {
-          $ref: "#/components/schemas/ItemType",
-        },
-      ],
+      $ref: "#/components/schemas/ItemType",
       default: "lexis",
     },
     text: {
@@ -4109,11 +4080,7 @@ export const $GenericItemModel = {
       title: "Project Id",
     },
     type: {
-      allOf: [
-        {
-          $ref: "#/components/schemas/ItemType",
-        },
-      ],
+      $ref: "#/components/schemas/ItemType",
       default: "generic",
     },
     text: {
@@ -4289,7 +4256,7 @@ export const $ImportFilter = {
   title: "ImportFilter",
 } as const;
 
-export const $ImportModel = {
+export const $ImportInfo = {
   properties: {
     import_id: {
       anyOf: [
@@ -4333,8 +4300,96 @@ export const $ImportModel = {
       ],
       title: "Project Id",
     },
-    pipeline_task_id: {
+    name: {
+      type: "string",
+      title: "Name",
+    },
+    description: {
+      type: "string",
+      title: "Description",
+    },
+    type: {
+      type: "string",
+      title: "Type",
+    },
+    time_created: {
       anyOf: [
+        {
+          type: "string",
+          format: "date-time",
+        },
+        {
+          type: "null",
+        },
+      ],
+      title: "Time Created",
+    },
+    config: {
+      anyOf: [
+        {
+          oneOf: [
+            {
+              $ref: "#/components/schemas/ScopusImport",
+            },
+            {
+              $ref: "#/components/schemas/AcademicItemImport",
+            },
+            {
+              $ref: "#/components/schemas/OpenAlexFileImport",
+            },
+            {
+              $ref: "#/components/schemas/OpenAlexSolrImport",
+            },
+            {
+              $ref: "#/components/schemas/WoSImport",
+            },
+          ],
+          discriminator: {
+            propertyName: "kind",
+            mapping: {
+              academic: "#/components/schemas/AcademicItemImport",
+              "oa-file": "#/components/schemas/OpenAlexFileImport",
+              "oa-solr": "#/components/schemas/OpenAlexSolrImport",
+              scopus: "#/components/schemas/ScopusImport",
+              wos: "#/components/schemas/WoSImport",
+            },
+          },
+        },
+        {
+          type: "null",
+        },
+      ],
+      title: "Config",
+    },
+    num_revisions: {
+      type: "integer",
+      title: "Num Revisions",
+    },
+    num_items: {
+      anyOf: [
+        {
+          type: "integer",
+        },
+        {
+          type: "null",
+        },
+      ],
+      title: "Num Items",
+    },
+  },
+  type: "object",
+  required: ["project_id", "name", "description", "type", "num_revisions"],
+  title: "ImportInfo",
+} as const;
+
+export const $ImportModel = {
+  properties: {
+    import_id: {
+      anyOf: [
+        {
+          type: "string",
+          format: "uuid",
+        },
         {
           type: "string",
         },
@@ -4342,7 +4397,34 @@ export const $ImportModel = {
           type: "null",
         },
       ],
-      title: "Pipeline Task Id",
+      title: "Import Id",
+    },
+    user_id: {
+      anyOf: [
+        {
+          type: "string",
+          format: "uuid",
+        },
+        {
+          type: "string",
+        },
+        {
+          type: "null",
+        },
+      ],
+      title: "User Id",
+    },
+    project_id: {
+      anyOf: [
+        {
+          type: "string",
+          format: "uuid",
+        },
+        {
+          type: "string",
+        },
+      ],
+      title: "Project Id",
     },
     name: {
       type: "string",
@@ -4409,6 +4491,129 @@ export const $ImportModel = {
   type: "object",
   required: ["project_id", "name", "description", "type"],
   title: "ImportModel",
+} as const;
+
+export const $ImportRevisionDetails = {
+  properties: {
+    import_revision_id: {
+      anyOf: [
+        {
+          type: "string",
+          format: "uuid",
+        },
+        {
+          type: "string",
+        },
+        {
+          type: "null",
+        },
+      ],
+      title: "Import Revision Id",
+    },
+    import_revision_counter: {
+      type: "integer",
+      title: "Import Revision Counter",
+    },
+    time_created: {
+      type: "string",
+      format: "date-time",
+      title: "Time Created",
+    },
+    pipeline_task_id: {
+      anyOf: [
+        {
+          type: "string",
+        },
+        {
+          type: "null",
+        },
+      ],
+      title: "Pipeline Task Id",
+    },
+    import_id: {
+      anyOf: [
+        {
+          type: "string",
+          format: "uuid",
+        },
+        {
+          type: "string",
+        },
+        {
+          type: "null",
+        },
+      ],
+      title: "Import Id",
+    },
+    num_items_retrieved: {
+      anyOf: [
+        {
+          type: "integer",
+        },
+        {
+          type: "null",
+        },
+      ],
+      title: "Num Items Retrieved",
+    },
+    num_items: {
+      anyOf: [
+        {
+          type: "integer",
+        },
+        {
+          type: "null",
+        },
+      ],
+      title: "Num Items",
+    },
+    num_items_new: {
+      anyOf: [
+        {
+          type: "integer",
+        },
+        {
+          type: "null",
+        },
+      ],
+      title: "Num Items New",
+    },
+    num_items_updated: {
+      anyOf: [
+        {
+          type: "integer",
+        },
+        {
+          type: "null",
+        },
+      ],
+      title: "Num Items Updated",
+    },
+    num_items_removed: {
+      anyOf: [
+        {
+          type: "integer",
+        },
+        {
+          type: "null",
+        },
+      ],
+      title: "Num Items Removed",
+    },
+    task: {
+      anyOf: [
+        {
+          $ref: "#/components/schemas/TaskModel",
+        },
+        {
+          type: "null",
+        },
+      ],
+    },
+  },
+  type: "object",
+  required: ["import_revision_counter", "time_created"],
+  title: "ImportRevisionDetails",
 } as const;
 
 export const $ItemAnnotation = {
@@ -5103,11 +5308,7 @@ export const $LexisNexisItemModel = {
       title: "Project Id",
     },
     type: {
-      allOf: [
-        {
-          $ref: "#/components/schemas/ItemType",
-        },
-      ],
+      $ref: "#/components/schemas/ItemType",
       default: "lexis",
     },
     text: {
@@ -5692,6 +5893,17 @@ export const $ProjectInfo = {
       ],
       title: "Type",
     },
+    import_mutex: {
+      anyOf: [
+        {
+          type: "boolean",
+        },
+        {
+          type: "null",
+        },
+      ],
+      title: "Import Mutex",
+    },
     setting_motivational_quotes: {
       type: "boolean",
       title: "Setting Motivational Quotes",
@@ -5765,6 +5977,17 @@ export const $ProjectModel = {
         },
       ],
       title: "Type",
+    },
+    import_mutex: {
+      anyOf: [
+        {
+          type: "boolean",
+        },
+        {
+          type: "null",
+        },
+      ],
+      title: "Import Mutex",
     },
     setting_motivational_quotes: {
       type: "boolean",
@@ -6026,11 +6249,7 @@ export const $ResolutionCell = {
       $ref: "#/components/schemas/BotAnnotationModel",
     },
     status: {
-      allOf: [
-        {
-          $ref: "#/components/schemas/ResolutionStatus",
-        },
-      ],
+      $ref: "#/components/schemas/ResolutionStatus",
       default: "UNCHANGED",
     },
   },
@@ -6156,11 +6375,7 @@ export const $ResolutionUserEntry = {
       ],
     },
     status: {
-      allOf: [
-        {
-          $ref: "#/components/schemas/ResolutionStatus",
-        },
-      ],
+      $ref: "#/components/schemas/ResolutionStatus",
       default: "UNCHANGED",
     },
   },
@@ -6754,11 +6969,7 @@ export const $TaskModel = {
       title: "Rec Expunge",
     },
     status: {
-      allOf: [
-        {
-          $ref: "#/components/schemas/TaskStatus",
-        },
-      ],
+      $ref: "#/components/schemas/TaskStatus",
       default: "PENDING",
     },
   },
@@ -6826,11 +7037,7 @@ export const $TwitterItemModel = {
       title: "Project Id",
     },
     type: {
-      allOf: [
-        {
-          $ref: "#/components/schemas/ItemType",
-        },
-      ],
+      $ref: "#/components/schemas/ItemType",
       default: "twitter",
     },
     text: {

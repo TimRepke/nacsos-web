@@ -2,19 +2,19 @@ import type { UserPermission } from "@/plugins/api/spec/types.gen";
 
 // https://github.com/typescript-eslint/typescript-eslint/issues/1824
 export type PermissionKeys =
-  | "owner" // eslint-disable-next-line @typescript-eslint/indent
-  | "dataset_read" // eslint-disable-next-line @typescript-eslint/indent
-  | "dataset_edit" // eslint-disable-next-line @typescript-eslint/indent
-  | "imports_read" // eslint-disable-next-line @typescript-eslint/indent
-  | "imports_edit" // eslint-disable-next-line @typescript-eslint/indent
-  | "annotations_read" // eslint-disable-next-line @typescript-eslint/indent
-  | "annotations_edit" // eslint-disable-next-line @typescript-eslint/indent
-  | "pipelines_read" // eslint-disable-next-line @typescript-eslint/indent
-  | "pipelines_edit" // eslint-disable-next-line @typescript-eslint/indent
-  | "artefacts_read" // eslint-disable-next-line @typescript-eslint/indent
-  | "artefacts_edit" // eslint-disable-next-line @typescript-eslint/indent
-  | "search_dimensions" // eslint-disable-next-line @typescript-eslint/indent
-  | "search_oa" // eslint-disable-next-line @typescript-eslint/indent
+  | "owner"
+  | "dataset_read"
+  | "dataset_edit"
+  | "imports_read"
+  | "imports_edit"
+  | "annotations_read"
+  | "annotations_edit"
+  | "pipelines_read"
+  | "pipelines_edit"
+  | "artefacts_read"
+  | "artefacts_edit"
+  | "search_dimensions"
+  | "search_oa"
   | "import_limit_oa";
 
 export type Permissions = Pick<UserPermission, PermissionKeys>;
@@ -70,7 +70,7 @@ export const PermissionPresets: Record<string, Permissions> = {
     artefacts_read: false,
     artefacts_edit: false,
     search_dimensions: false,
-    search_oa: false,
+    search_oa: true,
     import_limit_oa: 0,
   },
   "Full Access": {
@@ -86,7 +86,7 @@ export const PermissionPresets: Record<string, Permissions> = {
     artefacts_read: true,
     artefacts_edit: true,
     search_dimensions: false,
-    search_oa: false,
+    search_oa: true,
     import_limit_oa: 0,
   },
   Owner: {
@@ -102,7 +102,7 @@ export const PermissionPresets: Record<string, Permissions> = {
     artefacts_read: true,
     artefacts_edit: true,
     search_dimensions: false,
-    search_oa: false,
+    search_oa: true,
     import_limit_oa: 0,
   },
 };

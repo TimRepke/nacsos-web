@@ -1102,6 +1102,24 @@ export class ProjectService {
     });
   }
 
+  public static resetImportMutexApiProjectImportMutexPut(
+    data: $OpenApiTs["/api/project/import_mutex"]["put"]["req"],
+    options?: Partial<AxiosRequestConfig>,
+  ): CancelablePromise<ApiResult<$OpenApiTs["/api/project/import_mutex"]["put"]["res"][200]>> {
+    const { xProjectId } = data;
+    return __request(OpenAPI, {
+      method: "PUT",
+      url: "/api/project/import_mutex",
+      headers: {
+        "x-project-id": xProjectId,
+      },
+      errors: {
+        422: "Validation Error",
+      },
+      customRequestConfig: options,
+    });
+  }
+
   public static getProjectPermissionsCurrentUserApiProjectPermissionsMeGet(
     data: $OpenApiTs["/api/project/permissions/me"]["get"]["req"],
     options?: Partial<AxiosRequestConfig>,
@@ -1436,6 +1454,27 @@ export class ImportsService {
     });
   }
 
+  public static getImportRevisionsApiImportsImportImportIdRevisionsGet(
+    data: $OpenApiTs["/api/imports/import/{import_id}/revisions"]["get"]["req"],
+    options?: Partial<AxiosRequestConfig>,
+  ): CancelablePromise<ApiResult<$OpenApiTs["/api/imports/import/{import_id}/revisions"]["get"]["res"][200]>> {
+    const { importId, xProjectId } = data;
+    return __request(OpenAPI, {
+      method: "GET",
+      url: "/api/imports/import/{import_id}/revisions",
+      path: {
+        import_id: importId,
+      },
+      headers: {
+        "x-project-id": xProjectId,
+      },
+      errors: {
+        422: "Validation Error",
+      },
+      customRequestConfig: options,
+    });
+  }
+
   public static putImportDetailsApiImportsImportPut(
     data: $OpenApiTs["/api/imports/import"]["put"]["req"],
     options?: Partial<AxiosRequestConfig>,
@@ -1498,27 +1537,6 @@ export class EventsService {
 }
 
 export class HighlightersService {
-  public static getScopeHighlightersApiHighlightersScopeAssignmentScopeIdGet(
-    data: $OpenApiTs["/api/highlighters/scope/{assignment_scope_id}"]["get"]["req"],
-    options?: Partial<AxiosRequestConfig>,
-  ): CancelablePromise<ApiResult<$OpenApiTs["/api/highlighters/scope/{assignment_scope_id}"]["get"]["res"][200]>> {
-    const { assignmentScopeId, xProjectId } = data;
-    return __request(OpenAPI, {
-      method: "GET",
-      url: "/api/highlighters/scope/{assignment_scope_id}",
-      path: {
-        assignment_scope_id: assignmentScopeId,
-      },
-      headers: {
-        "x-project-id": xProjectId,
-      },
-      errors: {
-        422: "Validation Error",
-      },
-      customRequestConfig: options,
-    });
-  }
-
   public static getProjectHighlightersApiHighlightersProjectGet(
     data: $OpenApiTs["/api/highlighters/project"]["get"]["req"],
     options?: Partial<AxiosRequestConfig>,

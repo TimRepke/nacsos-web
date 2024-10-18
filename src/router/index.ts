@@ -293,7 +293,6 @@ const router = createRouter({
   routes,
 });
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 router.beforeEach(async (to) => {
   if (to.name === "password-reset") {
     await currentUserStore.loginWithAuthToken(to.params.token as string);

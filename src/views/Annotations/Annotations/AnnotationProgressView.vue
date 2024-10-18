@@ -265,7 +265,6 @@ import BuscarChart from "@/components/charts/BuscarChart.vue";
 
 export default defineComponent({
   name: "AnnotationTrackingView",
-  // eslint-disable-next-line vue/no-reserved-component-names
   components: { BuscarChart, ToolTip, ExpandableBox },
   data() {
     return {

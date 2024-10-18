@@ -6,7 +6,7 @@
 
 # Official language image. Look for the different tagged releases at:
 # https://hub.docker.com/r/library/python/tags/
-image: node:19-alpine
+image: node:20-alpine
 
 before_script:
   - apk add lftp

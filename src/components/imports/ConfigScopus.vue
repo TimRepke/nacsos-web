@@ -2,7 +2,7 @@
   <div class="m-2">
     <div class="row">
       <div class="col-xxl-7">
-        <h4>Scopus CSV import</h4>
+        <h5>Scopus CSV import</h5>
         <p class="text-muted">
           Upload a Scopus CSV file, where you selected (almost) all fields to export. Please consult
           <a href="https://apsis.mcc-berlin.net/nacsos-docs/user/import/" target="_blank" rel="noopener noreferrer">
@@ -27,7 +27,7 @@
           </div>
         </template>
         <template v-else>
-          <h4>Uploaded files</h4>
+          <h5>Uploaded files</h5>
           <ul>
             <li v-for="file in config.sources" :key="file">
               {{ file }}

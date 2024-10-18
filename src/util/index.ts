@@ -5,7 +5,6 @@ import { marked } from "marked";
 // inspired by https://github.com/jashkenas/underscore/blob/master/modules/_shallowProperty.js
 // Internal helper to generate a function to obtain property `key` from `obj`.
 export function shallowProperty<T>(key: string) {
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   return (obj: unknown): T | undefined => (obj == null ? undefined : obj[key]);
 }
@@ -33,7 +32,6 @@ export const keys = (obj: unknown) => {
   if (!isObject(obj)) return [];
   if (nativeKeys) return nativeKeys(obj as object);
   const objKeys = [];
-  // eslint-disable-next-line no-restricted-syntax
   for (const key in obj as object) if (has(obj as object, key)) objKeys.push(key);
   return objKeys;
 };
@@ -118,7 +116,7 @@ export type EnumLiteral<T> = `${StringValues<T>}` | NumberValues<T>;
 /**
  * Usage: type SearchParams = ArgumentTypes<typeof PipesService.searchTasksApiPipesTasksGet>[0];
  */
-// eslint-disable-next-line @typescript-eslint/ban-types
+// eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
 export type ArgumentTypes<F extends Function> = F extends (...args: infer A) => any ? A : never;
 
 export function useDelay<T extends Array<any>, U>(fn: (...args: T) => U, delay: number) {
@@ -149,7 +147,6 @@ export function useDelay<T extends Array<any>, U>(fn: (...args: T) => U, delay: 
 
 export default {
   install(app: App) {
-    // eslint-disable-next-line no-param-reassign
     app.config.globalProperties.$util = {
       isEmpty,
       range,

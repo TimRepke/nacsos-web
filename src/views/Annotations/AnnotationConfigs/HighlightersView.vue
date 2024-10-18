@@ -190,22 +190,16 @@ export default defineComponent({
       return [...new Set(str.split("|").map((part: string) => part.trim()))];
     },
     onKeywordsStrChange(highlighter: Highlighter) {
-      // eslint-disable-next-line no-param-reassign
       highlighter.keywords = this.str2lst(highlighter.keywordsStr);
-      // eslint-disable-next-line no-param-reassign
       highlighter.error = undefined;
       try {
-        // eslint-disable-next-line no-new
         new RegExp(highlighter.keywords.join("|"), "g");
       } catch (e: unknown) {
-        // eslint-disable-next-line no-param-reassign
         highlighter.error = (e as Error).toString();
       }
     },
     onDropKeyword(highlighter: Highlighter, keyword: string) {
-      // eslint-disable-next-line no-param-reassign
       highlighter.keywords = highlighter.keywords.filter((fKeyword: string) => fKeyword !== keyword);
-      // eslint-disable-next-line no-param-reassign
       highlighter.keywordsStr = highlighter.keywords.join("|");
     },
   },

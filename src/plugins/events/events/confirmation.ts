@@ -1,5 +1,3 @@
-/* eslint-disable max-classes-per-file, no-useless-constructor */
-
 import { BaseEvent } from "@/plugins/events/baseEvent";
 
 export type ConfirmationResponse = "ACCEPT" | "REJECT" | "IGNORE";

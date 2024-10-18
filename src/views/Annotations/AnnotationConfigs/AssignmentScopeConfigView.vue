@@ -27,23 +27,6 @@
           <label for="scopeDescription" class="form-label">Scope description</label>
           <textarea class="form-control" id="scopeDescription" rows="3" v-model="assignmentScope.description" />
         </div>
-        <div class="mb-3">
-          <label class="form-label">Highlighters</label>
-          <ul class="list-group mt-0 ps-4 pe-4">
-            <li v-for="highlighter in projectHighlighters" :key="highlighter.highlighter_id" class="list-group-item">
-              <input
-                :id="`hl-${highlighter.highlighter_id}`"
-                :value="highlighter.highlighter_id"
-                v-model="assignmentScope.highlighter_ids"
-                class="form-check-input me-1"
-                type="checkbox"
-              />
-              <label :for="`hl-${highlighter.highlighter_id}`" class="form-check-label stretched-link">
-                {{ highlighter.name }}
-              </label>
-            </li>
-          </ul>
-        </div>
       </div>
     </div>
     <div class="row pb-2 mb-2 border-bottom g-0" v-if="!scopeHasAssignments">
@@ -186,15 +169,8 @@ import type {
   AssignmentCounts,
   AssignmentScopeEntry,
   AssignmentScopeModel,
-  HighlighterModel,
   UserModel,
   UserBaseModel,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  AssignmentScopeRandomWithNQLConfig,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  AssignmentScopeRandomWithExclusionConfig,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  AssignmentScopeRandomConfig,
 } from "@/plugins/api/spec/types.gen";
 import { type AssignmentScopeBaseConfigTypes } from "@/plugins/api/types";
 import { currentProjectStore } from "@/stores";
@@ -218,7 +194,6 @@ type AssignmentScopeConfigData = {
   assignmentCounts?: AssignmentCounts;
   assignments: AssignmentScopeEntry[];
   assignmentScope: AssignmentScopeModel;
-  projectHighlighters: Partial<HighlighterModel>[];
   annotators: Record<string, UserBaseModel>;
 };
 
@@ -252,23 +227,11 @@ export default defineComponent({
         time_created: undefined,
         name: "",
         description: "",
-        highlighter_ids: [] as string[],
       } as AssignmentScopeModel,
-      projectHighlighters: [],
       annotators: {} as Record<string, UserBaseModel>,
     };
   },
   async mounted() {
-    API.highlighters
-      .getProjectHighlightersApiHighlightersProjectGet({
-        xProjectId: currentProjectStore.projectId as string,
-      })
-      .then((response) => {
-        this.projectHighlighters = response.data;
-      })
-      .catch(() => {
-        // pass
-      });
     if (!this.isNewScope) {
       Promise.allSettled([
         API.annotations.getAssignmentScopeApiAnnotationsAnnotateScopeAssignmentScopeIdGet({
@@ -283,10 +246,6 @@ export default defineComponent({
         if (scopePromise.status === "fulfilled" && countsPromise.status === "fulfilled") {
           this.assignmentScope = scopePromise.value.data;
           this.assignmentCounts = countsPromise.value.data;
-
-          if (!this.assignmentScope.highlighter_ids) {
-            this.assignmentScope.highlighter_ids = [];
-          }
         } else {
           EventBus.emit(new ToastEvent("ERROR", "Failed to load assignment scope info. Please try reloading."));
         }
@@ -366,9 +325,6 @@ export default defineComponent({
               const scope = JSON.parse(JSON.stringify(this.assignmentScope)); // clone the object
               if (scope.config) {
                 scope.config.users = this.selectedUserIds;
-              }
-              if (!scope.highlighter_ids || scope.highlighter_ids.length === 0) {
-                scope.highlighter_ids = undefined;
               }
               API.annotations
                 .putAssignmentScopeApiAnnotationsAnnotateScopePut({

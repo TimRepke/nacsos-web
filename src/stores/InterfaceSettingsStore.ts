@@ -35,10 +35,18 @@ export interface QualityColumnsSettings {
   num_agreement: boolean;
 }
 
+export interface ProjectHighlighters {
+  // Global switch to turn on/off highlighter application
+  enabled: boolean;
+  // Record<project_id, highlighter_id[]> (list of active highlighters per project)
+  active: Record<string, string[]>;
+}
+
 export type InterfaceSettingsState = {
   annotation: RemovableRef<AnnotationSettings>;
   itemDisplay: RemovableRef<ItemDisplaySettings>;
   qualityColumns: RemovableRef<QualityColumnsSettings>;
+  highlighters: RemovableRef<ProjectHighlighters>;
 };
 export type InterfaceSettingsActions = Record<string, never>;
 export type InterfaceSettingsGetters = Record<string, never>;
@@ -69,6 +77,17 @@ export const useInterfaceSettingsStore = defineStore("InterfaceSettingsStore", {
         } as ItemDisplaySettings,
         undefined,
         { mergeDefaults: true },
+      ),
+      highlighters: useStorage<ProjectHighlighters>(
+        "nacsos:ui-settings:highlighters",
+        {
+          enabled: true,
+          active: {},
+        },
+        undefined,
+        {
+          mergeDefaults: true,
+        },
       ),
       qualityColumns: useStorage<QualityColumnsSettings>(
         "nacsos:ui-settings:quality-columns",

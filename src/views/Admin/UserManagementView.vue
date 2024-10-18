@@ -207,9 +207,7 @@ export default defineComponent({
         });
     },
     resetPassword(user: UserModel) {
-      // eslint-disable-next-line no-param-reassign
       user.password = this.generateRandomPassword();
-      // eslint-disable-next-line no-param-reassign
       user.hasNewPassword = true;
       console.log(user);
     },

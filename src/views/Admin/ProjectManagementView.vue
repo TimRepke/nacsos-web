@@ -131,8 +131,8 @@ export default defineComponent({
           requestBody: project,
         })
         .then((response) => {
-          project.project_id = response.data; // eslint-disable-line no-param-reassign
-          project.isNew = false; // eslint-disable-line no-param-reassign
+          project.project_id = response.data;
+          project.isNew = false;
           EventBus.emit(new ToastEvent("SUCCESS", `New project created with ID ${project.project_id}`));
         })
         .catch((reason) => {

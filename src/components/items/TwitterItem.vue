@@ -16,7 +16,7 @@
           <font-awesome-icon :icon="['fa-brands', 'twitter']" />
         </a>
       </p>
-      <TextComponent class="card-text" :text="item.text" :html="renderedStatus" :highlighters="highlighters" />
+      <TextComponent class="card-text" :text="item.text" :html="renderedStatus" />
     </div>
     <div class="card-footer d-flex justify-content-between">
       <small class="text-muted">
@@ -40,7 +40,7 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import type { PropType } from "vue";
-import type { HighlighterModel, TwitterItemModel, Hashtag, Mention, URL } from "@/plugins/api/types";
+import type { TwitterItemModel, Hashtag, Mention, URL } from "@/plugins/api/types";
 import TextComponent from "@/components/items/TextComponent.vue";
 
 interface Replacement {
@@ -57,11 +57,6 @@ export default defineComponent({
       type: Object as PropType<TwitterItemModel>,
       required: true,
       default: null,
-    },
-    highlighters: {
-      type: Object as PropType<Array<HighlighterModel>>,
-      required: false,
-      default: undefined,
     },
   },
   computed: {

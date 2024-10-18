@@ -45,23 +45,3 @@ export default defineComponent({
   },
 });
 </script>
-
-<style scoped>
-.pill-text > .btn-close {
-  font-size: 0.5em;
-}
-
-.pill-text {
-  vertical-align: middle;
-  display: inline-block;
-  /*height: 1.3em;*/
-}
-
-/*
-.badge {
-  --bs-badge-padding-y: 0.15em;
-  --bs-badge-font-size: 0.7em;
-  --bs-badge-font-weight: 500;
-}
-*/
-</style>

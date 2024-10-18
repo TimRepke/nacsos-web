@@ -332,7 +332,6 @@ export default defineComponent({
   computed: {
     schemeLabelsWithKey() {
       return this.schemeLabels.map((schemeLabel: KeyedAnnotationSchemeLabel) => {
-        // eslint-disable-next-line no-param-reassign
         schemeLabel.tmpKey = crypto.randomUUID();
         return schemeLabel;
       });

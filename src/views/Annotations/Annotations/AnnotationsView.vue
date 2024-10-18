@@ -44,7 +44,7 @@
           </div>
         </div>
         <div class="row g-0">
-          <AnyItemComponent :item="item" :highlighters="highlighters" />
+          <AnyItemComponent :item="item" />
         </div>
       </div>
 
@@ -158,7 +158,6 @@ import {
   AssignmentModel,
   AssignmentScopeEntry,
   AssignmentScopeModel,
-  HighlighterModel,
   AnnotationSchemeLabelKindEnum as KindEnum,
   AssignmentStatus,
   AnnotationSchemeLabel,
@@ -227,7 +226,6 @@ type AnnotationsViewData = {
   scope?: AssignmentScopeModel;
   labels?: AnnotationSchemeLabel[];
   dirty: number;
-  highlighters?: HighlighterModel[];
   rerenderCounter: number; // this is a hack to force-update the AnnotationLabels-component
   showStatusBarModal: boolean;
 };
@@ -254,7 +252,6 @@ export default defineComponent({
       scope: undefined as AssignmentScopeModel | undefined,
       labels: undefined as AnnotationSchemeLabel[] | undefined,
       dirty: 0,
-      highlighters: undefined as HighlighterModel[] | undefined,
       rerenderCounter: 0,
       showStatusBarModal: false,
     };
@@ -285,19 +282,6 @@ export default defineComponent({
       }
 
       await this.setCurrentAssignment(response);
-
-      API.highlighters
-        .getScopeHighlightersApiHighlightersScopeAssignmentScopeIdGet({
-          xProjectId: currentProjectStore.projectId as string,
-          assignmentScopeId,
-        })
-        .then((resp) => {
-          const { data } = resp;
-          if (data !== null && data !== undefined) {
-            this.highlighters = data;
-          }
-        })
-        .catch(ignore);
     } catch (e) {
       console.error(e);
     }
@@ -369,7 +353,6 @@ export default defineComponent({
     populateEmptyAnnotations(labels: AnnotationSchemeLabel[]) {
       return labels.map((label: AnnotationSchemeLabel) => {
         if (!label.annotation && !!this.assignment) {
-          // eslint-disable-next-line no-param-reassign
           label.annotation = {
             assignment_id: this.assignment.assignment_id as string,
             user_id: this.assignment.user_id,
@@ -383,7 +366,6 @@ export default defineComponent({
         if (label.choices) {
           label.choices.forEach((choice) => {
             if (choice.children) {
-              // eslint-disable-next-line no-param-reassign
               choice.children = this.populateEmptyAnnotations(choice.children);
             }
           });
@@ -407,13 +389,11 @@ export default defineComponent({
               label.annotation?.value_float === undefined &&
               label.annotation?.multi_int === undefined
             ) {
-              // eslint-disable-next-line no-param-reassign
               delete label.annotation;
             }
             if (label.choices) {
               label.choices.forEach((choice) => {
                 if (choice.children) {
-                  // eslint-disable-next-line no-param-reassign
                   choice.children = removeEmptyAnnotations(choice.children);
                 }
               });

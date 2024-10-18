@@ -1,9 +1,7 @@
 import type { App } from "vue";
 import type { BaseEvent } from "@/plugins/events/baseEvent";
 
-// eslint-disable-next-line  @typescript-eslint/no-explicit-any
 type CallbackHandler = (payload: any) => void;
-// eslint-disable-next-line  @typescript-eslint/no-explicit-any
 type CallbackInfo = { fn: CallbackHandler; ctx?: any; selfDestruct?: boolean };
 
 interface Class {
@@ -11,7 +9,7 @@ interface Class {
 }
 
 class EventBus {
-  private static instance: EventBus; // eslint-disable-line no-use-before-define
+  private static instance: EventBus;
 
   private readonly listeners: Record<string, Record<number | string, CallbackInfo>>;
 
@@ -37,7 +35,6 @@ class EventBus {
    * @param ctx The context will be bound to the event callback (e.g. for providing this)
    * @param selfDestruct Set to true, so the event listener will be deleted after first occurrence.
    */
-  // eslint-disable-next-line  @typescript-eslint/no-explicit-any
   on(eventType: Class, callback: CallbackHandler, ctx?: any, selfDestruct?: boolean): [string, number] {
     const { name } = eventType;
     if (!(name in this.listeners)) {
@@ -57,7 +54,6 @@ class EventBus {
    * Use this function to hook an event listener.
    * This version of the function provides a static interface to the EventBus singleton.
    */
-  // eslint-disable-next-line  @typescript-eslint/no-explicit-any
   static on(eventType: Class, callback: CallbackHandler, ctx?: any, selfDestruct?: boolean): [string, number] {
     const self = EventBus.getInstance();
     return self.on(eventType, callback, ctx, selfDestruct);
@@ -71,7 +67,6 @@ class EventBus {
    * @param callback The function to be called when this event is emitted somewhere.
    * @param ctx The context will be bound to the event callback (e.g. for providing this)
    */
-  // eslint-disable-next-line  @typescript-eslint/no-explicit-any
   once(eventType: Class, callback: CallbackHandler, ctx?: any): [string, number] {
     return this.on(eventType, callback, ctx, true);
   }
@@ -81,7 +76,6 @@ class EventBus {
    * Once the event was emitted somewhere, the listener is removed again.
    * This version of the function provides a static interface to the EventBus singleton.
    */
-  // eslint-disable-next-line  @typescript-eslint/no-explicit-any
   static once(eventType: Class, callback: CallbackHandler, ctx?: any): [string, number] {
     const self = EventBus.getInstance();
     return self.once(eventType, callback, ctx);
@@ -137,7 +131,6 @@ class EventBus {
 
 export default {
   install(app: App) {
-    // eslint-disable-next-line no-param-reassign
     app.config.globalProperties.$eventBus = EventBus.getInstance();
   },
 };
