@@ -21,8 +21,7 @@ async function reload() {
     state.value = IconState.Loading;
     await props.refresh();
     state.value = IconState.Success;
-  } catch (e){
-    console.log(e)
+  } catch {
     state.value = IconState.Failed;
   } finally {
     setTimeout(() => (state.value = IconState.Ready), 1000);

@@ -1,6 +1,11 @@
 <script setup lang="ts">
 import { currentProjectStore, interfaceSettingsStore } from "@/stores";
 import RefreshIcon from "@/components/RefreshIcon.vue";
+
+if (!interfaceSettingsStore.highlighters.active[currentProjectStore.projectId]) {
+  // make sure that we at least have an empty list for the project
+  interfaceSettingsStore.highlighters.active[currentProjectStore.projectId] = [];
+}
 </script>
 
 <template>
@@ -47,7 +52,13 @@ import RefreshIcon from "@/components/RefreshIcon.vue";
         v-bind:key="hl.highlighter_id"
       >
         <div class="form-check">
-          <input class="form-check-input" type="checkbox" value="" :id="hl.highlighter_id" />
+          <input
+            class="form-check-input"
+            type="checkbox"
+            v-model="interfaceSettingsStore.highlighters.active[currentProjectStore.projectId]"
+            :id="hl.highlighter_id"
+            :value="hl.highlighter_id"
+          />
           <label class="form-check-label" :for="hl.highlighter_id"> {{ hl.name }} </label>
         </div>
       </li>

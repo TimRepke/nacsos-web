@@ -72,6 +72,9 @@ export default defineComponent({
       userStore: currentUserStore,
     };
   },
+  async mounted() {
+    await currentProjectStore.projectHighlighters.reload();
+  },
   computed: {
     viewNeedsSidebar(): boolean {
       return (
