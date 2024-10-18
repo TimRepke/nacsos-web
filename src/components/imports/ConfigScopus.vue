@@ -1,16 +1,15 @@
 <template>
   <div class="m-2">
     <div class="row">
-      <div class="col-xxl-7">
-        <h5>Scopus CSV import</h5>
-        <p class="text-muted">
-          Upload a Scopus CSV file, where you selected (almost) all fields to export. Please consult
-          <a href="https://apsis.mcc-berlin.net/nacsos-docs/user/import/" target="_blank" rel="noopener noreferrer">
-            the documentation
-          </a>
-          for additional details.
-        </p>
-      </div>
+      <h5>Scopus CSV import</h5>
+      <p class="text-muted">
+        Upload a Scopus CSV file, where you selected (almost) all fields to export. Please consult
+        <a href="https://apsis.mcc-berlin.net/nacsos-docs/user/import/" target="_blank" rel="noopener noreferrer">
+          the documentation
+        </a>
+        for additional details. For multi-file upload, press and hold <kbd>Shift</kbd> or <kbd>Ctrl</kbd> in file
+        browser. Previously uploaded files will be overridden on next upload.
+      </p>
     </div>
     <div class="row">
       <div class="col" v-if="!!config">
@@ -26,7 +25,7 @@
             {{ errorsToString(v$.files) }}
           </div>
         </template>
-        <template v-else>
+        <template v-if="config && config.sources.length > 0">
           <h5>Uploaded files</h5>
           <ul>
             <li v-for="file in config.sources" :key="file">
@@ -48,7 +47,6 @@ import type { BaseValidation, ValidationRule } from "@vuelidate/core";
 import { ImportConfigEnum, type ScopusImport } from "@/plugins/api/types";
 import FilesUploader from "@/components/FilesUploader.vue";
 import type { UploadFile } from "@/components/FilesUploader.vue";
-import { isEmpty } from "@/util";
 
 const areFilesUploaded: ValidationRule = {
   $validator(value?: UploadFile[]) {
@@ -92,15 +90,15 @@ export default defineComponent({
     };
   },
   data() {
-    return {
-      files: [] as UploadFile[],
-      config: this.existingConfig
-        ? this.existingConfig
-        : ({
-            kind: ImportConfigEnum.SCOPUS,
-            sources: [] as string[],
-          } as ScopusImport),
+    const emptyConfig: ScopusImport = {
+      kind: ImportConfigEnum.SCOPUS,
+      sources: [] as string[],
     };
+    if (!this.existingConfig || this.existingConfig.kind !== ImportConfigEnum.SCOPUS) {
+      this.$emit("configChanged", emptyConfig);
+      return { files: [] as UploadFile[], config: emptyConfig };
+    }
+    return { files: [] as UploadFile[], config: this.existingConfig };
   },
   methods: {
     errorsToString(field: BaseValidation): string {
@@ -114,7 +112,7 @@ export default defineComponent({
   },
   computed: {
     uploadsEnabled(): boolean {
-      return this.editable && this.config && isEmpty(this.config.sources);
+      return this.editable && this.config;
     },
   },
   watch: {

@@ -6,7 +6,9 @@
         <p class="text-muted">
           Upload a file, where each line has the exact same encoding for academic items in our database. In other words,
           each line in this file is produced by
-          <code>nacsos_data.models.items.AcademicItemModel.dump_model_json()</code>.
+          <code>nacsos_data.models.items.AcademicItemModel.dump_model_json()</code>. For multi-file upload, press and
+          hold <kbd>Shift</kbd> or <kbd>Ctrl</kbd> in file browser. Previously uploaded files will be overridden on next
+          upload.
         </p>
       </div>
     </div>
@@ -89,15 +91,15 @@ export default defineComponent({
     };
   },
   data() {
-    return {
-      files: [] as UploadFile[],
-      config: this.existingConfig
-        ? this.existingConfig
-        : ({
-            kind: ImportConfigEnum.ACADEMIC,
-            sources: [] as string[],
-          } as AcademicItemImport),
+    const emptyConfig: AcademicItemImport = {
+      kind: ImportConfigEnum.ACADEMIC,
+      sources: [] as string[],
     };
+    if (!this.existingConfig || this.existingConfig.kind !== ImportConfigEnum.ACADEMIC) {
+      this.$emit("configChanged", emptyConfig);
+      return { files: [] as UploadFile[], config: emptyConfig };
+    }
+    return { files: [] as UploadFile[], config: this.existingConfig };
   },
   methods: {
     errorsToString(field: BaseValidation): string {
@@ -111,11 +113,7 @@ export default defineComponent({
   },
   computed: {
     uploadsEnabled(): boolean {
-      return (
-        this.editable &&
-        this.config &&
-        (this.config.sources === undefined || this.config.sources === null || this.config.sources.length === 0)
-      );
+      return this.editable && this.config;
     },
   },
   watch: {

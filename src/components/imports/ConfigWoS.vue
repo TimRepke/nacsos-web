@@ -1,17 +1,16 @@
 <template>
   <div class="m-2">
     <div class="row">
-      <div class="col-xxl-7">
-        <h5>Web of Science import</h5>
-        <p class="text-muted">
-          Import method for Web of Science text files. These can be obtained by querying web of science, clicking
-          "export" and selecting "Plain text file". Please consult
-          <a href="https://apsis.mcc-berlin.net/nacsos-docs/user/import/" target="_blank" rel="noopener noreferrer">
-            the documentation
-          </a>
-          for additional details.
-        </p>
-      </div>
+      <h5>Web of Science import</h5>
+      <p class="text-muted">
+        Import method for Web of Science text files. These can be obtained by querying web of science, clicking "export"
+        and selecting "Plain text file". Please consult
+        <a href="https://apsis.mcc-berlin.net/nacsos-docs/user/import/" target="_blank" rel="noopener noreferrer">
+          the documentation
+        </a>
+        for additional details. For multi-file upload, press and hold <kbd>Shift</kbd> or <kbd>Ctrl</kbd> in file
+        browser. Previously uploaded files will be overridden on next upload.
+      </p>
     </div>
     <div class="row">
       <div class="col" v-if="!!config">
@@ -27,7 +26,7 @@
             {{ errorsToString(v$.files) }}
           </div>
         </template>
-        <template v-else>
+        <template v-if="config && config.sources.length > 0">
           <h5>Uploaded files</h5>
           <ul>
             <li v-for="file in config.sources" :key="file">
@@ -60,7 +59,10 @@ const areFilesUploaded: ValidationRule = {
   },
   $message: "Files not uploaded yet.",
 };
-
+const emptyConfig: WoSImport = {
+  kind: ImportConfigEnum.WOS,
+  sources: [] as string[],
+};
 export default defineComponent({
   name: "ConfigWoS",
   components: { FilesUploader },
@@ -92,15 +94,11 @@ export default defineComponent({
     };
   },
   data() {
-    return {
-      files: [] as UploadFile[],
-      config: this.existingConfig
-        ? this.existingConfig
-        : ({
-            kind: ImportConfigEnum.WOS,
-            sources: [] as string[],
-          } as WoSImport),
-    };
+    if (!this.existingConfig || this.existingConfig.kind !== ImportConfigEnum.WOS) {
+      this.$emit("configChanged", emptyConfig);
+      return { files: [] as UploadFile[], config: emptyConfig };
+    }
+    return { files: [] as UploadFile[], config: this.existingConfig };
   },
   methods: {
     errorsToString(field: BaseValidation): string {
@@ -114,11 +112,7 @@ export default defineComponent({
   },
   computed: {
     uploadsEnabled(): boolean {
-      return (
-        this.editable &&
-        this.config &&
-        (this.config.sources === undefined || this.config.sources === null || this.config.sources.length === 0)
-      );
+      return this.editable && this.config;
     },
   },
   watch: {

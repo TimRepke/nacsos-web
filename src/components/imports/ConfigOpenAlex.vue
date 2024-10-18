@@ -69,21 +69,18 @@ export default defineComponent({
     },
   },
   data() {
-    const config: OpenAlexSolrImport = this.existingConfig
-      ? this.existingConfig
-      : {
-          kind: ImportConfigEnum.OA_SOLR,
-          query: "",
-          def_type: DefTypeEnum.LUCENE,
-          field: SearchFieldEnum.TITLE_ABSTRACT,
-          op: OpEnum.AND,
-        };
-    if (!this.existingConfig) {
-      this.$emit("configChanged", config);
-    }
-    return {
-      config,
+    const emptyConfig: OpenAlexSolrImport = {
+      kind: ImportConfigEnum.OA_SOLR,
+      query: "",
+      def_type: DefTypeEnum.LUCENE,
+      field: SearchFieldEnum.TITLE_ABSTRACT,
+      op: OpEnum.AND,
     };
+    if (!this.existingConfig || this.existingConfig.kind !== ImportConfigEnum.OA_SOLR) {
+      this.$emit("configChanged", emptyConfig);
+      return { config: emptyConfig };
+    }
+    return { config: this.existingConfig };
   },
   watch: {
     config: {
