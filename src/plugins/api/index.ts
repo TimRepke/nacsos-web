@@ -16,7 +16,8 @@ import {
   StatsService,
   UsersService,
   PipesService,
-} from "@/plugins/api/spec/services.gen";
+  ItemService,
+} from '@/plugins/api/spec/services.gen';
 import type { ApiResponseReject } from "@/plugins/api/spec/core/ApiResult";
 import { EventBus } from "@/plugins/events";
 import { ToastEvent } from "@/plugins/events/events/toast";
@@ -39,6 +40,7 @@ export const API = {
   stats: StatsService,
   users: UsersService,
   pipes: PipesService,
+  item: ItemService,
 };
 
 export function ignore() {}

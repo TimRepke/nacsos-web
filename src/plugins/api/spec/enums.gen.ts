@@ -29,8 +29,8 @@ export enum BotKindEnum {
 }
 
 export enum EventEnum {
-  EXAMPLE_EVENT = "ExampleEvent",
   EXAMPLE_SUB_EVENT = "ExampleSubEvent",
+  EXAMPLE_EVENT = "ExampleEvent",
 }
 
 export enum FieldEnum {

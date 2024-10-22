@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { useCurrentProjectStore } from "@/stores/CurrentProjectStore";
-import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import ConfirmationButton from "@/components/ConfirmationButton.vue";
 import RefreshIcon from "@/components/RefreshIcon.vue";
 

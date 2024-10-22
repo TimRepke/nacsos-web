@@ -133,8 +133,15 @@ export default defineComponent({
               icon: "map-location-dot",
               target: "/project/dataset/list",
               permission: perm.dataset_read,
-              routes: ["project-dataset-list"],
+              routes: ["project-dataset-list", "project-dataset-item"],
             },
+            // {
+            //   name: "Item details",
+            //   icon: "file-lines",
+            //   target: "/project/dataset/item",
+            //   permission: perm.dataset_read,
+            //   routes: ["project-dataset-item"],
+            // },
             {
               name: "Statistics",
               icon: "chart-pie",

@@ -199,6 +199,18 @@ export const $AcademicItemModel = {
       $ref: "#/components/schemas/ItemType",
       default: "academic",
     },
+    time_edited: {
+      anyOf: [
+        {
+          type: "string",
+          format: "date-time",
+        },
+        {
+          type: "null",
+        },
+      ],
+      title: "Time Edited",
+    },
     text: {
       anyOf: [
         {
@@ -374,6 +386,224 @@ export const $AcademicItemModel = {
   type: "object",
   title: "AcademicItemModel",
   description: "Corresponds to db.schema.items.academic.AcademicItem",
+} as const;
+
+export const $AcademicItemVariantModel = {
+  properties: {
+    item_variant_id: {
+      anyOf: [
+        {
+          type: "string",
+        },
+        {
+          type: "string",
+          format: "uuid",
+        },
+      ],
+      title: "Item Variant Id",
+    },
+    item_id: {
+      anyOf: [
+        {
+          type: "string",
+        },
+        {
+          type: "string",
+          format: "uuid",
+        },
+      ],
+      title: "Item Id",
+    },
+    import_id: {
+      anyOf: [
+        {
+          type: "string",
+        },
+        {
+          type: "string",
+          format: "uuid",
+        },
+        {
+          type: "null",
+        },
+      ],
+      title: "Import Id",
+    },
+    import_revision: {
+      anyOf: [
+        {
+          type: "integer",
+        },
+        {
+          type: "null",
+        },
+      ],
+      title: "Import Revision",
+    },
+    doi: {
+      anyOf: [
+        {
+          type: "string",
+        },
+        {
+          type: "null",
+        },
+      ],
+      title: "Doi",
+    },
+    wos_id: {
+      anyOf: [
+        {
+          type: "string",
+        },
+        {
+          type: "null",
+        },
+      ],
+      title: "Wos Id",
+    },
+    scopus_id: {
+      anyOf: [
+        {
+          type: "string",
+        },
+        {
+          type: "null",
+        },
+      ],
+      title: "Scopus Id",
+    },
+    openalex_id: {
+      anyOf: [
+        {
+          type: "string",
+        },
+        {
+          type: "null",
+        },
+      ],
+      title: "Openalex Id",
+    },
+    s2_id: {
+      anyOf: [
+        {
+          type: "string",
+        },
+        {
+          type: "null",
+        },
+      ],
+      title: "S2 Id",
+    },
+    pubmed_id: {
+      anyOf: [
+        {
+          type: "string",
+        },
+        {
+          type: "null",
+        },
+      ],
+      title: "Pubmed Id",
+    },
+    dimensions_id: {
+      anyOf: [
+        {
+          type: "string",
+        },
+        {
+          type: "null",
+        },
+      ],
+      title: "Dimensions Id",
+    },
+    title: {
+      anyOf: [
+        {
+          type: "string",
+        },
+        {
+          type: "null",
+        },
+      ],
+      title: "Title",
+    },
+    publication_year: {
+      anyOf: [
+        {
+          type: "integer",
+        },
+        {
+          type: "null",
+        },
+      ],
+      title: "Publication Year",
+    },
+    source: {
+      anyOf: [
+        {
+          type: "string",
+        },
+        {
+          type: "null",
+        },
+      ],
+      title: "Source",
+    },
+    keywords: {
+      anyOf: [
+        {
+          items: {
+            type: "string",
+          },
+          type: "array",
+        },
+        {
+          type: "null",
+        },
+      ],
+      title: "Keywords",
+    },
+    authors: {
+      anyOf: [
+        {
+          items: {
+            $ref: "#/components/schemas/AcademicAuthorModel",
+          },
+          type: "array",
+        },
+        {
+          type: "null",
+        },
+      ],
+      title: "Authors",
+    },
+    text: {
+      anyOf: [
+        {
+          type: "string",
+        },
+        {
+          type: "null",
+        },
+      ],
+      title: "Text",
+    },
+    meta: {
+      anyOf: [
+        {
+          type: "object",
+        },
+        {
+          type: "null",
+        },
+      ],
+      title: "Meta",
+    },
+  },
+  type: "object",
+  required: ["item_variant_id", "item_id"],
+  title: "AcademicItemVariantModel",
 } as const;
 
 export const $AffiliationModel = {
@@ -3482,16 +3712,16 @@ export const $Event = {
   properties: {
     event: {
       type: "string",
-      enum: ["ExampleEvent", "ExampleSubEvent"],
+      enum: ["ExampleSubEvent", "ExampleEvent"],
       title: "Event",
     },
     payload: {
       anyOf: [
         {
-          $ref: "#/components/schemas/ExampleEvent",
+          $ref: "#/components/schemas/ExampleSubEvent",
         },
         {
-          $ref: "#/components/schemas/ExampleSubEvent",
+          $ref: "#/components/schemas/ExampleEvent",
         },
       ],
       title: "Payload",
@@ -3992,6 +4222,18 @@ export const $FullLexisNexisItemModel = {
       $ref: "#/components/schemas/ItemType",
       default: "lexis",
     },
+    time_edited: {
+      anyOf: [
+        {
+          type: "string",
+          format: "date-time",
+        },
+        {
+          type: "null",
+        },
+      ],
+      title: "Time Edited",
+    },
     text: {
       anyOf: [
         {
@@ -4082,6 +4324,18 @@ export const $GenericItemModel = {
     type: {
       $ref: "#/components/schemas/ItemType",
       default: "generic",
+    },
+    time_edited: {
+      anyOf: [
+        {
+          type: "string",
+          format: "date-time",
+        },
+        {
+          type: "null",
+        },
+      ],
+      title: "Time Edited",
     },
     text: {
       anyOf: [
@@ -5310,6 +5564,18 @@ export const $LexisNexisItemModel = {
     type: {
       $ref: "#/components/schemas/ItemType",
       default: "lexis",
+    },
+    time_edited: {
+      anyOf: [
+        {
+          type: "string",
+          format: "date-time",
+        },
+        {
+          type: "null",
+        },
+      ],
+      title: "Time Edited",
     },
     text: {
       anyOf: [
@@ -7039,6 +7305,18 @@ export const $TwitterItemModel = {
     type: {
       $ref: "#/components/schemas/ItemType",
       default: "twitter",
+    },
+    time_edited: {
+      anyOf: [
+        {
+          type: "string",
+          format: "date-time",
+        },
+        {
+          type: "null",
+        },
+      ],
+      title: "Time Edited",
     },
     text: {
       anyOf: [

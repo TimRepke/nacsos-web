@@ -31,6 +31,7 @@ export type AcademicItemModel = {
   item_id?: string | null;
   project_id?: string | null;
   type?: ItemType;
+  time_edited?: string | null;
   text?: string | null;
   doi?: string | null;
   wos_id?: string | null;
@@ -45,6 +46,29 @@ export type AcademicItemModel = {
   source?: string | null;
   keywords?: Array<string> | null;
   authors?: Array<AcademicAuthorModel> | null;
+  meta?: {
+    [key: string]: unknown;
+  } | null;
+};
+
+export type AcademicItemVariantModel = {
+  item_variant_id: string;
+  item_id: string;
+  import_id?: string | null;
+  import_revision?: number | null;
+  doi?: string | null;
+  wos_id?: string | null;
+  scopus_id?: string | null;
+  openalex_id?: string | null;
+  s2_id?: string | null;
+  pubmed_id?: string | null;
+  dimensions_id?: string | null;
+  title?: string | null;
+  publication_year?: number | null;
+  source?: string | null;
+  keywords?: Array<string> | null;
+  authors?: Array<AcademicAuthorModel> | null;
+  text?: string | null;
   meta?: {
     [key: string]: unknown;
   } | null;
@@ -558,8 +582,8 @@ export type DehydratedUser = {
 };
 
 export type Event = {
-  event: "ExampleEvent" | "ExampleSubEvent";
-  payload: ExampleEvent | ExampleSubEvent;
+  event: "ExampleSubEvent" | "ExampleEvent";
+  payload: ExampleSubEvent | ExampleEvent;
 };
 
 export type ExampleEvent = {
@@ -651,6 +675,7 @@ export type FullLexisNexisItemModel = {
   item_id?: string | null;
   project_id?: string | null;
   type?: ItemType;
+  time_edited?: string | null;
   text?: string | null;
   teaser?: string | null;
   authors?: Array<string> | null;
@@ -664,6 +689,7 @@ export type GenericItemModel = {
   item_id?: string | null;
   project_id?: string | null;
   type?: ItemType;
+  time_edited?: string | null;
   text?: string | null;
   meta: {
     [key: string]: unknown;
@@ -851,6 +877,7 @@ export type LexisNexisItemModel = {
   item_id?: string | null;
   project_id?: string | null;
   type?: ItemType;
+  time_edited?: string | null;
   text?: string | null;
   teaser?: string | null;
   authors?: Array<string> | null;
@@ -1197,6 +1224,7 @@ export type TwitterItemModel = {
   item_id?: string | null;
   project_id?: string | null;
   type?: ItemType;
+  time_edited?: string | null;
   text?: string | null;
   twitter_id?: string | null;
   twitter_author_id?: string | null;
@@ -1496,10 +1524,9 @@ export type $OpenApiTs = {
       };
     };
   };
-  "/api/annotations/schemes/list/{project_id}": {
+  "/api/annotations/schemes/list": {
     get: {
       req: {
-        projectId: string;
         xProjectId: string;
       };
       res: {
@@ -1507,6 +1534,28 @@ export type $OpenApiTs = {
          * Successful Response
          */
         200: Array<AnnotationSchemeModel>;
+        /**
+         * Validation Error
+         */
+        422: HTTPValidationError;
+      };
+    };
+  };
+  "/api/annotations/schemes/fingerprints": {
+    get: {
+      req: {
+        merged?: boolean;
+        xProjectId: string;
+      };
+      res: {
+        /**
+         * Successful Response
+         */
+        200:
+          | string
+          | {
+              [key: string]: string;
+            };
         /**
          * Validation Error
          */
@@ -3334,6 +3383,42 @@ export type $OpenApiTs = {
          * Successful Response
          */
         200: unknown;
+      };
+    };
+  };
+  "/api/item/variants/{item_id}": {
+    get: {
+      req: {
+        itemId: string;
+        xProjectId: string;
+      };
+      res: {
+        /**
+         * Successful Response
+         */
+        200: Array<AcademicItemVariantModel>;
+        /**
+         * Validation Error
+         */
+        422: HTTPValidationError;
+      };
+    };
+  };
+  "/api/item/info/{item_id}": {
+    get: {
+      req: {
+        itemId: string;
+        xProjectId: string;
+      };
+      res: {
+        /**
+         * Successful Response
+         */
+        200: AcademicItemModel;
+        /**
+         * Validation Error
+         */
+        422: HTTPValidationError;
       };
     };
   };
