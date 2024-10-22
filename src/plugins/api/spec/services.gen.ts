@@ -575,7 +575,7 @@ export class AnnotationsService {
     data: $OpenApiTs["/api/annotations/config/scopes/clear/{scheme_id}"]["post"]["req"],
     options?: Partial<AxiosRequestConfig>,
   ): CancelablePromise<ApiResult<$OpenApiTs["/api/annotations/config/scopes/clear/{scheme_id}"]["post"]["res"][200]>> {
-    const { scopeId, xProjectId } = data;
+    const { scopeId, xProjectId, userId } = data;
     return __request(OpenAPI, {
       method: "POST",
       url: "/api/annotations/config/scopes/clear/{scheme_id}",
@@ -584,7 +584,28 @@ export class AnnotationsService {
       },
       query: {
         scope_id: scopeId,
+        user_id: userId,
       },
+      errors: {
+        422: "Validation Error",
+      },
+      customRequestConfig: options,
+    });
+  }
+
+  public static bulkAddAssignmentApiAnnotationsConfigScopesBulkAddPut(
+    data: $OpenApiTs["/api/annotations/config/scopes/bulk-add/"]["put"]["req"],
+    options?: Partial<AxiosRequestConfig>,
+  ): CancelablePromise<ApiResult<$OpenApiTs["/api/annotations/config/scopes/bulk-add/"]["put"]["res"][200]>> {
+    const { xProjectId, requestBody } = data;
+    return __request(OpenAPI, {
+      method: "PUT",
+      url: "/api/annotations/config/scopes/bulk-add/",
+      headers: {
+        "x-project-id": xProjectId,
+      },
+      body: requestBody,
+      mediaType: "application/json",
       errors: {
         422: "Validation Error",
       },

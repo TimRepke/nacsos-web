@@ -21,7 +21,15 @@
       <table class="table table-bordered table-sm">
         <tbody>
           <tr v-for="username in shownUsernames" :key="username" :class="{ 'edit-mode': assiEditMode }">
-            <th>{{ username }}</th>
+            <th>
+              {{ username }}
+              <inline-tool-tip v-show="assiEditMode" info="Assign all to user" placement="right" class="ms-2">
+                <font-awesome-icon icon="user-tag" @click="assignAll(username)" class="clickable-icon" />
+              </inline-tool-tip>
+              <inline-tool-tip v-show="assiEditMode" info="Drop all open assignments for user" placement="right" class="ms-1">
+                <font-awesome-icon icon="user-xmark" @click="clearUser(username)" class="clickable-icon" />
+              </inline-tool-tip>
+            </th>
             <td
               v-for="(itemId, i) in itemIds"
               :key="itemId"
@@ -41,18 +49,19 @@
 import { defineComponent } from "vue";
 import type { PropType } from "vue";
 import { AssignmentInfo, AssignmentScopeEntry } from "@/plugins/api/types";
-import { API, toastReject } from "@/plugins/api";
+import { API, toastReject, toastSuccess } from "@/plugins/api";
 import { currentProjectStore } from "@/stores";
 import { EventBus } from "@/plugins/events";
 import { ConfirmationRequestEvent } from "@/plugins/events/events/confirmation";
 import { ToastEvent } from "@/plugins/events/events/toast";
 import InlineToolTip from "@/components/InlineToolTip.vue";
+import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 
 type Indexed<T> = T & { index: number };
 
 export default defineComponent({
   name: "AssignmentsVisualiser",
-  components: { InlineToolTip },
+  components: { FontAwesomeIcon, InlineToolTip },
   props: {
     assignmentEntries: {
       type: Object as PropType<AssignmentScopeEntry[]>,
@@ -155,6 +164,32 @@ export default defineComponent({
           "Cancel",
         ),
       );
+    },
+    clearUser(username: string) {
+      API.annotations
+        .clearEmptyAssignmentsApiAnnotationsConfigScopesClearSchemeIdPost({
+          scopeId: this.assignmentScopeId,
+          userId: currentProjectStore.projectUsers.name2id[username],
+          xProjectId: currentProjectStore.projectId as string,
+        })
+        .then(toastSuccess(`All open assignments for ${username} cleared; reload page (F5) to see result!`))
+        .catch(toastReject);
+    },
+    assignAll(username: string) {
+      if (this.assiEditMode) {
+        API.annotations
+          .bulkAddAssignmentApiAnnotationsConfigScopesBulkAddPut({
+            requestBody: {
+              item_ids: this.itemIds,
+              scheme_id: this.annotationSchemeId,
+              scope_id: this.assignmentScopeId,
+              user_id: currentProjectStore.projectUsers.name2id[username],
+            },
+            xProjectId: currentProjectStore.projectId as string,
+          })
+          .then(toastSuccess(`Bulk-created assignments for ${username}; reload page (F5) to see result!`))
+          .catch(toastReject);
+      }
     },
     editCell(username: string, itemId: string, order: number) {
       if (this.assiEditMode) {
