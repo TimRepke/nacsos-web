@@ -3557,6 +3557,33 @@ export const $BotMetaResolveBase = {
   title: "BotMetaResolveBase",
 } as const;
 
+export const $BulkAddPayload = {
+  properties: {
+    user_id: {
+      type: "string",
+      title: "User Id",
+    },
+    scope_id: {
+      type: "string",
+      title: "Scope Id",
+    },
+    scheme_id: {
+      type: "string",
+      title: "Scheme Id",
+    },
+    item_ids: {
+      items: {
+        type: "string",
+      },
+      type: "array",
+      title: "Item Ids",
+    },
+  },
+  type: "object",
+  required: ["user_id", "scope_id", "scheme_id", "item_ids"],
+  title: "BulkAddPayload",
+} as const;
+
 export const $Cashtag = {
   properties: {
     start: {
@@ -3712,16 +3739,16 @@ export const $Event = {
   properties: {
     event: {
       type: "string",
-      enum: ["ExampleSubEvent", "ExampleEvent"],
+      enum: ["ExampleEvent", "ExampleSubEvent"],
       title: "Event",
     },
     payload: {
       anyOf: [
         {
-          $ref: "#/components/schemas/ExampleSubEvent",
+          $ref: "#/components/schemas/ExampleEvent",
         },
         {
-          $ref: "#/components/schemas/ExampleEvent",
+          $ref: "#/components/schemas/ExampleSubEvent",
         },
       ],
       title: "Payload",

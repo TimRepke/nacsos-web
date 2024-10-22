@@ -541,6 +541,13 @@ export type BotMetaResolveBase = {
   ignore_repeat: boolean;
 };
 
+export type BulkAddPayload = {
+  user_id: string;
+  scope_id: string;
+  scheme_id: string;
+  item_ids: Array<string>;
+};
+
 export type Cashtag = {
   start: number;
   end: number;
@@ -582,8 +589,8 @@ export type DehydratedUser = {
 };
 
 export type Event = {
-  event: "ExampleSubEvent" | "ExampleEvent";
-  payload: ExampleSubEvent | ExampleEvent;
+  event: "ExampleEvent" | "ExampleSubEvent";
+  payload: ExampleEvent | ExampleSubEvent;
 };
 
 export type ExampleEvent = {
@@ -1896,6 +1903,7 @@ export type $OpenApiTs = {
     post: {
       req: {
         scopeId: string;
+        userId?: string | null;
         xProjectId: string;
       };
       res: {
@@ -1903,6 +1911,24 @@ export type $OpenApiTs = {
          * Successful Response
          */
         200: unknown;
+        /**
+         * Validation Error
+         */
+        422: HTTPValidationError;
+      };
+    };
+  };
+  "/api/annotations/config/scopes/bulk-add/": {
+    put: {
+      req: {
+        requestBody: BulkAddPayload;
+        xProjectId: string;
+      };
+      res: {
+        /**
+         * Successful Response
+         */
+        200: AssignmentModel;
         /**
          * Validation Error
          */
