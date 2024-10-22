@@ -223,8 +223,7 @@ export default defineComponent({
     async refreshData() {
       try {
         this.projectSchemes = (
-          await API.annotations.getSchemeDefinitionsForProjectApiAnnotationsSchemesListProjectIdGet({
-            projectId: currentProjectStore.projectId as string,
+          await API.annotations.getSchemeDefinitionsForProjectApiAnnotationsSchemesListGet({
             xProjectId: currentProjectStore.projectId as string,
           })
         ).data;
@@ -263,8 +262,7 @@ export default defineComponent({
           new ToastEvent("SUCCESS", `Created copy of the annotation scheme "${scheme.name}" with ID ${copyId.data}.`),
         );
 
-        const schemes = await API.annotations.getSchemeDefinitionsForProjectApiAnnotationsSchemesListProjectIdGet({
-          projectId: currentProjectStore.projectId as string,
+        const schemes = await API.annotations.getSchemeDefinitionsForProjectApiAnnotationsSchemesListGet({
           xProjectId: currentProjectStore.projectId as string,
         });
         this.projectSchemes = schemes.data;

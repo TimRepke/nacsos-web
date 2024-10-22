@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useCurrentProjectStore } from "@/stores/CurrentProjectStore";
-import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import ConfirmationButton from "@/components/ConfirmationButton.vue";
+import RefreshIcon from "@/components/RefreshIcon.vue";
 
 const projectStore = useCurrentProjectStore();
 </script>
@@ -15,8 +15,8 @@ const projectStore = useCurrentProjectStore();
         >Clear mutex
       </ConfirmationButton>
     </li>
-    <li class="list-group-item clickable-icon" @click="projectStore.refreshInfo">
-      <font-awesome-icon :icon="['fas', 'refresh']" />
+    <li class="list-group-item">
+      <refresh-icon :refresh="projectStore.refreshInfo" />
     </li>
   </ul>
 </template>

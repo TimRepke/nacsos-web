@@ -4,6 +4,7 @@ import { ref } from "vue";
 
 const props = defineProps({
   refresh: { type: Function, required: true },
+  timeout: { type: Number, required: false, default: 1000 },
 });
 
 enum IconState {
@@ -24,7 +25,7 @@ async function reload() {
   } catch {
     state.value = IconState.Failed;
   } finally {
-    setTimeout(() => (state.value = IconState.Ready), 1000);
+    setTimeout(() => (state.value = IconState.Ready), props.timeout);
   }
 }
 </script>

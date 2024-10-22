@@ -1,11 +1,12 @@
 import { defineStore } from "pinia";
 import { useStorage } from "@vueuse/core";
 import type { RemovableRef } from "@vueuse/core";
-import type { ProjectModel, ProjectPermissionsModel } from "@/plugins/api/spec/types.gen";
 import Serializer from "@/types/serializer";
-import { type ProjectUsers, useProjectUsers } from "@/stores/CurrentProjectStore/projectUsers";
 import { API } from "@/plugins/api";
-import { type ProjectHighlighterStore, useProjectHighlighters } from "@/stores/CurrentProjectStore/projectHighlighters";
+import type { ProjectModel, ProjectPermissionsModel } from "@/plugins/api/spec/types.gen";
+import { type Users, useProjectUsers } from "@/stores/CurrentProjectStore/users";
+import { type ProjectHighlighterStore, useProjectHighlighters } from "@/stores/CurrentProjectStore/highlighters";
+import { ProjectAnnotationSchemesStore, useProjectAnnotationSchemesStore } from "@/stores/CurrentProjectStore/schemes";
 
 const ProjectSerializer = Serializer<ProjectModel>();
 const ProjectPermissionSerializer = Serializer<ProjectPermissionsModel>();
@@ -14,8 +15,9 @@ export type CurrentProjectStoreType = {
   projectId: RemovableRef<string | undefined>;
   project: RemovableRef<ProjectModel | undefined>;
   projectPermissions: RemovableRef<ProjectPermissionsModel | undefined>;
-  projectUsers: ProjectUsers;
+  projectUsers: Users;
   projectHighlighters: ProjectHighlighterStore;
+  projectSchemes: ProjectAnnotationSchemesStore;
 };
 
 export const useCurrentProjectStore = defineStore("CurrentProjectStore", {
@@ -35,6 +37,7 @@ export const useCurrentProjectStore = defineStore("CurrentProjectStore", {
       ),
       projectUsers: useProjectUsers(),
       projectHighlighters: useProjectHighlighters(),
+      projectSchemes: useProjectAnnotationSchemesStore(),
     };
   },
   actions: {

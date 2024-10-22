@@ -41,8 +41,7 @@ export default defineComponent({
   },
   async mounted() {
     API.annotations
-      .getSchemeDefinitionsForProjectApiAnnotationsSchemesListProjectIdGet({
-        projectId: currentProjectStore.projectId as string,
+      .getSchemeDefinitionsForProjectApiAnnotationsSchemesListGet({
         xProjectId: currentProjectStore.projectId as string,
       })
       .then((response) => {

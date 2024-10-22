@@ -20,6 +20,11 @@
           <font-awesome-icon :icon="['far', 'circle-question']" class="me-2" @click="showRaw = !showRaw" />
         </inline-tool-tip>
       </div>
+      <div>
+        <router-link :to="{ name: 'project-dataset-item', params: { item_id: item.item_id } }">
+          <font-awesome-icon icon="file-signature" />
+        </router-link>
+      </div>
     </div>
     <div class="card-body position-relative">
       <div v-if="showRaw">
@@ -68,10 +73,11 @@ import InlineToolTip from "@/components/InlineToolTip.vue";
 import type { AcademicAuthorModel, AcademicItemModel, AffiliationModel } from "@/plugins/api/types";
 import { currentProjectStore, interfaceSettingsStore } from "@/stores";
 import TextComponent from "@/components/items/TextComponent.vue";
+import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 
 export default defineComponent({
   name: "AcademicItem",
-  components: { TextComponent, InlineToolTip },
+  components: { FontAwesomeIcon, TextComponent, InlineToolTip },
   props: {
     item: {
       type: Object as PropType<AcademicItemModel>,

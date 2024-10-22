@@ -29,8 +29,8 @@ export enum BotKindEnum {
 }
 
 export enum EventEnum {
-  EXAMPLE_EVENT = "ExampleEvent",
   EXAMPLE_SUB_EVENT = "ExampleSubEvent",
+  EXAMPLE_EVENT = "ExampleEvent",
 }
 
 export enum FieldEnum {
@@ -66,6 +66,20 @@ export enum CompEnum {
 export enum ScopeTypeEnum {
   H = "H",
   R = "R",
+}
+
+/**
+ * This is a type to specify an entry in the many-to-many relation for items to imports.
+ *
+ * - An `explicit` m2m relation is used for cases where the import "explicitly" matched this item.
+ * For example: A tweet or paper matched a keyword specified in the query
+ * - An `implicit` m2m relation is used for cases where the import only "implicitly" includes this item.
+ * For example: A tweet is part of the conversation that contained a specified keyword or an
+ * article that is referenced by an article that is included "explicitly" in the query.
+ */
+export enum M2MImportItemTypeEnum {
+  EXPLICIT = "explicit",
+  IMPLICIT = "implicit",
 }
 
 export enum DefTypeEnum {

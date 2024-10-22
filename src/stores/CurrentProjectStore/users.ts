@@ -4,7 +4,7 @@ import { currentProjectStore } from "@/stores";
 import { DeferredValue, useDeferredValue } from "@/stores/storeHelpers";
 import { computed, ComputedRef } from "vue";
 
-export interface ProjectUsers extends DeferredValue<UserModel[]> {
+export interface Users extends DeferredValue<UserModel[]> {
   id2name: ComputedRef<Record<string, string>>;
   name2id: ComputedRef<Record<string, string>>;
   name2user: ComputedRef<Record<string, UserModel>>;
@@ -13,7 +13,7 @@ export interface ProjectUsers extends DeferredValue<UserModel[]> {
   userIds: ComputedRef<string[]>;
 }
 
-export function useProjectUsers(): ProjectUsers {
+export function useProjectUsers(): Users {
   async function request(): Promise<UserModel[]> {
     return (
       await API.users.getProjectUsersApiUsersListProjectProjectIdGet({
