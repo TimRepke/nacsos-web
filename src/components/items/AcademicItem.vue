@@ -3,7 +3,7 @@
     <div class="card-header d-flex">
       <div style="line-height: 2rem" class="fw-bold" v-html="htmlTitle" />
       <div class="ms-auto">
-        <inline-tool-tip info="DOI" placement="left" v-show="item.doi !== null">
+        <inline-tool-tip info="DOI" placement="left" v-show="!!item.doi">
           <a
             :href="`https://dx.doi.org/${item.doi || ''}`"
             class="float-end link-secondary"
@@ -12,6 +12,19 @@
             aria-label="DOI"
           >
             <font-awesome-icon :icon="['fas', 'file-lines']" class="me-2" />
+          </a>
+        </inline-tool-tip>
+      </div>
+      <div>
+        <inline-tool-tip info="OpenAlex" placement="left" v-show="!!item.openalex_id">
+          <a
+            :href="`https://openalex.org/works/${item.openalex_id}`"
+            class="float-end link-secondary"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="OpenAlex"
+          >
+            <font-awesome-icon :icon="['fas', 'database']" class="me-2" />
           </a>
         </inline-tool-tip>
       </div>
