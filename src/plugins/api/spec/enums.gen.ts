@@ -68,6 +68,20 @@ export enum ScopeTypeEnum {
   R = "R",
 }
 
+/**
+ * This is a type to specify an entry in the many-to-many relation for items to imports.
+ *
+ * - An `explicit` m2m relation is used for cases where the import "explicitly" matched this item.
+ * For example: A tweet or paper matched a keyword specified in the query
+ * - An `implicit` m2m relation is used for cases where the import only "implicitly" includes this item.
+ * For example: A tweet is part of the conversation that contained a specified keyword or an
+ * article that is referenced by an article that is included "explicitly" in the query.
+ */
+export enum M2MImportItemTypeEnum {
+  EXPLICIT = "explicit",
+  IMPLICIT = "implicit",
+}
+
 export enum DefTypeEnum {
   EDISMAX = "edismax",
   LUCENE = "lucene",

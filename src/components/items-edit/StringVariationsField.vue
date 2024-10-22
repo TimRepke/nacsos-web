@@ -1,30 +1,17 @@
 <script setup lang="ts">
-import { computed, ref } from "vue";
-import { AcademicItemVariantModel } from "@/plugins/api/spec";
-
-import { isEmpty } from "@/util";
 import { type Change, diffChars } from "diff";
+import { computed, ref } from "vue";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
-
-type StringFieldKeys =
-  | "title"
-  | "publication_year"
-  | "source"
-  | "doi"
-  | "wos_id"
-  | "scopus_id"
-  | "openalex_id"
-  | "s2_id"
-  | "pubmed_id"
-  | "dimensions_id";
-type AcademicItemVariantStrings = Pick<AcademicItemVariantModel, StringFieldKeys>;
+import type { AcademicItemVariantModel } from "@/plugins/api/spec";
+import type { AcademicItemVariantStrings } from "@/types/items";
+import { isEmpty } from "@/util";
 
 const props = defineProps<{
   title: string;
   field: keyof AcademicItemVariantStrings;
   variants: AcademicItemVariantModel[];
 }>();
-const model = defineModel<string>("model", { required: true });
+const model = defineModel<string | number | null>("model", { required: true });
 const showVariants = ref<boolean>(false);
 const showDiff = ref<boolean>(false);
 const urlPrefix: string | null = {
@@ -38,12 +25,13 @@ const urlPrefix: string | null = {
   scopus_id: null,
   s2_id: null,
   dimensions_id: null,
+  text: null,
 }[props.field];
 
 const variations = computed<(AcademicItemVariantModel & { diff: Change[] })[]>(() =>
   (props.variants as AcademicItemVariantModel[])
     .filter((variant) => !isEmpty(variant[props.field]))
-    .map((variant) => ({ ...variant, diff: diffChars(model.value, variant[props.field] as string) })),
+    .map((variant) => ({ ...variant, diff: diffChars(model.value as string, variant[props.field] as string) })),
 );
 </script>
 
@@ -51,7 +39,8 @@ const variations = computed<(AcademicItemVariantModel & { diff: Change[] })[]>((
   <div>
     <label :for="`variants-${field}`" class="form-label">{{ title }}</label>
     <div class="input-group input-group-sm">
-      <input :id="`variants-${field}`" class="form-control form-control-sm" type="text" v-model="model" />
+      <textarea v-if="field === 'text'" class="form-control" rows="6" :id="`variants-${field}`" v-model="model" />
+      <input v-else :id="`variants-${field}`" class="form-control form-control-sm" type="text" v-model="model" />
 
       <label v-if="variations.length === 0" class="input-group-text">No variants</label>
       <button v-else class="btn btn-sm btn-outline-secondary" type="button" @click="showVariants = !showVariants">

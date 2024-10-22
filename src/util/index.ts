@@ -41,6 +41,7 @@ export const keys = (obj: unknown) => {
 export const getLength = shallowProperty<number>("length");
 // inspired by https://github.com/jashkenas/underscore/blob/master/modules/isString.js
 export const isString = tagTester("String");
+export const isNumber = tagTester("Number");
 // inspired by https://github.com/jashkenas/underscore/blob/master/modules/isArguments.js
 export const isArguments = tagTester("Arguments");
 
@@ -91,7 +92,16 @@ export function dt2str(datetime: string | null | undefined): string | null {
     const dt = new Date(datetime);
     return `
     ${dt.getFullYear()}-${padZero(dt.getMonth() + 1, 2)}-${padZero(dt.getDate(), 2)} 
-    ${padZero(dt.getHours(), 2)}:${padZero(dt.getMinutes(), 2)}`;
+    ${padZero(dt.getHours() + dt.getTimezoneOffset(), 2)}:${padZero(dt.getMinutes(), 2)}`;
+  }
+  return null;
+}
+
+export function clearString(s: string | null | undefined): string | null {
+  if (is<string>(s)) {
+    s = s.trim();
+    if (s.length > 0) return s;
+    return null;
   }
   return null;
 }

@@ -1409,6 +1409,24 @@ export class ImportsService {
     });
   }
 
+  public static getProjectImportsApiImportsListDetailsGet(
+    data: $OpenApiTs["/api/imports/list/details"]["get"]["req"],
+    options?: Partial<AxiosRequestConfig>,
+  ): CancelablePromise<ApiResult<$OpenApiTs["/api/imports/list/details"]["get"]["res"][200]>> {
+    const { xProjectId } = data;
+    return __request(OpenAPI, {
+      method: "GET",
+      url: "/api/imports/list/details",
+      headers: {
+        "x-project-id": xProjectId,
+      },
+      errors: {
+        422: "Validation Error",
+      },
+      customRequestConfig: options,
+    });
+  }
+
   public static getImportDetailsApiImportsImportImportIdGet(
     data: $OpenApiTs["/api/imports/import/{import_id}"]["get"]["req"],
     options?: Partial<AxiosRequestConfig>,
@@ -2333,6 +2351,68 @@ export class ItemService {
       headers: {
         "x-project-id": xProjectId,
       },
+      errors: {
+        422: "Validation Error",
+      },
+      customRequestConfig: options,
+    });
+  }
+
+  public static getItemM2MsApiItemM2MsItemIdGet(
+    data: $OpenApiTs["/api/item/m2ms/{item_id}"]["get"]["req"],
+    options?: Partial<AxiosRequestConfig>,
+  ): CancelablePromise<ApiResult<$OpenApiTs["/api/item/m2ms/{item_id}"]["get"]["res"][200]>> {
+    const { itemId, xProjectId } = data;
+    return __request(OpenAPI, {
+      method: "GET",
+      url: "/api/item/m2ms/{item_id}",
+      path: {
+        item_id: itemId,
+      },
+      headers: {
+        "x-project-id": xProjectId,
+      },
+      errors: {
+        422: "Validation Error",
+      },
+      customRequestConfig: options,
+    });
+  }
+
+  public static getItemLabelsApiItemLabelsItemIdGet(
+    data: $OpenApiTs["/api/item/labels/{item_id}"]["get"]["req"],
+    options?: Partial<AxiosRequestConfig>,
+  ): CancelablePromise<ApiResult<$OpenApiTs["/api/item/labels/{item_id}"]["get"]["res"][200]>> {
+    const { itemId, xProjectId } = data;
+    return __request(OpenAPI, {
+      method: "GET",
+      url: "/api/item/labels/{item_id}",
+      path: {
+        item_id: itemId,
+      },
+      headers: {
+        "x-project-id": xProjectId,
+      },
+      errors: {
+        422: "Validation Error",
+      },
+      customRequestConfig: options,
+    });
+  }
+
+  public static updateItemInfoApiItemInfoPut(
+    data: $OpenApiTs["/api/item/info"]["put"]["req"],
+    options?: Partial<AxiosRequestConfig>,
+  ): CancelablePromise<ApiResult<$OpenApiTs["/api/item/info"]["put"]["res"][200]>> {
+    const { xProjectId, requestBody } = data;
+    return __request(OpenAPI, {
+      method: "PUT",
+      url: "/api/item/info",
+      headers: {
+        "x-project-id": xProjectId,
+      },
+      body: requestBody,
+      mediaType: "application/json",
       errors: {
         422: "Validation Error",
       },

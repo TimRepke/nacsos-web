@@ -734,6 +734,18 @@ export type IEUUID = {
   uuid: string;
 };
 
+export type ImportDetails = {
+  import_id?: string | null;
+  user_id?: string | null;
+  project_id: string;
+  name: string;
+  description: string;
+  type: string;
+  time_created?: string | null;
+  config?: ScopusImport | AcademicItemImport | OpenAlexFileImport | OpenAlexSolrImport | WoSImport | null;
+  revisions: Array<ImportRevisionModel>;
+};
+
 export type ImportFilter = {
   filter?: "import";
   import_ids: Array<IEUUID>;
@@ -750,6 +762,14 @@ export type ImportInfo = {
   config?: ScopusImport | AcademicItemImport | OpenAlexFileImport | OpenAlexSolrImport | WoSImport | null;
   num_revisions: number;
   num_items?: number | null;
+};
+
+export type ImportM2M = {
+  import_id: string;
+  item_id: string;
+  type: M2MImportItemType;
+  first_revision: number;
+  latest_revision: number;
 };
 
 export type ImportModel = {
@@ -775,6 +795,19 @@ export type ImportRevisionDetails = {
   num_items_updated?: number | null;
   num_items_removed?: number | null;
   task?: TaskModel | null;
+};
+
+export type ImportRevisionModel = {
+  import_revision_id?: string | null;
+  import_revision_counter: number;
+  time_created: string;
+  pipeline_task_id?: string | null;
+  import_id?: string | null;
+  num_items_retrieved?: number | null;
+  num_items?: number | null;
+  num_items_new?: number | null;
+  num_items_updated?: number | null;
+  num_items_removed?: number | null;
 };
 
 export type ItemAnnotation = {
@@ -899,6 +932,17 @@ export type LexisNexisItemSourceModel = {
     [key: string]: unknown;
   } | null;
 };
+
+/**
+ * This is a type to specify an entry in the many-to-many relation for items to imports.
+ *
+ * - An `explicit` m2m relation is used for cases where the import "explicitly" matched this item.
+ * For example: A tweet or paper matched a keyword specified in the query
+ * - An `implicit` m2m relation is used for cases where the import only "implicitly" includes this item.
+ * For example: A tweet is part of the conversation that contained a specified keyword or an
+ * article that is referenced by an article that is included "explicitly" in the query.
+ */
+export type M2MImportItemType = "explicit" | "implicit";
 
 export type MakeAssignmentsRequestModel = {
   annotation_scheme_id: string;
@@ -2584,6 +2628,23 @@ export type $OpenApiTs = {
       };
     };
   };
+  "/api/imports/list/details": {
+    get: {
+      req: {
+        xProjectId: string;
+      };
+      res: {
+        /**
+         * Successful Response
+         */
+        200: Array<ImportDetails>;
+        /**
+         * Validation Error
+         */
+        422: HTTPValidationError;
+      };
+    };
+  };
   "/api/imports/import/{import_id}": {
     get: {
       req: {
@@ -3415,6 +3476,60 @@ export type $OpenApiTs = {
          * Successful Response
          */
         200: AcademicItemModel;
+        /**
+         * Validation Error
+         */
+        422: HTTPValidationError;
+      };
+    };
+  };
+  "/api/item/m2ms/{item_id}": {
+    get: {
+      req: {
+        itemId: string;
+        xProjectId: string;
+      };
+      res: {
+        /**
+         * Successful Response
+         */
+        200: Array<ImportM2M>;
+        /**
+         * Validation Error
+         */
+        422: HTTPValidationError;
+      };
+    };
+  };
+  "/api/item/labels/{item_id}": {
+    get: {
+      req: {
+        itemId: string;
+        xProjectId: string;
+      };
+      res: {
+        /**
+         * Successful Response
+         */
+        200: unknown[];
+        /**
+         * Validation Error
+         */
+        422: HTTPValidationError;
+      };
+    };
+  };
+  "/api/item/info": {
+    put: {
+      req: {
+        requestBody: AcademicItemModel;
+        xProjectId: string;
+      };
+      res: {
+        /**
+         * Successful Response
+         */
+        200: unknown;
         /**
          * Validation Error
          */

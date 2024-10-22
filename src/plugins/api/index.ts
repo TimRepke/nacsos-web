@@ -17,7 +17,7 @@ import {
   UsersService,
   PipesService,
   ItemService,
-} from '@/plugins/api/spec/services.gen';
+} from "@/plugins/api/spec/services.gen";
 import type { ApiResponseReject } from "@/plugins/api/spec/core/ApiResult";
 import { EventBus } from "@/plugins/events";
 import { ToastEvent } from "@/plugins/events/events/toast";
@@ -57,6 +57,12 @@ export function toastReject(reason: ApiResponseReject) {
       `Request failed ${reason.error.detail.level}[${reason.status}] ${reason.error?.detail?.type}(${reason.error?.detail?.message})`,
     ),
   );
+}
+
+export function toastSuccess(txt: string) {
+  return () => {
+    EventBus.emit(new ToastEvent("SUCCESS", txt));
+  };
 }
 
 export type { ApiResult, ApiResponseReject, ErrorDetails } from "@/plugins/api/spec/core/ApiResult";

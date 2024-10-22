@@ -4488,6 +4488,124 @@ export const $IEUUID = {
   title: "IEUUID",
 } as const;
 
+export const $ImportDetails = {
+  properties: {
+    import_id: {
+      anyOf: [
+        {
+          type: "string",
+          format: "uuid",
+        },
+        {
+          type: "string",
+        },
+        {
+          type: "null",
+        },
+      ],
+      title: "Import Id",
+    },
+    user_id: {
+      anyOf: [
+        {
+          type: "string",
+          format: "uuid",
+        },
+        {
+          type: "string",
+        },
+        {
+          type: "null",
+        },
+      ],
+      title: "User Id",
+    },
+    project_id: {
+      anyOf: [
+        {
+          type: "string",
+          format: "uuid",
+        },
+        {
+          type: "string",
+        },
+      ],
+      title: "Project Id",
+    },
+    name: {
+      type: "string",
+      title: "Name",
+    },
+    description: {
+      type: "string",
+      title: "Description",
+    },
+    type: {
+      type: "string",
+      title: "Type",
+    },
+    time_created: {
+      anyOf: [
+        {
+          type: "string",
+          format: "date-time",
+        },
+        {
+          type: "null",
+        },
+      ],
+      title: "Time Created",
+    },
+    config: {
+      anyOf: [
+        {
+          oneOf: [
+            {
+              $ref: "#/components/schemas/ScopusImport",
+            },
+            {
+              $ref: "#/components/schemas/AcademicItemImport",
+            },
+            {
+              $ref: "#/components/schemas/OpenAlexFileImport",
+            },
+            {
+              $ref: "#/components/schemas/OpenAlexSolrImport",
+            },
+            {
+              $ref: "#/components/schemas/WoSImport",
+            },
+          ],
+          discriminator: {
+            propertyName: "kind",
+            mapping: {
+              academic: "#/components/schemas/AcademicItemImport",
+              "oa-file": "#/components/schemas/OpenAlexFileImport",
+              "oa-solr": "#/components/schemas/OpenAlexSolrImport",
+              scopus: "#/components/schemas/ScopusImport",
+              wos: "#/components/schemas/WoSImport",
+            },
+          },
+        },
+        {
+          type: "null",
+        },
+      ],
+      title: "Config",
+    },
+    revisions: {
+      items: {
+        $ref: "#/components/schemas/ImportRevisionModel",
+      },
+      type: "array",
+      title: "Revisions",
+    },
+  },
+  type: "object",
+  required: ["project_id", "name", "description", "type", "revisions"],
+  title: "ImportDetails",
+} as const;
+
 export const $ImportFilter = {
   properties: {
     filter: {
@@ -4634,6 +4752,49 @@ export const $ImportInfo = {
   type: "object",
   required: ["project_id", "name", "description", "type", "num_revisions"],
   title: "ImportInfo",
+} as const;
+
+export const $ImportM2M = {
+  properties: {
+    import_id: {
+      anyOf: [
+        {
+          type: "string",
+        },
+        {
+          type: "string",
+          format: "uuid",
+        },
+      ],
+      title: "Import Id",
+    },
+    item_id: {
+      anyOf: [
+        {
+          type: "string",
+        },
+        {
+          type: "string",
+          format: "uuid",
+        },
+      ],
+      title: "Item Id",
+    },
+    type: {
+      $ref: "#/components/schemas/M2MImportItemType",
+    },
+    first_revision: {
+      type: "integer",
+      title: "First Revision",
+    },
+    latest_revision: {
+      type: "integer",
+      title: "Latest Revision",
+    },
+  },
+  type: "object",
+  required: ["import_id", "item_id", "type", "first_revision", "latest_revision"],
+  title: "ImportM2M",
 } as const;
 
 export const $ImportModel = {
@@ -4868,6 +5029,119 @@ export const $ImportRevisionDetails = {
   type: "object",
   required: ["import_revision_counter", "time_created"],
   title: "ImportRevisionDetails",
+} as const;
+
+export const $ImportRevisionModel = {
+  properties: {
+    import_revision_id: {
+      anyOf: [
+        {
+          type: "string",
+          format: "uuid",
+        },
+        {
+          type: "string",
+        },
+        {
+          type: "null",
+        },
+      ],
+      title: "Import Revision Id",
+    },
+    import_revision_counter: {
+      type: "integer",
+      title: "Import Revision Counter",
+    },
+    time_created: {
+      type: "string",
+      format: "date-time",
+      title: "Time Created",
+    },
+    pipeline_task_id: {
+      anyOf: [
+        {
+          type: "string",
+        },
+        {
+          type: "null",
+        },
+      ],
+      title: "Pipeline Task Id",
+    },
+    import_id: {
+      anyOf: [
+        {
+          type: "string",
+          format: "uuid",
+        },
+        {
+          type: "string",
+        },
+        {
+          type: "null",
+        },
+      ],
+      title: "Import Id",
+    },
+    num_items_retrieved: {
+      anyOf: [
+        {
+          type: "integer",
+        },
+        {
+          type: "null",
+        },
+      ],
+      title: "Num Items Retrieved",
+    },
+    num_items: {
+      anyOf: [
+        {
+          type: "integer",
+        },
+        {
+          type: "null",
+        },
+      ],
+      title: "Num Items",
+    },
+    num_items_new: {
+      anyOf: [
+        {
+          type: "integer",
+        },
+        {
+          type: "null",
+        },
+      ],
+      title: "Num Items New",
+    },
+    num_items_updated: {
+      anyOf: [
+        {
+          type: "integer",
+        },
+        {
+          type: "null",
+        },
+      ],
+      title: "Num Items Updated",
+    },
+    num_items_removed: {
+      anyOf: [
+        {
+          type: "integer",
+        },
+        {
+          type: "null",
+        },
+      ],
+      title: "Num Items Removed",
+    },
+  },
+  type: "object",
+  required: ["import_revision_counter", "time_created"],
+  title: "ImportRevisionModel",
 } as const;
 
 export const $ItemAnnotation = {
@@ -5759,6 +6033,19 @@ export const $LexisNexisItemSourceModel = {
   type: "object",
   required: ["lexis_id"],
   title: "LexisNexisItemSourceModel",
+} as const;
+
+export const $M2MImportItemType = {
+  type: "string",
+  enum: ["explicit", "implicit"],
+  title: "M2MImportItemType",
+  description: `This is a type to specify an entry in the many-to-many relation for items to imports.
+
+  - An \`explicit\` m2m relation is used for cases where the import "explicitly" matched this item.
+    For example: A tweet or paper matched a keyword specified in the query
+  - An \`implicit\` m2m relation is used for cases where the import only "implicitly" includes this item.
+    For example: A tweet is part of the conversation that contained a specified keyword or an
+                 article that is referenced by an article that is included "explicitly" in the query.`,
 } as const;
 
 export const $MakeAssignmentsRequestModel = {
