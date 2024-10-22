@@ -26,7 +26,12 @@
               <inline-tool-tip v-show="assiEditMode" info="Assign all to user" placement="right" class="ms-2">
                 <font-awesome-icon icon="user-tag" @click="assignAll(username)" class="clickable-icon" />
               </inline-tool-tip>
-              <inline-tool-tip v-show="assiEditMode" info="Drop all open assignments for user" placement="right" class="ms-1">
+              <inline-tool-tip
+                v-show="assiEditMode"
+                info="Drop all open assignments for user"
+                placement="right"
+                class="ms-1"
+              >
                 <font-awesome-icon icon="user-xmark" @click="clearUser(username)" class="clickable-icon" />
               </inline-tool-tip>
             </th>
