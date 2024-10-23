@@ -8,7 +8,7 @@ import NacsosLogo from "@/components/NacsosLogo.vue";
 </script>
 
 <template>
-  <nav class="navbar navbar-expand-lg bg-body-tertiary">
+  <nav class="navbar navbar-expand-lg bg-body-tertiary apsis-head">
     <div class="container-fluid">
       <router-link to="/" class="navbar-brand">
         <NacsosLogo class="position-absolute top-0" />
@@ -58,5 +58,12 @@ import NacsosLogo from "@/components/NacsosLogo.vue";
 <style scoped>
 nav {
   border-bottom: 1px solid gray;
+  transition: height 3s ease-out;
+  max-height: 100rem;
+}
+
+nav:has(button[aria-expanded="false"]) {
+  max-height: 3rem;
+  transition: max-height 3s ease-in-out;
 }
 </style>
