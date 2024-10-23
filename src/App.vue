@@ -1,49 +1,41 @@
 <template>
-  <div class="w-100 h-100 p-0 m-0">
-    <template v-if="!isLoggedIn && $route.name !== 'about'">
-      <LoginView />
-    </template>
-    <template v-else>
-      <TopBar v-if="viewNeedsTopNav" class="d-flex flex-row vw-100" style="height: var(--topnav-height)" />
-      <div class="d-flex flex-row" :class="{ 'w-100': !viewNeedsTopNav, 'h-100': !viewNeedsTopNav }">
-        <SideBar v-if="viewNeedsSidebar" style="height: calc(100vh - var(--topnav-height))" />
+  <template v-if="!isLoggedIn && $route.name !== 'about'">
+    <LoginView />
+  </template>
+  <template v-else>
+    <TopBar v-if="viewNeedsTopNav" />
 
-        <router-view
-          v-slot="{ Component }"
-          class="col overflow-auto p-2 ps-md-3 pe-md-4 pb-3 text-start"
-          :class="{ 'pt-4': !viewNeedsSidebar }"
-          :style="{ height: viewNeedsTopNav ? 'calc(100vh - var(--topnav-height))' : undefined }"
-        >
-          <template v-if="Component">
-            <Transition mode="out-in">
-              <KeepAlive>
-                <Suspense>
-                  <!-- main content -->
-                  <component :is="Component" />
+    <div class="d-flex flex-row" :class="{ 'w-100': !viewNeedsTopNav, 'h-100': !viewNeedsTopNav }">
+      <SideBar v-if="viewNeedsSidebar" style="height: calc(100vh - var(--topnav-height))" />
 
-                  <!-- loading state -->
-                  <!--                <template #fallback>-->
-                  <!--                  Loading...<br />-->
-                  <!--                  If this takes longer than expected, something might be wrong.-->
-                  <!--                </template>-->
-                </Suspense>
-              </KeepAlive>
-            </Transition>
-          </template>
-        </router-view>
-      </div>
-      <router-link
-        v-if="viewNeedsTopNav"
-        to="/"
-        class="text-decoration-none text-nowrap position-absolute d-inline-block mt-1 top-0"
-        style="z-index: 2000; left: 1rem"
+      <router-view
+        v-slot="{ Component }"
+        class="col overflow-auto p-2 ps-md-3 pe-md-4 pb-3 text-start"
+        :class="{ 'pt-4': !viewNeedsSidebar }"
+        :style="{ height: viewNeedsTopNav ? 'calc(100vh - var(--topnav-height))' : undefined }"
       >
-        <NacsosLogo class="mt-0" />
-      </router-link>
-      <ToastsViewer />
-      <ConfirmationModal />
-    </template>
-  </div>
+        <template v-if="Component">
+          <Transition mode="out-in">
+            <KeepAlive>
+              <Suspense>
+                <!-- main content -->
+                <component :is="Component" />
+
+                <!-- loading state -->
+                <!--                <template #fallback>-->
+                <!--                  Loading...<br />-->
+                <!--                  If this takes longer than expected, something might be wrong.-->
+                <!--                </template>-->
+              </Suspense>
+            </KeepAlive>
+          </Transition>
+        </template>
+      </router-view>
+    </div>
+
+    <ToastsViewer />
+    <ConfirmationModal />
+  </template>
 </template>
 
 <script lang="ts">
@@ -122,18 +114,5 @@ export default defineComponent({
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
-}
-
-nav {
-  padding: 30px;
-
-  a {
-    font-weight: bold;
-    color: #2c3e50;
-
-    &.router-link-exact-active {
-      color: #42b983;
-    }
-  }
 }
 </style>
