@@ -12,13 +12,9 @@ function logout() {
 </script>
 
 <template>
-  <div class="dropdown">
+  <li class="dropdown">
     <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-      <font-awesome-icon
-        class="me-1 mb-1"
-        style="font-size: 1.5em; vertical-align: middle"
-        :icon="['fas', 'circle-user']"
-      />
+      <font-awesome-icon class="me-1 mb-1" style="vertical-align: middle" :icon="['fas', 'circle-user']" />
       {{ currentUserStore.user?.username || "Username" }}
     </a>
     <ul class="dropdown-menu">
@@ -68,5 +64,5 @@ function logout() {
         Log out
       </li>
     </ul>
-  </div>
+  </li>
 </template>

@@ -329,6 +329,10 @@ router.beforeEach(async (to) => {
     currentUserStore.clear();
   }
 
+  if (to.name === "home" && currentProjectStore.projectSelected) {
+    return { name: "project-overview" };
+  }
+
   // otherwise, navigation is valid, so continue
   return true;
 });

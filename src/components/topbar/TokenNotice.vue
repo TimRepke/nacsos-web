@@ -19,7 +19,7 @@ setInterval(checkTokenNeedsExtension, 60 * 1000);
 </script>
 
 <template>
-  <div class="pe-4 text-warning-emphasis" v-if="tokenNeedsExtension">
+  <li class="text-warning-emphasis" v-if="tokenNeedsExtension">
     <router-link :to="{ name: 'user-profile' }" class="nav-link d-inline-block">
       <font-awesome-icon
         class="me-1 mb-1 clickable-icon"
@@ -28,5 +28,5 @@ setInterval(checkTokenNeedsExtension, 60 * 1000);
       />
       Consider extending login token.
     </router-link>
-  </div>
+  </li>
 </template>

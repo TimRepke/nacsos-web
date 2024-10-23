@@ -9,10 +9,11 @@ if (!interfaceSettingsStore.highlighters.active[currentProjectStore.projectId as
 </script>
 
 <template>
-  <div class="dropdown">
+  <li class="dropdown">
     <a
       class="nav-link dropdown-toggle"
       type="button"
+      style="line-height: 1.5em"
       data-bs-toggle="dropdown"
       data-bs-auto-close="outside"
       aria-expanded="false"
@@ -63,5 +64,5 @@ if (!interfaceSettingsStore.highlighters.active[currentProjectStore.projectId as
         </div>
       </li>
     </ul>
-  </div>
+  </li>
 </template>
