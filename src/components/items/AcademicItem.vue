@@ -53,6 +53,10 @@
           <font-awesome-icon :icon="['fas', 'calendar-days']" class="me-2" />
           {{ item.publication_year }}
         </div>
+        <div v-if="item.source" class="flex-nowrap d-flex me-4">
+          <font-awesome-icon :icon="['fas', 'book-open']" class="me-2" />
+          {{ item.source }}
+        </div>
         <div v-if="item.authors" class="flex-nowrap d-flex me-4">
           <font-awesome-icon :icon="['fas', 'people-group']" class="me-2" />
           <ul class="list-inline mb-0">
