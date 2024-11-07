@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { useScopesStore } from "@/stores/CurrentProjectStore/scopes.ts";
 import { computed } from "vue";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
+import { useScopesStore } from "@/stores/CurrentProjectStore/scopes";
 
 const selectedScopes = defineModel<string[]>({ required: true });
 
@@ -14,11 +14,11 @@ const sortedFilteredScopes = computed(() =>
     .filter(
       (scope) =>
         ((scope.bot && scope.bot?.kind === "RESOLVE") || !scope.bot) &&
-        selectedScopes.value.indexOf(scope.scopeKey) < 0,
+        selectedScopes.value.indexOf(scope.scopeKey as string) < 0,
     )
     .toSorted((s1, s2) => {
-      const n1 = (s1.bot?.name ?? s1.human?.name).toLowerCase();
-      const n2 = (s2.bot?.name ?? s2.human?.name).toLowerCase();
+      const n1 = ((s1.bot?.name ?? s1.human?.name) as string).toLowerCase();
+      const n2 = ((s2.bot?.name ?? s2.human?.name) as string).toLowerCase();
       return n1 === n2 ? 0 : n1 < n2 ? -1 : 1;
     }),
 );

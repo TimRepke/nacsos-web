@@ -72,16 +72,20 @@ const revisions = computed<Record<string, Revision>>(() =>
 
 const table = computed(() =>
   annotations.value.map((anno) => {
-    anno.username = platformUsersStore.userLookup[anno.user_id]?.username ?? "??";
-    anno.value = anno.value_bool ?? anno.value_int ?? anno.value_str ?? anno.value_float ?? anno.multi_int;
-    return anno;
+    return {
+      ...anno,
+      username: platformUsersStore.userLookup[anno.user_id]?.username ?? "??",
+      value: anno.value_bool ?? anno.value_int ?? anno.value_str ?? anno.value_float ?? anno.multi_int,
+    };
   }),
 );
 
 const botTable = computed(() =>
   botAnnotations.value.map((anno) => {
-    anno.value = anno.value_bool ?? anno.value_int ?? anno.value_str ?? anno.value_float ?? anno.multi_int;
-    return anno;
+    return {
+      ...anno,
+      value: anno.value_bool ?? anno.value_int ?? anno.value_str ?? anno.value_float ?? anno.multi_int,
+    };
   }),
 );
 </script>

@@ -1,20 +1,20 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from "vue";
+import { useRoute } from "vue-router";
+import { dt2str, pyDTNow, timestampNow } from "@/util";
+import { currentProjectStore, currentUserStore } from "@/stores";
+import { EventBus } from "@/plugins/events";
+import { ToastEvent } from "@/plugins/events/events/toast";
+import { ConfirmationRequestEvent } from "@/plugins/events/events/confirmation";
+import { API, toastReject, toastSuccess } from "@/plugins/api";
+import { ClimateBERTModel, SciBERTModel, PriorityModel } from "@/plugins/api/spec";
+import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import SortedScopePicker from "@/components/annotations/SortedScopePicker.vue";
 import ExpandableBox from "@/components/ExpandableBox.vue";
-import { dt2str, pyDTNow, timestampNow, delay } from "@/util";
 import NQLBox from "@/components/NQLBox.vue";
-import { EventBus } from "@/plugins/events";
-import { ConfirmationRequestEvent } from "@/plugins/events/events/confirmation.ts";
-import { ToastEvent } from "@/plugins/events/events/toast.ts";
-import { currentProjectStore, currentUserStore } from "@/stores";
-import { API, toastReject, toastSuccess } from "@/plugins/api";
-import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
-import { ClimateBERTModel, SciBERTModel, PriorityModel } from "@/plugins/api/spec";
 import SortedTableHead from "@/components/SortableTable/SortedTableHead.vue";
 import SortedTable from "@/components/SortableTable/SortedTable.vue";
 import ItemModal from "@/components/items/ItemModal.vue";
-import { useRoute } from "vue-router";
 import ViewContainer from "@/components/ViewContainer.vue";
 
 export type PeekRow = {
@@ -40,32 +40,36 @@ const peekTableExtraColumns = computed<string[]>(() =>
     ? []
     : [
         ...new Set(Object.keys(peekTable.value[0])).difference(
-          new Set(["scope_order", "item_order", "item_id", "wos_id", "oa_id", "doi", "py", setup.value.incl_field]),
+          new Set(["scope_order", "item_order", "item_id", "wos_id", "oa_id", "doi", "py", setup.value?.incl_field]),
         ),
       ],
 );
 
 async function peek() {
-  peekTable.value = (
-    await API.prio.getTableSampleApiPrioTablePeekPost({
-      xProjectId: currentProjectStore.projectId as string,
-      requestBody: {
-        query: nql.value[0],
-        scope_ids: setup.value.source_scopes,
-        incl: setup.value.incl_rule,
-      },
-    })
-  ).data;
+  if (setup.value) {
+    peekTable.value = (
+      await API.prio.getTableSampleApiPrioTablePeekPost({
+        xProjectId: currentProjectStore.projectId as string,
+        requestBody: {
+          query: nql.value[0],
+          scope_ids: setup.value.source_scopes as string[],
+          incl: setup.value.incl_rule as string,
+        },
+      })
+    ).data as unknown as PeekRow[];
+  }
 }
 
 async function apiSave() {
-  if (!setup.value.time_created) {
-    setup.value.time_created = pyDTNow();
+  if (setup.value) {
+    if (!setup.value.time_created) {
+      setup.value.time_created = pyDTNow();
+    }
+    await API.prio.savePrioSetupApiPrioSetupPut({
+      xProjectId: currentProjectStore.projectId as string,
+      requestBody: setup.value as PriorityModel,
+    });
   }
-  await API.prio.savePrioSetupApiPrioSetupPut({
-    xProjectId: currentProjectStore.projectId as string,
-    requestBody: setup.value,
-  });
 }
 
 async function train() {
@@ -73,7 +77,7 @@ async function train() {
     new ConfirmationRequestEvent(
       "This is expensive. Really?",
       (response) => {
-        if (response === "ACCEPT") {
+        if (response === "ACCEPT" && !!setup.value) {
           setup.value.time_started = pyDTNow();
           apiSave()
             .then(() => {
@@ -111,14 +115,14 @@ onMounted(async () => {
   if (route.query.priority_id) {
     setup.value = (
       await API.prio.readPrioSetupApiPrioSetupGet({
-        priorityId: route.query.priority_id,
+        priorityId: route.query.priority_id as string,
         xProjectId: currentProjectStore.projectId as string,
       })
     ).data;
   }
   if (!setup.value) {
     setup.value = {
-      priority_id: route.query.priority_id ?? crypto.randomUUID().toString(),
+      priority_id: (route.query.priority_id as string | undefined) ?? crypto.randomUUID().toString(),
       project_id: currentProjectStore.projectId,
       name: `${timestampNow()}_round_??`,
       // scopes to use labels from

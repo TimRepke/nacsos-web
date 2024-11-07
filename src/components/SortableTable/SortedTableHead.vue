@@ -1,11 +1,15 @@
 <script setup lang="ts">
-import { computed, inject } from "vue";
-import { Sort } from "@/components/SortableTable/index";
+import { computed, inject, ref } from "vue";
+import { Sort, sortTableStoreKey } from "@/components/SortableTable/index";
 
 const props = defineProps<{
   colKey: string;
 }>();
-const { sortBy, sortOrder, sort } = inject("tableSort");
+const { sortBy, sortOrder, sort } = inject(sortTableStoreKey, {
+  sortBy: ref(null),
+  sortOrder: ref(0),
+  sort: () => {},
+});
 const icon = computed(() =>
   props.colKey === sortBy.value ? [Sort["sort-down"], Sort.sort, Sort["sort-up"]][sortOrder.value + 1] : Sort.sort,
 );

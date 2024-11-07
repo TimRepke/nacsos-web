@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import { type Filter, parse } from "@/util/nql";
-import { isNone, notNone } from '@/util';
+import { isNone, notNone } from "@/util";
 import { computed, onMounted, ref, watch } from "vue";
 import RefreshIcon from "@/components/RefreshIcon.vue";
 import { API } from "@/plugins/api";

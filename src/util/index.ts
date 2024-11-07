@@ -99,18 +99,22 @@ export function dt2str(datetime: string | null | undefined): string | null {
   return null;
 }
 
+function _dt2pstr(dt: Date): string {
+  // 2024-07-30T17:43:46.095103Z
+  // eslint-disable-next-line vue/max-len
+  return `${dt.getFullYear()}-${padZero(dt.getMonth() + 1, 2)}-${padZero(dt.getDate(), 2)}T${padZero(dt.getHours() + dt.getTimezoneOffset(), 2)}:${padZero(dt.getMinutes(), 2)}:${padZero(dt.getSeconds(), 2)}.000000Z`;
+}
+
 export function dt2pstr(datetime: string | null | undefined): string | null {
   // 2024-07-30T17:43:46.095103Z
   if (datetime !== null && datetime !== undefined) {
-    const dt = new Date(datetime);
-    // eslint-disable-next-line vue/max-len
-    return `${dt.getFullYear()}-${padZero(dt.getMonth() + 1, 2)}-${padZero(dt.getDate(), 2)}T${padZero(dt.getHours() + dt.getTimezoneOffset(), 2)}:${padZero(dt.getMinutes(), 2)}:${padZero(dt.getSeconds(), 2)}.000000Z`;
+    return _dt2pstr(new Date(datetime));
   }
   return null;
 }
 
 export function pyDTNow() {
-  return dt2pstr(new Date());
+  return _dt2pstr(new Date());
 }
 
 export function timestampNow() {
@@ -176,7 +180,7 @@ export function useDelay<T extends Array<any>, U>(fn: (...args: T) => U, delay: 
   return { call, delayedCall, clear };
 }
 
-export function delay(ms) {
+export function delay(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 

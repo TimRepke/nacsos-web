@@ -8,7 +8,7 @@ import { API, ignore, toastReject, toastSuccess } from "@/plugins/api";
 import { dt2str } from "@/util";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import { EventBus } from "@/plugins/events";
-import { ConfirmationRequestEvent } from "@/plugins/events/events/confirmation.ts";
+import { ConfirmationRequestEvent } from "@/plugins/events/events/confirmation";
 
 const newId = crypto.randomUUID().toString();
 const setups = ref<DehydratedPriorityModel[]>([]);

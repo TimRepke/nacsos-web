@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, provide } from "vue";
+import { sortTableStoreKey } from "@/components/SortableTable/index";
 
 const props = defineProps<{
   data: Record<string, any>[];
@@ -14,7 +15,7 @@ const sortedData = computed(() =>
   !sortBy.value
     ? props.data
     : props.data.toSorted((a, b) => {
-        if (a[sortBy.value] >= b[sortBy.value]) {
+        if (a[sortBy.value as string] >= b[sortBy.value as string]) {
           return sortOrder.value;
         }
         return -sortOrder.value;
@@ -29,7 +30,7 @@ function sort(field: string) {
   }
 }
 
-provide("tableSort", {
+provide(sortTableStoreKey, {
   sortBy,
   sortOrder,
   sort,
