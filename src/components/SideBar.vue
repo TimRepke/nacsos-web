@@ -186,6 +186,13 @@ export default defineComponent({
               routes: ["project-annotate-progress"],
             },
             {
+              name: "Prioritisation",
+              icon: "wand-magic-sparkles",
+              target: "/project/config/priority/list",
+              permission: perm.annotations_prio,
+              routes: ["config-priority", "config-priority-setup", "config-priority-list"],
+            },
+            {
               name: "Label Manager",
               icon: "tags",
               target: "/project/config/annotations",

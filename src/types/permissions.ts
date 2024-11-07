@@ -9,6 +9,7 @@ export type PermissionKeys =
   | "imports_edit"
   | "annotations_read"
   | "annotations_edit"
+  | "annotations_prio"
   | "pipelines_read"
   | "pipelines_edit"
   | "artefacts_read"
@@ -31,6 +32,7 @@ export const ProjectPermissionHints: Record<PermissionKeys, string> = {
     "The user will be able to see their own annotations made in this project and create/update their annotations.",
   annotations_edit:
     "The user will be able to see all annotations in this project, create annotation schemes, assignments, resolve annotations, and export them.",
+  annotations_prio: "The user will be able to train models for priority screening.",
   pipelines_read: "The user will be able to see the status of pipelines.",
   pipelines_edit: "The user will be able to trigger pipeline runs.",
   artefacts_read: "The user will be able to see artefacts.",
@@ -49,6 +51,7 @@ export const PermissionPresets: Record<string, Permissions> = {
     imports_edit: false,
     annotations_read: false,
     annotations_edit: false,
+    annotations_prio: false,
     pipelines_read: false,
     pipelines_edit: false,
     artefacts_read: false,
@@ -65,6 +68,7 @@ export const PermissionPresets: Record<string, Permissions> = {
     imports_edit: false,
     annotations_read: true,
     annotations_edit: false,
+    annotations_prio: false,
     pipelines_read: false,
     pipelines_edit: false,
     artefacts_read: false,
@@ -81,6 +85,7 @@ export const PermissionPresets: Record<string, Permissions> = {
     imports_edit: true,
     annotations_read: true,
     annotations_edit: true,
+    annotations_prio: false,
     pipelines_read: true,
     pipelines_edit: true,
     artefacts_read: true,
@@ -97,6 +102,7 @@ export const PermissionPresets: Record<string, Permissions> = {
     imports_edit: true,
     annotations_read: true,
     annotations_edit: true,
+    annotations_prio: false,
     pipelines_read: true,
     pipelines_edit: true,
     artefacts_read: true,

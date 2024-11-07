@@ -2,30 +2,34 @@
   <div class="position-relative">
     <div class="row g-0">
       <!-- Search sidebar -->
-      <div class="col-12 col-lg-3 order-lg-last overflow-auto text-start searchbar" v-show="showSearchBar">
-        <div class="row m-2">
-          <h3>Search options</h3>
+      <div class="col-12 col-lg-3 order-lg-last overflow-auto text-start searchbar p-2" v-show="showSearchBar">
+        <div class="row">
+          <div class="col">
+            <h3>Search options</h3>
+          </div>
         </div>
-        <div class="row m-2 mt-0 small text-muted">
-          Number of documents:
-          <template v-if="queryNumItems !== null"> {{ queryNumItems.toLocaleString("en") }} /</template>
-          {{ totalNumItems.toLocaleString("en") }}
+        <div class="row small text-muted mb-3">
+          <div class="col">
+            Number of documents:
+            <template v-if="queryNumItems !== null"> {{ queryNumItems.toLocaleString("en") }} /</template>
+            {{ totalNumItems.toLocaleString("en") }}
+          </div>
         </div>
-        <div class="row m-2 mt-0">
+        <div class="row">
           <NQLBox v-model:query="queryStr" @update:query-parsed="updateQuery" />
         </div>
-        <div class="row m-2 mt-0">
+        <div class="row mt-2">
           <div class="col">
             <button
               type="button"
               @click="fetchData({ currentPage: 1, currentPageSize: 30 })"
-              class="btn btn-outline-primary"
+              class="btn btn-outline-primary btn-sm"
             >
               Query
             </button>
           </div>
-          <div class="col">
-            <button type="button" @click="resetQuery" class="btn btn-outline-danger">Reset</button>
+          <div class="col text-end">
+            <button type="button" @click="resetQuery" class="btn btn-sm btn-outline-danger">Reset</button>
           </div>
         </div>
       </div>

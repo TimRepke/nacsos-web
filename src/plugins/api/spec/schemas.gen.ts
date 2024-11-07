@@ -3117,6 +3117,112 @@ export const $BotAnnotationMetaDataBaseModel = {
   title: "BotAnnotationMetaDataBaseModel",
 } as const;
 
+export const $BotAnnotationMetaDataModel = {
+  properties: {
+    bot_annotation_metadata_id: {
+      anyOf: [
+        {
+          type: "string",
+        },
+        {
+          type: "string",
+          format: "uuid",
+        },
+        {
+          type: "null",
+        },
+      ],
+      title: "Bot Annotation Metadata Id",
+    },
+    name: {
+      type: "string",
+      title: "Name",
+    },
+    kind: {
+      $ref: "#/components/schemas/BotKind",
+    },
+    project_id: {
+      anyOf: [
+        {
+          type: "string",
+        },
+        {
+          type: "string",
+          format: "uuid",
+        },
+      ],
+      title: "Project Id",
+    },
+    time_created: {
+      anyOf: [
+        {
+          type: "string",
+          format: "date-time",
+        },
+        {
+          type: "null",
+        },
+      ],
+      title: "Time Created",
+    },
+    time_updated: {
+      anyOf: [
+        {
+          type: "string",
+          format: "date-time",
+        },
+        {
+          type: "null",
+        },
+      ],
+      title: "Time Updated",
+    },
+    assignment_scope_id: {
+      anyOf: [
+        {
+          type: "string",
+        },
+        {
+          type: "string",
+          format: "uuid",
+        },
+        {
+          type: "null",
+        },
+      ],
+      title: "Assignment Scope Id",
+    },
+    annotation_scheme_id: {
+      anyOf: [
+        {
+          type: "string",
+        },
+        {
+          type: "string",
+          format: "uuid",
+        },
+        {
+          type: "null",
+        },
+      ],
+      title: "Annotation Scheme Id",
+    },
+    meta: {
+      anyOf: [
+        {
+          $ref: "#/components/schemas/BotMetaResolve",
+        },
+        {
+          type: "null",
+        },
+      ],
+    },
+  },
+  type: "object",
+  required: ["name", "kind", "project_id"],
+  title: "BotAnnotationMetaDataModel",
+} as const;
+
 export const $BotAnnotationModel = {
   properties: {
     value_bool: {
@@ -3604,6 +3710,80 @@ export const $Cashtag = {
   title: "Cashtag",
 } as const;
 
+export const $ClimateBERTModel = {
+  properties: {
+    max_len: {
+      type: "integer",
+      title: "Max Len",
+      default: 512,
+    },
+    train_split: {
+      type: "number",
+      title: "Train Split",
+      default: 0.9,
+    },
+    n_epochs: {
+      type: "integer",
+      title: "N Epochs",
+      default: 3,
+    },
+    batch_size_predict: {
+      type: "integer",
+      title: "Batch Size Predict",
+      default: 50,
+    },
+    batch_size_train: {
+      type: "integer",
+      title: "Batch Size Train",
+      default: 16,
+    },
+    batch_size_eval: {
+      type: "integer",
+      title: "Batch Size Eval",
+      default: 50,
+    },
+    warmup_steps: {
+      type: "integer",
+      title: "Warmup Steps",
+      default: 400,
+    },
+    weight_decay: {
+      type: "number",
+      title: "Weight Decay",
+      default: 0.01,
+    },
+    logging_steps: {
+      type: "integer",
+      title: "Logging Steps",
+      default: 10,
+    },
+    eval_strategy: {
+      type: "string",
+      title: "Eval Strategy",
+      default: "steps",
+    },
+    eval_steps: {
+      type: "integer",
+      title: "Eval Steps",
+      default: 50,
+    },
+    conf: {
+      type: "string",
+      enum: ["CLIMBERT"],
+      const: "CLIMBERT",
+      title: "Conf",
+      default: "CLIMBERT",
+    },
+    model: {
+      type: "string",
+      title: "Model",
+      default: "climatebert/distilroberta-base-climate-f",
+    },
+  },
+  type: "object",
+  title: "ClimateBERTModel",
+} as const;
+
 export const $ContextAnnotation = {
   properties: {
     domain_id: {
@@ -3691,6 +3871,102 @@ export const $DehydratedAssignment = {
   title: "DehydratedAssignment",
 } as const;
 
+export const $DehydratedPriorityModel = {
+  properties: {
+    priority_id: {
+      anyOf: [
+        {
+          type: "string",
+        },
+        {
+          type: "string",
+          format: "uuid",
+        },
+        {
+          type: "null",
+        },
+      ],
+      title: "Priority Id",
+    },
+    project_id: {
+      anyOf: [
+        {
+          type: "string",
+        },
+        {
+          type: "string",
+          format: "uuid",
+        },
+        {
+          type: "null",
+        },
+      ],
+      title: "Project Id",
+    },
+    name: {
+      anyOf: [
+        {
+          type: "string",
+        },
+        {
+          type: "null",
+        },
+      ],
+      title: "Name",
+    },
+    time_created: {
+      anyOf: [
+        {
+          type: "string",
+          format: "date-time",
+        },
+        {
+          type: "null",
+        },
+      ],
+      title: "Time Created",
+    },
+    time_started: {
+      anyOf: [
+        {
+          type: "string",
+          format: "date-time",
+        },
+        {
+          type: "null",
+        },
+      ],
+      title: "Time Started",
+    },
+    time_ready: {
+      anyOf: [
+        {
+          type: "string",
+          format: "date-time",
+        },
+        {
+          type: "null",
+        },
+      ],
+      title: "Time Ready",
+    },
+    time_assigned: {
+      anyOf: [
+        {
+          type: "string",
+          format: "date-time",
+        },
+        {
+          type: "null",
+        },
+      ],
+      title: "Time Assigned",
+    },
+  },
+  type: "object",
+  title: "DehydratedPriorityModel",
+} as const;
+
 export const $DehydratedUser = {
   properties: {
     user_id: {
@@ -3739,16 +4015,16 @@ export const $Event = {
   properties: {
     event: {
       type: "string",
-      enum: ["ExampleEvent", "ExampleSubEvent"],
+      enum: ["ExampleSubEvent", "ExampleEvent"],
       title: "Event",
     },
     payload: {
       anyOf: [
         {
-          $ref: "#/components/schemas/ExampleEvent",
+          $ref: "#/components/schemas/ExampleSubEvent",
         },
         {
-          $ref: "#/components/schemas/ExampleSubEvent",
+          $ref: "#/components/schemas/ExampleEvent",
         },
       ],
       title: "Payload",
@@ -6317,6 +6593,344 @@ export const $OpenAlexSolrImport = {
   title: "OpenAlexSolrImport",
 } as const;
 
+export const $PrioTableParams = {
+  properties: {
+    scope_ids: {
+      items: {
+        type: "string",
+      },
+      type: "array",
+      title: "Scope Ids",
+    },
+    incl: {
+      type: "string",
+      title: "Incl",
+      default: "incl:1",
+    },
+    query: {
+      anyOf: [
+        {
+          oneOf: [
+            {
+              $ref: "#/components/schemas/FieldFilter",
+            },
+            {
+              $ref: "#/components/schemas/FieldFilters",
+            },
+            {
+              $ref: "#/components/schemas/LabelFilterMulti",
+            },
+            {
+              $ref: "#/components/schemas/LabelFilterBool",
+            },
+            {
+              $ref: "#/components/schemas/LabelFilterInt",
+            },
+            {
+              $ref: "#/components/schemas/AssignmentFilter",
+            },
+            {
+              $ref: "#/components/schemas/AnnotationFilter",
+            },
+            {
+              $ref: "#/components/schemas/AbstractFilter",
+            },
+            {
+              $ref: "#/components/schemas/ImportFilter",
+            },
+            {
+              $ref: "#/components/schemas/MetaFilterBool",
+            },
+            {
+              $ref: "#/components/schemas/MetaFilterInt",
+            },
+            {
+              $ref: "#/components/schemas/MetaFilterStr",
+            },
+            {
+              $ref: "#/components/schemas/SubQuery",
+            },
+          ],
+          discriminator: {
+            propertyName: "filter",
+            mapping: {
+              abstract: "#/components/schemas/AbstractFilter",
+              annotation: "#/components/schemas/AnnotationFilter",
+              assignment: "#/components/schemas/AssignmentFilter",
+              field: "#/components/schemas/FieldFilter",
+              field_mul: "#/components/schemas/FieldFilters",
+              import: "#/components/schemas/ImportFilter",
+              label_bool: "#/components/schemas/LabelFilterBool",
+              label_int: "#/components/schemas/LabelFilterInt",
+              label_multi: "#/components/schemas/LabelFilterMulti",
+              meta_bool: "#/components/schemas/MetaFilterBool",
+              meta_int: "#/components/schemas/MetaFilterInt",
+              meta_str: "#/components/schemas/MetaFilterStr",
+              sub: "#/components/schemas/SubQuery",
+            },
+          },
+        },
+        {
+          type: "null",
+        },
+      ],
+      title: "Query",
+    },
+    limit: {
+      anyOf: [
+        {
+          type: "integer",
+        },
+        {
+          type: "null",
+        },
+      ],
+      title: "Limit",
+      default: 20,
+    },
+  },
+  type: "object",
+  required: ["scope_ids"],
+  title: "PrioTableParams",
+} as const;
+
+export const $PriorityModel = {
+  properties: {
+    priority_id: {
+      anyOf: [
+        {
+          type: "string",
+        },
+        {
+          type: "string",
+          format: "uuid",
+        },
+        {
+          type: "null",
+        },
+      ],
+      title: "Priority Id",
+    },
+    project_id: {
+      anyOf: [
+        {
+          type: "string",
+        },
+        {
+          type: "string",
+          format: "uuid",
+        },
+        {
+          type: "null",
+        },
+      ],
+      title: "Project Id",
+    },
+    name: {
+      anyOf: [
+        {
+          type: "string",
+        },
+        {
+          type: "null",
+        },
+      ],
+      title: "Name",
+    },
+    time_created: {
+      anyOf: [
+        {
+          type: "string",
+          format: "date-time",
+        },
+        {
+          type: "null",
+        },
+      ],
+      title: "Time Created",
+    },
+    time_started: {
+      anyOf: [
+        {
+          type: "string",
+          format: "date-time",
+        },
+        {
+          type: "null",
+        },
+      ],
+      title: "Time Started",
+    },
+    time_ready: {
+      anyOf: [
+        {
+          type: "string",
+          format: "date-time",
+        },
+        {
+          type: "null",
+        },
+      ],
+      title: "Time Ready",
+    },
+    time_assigned: {
+      anyOf: [
+        {
+          type: "string",
+          format: "date-time",
+        },
+        {
+          type: "null",
+        },
+      ],
+      title: "Time Assigned",
+    },
+    source_scopes: {
+      anyOf: [
+        {
+          items: {
+            type: "string",
+          },
+          type: "array",
+        },
+        {
+          items: {
+            type: "string",
+            format: "uuid",
+          },
+          type: "array",
+        },
+        {
+          type: "null",
+        },
+      ],
+      title: "Source Scopes",
+    },
+    nql: {
+      anyOf: [
+        {
+          type: "string",
+        },
+        {
+          type: "null",
+        },
+      ],
+      title: "Nql",
+    },
+    incl_rule: {
+      anyOf: [
+        {
+          type: "string",
+        },
+        {
+          type: "null",
+        },
+      ],
+      title: "Incl Rule",
+    },
+    incl_field: {
+      anyOf: [
+        {
+          type: "string",
+        },
+        {
+          type: "null",
+        },
+      ],
+      title: "Incl Field",
+    },
+    incl_pred_field: {
+      anyOf: [
+        {
+          type: "string",
+        },
+        {
+          type: "null",
+        },
+      ],
+      title: "Incl Pred Field",
+    },
+    train_split: {
+      anyOf: [
+        {
+          type: "number",
+        },
+        {
+          type: "null",
+        },
+      ],
+      title: "Train Split",
+    },
+    n_predictions: {
+      anyOf: [
+        {
+          type: "integer",
+        },
+        {
+          type: "null",
+        },
+      ],
+      title: "N Predictions",
+    },
+    config: {
+      anyOf: [
+        {
+          oneOf: [
+            {
+              $ref: "#/components/schemas/SciBERTModel",
+            },
+            {
+              $ref: "#/components/schemas/ClimateBERTModel",
+            },
+            {
+              $ref: "#/components/schemas/RegressionModel",
+            },
+            {
+              $ref: "#/components/schemas/SVMModel",
+            },
+          ],
+          discriminator: {
+            propertyName: "conf",
+            mapping: {
+              CLIMBERT: "#/components/schemas/ClimateBERTModel",
+              REG: "#/components/schemas/RegressionModel",
+              SCIBERT: "#/components/schemas/SciBERTModel",
+              SVM: "#/components/schemas/SVMModel",
+            },
+          },
+        },
+        {
+          type: "null",
+        },
+      ],
+      title: "Config",
+    },
+    prioritised_ids: {
+      anyOf: [
+        {
+          items: {
+            type: "string",
+          },
+          type: "array",
+        },
+        {
+          items: {
+            type: "string",
+            format: "uuid",
+          },
+          type: "array",
+        },
+        {
+          type: "null",
+        },
+      ],
+      title: "Prioritised Ids",
+    },
+  },
+  type: "object",
+  title: "PriorityModel",
+} as const;
+
 export const $ProjectBaseInfo = {
   properties: {
     users: {
@@ -6662,6 +7276,11 @@ export const $ProjectPermissionsModel = {
       title: "Annotations Edit",
       default: false,
     },
+    annotations_prio: {
+      type: "boolean",
+      title: "Annotations Prio",
+      default: false,
+    },
     pipelines_read: {
       type: "boolean",
       title: "Pipelines Read",
@@ -6811,6 +7430,90 @@ export const $ReferencedTweet = {
   type: "object",
   required: ["id", "type"],
   title: "ReferencedTweet",
+} as const;
+
+export const $RegressionModel = {
+  properties: {
+    stop_words: {
+      anyOf: [
+        {
+          type: "string",
+          enum: ["english"],
+          const: "english",
+        },
+        {
+          items: {
+            type: "string",
+          },
+          type: "array",
+        },
+        {
+          type: "null",
+        },
+      ],
+      title: "Stop Words",
+      default: "english",
+    },
+    ngram_range: {
+      prefixItems: [
+        {
+          type: "integer",
+        },
+        {
+          type: "integer",
+        },
+      ],
+      type: "array",
+      maxItems: 2,
+      minItems: 2,
+      title: "Ngram Range",
+      default: [1, 1],
+    },
+    max_df: {
+      anyOf: [
+        {
+          type: "number",
+        },
+        {
+          type: "integer",
+        },
+      ],
+      title: "Max Df",
+      default: 1,
+    },
+    min_df: {
+      anyOf: [
+        {
+          type: "number",
+        },
+        {
+          type: "integer",
+        },
+      ],
+      title: "Min Df",
+      default: 1,
+    },
+    max_features: {
+      anyOf: [
+        {
+          type: "integer",
+        },
+        {
+          type: "null",
+        },
+      ],
+      title: "Max Features",
+    },
+    conf: {
+      type: "string",
+      enum: ["REG"],
+      const: "REG",
+      title: "Conf",
+      default: "REG",
+    },
+  },
+  type: "object",
+  title: "RegressionModel",
 } as const;
 
 export const $ResolutionCell = {
@@ -6963,6 +7666,106 @@ export const $ResolutionUserEntry = {
   title: "ResolutionUserEntry",
 } as const;
 
+export const $SVMModel = {
+  properties: {
+    stop_words: {
+      anyOf: [
+        {
+          type: "string",
+          enum: ["english"],
+          const: "english",
+        },
+        {
+          items: {
+            type: "string",
+          },
+          type: "array",
+        },
+        {
+          type: "null",
+        },
+      ],
+      title: "Stop Words",
+      default: "english",
+    },
+    ngram_range: {
+      prefixItems: [
+        {
+          type: "integer",
+        },
+        {
+          type: "integer",
+        },
+      ],
+      type: "array",
+      maxItems: 2,
+      minItems: 2,
+      title: "Ngram Range",
+      default: [1, 1],
+    },
+    max_df: {
+      anyOf: [
+        {
+          type: "number",
+        },
+        {
+          type: "integer",
+        },
+      ],
+      title: "Max Df",
+      default: 1,
+    },
+    min_df: {
+      anyOf: [
+        {
+          type: "number",
+        },
+        {
+          type: "integer",
+        },
+      ],
+      title: "Min Df",
+      default: 1,
+    },
+    max_features: {
+      anyOf: [
+        {
+          type: "integer",
+        },
+        {
+          type: "null",
+        },
+      ],
+      title: "Max Features",
+    },
+    conf: {
+      type: "string",
+      enum: ["SVM"],
+      const: "SVM",
+      title: "Conf",
+      default: "SVM",
+    },
+    C: {
+      type: "number",
+      title: "C",
+      default: 1,
+    },
+    kernel: {
+      type: "string",
+      enum: ["linear", "poly", "rbf", "sigmoid", "precomputed"],
+      title: "Kernel",
+      default: "rbf",
+    },
+    degree: {
+      type: "integer",
+      title: "Degree",
+      default: 3,
+    },
+  },
+  type: "object",
+  title: "SVMModel",
+} as const;
+
 export const $SavedResolution = {
   properties: {
     meta: {
@@ -6975,6 +7778,80 @@ export const $SavedResolution = {
   type: "object",
   required: ["meta", "proposal"],
   title: "SavedResolution",
+} as const;
+
+export const $SciBERTModel = {
+  properties: {
+    max_len: {
+      type: "integer",
+      title: "Max Len",
+      default: 512,
+    },
+    train_split: {
+      type: "number",
+      title: "Train Split",
+      default: 0.9,
+    },
+    n_epochs: {
+      type: "integer",
+      title: "N Epochs",
+      default: 3,
+    },
+    batch_size_predict: {
+      type: "integer",
+      title: "Batch Size Predict",
+      default: 50,
+    },
+    batch_size_train: {
+      type: "integer",
+      title: "Batch Size Train",
+      default: 16,
+    },
+    batch_size_eval: {
+      type: "integer",
+      title: "Batch Size Eval",
+      default: 50,
+    },
+    warmup_steps: {
+      type: "integer",
+      title: "Warmup Steps",
+      default: 400,
+    },
+    weight_decay: {
+      type: "number",
+      title: "Weight Decay",
+      default: 0.01,
+    },
+    logging_steps: {
+      type: "integer",
+      title: "Logging Steps",
+      default: 10,
+    },
+    eval_strategy: {
+      type: "string",
+      title: "Eval Strategy",
+      default: "steps",
+    },
+    eval_steps: {
+      type: "integer",
+      title: "Eval Steps",
+      default: 50,
+    },
+    conf: {
+      type: "string",
+      enum: ["SCIBERT"],
+      const: "SCIBERT",
+      title: "Conf",
+      default: "SCIBERT",
+    },
+    model: {
+      type: "string",
+      title: "Model",
+      default: "allenai/scibert_scivocab_uncased",
+    },
+  },
+  type: "object",
+  title: "SciBERTModel",
 } as const;
 
 export const $ScopusImport = {
@@ -8442,6 +9319,11 @@ export const $UserPermission = {
     annotations_edit: {
       type: "boolean",
       title: "Annotations Edit",
+      default: false,
+    },
+    annotations_prio: {
+      type: "boolean",
+      title: "Annotations Prio",
       default: false,
     },
     pipelines_read: {

@@ -226,6 +226,27 @@ const routes: Array<RouteRecordRaw> = [
     ],
   },
   {
+    path: "/project/config/priority",
+    name: "config-priority",
+    component: () =>
+      import(/* webpackChunkName: "PriorityContainer" */ "../views/Annotations/Priority/PriorityContainer.vue"),
+    children: [
+      {
+        path: "",
+        alias: ["", "list"],
+        name: "config-priority-list",
+        component: () =>
+          import(/* webpackChunkName: "PriorityListView" */ "../views/Annotations/Priority/PriorityListView.vue"),
+      },
+      {
+        path: "setup/:priority_id?",
+        name: "config-priority-setup",
+        component: () =>
+          import(/* webpackChunkName: "PrioritisationView" */ "../views/Annotations/Priority/PrioritisationView.vue"),
+      },
+    ],
+  },
+  {
     path: "/project/settings",
     name: "project-settings",
     component: () =>

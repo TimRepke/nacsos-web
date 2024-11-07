@@ -846,6 +846,27 @@ export class AnnotationsService {
       customRequestConfig: options,
     });
   }
+
+  public static getBotScopesApiAnnotationsBotScopesGet(
+    data: $OpenApiTs["/api/annotations/bot/scopes"]["get"]["req"],
+    options?: Partial<AxiosRequestConfig>,
+  ): CancelablePromise<ApiResult<$OpenApiTs["/api/annotations/bot/scopes"]["get"]["res"][200]>> {
+    const { xProjectId, onlyResolve } = data;
+    return __request(OpenAPI, {
+      method: "GET",
+      url: "/api/annotations/bot/scopes",
+      headers: {
+        "x-project-id": xProjectId,
+      },
+      query: {
+        only_resolve: onlyResolve,
+      },
+      errors: {
+        422: "Validation Error",
+      },
+      customRequestConfig: options,
+    });
+  }
 }
 
 export class UsersService {
@@ -2434,6 +2455,128 @@ export class ItemService {
       },
       body: requestBody,
       mediaType: "application/json",
+      errors: {
+        422: "Validation Error",
+      },
+      customRequestConfig: options,
+    });
+  }
+}
+
+export class PrioService {
+  public static getTableSampleHtmlApiPrioTablePeekHtmlPost(
+    data: $OpenApiTs["/api/prio/table/peek/html"]["post"]["req"],
+    options?: Partial<AxiosRequestConfig>,
+  ): CancelablePromise<ApiResult<$OpenApiTs["/api/prio/table/peek/html"]["post"]["res"][200]>> {
+    const { xProjectId, requestBody } = data;
+    return __request(OpenAPI, {
+      method: "POST",
+      url: "/api/prio/table/peek/html",
+      headers: {
+        "x-project-id": xProjectId,
+      },
+      body: requestBody,
+      mediaType: "application/json",
+      errors: {
+        422: "Validation Error",
+      },
+      customRequestConfig: options,
+    });
+  }
+
+  public static getTableSampleApiPrioTablePeekPost(
+    data: $OpenApiTs["/api/prio/table/peek"]["post"]["req"],
+    options?: Partial<AxiosRequestConfig>,
+  ): CancelablePromise<ApiResult<$OpenApiTs["/api/prio/table/peek"]["post"]["res"][200]>> {
+    const { xProjectId, requestBody } = data;
+    return __request(OpenAPI, {
+      method: "POST",
+      url: "/api/prio/table/peek",
+      headers: {
+        "x-project-id": xProjectId,
+      },
+      body: requestBody,
+      mediaType: "application/json",
+      errors: {
+        422: "Validation Error",
+      },
+      customRequestConfig: options,
+    });
+  }
+
+  public static readProjectSetupApiPrioSetupsGet(
+    data: $OpenApiTs["/api/prio/setups"]["get"]["req"],
+    options?: Partial<AxiosRequestConfig>,
+  ): CancelablePromise<ApiResult<$OpenApiTs["/api/prio/setups"]["get"]["res"][200]>> {
+    const { xProjectId } = data;
+    return __request(OpenAPI, {
+      method: "GET",
+      url: "/api/prio/setups",
+      headers: {
+        "x-project-id": xProjectId,
+      },
+      errors: {
+        422: "Validation Error",
+      },
+      customRequestConfig: options,
+    });
+  }
+
+  public static readPrioSetupApiPrioSetupGet(
+    data: $OpenApiTs["/api/prio/setup"]["get"]["req"],
+    options?: Partial<AxiosRequestConfig>,
+  ): CancelablePromise<ApiResult<$OpenApiTs["/api/prio/setup"]["get"]["res"][200]>> {
+    const { priorityId, xProjectId } = data;
+    return __request(OpenAPI, {
+      method: "GET",
+      url: "/api/prio/setup",
+      headers: {
+        "x-project-id": xProjectId,
+      },
+      query: {
+        priority_id: priorityId,
+      },
+      errors: {
+        422: "Validation Error",
+      },
+      customRequestConfig: options,
+    });
+  }
+
+  public static savePrioSetupApiPrioSetupPut(
+    data: $OpenApiTs["/api/prio/setup"]["put"]["req"],
+    options?: Partial<AxiosRequestConfig>,
+  ): CancelablePromise<ApiResult<$OpenApiTs["/api/prio/setup"]["put"]["res"][200]>> {
+    const { xProjectId, requestBody } = data;
+    return __request(OpenAPI, {
+      method: "PUT",
+      url: "/api/prio/setup",
+      headers: {
+        "x-project-id": xProjectId,
+      },
+      body: requestBody,
+      mediaType: "application/json",
+      errors: {
+        422: "Validation Error",
+      },
+      customRequestConfig: options,
+    });
+  }
+
+  public static dropPrioSetupApiPrioSetupDelete(
+    data: $OpenApiTs["/api/prio/setup"]["delete"]["req"],
+    options?: Partial<AxiosRequestConfig>,
+  ): CancelablePromise<ApiResult<$OpenApiTs["/api/prio/setup"]["delete"]["res"][200]>> {
+    const { priorityId, xProjectId } = data;
+    return __request(OpenAPI, {
+      method: "DELETE",
+      url: "/api/prio/setup",
+      headers: {
+        "x-project-id": xProjectId,
+      },
+      query: {
+        priority_id: priorityId,
+      },
       errors: {
         422: "Validation Error",
       },

@@ -482,6 +482,18 @@ export type BotAnnotationMetaDataBaseModel = {
   annotation_scheme_id?: string | null;
 };
 
+export type BotAnnotationMetaDataModel = {
+  bot_annotation_metadata_id?: string | null;
+  name: string;
+  kind: BotKind;
+  project_id: string;
+  time_created?: string | null;
+  time_updated?: string | null;
+  assignment_scope_id?: string | null;
+  annotation_scheme_id?: string | null;
+  meta?: BotMetaResolve | null;
+};
+
 export type BotAnnotationModel = {
   value_bool?: boolean | null;
   value_int?: number | null;
@@ -554,6 +566,22 @@ export type Cashtag = {
   tag: string;
 };
 
+export type ClimateBERTModel = {
+  max_len?: number;
+  train_split?: number;
+  n_epochs?: number;
+  batch_size_predict?: number;
+  batch_size_train?: number;
+  batch_size_eval?: number;
+  warmup_steps?: number;
+  weight_decay?: number;
+  logging_steps?: number;
+  eval_strategy?: string;
+  eval_steps?: number;
+  conf?: "CLIMBERT";
+  model?: string;
+};
+
 /**
  * Flattened and reduced version of the context_annotation object
  * https://developer.twitter.com/en/docs/twitter-api/annotations/overview
@@ -582,6 +610,16 @@ export type DehydratedAssignment = {
   order: number;
 };
 
+export type DehydratedPriorityModel = {
+  priority_id?: string | null;
+  project_id?: string | null;
+  name?: string | null;
+  time_created?: string | null;
+  time_started?: string | null;
+  time_ready?: string | null;
+  time_assigned?: string | null;
+};
+
 export type DehydratedUser = {
   user_id?: string | null;
   username?: string | null;
@@ -589,8 +627,8 @@ export type DehydratedUser = {
 };
 
 export type Event = {
-  event: "ExampleEvent" | "ExampleSubEvent";
-  payload: ExampleEvent | ExampleSubEvent;
+  event: "ExampleSubEvent" | "ExampleEvent";
+  payload: ExampleSubEvent | ExampleEvent;
 };
 
 export type ExampleEvent = {
@@ -1002,6 +1040,46 @@ export type OpenAlexSolrImport = {
   op?: "OR" | "AND";
 };
 
+export type PrioTableParams = {
+  scope_ids: Array<string>;
+  incl?: string;
+  query?:
+    | FieldFilter
+    | FieldFilters
+    | LabelFilterMulti
+    | LabelFilterBool
+    | LabelFilterInt
+    | AssignmentFilter
+    | AnnotationFilter
+    | AbstractFilter
+    | ImportFilter
+    | MetaFilterBool
+    | MetaFilterInt
+    | MetaFilterStr
+    | SubQuery
+    | null;
+  limit?: number | null;
+};
+
+export type PriorityModel = {
+  priority_id?: string | null;
+  project_id?: string | null;
+  name?: string | null;
+  time_created?: string | null;
+  time_started?: string | null;
+  time_ready?: string | null;
+  time_assigned?: string | null;
+  source_scopes?: Array<string> | null;
+  nql?: string | null;
+  incl_rule?: string | null;
+  incl_field?: string | null;
+  incl_pred_field?: string | null;
+  train_split?: number | null;
+  n_predictions?: number | null;
+  config?: SciBERTModel | ClimateBERTModel | RegressionModel | SVMModel | null;
+  prioritised_ids?: Array<string> | null;
+};
+
 export type ProjectBaseInfo = {
   users: Array<ProjectBaseInfoEntry>;
   scopes: Array<ProjectBaseInfoScopeEntry>;
@@ -1072,6 +1150,7 @@ export type ProjectPermissionsModel = {
   imports_edit?: boolean;
   annotations_read?: boolean;
   annotations_edit?: boolean;
+  annotations_prio?: boolean;
   pipelines_read?: boolean;
   pipelines_edit?: boolean;
   artefacts_read?: boolean;
@@ -1099,6 +1178,15 @@ export type RankEntry = {
 export type ReferencedTweet = {
   id: string | number;
   type: "retweeted" | "quoted" | "replied_to";
+};
+
+export type RegressionModel = {
+  stop_words?: "english" | Array<string> | null;
+  ngram_range?: unknown[];
+  max_df?: number;
+  min_df?: number;
+  max_features?: number | null;
+  conf?: "REG";
 };
 
 export type ResolutionCell = {
@@ -1143,9 +1231,37 @@ export type ResolutionUserEntry = {
   status?: ResolutionStatus;
 };
 
+export type SVMModel = {
+  stop_words?: "english" | Array<string> | null;
+  ngram_range?: unknown[];
+  max_df?: number;
+  min_df?: number;
+  max_features?: number | null;
+  conf?: "SVM";
+  C?: number;
+  kernel?: "linear" | "poly" | "rbf" | "sigmoid" | "precomputed";
+  degree?: number;
+};
+
 export type SavedResolution = {
   meta: BotAnnotationResolution;
   proposal: ResolutionProposal;
+};
+
+export type SciBERTModel = {
+  max_len?: number;
+  train_split?: number;
+  n_epochs?: number;
+  batch_size_predict?: number;
+  batch_size_train?: number;
+  batch_size_eval?: number;
+  warmup_steps?: number;
+  weight_decay?: number;
+  logging_steps?: number;
+  eval_strategy?: string;
+  eval_steps?: number;
+  conf?: "SCIBERT";
+  model?: string;
 };
 
 export type ScopusImport = {
@@ -1382,6 +1498,7 @@ export type UserPermission = {
   imports_edit?: boolean;
   annotations_read?: boolean;
   annotations_edit?: boolean;
+  annotations_prio?: boolean;
   pipelines_read?: boolean;
   pipelines_edit?: boolean;
   artefacts_read?: boolean;
@@ -1928,7 +2045,7 @@ export type $OpenApiTs = {
         /**
          * Successful Response
          */
-        200: AssignmentModel;
+        200: unknown;
         /**
          * Validation Error
          */
@@ -2123,6 +2240,24 @@ export type $OpenApiTs = {
          * Successful Response
          */
         200: Array<BotMetaInfo>;
+        /**
+         * Validation Error
+         */
+        422: HTTPValidationError;
+      };
+    };
+  };
+  "/api/annotations/bot/scopes": {
+    get: {
+      req: {
+        onlyResolve?: boolean;
+        xProjectId: string;
+      };
+      res: {
+        /**
+         * Successful Response
+         */
+        200: Array<BotAnnotationMetaDataModel>;
         /**
          * Validation Error
          */
@@ -3006,7 +3141,7 @@ export type $OpenApiTs = {
   "/api/search/nql/count": {
     post: {
       req: {
-        requestBody:
+        requestBody?:
           | FieldFilter
           | FieldFilters
           | LabelFilterMulti
@@ -3019,7 +3154,8 @@ export type $OpenApiTs = {
           | MetaFilterBool
           | MetaFilterInt
           | MetaFilterStr
-          | SubQuery;
+          | SubQuery
+          | null;
         xProjectId: string;
       };
       res: {
@@ -3549,6 +3685,111 @@ export type $OpenApiTs = {
     put: {
       req: {
         requestBody: AcademicItemModel;
+        xProjectId: string;
+      };
+      res: {
+        /**
+         * Successful Response
+         */
+        200: unknown;
+        /**
+         * Validation Error
+         */
+        422: HTTPValidationError;
+      };
+    };
+  };
+  "/api/prio/table/peek/html": {
+    post: {
+      req: {
+        requestBody: PrioTableParams;
+        xProjectId: string;
+      };
+      res: {
+        /**
+         * Successful Response
+         */
+        200: string;
+        /**
+         * Validation Error
+         */
+        422: HTTPValidationError;
+      };
+    };
+  };
+  "/api/prio/table/peek": {
+    post: {
+      req: {
+        requestBody: PrioTableParams;
+        xProjectId: string;
+      };
+      res: {
+        /**
+         * Successful Response
+         */
+        200: Array<{
+          [key: string]: unknown;
+        }>;
+        /**
+         * Validation Error
+         */
+        422: HTTPValidationError;
+      };
+    };
+  };
+  "/api/prio/setups": {
+    get: {
+      req: {
+        xProjectId: string;
+      };
+      res: {
+        /**
+         * Successful Response
+         */
+        200: Array<DehydratedPriorityModel>;
+        /**
+         * Validation Error
+         */
+        422: HTTPValidationError;
+      };
+    };
+  };
+  "/api/prio/setup": {
+    get: {
+      req: {
+        priorityId: string;
+        xProjectId: string;
+      };
+      res: {
+        /**
+         * Successful Response
+         */
+        200: PriorityModel | null;
+        /**
+         * Validation Error
+         */
+        422: HTTPValidationError;
+      };
+    };
+    put: {
+      req: {
+        requestBody: PriorityModel;
+        xProjectId: string;
+      };
+      res: {
+        /**
+         * Successful Response
+         */
+        200: unknown;
+        /**
+         * Validation Error
+         */
+        422: HTTPValidationError;
+      };
+    };
+    delete: {
+      req: {
+        priorityId: string;
         xProjectId: string;
       };
       res: {

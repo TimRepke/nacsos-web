@@ -11,11 +11,7 @@
       <font-awesome-icon class="text-muted ms-auto" :icon="['fas', expanded ? 'minus' : 'plus']" />
     </div>
     <div class="card-body" v-show="expanded">
-      <div class="row g-2 row-cols-auto">
-        <div class="col-12">
-          <slot name="body" />
-        </div>
-      </div>
+      <slot name="body" />
     </div>
   </div>
 </template>

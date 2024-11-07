@@ -118,5 +118,8 @@ export const useCurrentUserStore = defineStore("CurrentUserStore", {
     isAuthTokenValid(): boolean {
       return isAuthTokenValid(this.authToken);
     },
+    isSudo(): boolean {
+      return !!this.user && this.user.is_superuser && this.user.is_active;
+    },
   },
 });
