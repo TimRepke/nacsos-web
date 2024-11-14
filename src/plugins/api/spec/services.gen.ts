@@ -1733,6 +1733,26 @@ export class StatsService {
       customRequestConfig: options,
     });
   }
+
+  public static labelStatsApiStatsLabelsPost(
+    data: $OpenApiTs["/api/stats/labels"]["post"]["req"],
+    options?: Partial<AxiosRequestConfig>,
+  ): CancelablePromise<ApiResult<$OpenApiTs["/api/stats/labels"]["post"]["res"][200]>> {
+    const { xProjectId, requestBody } = data;
+    return __request(OpenAPI, {
+      method: "POST",
+      url: "/api/stats/labels",
+      headers: {
+        "x-project-id": xProjectId,
+      },
+      body: requestBody,
+      mediaType: "application/json",
+      errors: {
+        422: "Validation Error",
+      },
+      customRequestConfig: options,
+    });
+  }
 }
 
 export class ExportService {
@@ -2576,6 +2596,47 @@ export class PrioService {
       },
       query: {
         priority_id: priorityId,
+      },
+      errors: {
+        422: "Validation Error",
+      },
+      customRequestConfig: options,
+    });
+  }
+
+  public static getArtefactsApiPrioArtefactsListGet(
+    data: $OpenApiTs["/api/prio/artefacts/list"]["get"]["req"],
+    options?: Partial<AxiosRequestConfig>,
+  ): CancelablePromise<ApiResult<$OpenApiTs["/api/prio/artefacts/list"]["get"]["res"][200]>> {
+    const { xPriorityId, xProjectId } = data;
+    return __request(OpenAPI, {
+      method: "GET",
+      url: "/api/prio/artefacts/list",
+      headers: {
+        "x-priority-id": xPriorityId,
+        "x-project-id": xProjectId,
+      },
+      errors: {
+        422: "Validation Error",
+      },
+      customRequestConfig: options,
+    });
+  }
+
+  public static getFileApiPrioArtefactsFileGet(
+    data: $OpenApiTs["/api/prio/artefacts/file"]["get"]["req"],
+    options?: Partial<AxiosRequestConfig>,
+  ): CancelablePromise<ApiResult<$OpenApiTs["/api/prio/artefacts/file"]["get"]["res"][200]>> {
+    const { filename, xPriorityId, xProjectId } = data;
+    return __request(OpenAPI, {
+      method: "GET",
+      url: "/api/prio/artefacts/file",
+      headers: {
+        "x-priority-id": xPriorityId,
+        "x-project-id": xProjectId,
+      },
+      query: {
+        filename,
       },
       errors: {
         422: "Validation Error",

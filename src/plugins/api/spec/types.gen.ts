@@ -898,6 +898,16 @@ export type Label = {
   value?: number | null;
 };
 
+export type LabelCount = {
+  num_items: number;
+  key: string;
+  value_bool?: boolean | null;
+  value_int?: number | null;
+  value_float?: number | null;
+  value_str?: string | null;
+  multi?: number | null;
+};
+
 export type LabelFilterBool = {
   scopes?: Array<string> | null;
   scheme?: string | null;
@@ -1058,7 +1068,7 @@ export type PrioTableParams = {
     | MetaFilterStr
     | SubQuery
     | null;
-  limit?: number | null;
+  limit?: number;
 };
 
 export type PriorityModel = {
@@ -1071,6 +1081,21 @@ export type PriorityModel = {
   time_assigned?: string | null;
   source_scopes?: Array<string> | null;
   nql?: string | null;
+  nql_parsed?:
+    | FieldFilter
+    | FieldFilters
+    | LabelFilterMulti
+    | LabelFilterBool
+    | LabelFilterInt
+    | AssignmentFilter
+    | AnnotationFilter
+    | AbstractFilter
+    | ImportFilter
+    | MetaFilterBool
+    | MetaFilterInt
+    | MetaFilterStr
+    | SubQuery
+    | null;
   incl_rule?: string | null;
   incl_field?: string | null;
   incl_pred_field?: string | null;
@@ -3033,6 +3058,38 @@ export type $OpenApiTs = {
       };
     };
   };
+  "/api/stats/labels": {
+    post: {
+      req: {
+        requestBody?:
+          | FieldFilter
+          | FieldFilters
+          | LabelFilterMulti
+          | LabelFilterBool
+          | LabelFilterInt
+          | AssignmentFilter
+          | AnnotationFilter
+          | AbstractFilter
+          | ImportFilter
+          | MetaFilterBool
+          | MetaFilterInt
+          | MetaFilterStr
+          | SubQuery
+          | null;
+        xProjectId: string;
+      };
+      res: {
+        /**
+         * Successful Response
+         */
+        200: Array<LabelCount>;
+        /**
+         * Validation Error
+         */
+        422: HTTPValidationError;
+      };
+    };
+  };
   "/api/export/annotations/csv": {
     post: {
       req: {
@@ -3790,6 +3847,43 @@ export type $OpenApiTs = {
     delete: {
       req: {
         priorityId: string;
+        xProjectId: string;
+      };
+      res: {
+        /**
+         * Successful Response
+         */
+        200: unknown;
+        /**
+         * Validation Error
+         */
+        422: HTTPValidationError;
+      };
+    };
+  };
+  "/api/prio/artefacts/list": {
+    get: {
+      req: {
+        xPriorityId: string;
+        xProjectId: string;
+      };
+      res: {
+        /**
+         * Successful Response
+         */
+        200: Array<FileOnDisk>;
+        /**
+         * Validation Error
+         */
+        422: HTTPValidationError;
+      };
+    };
+  };
+  "/api/prio/artefacts/file": {
+    get: {
+      req: {
+        filename: string;
+        xPriorityId: string;
         xProjectId: string;
       };
       res: {

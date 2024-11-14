@@ -184,6 +184,10 @@ export function delay(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+export function isElem(obj: unknown): obj is HTMLElement | Node {
+  return !!obj && (obj instanceof Node || obj instanceof HTMLElement);
+}
+
 export default {
   install(app: App) {
     app.config.globalProperties.$util = {

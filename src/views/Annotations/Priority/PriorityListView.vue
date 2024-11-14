@@ -38,6 +38,30 @@ async function drop(priority: DehydratedPriorityModel) {
   );
 }
 
+async function clone(priority: DehydratedPriorityModel) {
+  const cloned = (
+    await API.prio.readPrioSetupApiPrioSetupGet({
+      xProjectId: currentProjectStore.projectId as string,
+      priorityId: priority.priority_id as string,
+    })
+  ).data;
+  if (!cloned) return;
+
+  cloned.priority_id = crypto.randomUUID().toString();
+  cloned.name = `Copy of ${cloned.name}`;
+  delete cloned.prioritised_ids;
+  delete cloned.time_created;
+  delete cloned.time_started;
+  delete cloned.time_ready;
+  delete cloned.time_assigned;
+  delete cloned.prioritised_ids;
+  delete cloned.prioritised_ids;
+  await API.prio.savePrioSetupApiPrioSetupPut({
+    xProjectId: currentProjectStore.projectId as string,
+    requestBody: cloned,
+  });
+}
+
 function reload() {
   API.prio
     .readProjectSetupApiPrioSetupsGet({
@@ -89,8 +113,9 @@ onMounted(reload);
             <td>{{ dt2str(row.time_created) }}</td>
             <td>{{ dt2str(row.time_started) }}</td>
             <td>{{ dt2str(row.time_ready) }}</td>
-            <td>
-              <font-awesome-icon icon="trash" class="clickable-icon" @click="drop(row)" />
+            <td class="text-end">
+              <font-awesome-icon icon="copy" class="clickable-icon me-2" @click="clone(row)" />
+              <font-awesome-icon icon="trash" class="clickable-icon me-2" @click="drop(row)" />
             </td>
           </router-link>
         </tr>

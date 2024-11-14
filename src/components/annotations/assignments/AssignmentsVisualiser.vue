@@ -96,8 +96,8 @@ export default defineComponent({
     };
   },
   computed: {
-    assignedUsers(): Record<[string, number]> {
-      const count = {};
+    assignedUsers(): Record<string, number> {
+      const count: Record<string, number> = {};
       this.entries.forEach((entry: AssignmentScopeEntry) =>
         entry.assignments.forEach(
           (assignment: AssignmentInfo) => (count[assignment.username] = (count[assignment.username] ?? 0) + 1),
@@ -105,7 +105,7 @@ export default defineComponent({
       );
       return count;
     },
-    shownUsernames(): Record<[string, number]> {
+    shownUsernames(): Record<string, number> {
       if (this.assiEditMode) {
         return {
           ...Object.fromEntries(currentProjectStore.projectUsers.usernames.map((username) => [username, 0])),

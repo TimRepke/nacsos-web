@@ -40,6 +40,19 @@
         </div>
       </div>
 
+      <!-- Label counts -->
+      <div class="col-md-4">
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">
+              <font-awesome-icon :icon="['fas', 'tags']" class="me-2" />
+              Number of items per label
+            </h5>
+            <LabelStats />
+          </div>
+        </div>
+      </div>
+
       <!-- Histogram over years -->
       <div class="col-md-4">
         <div v-if="histogramChart" class="card">
@@ -56,65 +69,52 @@
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from "vue";
+<script setup lang="ts">
+import { computed, onMounted, ref } from "vue";
 import { Bar } from "vue-chartjs";
 import { Chart as ChartJS, Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale } from "chart.js";
 import { API, ignore } from "@/plugins/api";
 import { currentProjectStore } from "@/stores";
 import type { BasicProjectStats, HistogramEntry, RankEntry } from "@/plugins/api/types";
+import LabelStats from "@/components/annotations/LabelStats.vue";
 
 ChartJS.register(Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale);
 
-export default defineComponent({
-  name: "DatasetStatisticsView",
-  components: { Bar },
-  data() {
-    return {
-      basic: undefined as BasicProjectStats | undefined,
-      leaderboard: undefined as Array<RankEntry> | undefined,
-      histogramYears: undefined as Array<HistogramEntry> | undefined,
-    };
-  },
-  mounted() {
-    API.stats
-      .getBasicStatsApiStatsBasicsGet({ xProjectId: currentProjectStore.projectId as string })
-      .then((response) => {
-        this.basic = response.data;
-      })
-      .catch(ignore);
-    API.stats
-      .getAnnotatorRankingApiStatsRankGet({ xProjectId: currentProjectStore.projectId as string })
-      .then((response) => {
-        this.leaderboard = response.data;
-      })
-      .catch(ignore);
-    API.stats
-      .getPublicationYearHistogramApiStatsHistogramYearsGet({ xProjectId: currentProjectStore.projectId as string })
-      .then((response) => {
-        this.histogramYears = response.data;
-      })
-      .catch(ignore);
-  },
-  methods: {
-    // pass
-  },
-  computed: {
-    histogramChart() {
-      if (this.histogramYears) {
-        return {
-          chartData: {
-            labels: this.histogramYears.map((entry: HistogramEntry) => entry.bucket.substring(0, 4)),
-            datasets: [{ data: this.histogramYears.map((entry: HistogramEntry) => entry.num_items), label: "Items" }],
-          },
-          chartOptions: {
-            responsive: true,
-          },
-        };
-      }
-      return undefined;
+const basic = ref<BasicProjectStats | null>(null);
+const leaderboard = ref<Array<RankEntry> | null>(null);
+const histogramYears = ref<Array<HistogramEntry> | null>(null);
+
+const histogramChart = computed(() => {
+  if (!histogramYears.value) return null;
+  return {
+    chartData: {
+      labels: histogramYears.value.map((entry: HistogramEntry) => entry.bucket.substring(0, 4)),
+      datasets: [{ data: histogramYears.value.map((entry: HistogramEntry) => entry.num_items), label: "Items" }],
     },
-  },
+    chartOptions: {
+      responsive: true,
+    },
+  };
+});
+onMounted(() => {
+  API.stats
+    .getBasicStatsApiStatsBasicsGet({ xProjectId: currentProjectStore.projectId as string })
+    .then((response) => {
+      basic.value = response.data;
+    })
+    .catch(ignore);
+  API.stats
+    .getAnnotatorRankingApiStatsRankGet({ xProjectId: currentProjectStore.projectId as string })
+    .then((response) => {
+      leaderboard.value = response.data;
+    })
+    .catch(ignore);
+  API.stats
+    .getPublicationYearHistogramApiStatsHistogramYearsGet({ xProjectId: currentProjectStore.projectId as string })
+    .then((response) => {
+      histogramYears.value = response.data;
+    })
+    .catch(ignore);
 });
 </script>
 

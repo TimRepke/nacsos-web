@@ -5729,6 +5729,77 @@ For Annotation or BotAnnotation, this is the combination of their respective key
 Mainly used during resolving annotations.`,
 } as const;
 
+export const $LabelCount = {
+  properties: {
+    num_items: {
+      type: "integer",
+      title: "Num Items",
+    },
+    key: {
+      type: "string",
+      title: "Key",
+    },
+    value_bool: {
+      anyOf: [
+        {
+          type: "boolean",
+        },
+        {
+          type: "null",
+        },
+      ],
+      title: "Value Bool",
+    },
+    value_int: {
+      anyOf: [
+        {
+          type: "integer",
+        },
+        {
+          type: "null",
+        },
+      ],
+      title: "Value Int",
+    },
+    value_float: {
+      anyOf: [
+        {
+          type: "number",
+        },
+        {
+          type: "null",
+        },
+      ],
+      title: "Value Float",
+    },
+    value_str: {
+      anyOf: [
+        {
+          type: "string",
+        },
+        {
+          type: "null",
+        },
+      ],
+      title: "Value Str",
+    },
+    multi: {
+      anyOf: [
+        {
+          type: "integer",
+        },
+        {
+          type: "null",
+        },
+      ],
+      title: "Multi",
+    },
+  },
+  type: "object",
+  required: ["num_items", "key"],
+  title: "LabelCount",
+} as const;
+
 export const $LabelFilterBool = {
   properties: {
     scopes: {
@@ -6677,14 +6748,7 @@ export const $PrioTableParams = {
       title: "Query",
     },
     limit: {
-      anyOf: [
-        {
-          type: "integer",
-        },
-        {
-          type: "null",
-        },
-      ],
+      type: "integer",
       title: "Limit",
       default: 20,
     },
@@ -6816,6 +6880,75 @@ export const $PriorityModel = {
         },
       ],
       title: "Nql",
+    },
+    nql_parsed: {
+      anyOf: [
+        {
+          oneOf: [
+            {
+              $ref: "#/components/schemas/FieldFilter",
+            },
+            {
+              $ref: "#/components/schemas/FieldFilters",
+            },
+            {
+              $ref: "#/components/schemas/LabelFilterMulti",
+            },
+            {
+              $ref: "#/components/schemas/LabelFilterBool",
+            },
+            {
+              $ref: "#/components/schemas/LabelFilterInt",
+            },
+            {
+              $ref: "#/components/schemas/AssignmentFilter",
+            },
+            {
+              $ref: "#/components/schemas/AnnotationFilter",
+            },
+            {
+              $ref: "#/components/schemas/AbstractFilter",
+            },
+            {
+              $ref: "#/components/schemas/ImportFilter",
+            },
+            {
+              $ref: "#/components/schemas/MetaFilterBool",
+            },
+            {
+              $ref: "#/components/schemas/MetaFilterInt",
+            },
+            {
+              $ref: "#/components/schemas/MetaFilterStr",
+            },
+            {
+              $ref: "#/components/schemas/SubQuery",
+            },
+          ],
+          discriminator: {
+            propertyName: "filter",
+            mapping: {
+              abstract: "#/components/schemas/AbstractFilter",
+              annotation: "#/components/schemas/AnnotationFilter",
+              assignment: "#/components/schemas/AssignmentFilter",
+              field: "#/components/schemas/FieldFilter",
+              field_mul: "#/components/schemas/FieldFilters",
+              import: "#/components/schemas/ImportFilter",
+              label_bool: "#/components/schemas/LabelFilterBool",
+              label_int: "#/components/schemas/LabelFilterInt",
+              label_multi: "#/components/schemas/LabelFilterMulti",
+              meta_bool: "#/components/schemas/MetaFilterBool",
+              meta_int: "#/components/schemas/MetaFilterInt",
+              meta_str: "#/components/schemas/MetaFilterStr",
+              sub: "#/components/schemas/SubQuery",
+            },
+          },
+        },
+        {
+          type: "null",
+        },
+      ],
+      title: "Nql Parsed",
     },
     incl_rule: {
       anyOf: [

@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from "vue";
 import { useRoute } from "vue-router";
-import { dt2str, pyDTNow, timestampNow } from "@/util";
+import { dt2str, isElem, pyDTNow, timestampNow } from "@/util";
 import { currentProjectStore, currentUserStore } from "@/stores";
 import { EventBus } from "@/plugins/events";
 import { ToastEvent } from "@/plugins/events/events/toast";
 import { ConfirmationRequestEvent } from "@/plugins/events/events/confirmation";
 import { API, toastReject, toastSuccess } from "@/plugins/api";
-import { ClimateBERTModel, SciBERTModel, PriorityModel } from "@/plugins/api/spec";
+import { ClimateBERTModel, SciBERTModel, PriorityModel, FileOnDisk } from "@/plugins/api/spec";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import SortedScopePicker from "@/components/annotations/SortedScopePicker.vue";
 import ExpandableBox from "@/components/ExpandableBox.vue";
@@ -16,6 +16,8 @@ import SortedTableHead from "@/components/SortableTable/SortedTableHead.vue";
 import SortedTable from "@/components/SortableTable/SortedTable.vue";
 import ItemModal from "@/components/items/ItemModal.vue";
 import ViewContainer from "@/components/ViewContainer.vue";
+import DataFrame from "@/components/DataFrame.vue";
+import { mount } from "@/util/mount";
 
 export type PeekRow = {
   scope_order: number;
@@ -67,7 +69,10 @@ async function apiSave() {
     }
     await API.prio.savePrioSetupApiPrioSetupPut({
       xProjectId: currentProjectStore.projectId as string,
-      requestBody: setup.value as PriorityModel,
+      requestBody: {
+        ...setup.value,
+        nql_parsed: nql.value[0],
+      } as PriorityModel,
     });
   }
 }
@@ -111,6 +116,8 @@ function save() {
   );
 }
 
+const files = ref<FileOnDisk[]>([]);
+
 onMounted(async () => {
   if (route.query.priority_id) {
     setup.value = (
@@ -119,6 +126,15 @@ onMounted(async () => {
         xProjectId: currentProjectStore.projectId as string,
       })
     ).data;
+
+    if (setup.value?.time_ready) {
+      files.value = (
+        await API.prio.getArtefactsApiPrioArtefactsListGet({
+          xPriorityId: route.query.priority_id as string,
+          xProjectId: currentProjectStore.projectId as string,
+        })
+      ).data;
+    }
   }
   if (!setup.value) {
     setup.value = {
@@ -138,10 +154,47 @@ onMounted(async () => {
     };
   }
 });
+
+async function loadImage(event: MouseEvent, filename: string) {
+  const res = await API.prio.getFileApiPrioArtefactsFileGet(
+    {
+      xPriorityId: route.query.priority_id as string,
+      xProjectId: currentProjectStore.projectId as string,
+      filename,
+    },
+    { responseType: "blob" },
+  );
+  const url = URL.createObjectURL(res.data as Blob);
+  const img = new Image();
+  img.src = url;
+  img.style.width = "90%";
+  img.onload = () => {
+    const { target } = event;
+    if (isElem(target)) {
+      (target as HTMLElement).closest("li")?.appendChild(img);
+      (target as HTMLElement).classList.add("invisible");
+    }
+  };
+}
+
+async function loadDF(event: MouseEvent, filename: string) {
+  const res = (
+    await API.prio.getFileApiPrioArtefactsFileGet({
+      xPriorityId: route.query.priority_id as string,
+      xProjectId: currentProjectStore.projectId as string,
+      filename,
+    })
+  ).data;
+  const { el } = mount(DataFrame, { props: { df: res } });
+  const { target } = event;
+  if (isElem(target)) {
+    (target as HTMLElement).closest("li")?.appendChild(el);
+  }
+}
 </script>
 
 <template>
-  <ViewContainer title="Priority screening run" :ready="!!setup" icon="robot" load-text="Loading...">
+  <ViewContainer title="Priority screening run" :ready="!!setup" :icon="['fas', 'robot']" load-text="Loading...">
     <div class="row">
       <div class="col-6">
         <div class="mb-3">
@@ -300,11 +353,35 @@ onMounted(async () => {
           </button>
           <div v-else>Ask someone to initiate training.</div>
         </template>
+
         <template v-else-if="!setup.time_ready">
           <div class="callout callout-warning">
             <font-awesome-icon icon="stopwatch" />
             Please wait while the model is training
           </div>
+        </template>
+
+        <template v-else>
+          <ul>
+            <li v-for="file in files" :key="file.path">
+              <code>{{ file.path.slice(37) }}</code>
+              <span class="text-muted small ms-2">{{ file.size.toLocaleString() }}b</span>
+
+              <font-awesome-icon
+                v-if="file.path.endsWith('.png')"
+                icon="image"
+                class="clickable-icon ms-2"
+                @click="(event) => loadImage(event, file.path)"
+              />
+
+              <font-awesome-icon
+                v-else-if="file.path.endsWith('.json')"
+                icon="table"
+                class="clickable-icon ms-2"
+                @click="(event) => loadDF(event, file.path)"
+              />
+            </li>
+          </ul>
         </template>
       </template>
     </ExpandableBox>
