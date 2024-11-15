@@ -280,6 +280,60 @@ export type AnnotationValue = {
   multi_int?: Array<number> | null;
 };
 
+export type AssignmentConfigLegacy = {
+  users: {
+    [key: string]: number;
+  };
+  overlaps: {
+    [key: string]: number;
+  };
+  random_seed?: number;
+  config_type?: "LEGACY";
+  legacy: {
+    [key: string]: unknown;
+  };
+};
+
+export type AssignmentConfigPriority = {
+  users: {
+    [key: string]: number;
+  };
+  overlaps: {
+    [key: string]: number;
+  };
+  random_seed?: number;
+  config_type?: "PRIORITY";
+  priority_id: string;
+  prio_offset: number;
+};
+
+export type AssignmentConfigRandom = {
+  users: {
+    [key: string]: number;
+  };
+  overlaps: {
+    [key: string]: number;
+  };
+  random_seed?: number;
+  config_type?: "RANDOM";
+  nql: string;
+  nql_parsed?:
+    | FieldFilter
+    | FieldFilters
+    | LabelFilterMulti
+    | LabelFilterBool
+    | LabelFilterInt
+    | AssignmentFilter
+    | AnnotationFilter
+    | AbstractFilter
+    | ImportFilter
+    | MetaFilterBool
+    | MetaFilterInt
+    | MetaFilterStr
+    | SubQuery
+    | null;
+};
+
 export type AssignmentCounts = {
   num_total: number;
   num_open: number;
@@ -368,57 +422,7 @@ export type AssignmentScopeModel = {
   time_created?: string | null;
   name: string;
   description?: string | null;
-  config?:
-    | AssignmentScopeRandomWithExclusionConfig
-    | AssignmentScopeRandomWithNQLConfig
-    | AssignmentScopeRandomConfig
-    | null;
-};
-
-export type AssignmentScopeRandomConfig = {
-  config_type?: "random";
-  users?: Array<string> | null;
-  num_items: number;
-  min_assignments_per_item: number;
-  max_assignments_per_item: number;
-  num_multi_coded_items: number;
-  random_seed: number;
-};
-
-export type AssignmentScopeRandomWithExclusionConfig = {
-  config_type?: "random_exclusion";
-  users?: Array<string> | null;
-  num_items: number;
-  min_assignments_per_item: number;
-  max_assignments_per_item: number;
-  num_multi_coded_items: number;
-  random_seed: number;
-  excluded_scopes: Array<string>;
-};
-
-export type AssignmentScopeRandomWithNQLConfig = {
-  config_type?: "random_nql";
-  users?: Array<string> | null;
-  num_items: number;
-  min_assignments_per_item: number;
-  max_assignments_per_item: number;
-  num_multi_coded_items: number;
-  random_seed: number;
-  query_parsed:
-    | FieldFilter
-    | FieldFilters
-    | LabelFilterMulti
-    | LabelFilterBool
-    | LabelFilterInt
-    | AssignmentFilter
-    | AnnotationFilter
-    | AbstractFilter
-    | ImportFilter
-    | MetaFilterBool
-    | MetaFilterInt
-    | MetaFilterStr
-    | SubQuery;
-  query_str: string;
+  config?: AssignmentConfigRandom | AssignmentConfigPriority | AssignmentConfigLegacy | null;
 };
 
 export type AssignmentStatus = "FULL" | "PARTIAL" | "OPEN" | "INVALID";
@@ -618,6 +622,7 @@ export type DehydratedPriorityModel = {
   time_started?: string | null;
   time_ready?: string | null;
   time_assigned?: string | null;
+  num_prioritised?: number | null;
 };
 
 export type DehydratedUser = {
@@ -998,13 +1003,6 @@ export type LexisNexisItemSourceModel = {
  * article that is referenced by an article that is included "explicitly" in the query.
  */
 export type M2MImportItemType = "explicit" | "implicit";
-
-export type MakeAssignmentsRequestModel = {
-  annotation_scheme_id: string;
-  scope_id: string;
-  config: AssignmentScopeRandomWithExclusionConfig | AssignmentScopeRandomWithNQLConfig | AssignmentScopeRandomConfig;
-  save?: boolean;
-};
 
 export type Mention = {
   start: number;
@@ -1811,7 +1809,7 @@ export type $OpenApiTs = {
       };
     };
   };
-  "/api/annotations/annotate/scopes/{project_id}": {
+  "/api/annotations/assignments/scopes/{project_id}": {
     get: {
       req: {
         projectId: string;
@@ -1829,7 +1827,7 @@ export type $OpenApiTs = {
       };
     };
   };
-  "/api/annotations/annotate/scopes/": {
+  "/api/annotations/assignments/scopes/": {
     get: {
       req: {
         xProjectId: string;
@@ -1846,7 +1844,7 @@ export type $OpenApiTs = {
       };
     };
   };
-  "/api/annotations/annotate/scope/{assignment_scope_id}": {
+  "/api/annotations/assignments/scope/{assignment_scope_id}": {
     get: {
       req: {
         assignmentScopeId: string;
@@ -1856,16 +1854,18 @@ export type $OpenApiTs = {
         /**
          * Successful Response
          */
-        200: AssignmentScopeModel;
+        200: AssignmentScopeModel | null;
         /**
          * Validation Error
          */
         422: HTTPValidationError;
       };
     };
-    delete: {
+  };
+  "/api/annotations/assignments/scope/": {
+    put: {
       req: {
-        assignmentScopeId: string;
+        requestBody: AssignmentScopeModel;
         xProjectId: string;
       };
       res: {
@@ -1880,17 +1880,17 @@ export type $OpenApiTs = {
       };
     };
   };
-  "/api/annotations/annotate/scope/": {
-    put: {
+  "/api/annotations/annotate/scope/{assignment_scope_id}": {
+    delete: {
       req: {
-        requestBody: AssignmentScopeModel;
+        assignmentScopeId: string;
         xProjectId: string;
       };
       res: {
         /**
          * Successful Response
          */
-        200: string;
+        200: unknown;
         /**
          * Validation Error
          */
@@ -2023,17 +2023,17 @@ export type $OpenApiTs = {
       };
     };
   };
-  "/api/annotations/config/assignments/": {
-    post: {
+  "/api/annotations/config/assignments/{assignment_scope_id}": {
+    put: {
       req: {
-        requestBody: MakeAssignmentsRequestModel;
+        assignmentScopeId: string;
         xProjectId: string;
       };
       res: {
         /**
          * Successful Response
          */
-        200: Array<AssignmentModel>;
+        200: unknown;
         /**
          * Validation Error
          */

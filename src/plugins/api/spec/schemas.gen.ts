@@ -2093,6 +2093,193 @@ export const $AnnotationValue = {
   title: "AnnotationValue",
 } as const;
 
+export const $AssignmentConfigLegacy = {
+  properties: {
+    users: {
+      additionalProperties: {
+        type: "integer",
+      },
+      type: "object",
+      title: "Users",
+    },
+    overlaps: {
+      additionalProperties: {
+        type: "integer",
+      },
+      type: "object",
+      title: "Overlaps",
+    },
+    random_seed: {
+      type: "integer",
+      title: "Random Seed",
+      default: 1337,
+    },
+    config_type: {
+      type: "string",
+      enum: ["LEGACY"],
+      const: "LEGACY",
+      title: "Config Type",
+      default: "LEGACY",
+    },
+    legacy: {
+      type: "object",
+      title: "Legacy",
+    },
+  },
+  type: "object",
+  required: ["users", "overlaps", "legacy"],
+  title: "AssignmentConfigLegacy",
+} as const;
+
+export const $AssignmentConfigPriority = {
+  properties: {
+    users: {
+      additionalProperties: {
+        type: "integer",
+      },
+      type: "object",
+      title: "Users",
+    },
+    overlaps: {
+      additionalProperties: {
+        type: "integer",
+      },
+      type: "object",
+      title: "Overlaps",
+    },
+    random_seed: {
+      type: "integer",
+      title: "Random Seed",
+      default: 1337,
+    },
+    config_type: {
+      type: "string",
+      enum: ["PRIORITY"],
+      const: "PRIORITY",
+      title: "Config Type",
+      default: "PRIORITY",
+    },
+    priority_id: {
+      type: "string",
+      title: "Priority Id",
+    },
+    prio_offset: {
+      type: "integer",
+      title: "Prio Offset",
+    },
+  },
+  type: "object",
+  required: ["users", "overlaps", "priority_id", "prio_offset"],
+  title: "AssignmentConfigPriority",
+} as const;
+
+export const $AssignmentConfigRandom = {
+  properties: {
+    users: {
+      additionalProperties: {
+        type: "integer",
+      },
+      type: "object",
+      title: "Users",
+    },
+    overlaps: {
+      additionalProperties: {
+        type: "integer",
+      },
+      type: "object",
+      title: "Overlaps",
+    },
+    random_seed: {
+      type: "integer",
+      title: "Random Seed",
+      default: 1337,
+    },
+    config_type: {
+      type: "string",
+      enum: ["RANDOM"],
+      const: "RANDOM",
+      title: "Config Type",
+      default: "RANDOM",
+    },
+    nql: {
+      type: "string",
+      title: "Nql",
+    },
+    nql_parsed: {
+      anyOf: [
+        {
+          oneOf: [
+            {
+              $ref: "#/components/schemas/FieldFilter",
+            },
+            {
+              $ref: "#/components/schemas/FieldFilters",
+            },
+            {
+              $ref: "#/components/schemas/LabelFilterMulti",
+            },
+            {
+              $ref: "#/components/schemas/LabelFilterBool",
+            },
+            {
+              $ref: "#/components/schemas/LabelFilterInt",
+            },
+            {
+              $ref: "#/components/schemas/AssignmentFilter",
+            },
+            {
+              $ref: "#/components/schemas/AnnotationFilter",
+            },
+            {
+              $ref: "#/components/schemas/AbstractFilter",
+            },
+            {
+              $ref: "#/components/schemas/ImportFilter",
+            },
+            {
+              $ref: "#/components/schemas/MetaFilterBool",
+            },
+            {
+              $ref: "#/components/schemas/MetaFilterInt",
+            },
+            {
+              $ref: "#/components/schemas/MetaFilterStr",
+            },
+            {
+              $ref: "#/components/schemas/SubQuery",
+            },
+          ],
+          discriminator: {
+            propertyName: "filter",
+            mapping: {
+              abstract: "#/components/schemas/AbstractFilter",
+              annotation: "#/components/schemas/AnnotationFilter",
+              assignment: "#/components/schemas/AssignmentFilter",
+              field: "#/components/schemas/FieldFilter",
+              field_mul: "#/components/schemas/FieldFilters",
+              import: "#/components/schemas/ImportFilter",
+              label_bool: "#/components/schemas/LabelFilterBool",
+              label_int: "#/components/schemas/LabelFilterInt",
+              label_multi: "#/components/schemas/LabelFilterMulti",
+              meta_bool: "#/components/schemas/MetaFilterBool",
+              meta_int: "#/components/schemas/MetaFilterInt",
+              meta_str: "#/components/schemas/MetaFilterStr",
+              sub: "#/components/schemas/SubQuery",
+            },
+          },
+        },
+        {
+          type: "null",
+        },
+      ],
+      title: "Nql Parsed",
+    },
+  },
+  type: "object",
+  required: ["users", "overlaps", "nql"],
+  title: "AssignmentConfigRandom",
+} as const;
+
 export const $AssignmentCounts = {
   properties: {
     num_total: {
@@ -2492,21 +2679,21 @@ export const $AssignmentScopeModel = {
         {
           oneOf: [
             {
-              $ref: "#/components/schemas/AssignmentScopeRandomWithExclusionConfig",
+              $ref: "#/components/schemas/AssignmentConfigRandom",
             },
             {
-              $ref: "#/components/schemas/AssignmentScopeRandomWithNQLConfig",
+              $ref: "#/components/schemas/AssignmentConfigPriority",
             },
             {
-              $ref: "#/components/schemas/AssignmentScopeRandomConfig",
+              $ref: "#/components/schemas/AssignmentConfigLegacy",
             },
           ],
           discriminator: {
             propertyName: "config_type",
             mapping: {
-              random: "#/components/schemas/AssignmentScopeRandomConfig",
-              random_exclusion: "#/components/schemas/AssignmentScopeRandomWithExclusionConfig",
-              random_nql: "#/components/schemas/AssignmentScopeRandomWithNQLConfig",
+              LEGACY: "#/components/schemas/AssignmentConfigLegacy",
+              PRIORITY: "#/components/schemas/AssignmentConfigPriority",
+              RANDOM: "#/components/schemas/AssignmentConfigRandom",
             },
           },
         },
@@ -2527,279 +2714,6 @@ the annotation process, for example to make it clear that different subsets of a
 are to be annotated.
 Logically, this should be viewed as a hierarchical organisation
 AnnotationScheme -> [AssignmentScope] -> Assignment -> Annotation`,
-} as const;
-
-export const $AssignmentScopeRandomConfig = {
-  properties: {
-    config_type: {
-      type: "string",
-      enum: ["random"],
-      const: "random",
-      title: "Config Type",
-      default: "random",
-    },
-    users: {
-      anyOf: [
-        {
-          items: {
-            type: "string",
-          },
-          type: "array",
-        },
-        {
-          items: {
-            type: "string",
-            format: "uuid",
-          },
-          type: "array",
-        },
-        {
-          type: "null",
-        },
-      ],
-      title: "Users",
-    },
-    num_items: {
-      type: "integer",
-      title: "Num Items",
-    },
-    min_assignments_per_item: {
-      type: "integer",
-      title: "Min Assignments Per Item",
-    },
-    max_assignments_per_item: {
-      type: "integer",
-      title: "Max Assignments Per Item",
-    },
-    num_multi_coded_items: {
-      type: "integer",
-      title: "Num Multi Coded Items",
-    },
-    random_seed: {
-      type: "integer",
-      title: "Random Seed",
-    },
-  },
-  type: "object",
-  required: [
-    "num_items",
-    "min_assignments_per_item",
-    "max_assignments_per_item",
-    "num_multi_coded_items",
-    "random_seed",
-  ],
-  title: "AssignmentScopeRandomConfig",
-} as const;
-
-export const $AssignmentScopeRandomWithExclusionConfig = {
-  properties: {
-    config_type: {
-      type: "string",
-      enum: ["random_exclusion"],
-      const: "random_exclusion",
-      title: "Config Type",
-      default: "random_exclusion",
-    },
-    users: {
-      anyOf: [
-        {
-          items: {
-            type: "string",
-          },
-          type: "array",
-        },
-        {
-          items: {
-            type: "string",
-            format: "uuid",
-          },
-          type: "array",
-        },
-        {
-          type: "null",
-        },
-      ],
-      title: "Users",
-    },
-    num_items: {
-      type: "integer",
-      title: "Num Items",
-    },
-    min_assignments_per_item: {
-      type: "integer",
-      title: "Min Assignments Per Item",
-    },
-    max_assignments_per_item: {
-      type: "integer",
-      title: "Max Assignments Per Item",
-    },
-    num_multi_coded_items: {
-      type: "integer",
-      title: "Num Multi Coded Items",
-    },
-    random_seed: {
-      type: "integer",
-      title: "Random Seed",
-    },
-    excluded_scopes: {
-      anyOf: [
-        {
-          items: {
-            type: "string",
-          },
-          type: "array",
-        },
-        {
-          items: {
-            type: "string",
-            format: "uuid",
-          },
-          type: "array",
-        },
-      ],
-      title: "Excluded Scopes",
-    },
-  },
-  type: "object",
-  required: [
-    "num_items",
-    "min_assignments_per_item",
-    "max_assignments_per_item",
-    "num_multi_coded_items",
-    "random_seed",
-    "excluded_scopes",
-  ],
-  title: "AssignmentScopeRandomWithExclusionConfig",
-} as const;
-
-export const $AssignmentScopeRandomWithNQLConfig = {
-  properties: {
-    config_type: {
-      type: "string",
-      enum: ["random_nql"],
-      const: "random_nql",
-      title: "Config Type",
-      default: "random_nql",
-    },
-    users: {
-      anyOf: [
-        {
-          items: {
-            type: "string",
-          },
-          type: "array",
-        },
-        {
-          items: {
-            type: "string",
-            format: "uuid",
-          },
-          type: "array",
-        },
-        {
-          type: "null",
-        },
-      ],
-      title: "Users",
-    },
-    num_items: {
-      type: "integer",
-      title: "Num Items",
-    },
-    min_assignments_per_item: {
-      type: "integer",
-      title: "Min Assignments Per Item",
-    },
-    max_assignments_per_item: {
-      type: "integer",
-      title: "Max Assignments Per Item",
-    },
-    num_multi_coded_items: {
-      type: "integer",
-      title: "Num Multi Coded Items",
-    },
-    random_seed: {
-      type: "integer",
-      title: "Random Seed",
-    },
-    query_parsed: {
-      oneOf: [
-        {
-          $ref: "#/components/schemas/FieldFilter",
-        },
-        {
-          $ref: "#/components/schemas/FieldFilters",
-        },
-        {
-          $ref: "#/components/schemas/LabelFilterMulti",
-        },
-        {
-          $ref: "#/components/schemas/LabelFilterBool",
-        },
-        {
-          $ref: "#/components/schemas/LabelFilterInt",
-        },
-        {
-          $ref: "#/components/schemas/AssignmentFilter",
-        },
-        {
-          $ref: "#/components/schemas/AnnotationFilter",
-        },
-        {
-          $ref: "#/components/schemas/AbstractFilter",
-        },
-        {
-          $ref: "#/components/schemas/ImportFilter",
-        },
-        {
-          $ref: "#/components/schemas/MetaFilterBool",
-        },
-        {
-          $ref: "#/components/schemas/MetaFilterInt",
-        },
-        {
-          $ref: "#/components/schemas/MetaFilterStr",
-        },
-        {
-          $ref: "#/components/schemas/SubQuery",
-        },
-      ],
-      title: "Query Parsed",
-      discriminator: {
-        propertyName: "filter",
-        mapping: {
-          abstract: "#/components/schemas/AbstractFilter",
-          annotation: "#/components/schemas/AnnotationFilter",
-          assignment: "#/components/schemas/AssignmentFilter",
-          field: "#/components/schemas/FieldFilter",
-          field_mul: "#/components/schemas/FieldFilters",
-          import: "#/components/schemas/ImportFilter",
-          label_bool: "#/components/schemas/LabelFilterBool",
-          label_int: "#/components/schemas/LabelFilterInt",
-          label_multi: "#/components/schemas/LabelFilterMulti",
-          meta_bool: "#/components/schemas/MetaFilterBool",
-          meta_int: "#/components/schemas/MetaFilterInt",
-          meta_str: "#/components/schemas/MetaFilterStr",
-          sub: "#/components/schemas/SubQuery",
-        },
-      },
-    },
-    query_str: {
-      type: "string",
-      title: "Query Str",
-    },
-  },
-  type: "object",
-  required: [
-    "num_items",
-    "min_assignments_per_item",
-    "max_assignments_per_item",
-    "num_multi_coded_items",
-    "random_seed",
-    "query_parsed",
-    "query_str",
-  ],
-  title: "AssignmentScopeRandomWithNQLConfig",
 } as const;
 
 export const $AssignmentStatus = {
@@ -3961,6 +3875,17 @@ export const $DehydratedPriorityModel = {
         },
       ],
       title: "Time Assigned",
+    },
+    num_prioritised: {
+      anyOf: [
+        {
+          type: "integer",
+        },
+        {
+          type: "null",
+        },
+      ],
+      title: "Num Prioritised",
     },
   },
   type: "object",
@@ -6420,49 +6345,6 @@ export const $M2MImportItemType = {
   - An \`implicit\` m2m relation is used for cases where the import only "implicitly" includes this item.
     For example: A tweet is part of the conversation that contained a specified keyword or an
                  article that is referenced by an article that is included "explicitly" in the query.`,
-} as const;
-
-export const $MakeAssignmentsRequestModel = {
-  properties: {
-    annotation_scheme_id: {
-      type: "string",
-      title: "Annotation Scheme Id",
-    },
-    scope_id: {
-      type: "string",
-      title: "Scope Id",
-    },
-    config: {
-      oneOf: [
-        {
-          $ref: "#/components/schemas/AssignmentScopeRandomWithExclusionConfig",
-        },
-        {
-          $ref: "#/components/schemas/AssignmentScopeRandomWithNQLConfig",
-        },
-        {
-          $ref: "#/components/schemas/AssignmentScopeRandomConfig",
-        },
-      ],
-      title: "Config",
-      discriminator: {
-        propertyName: "config_type",
-        mapping: {
-          random: "#/components/schemas/AssignmentScopeRandomConfig",
-          random_exclusion: "#/components/schemas/AssignmentScopeRandomWithExclusionConfig",
-          random_nql: "#/components/schemas/AssignmentScopeRandomWithNQLConfig",
-        },
-      },
-    },
-    save: {
-      type: "boolean",
-      title: "Save",
-      default: false,
-    },
-  },
-  type: "object",
-  required: ["annotation_scheme_id", "scope_id", "config"],
-  title: "MakeAssignmentsRequestModel",
 } as const;
 
 export const $Mention = {

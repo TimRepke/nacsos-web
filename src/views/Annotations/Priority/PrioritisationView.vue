@@ -77,26 +77,26 @@ async function apiSave() {
   }
 }
 
-async function train() {
-  EventBus.emit(
-    new ConfirmationRequestEvent(
-      "This is expensive. Really?",
-      (response) => {
-        if (response === "ACCEPT" && !!setup.value) {
-          setup.value.time_started = pyDTNow();
-          apiSave()
-            .then(() => {
-              // TODO: init training
-            })
-            .catch(toastReject);
-        }
-      },
-      "Run model training and prediction",
-      "Yes!",
-      "oops, no.",
-    ),
-  );
-}
+// async function train() {
+//   EventBus.emit(
+//     new ConfirmationRequestEvent(
+//       "This is expensive. Really?",
+//       (response) => {
+//         if (response === "ACCEPT" && !!setup.value) {
+//           setup.value.time_started = pyDTNow();
+//           apiSave()
+//             .then(() => {
+//               // TODO: init training
+//             })
+//             .catch(toastReject);
+//         }
+//       },
+//       "Run model training and prediction",
+//       "Yes!",
+//       "oops, no.",
+//     ),
+//   );
+// }
 
 function save() {
   EventBus.emit(
@@ -209,7 +209,7 @@ async function loadDF(event: MouseEvent, filename: string) {
         <div><strong>Setup created:</strong> {{ dt2str(setup.time_created) }}</div>
         <div><strong>Training started:</strong> {{ dt2str(setup.time_started) }}</div>
         <div><strong>Predictions ready:</strong> {{ dt2str(setup.time_ready) }}</div>
-        <div><strong>Assignments done:</strong> {{ dt2str(setup.time_assigned) }}</div>
+        <!-- <div><strong>Assignments done:</strong> {{ dt2str(setup.time_assigned) }}</div>-->
       </div>
       <div class="col-2 text-end">
         <button class="btn btn-success" @click="save">Save</button>
@@ -347,10 +347,16 @@ async function loadDF(event: MouseEvent, filename: string) {
       <template v-slot:head><strong>3) Prioritisation results</strong></template>
       <template v-slot:body>
         <template v-if="!setup.time_started">
-          <button class="btn btn-outline-secondary" @click="train" v-if="currentUserStore.isSudo">
+          <a
+            href="https://gitlab.pik-potsdam.de/mcc-apsis/nacsos/nacsos-ml/-/pipelines/new"
+            target="_blank"
+            class="btn btn-outline-secondary"
+            v-if="currentUserStore.isSudo"
+          >
+            <!-- @click="train"-->
             <font-awesome-icon icon="robot" />
             Initiate training
-          </button>
+          </a>
           <div v-else>Ask someone to initiate training.</div>
         </template>
 

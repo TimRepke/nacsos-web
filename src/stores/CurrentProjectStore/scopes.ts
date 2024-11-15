@@ -22,7 +22,7 @@ export function useScopesStore(): ScopesStore {
         })
       ).data,
       human: (
-        await API.annotations.getAssignmentScopesForProjectApiAnnotationsAnnotateScopesGet({
+        await API.annotations.getAssignmentScopesForProjectApiAnnotationsAssignmentsScopesGet({
           xProjectId: currentProjectStore.projectId as string,
         })
       ).data,

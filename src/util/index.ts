@@ -187,7 +187,7 @@ export function delay(ms: number) {
 export function isElem(obj: unknown): obj is HTMLElement | Node {
   return !!obj && (obj instanceof Node || obj instanceof HTMLElement);
 }
-
+export const sum = (arr: number[]) => arr.reduce((acc, v) => acc + v, 0);
 export default {
   install(app: App) {
     app.config.globalProperties.$util = {

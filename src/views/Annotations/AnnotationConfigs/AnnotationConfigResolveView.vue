@@ -272,7 +272,7 @@ export default defineComponent({
       }
       if (this.assignment_scope_id) {
         this.assignmentScope = (
-          await API.annotations.getAssignmentScopeApiAnnotationsAnnotateScopeAssignmentScopeIdGet({
+          await API.annotations.getAssignmentScopeApiAnnotationsAssignmentsScopeAssignmentScopeIdGet({
             assignmentScopeId: this.assignment_scope_id,
             xProjectId: currentProjectStore.projectId as string,
           })

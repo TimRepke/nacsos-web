@@ -10,7 +10,7 @@ export enum KindEnum {
 }
 
 export enum ConfigTypeEnum {
-  RANDOM = "random",
+  LEGACY = "LEGACY",
 }
 
 export enum AssignmentStatusEnum {

@@ -49,7 +49,7 @@ export default defineComponent({
       })
       .catch(ignore);
     API.annotations
-      .getAssignmentScopesForProjectApiAnnotationsAnnotateScopesGet({
+      .getAssignmentScopesForProjectApiAnnotationsAssignmentsScopesGet({
         xProjectId: currentProjectStore.projectId as string,
       })
       .then((response) => {

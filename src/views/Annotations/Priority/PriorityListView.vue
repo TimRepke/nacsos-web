@@ -64,7 +64,7 @@ async function clone(priority: DehydratedPriorityModel) {
 
 function reload() {
   API.prio
-    .readProjectSetupApiPrioSetupsGet({
+    .readProjectSetupsApiPrioSetupsGet({
       xProjectId: currentProjectStore.projectId as string,
     })
     .then((res) => (setups.value = res.data))

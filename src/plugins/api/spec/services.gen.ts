@@ -293,14 +293,14 @@ export class AnnotationsService {
     });
   }
 
-  public static getAssignmentScopesForUserApiAnnotationsAnnotateScopesProjectIdGet(
-    data: $OpenApiTs["/api/annotations/annotate/scopes/{project_id}"]["get"]["req"],
+  public static getAssignmentScopesForUserApiAnnotationsAssignmentsScopesProjectIdGet(
+    data: $OpenApiTs["/api/annotations/assignments/scopes/{project_id}"]["get"]["req"],
     options?: Partial<AxiosRequestConfig>,
-  ): CancelablePromise<ApiResult<$OpenApiTs["/api/annotations/annotate/scopes/{project_id}"]["get"]["res"][200]>> {
+  ): CancelablePromise<ApiResult<$OpenApiTs["/api/annotations/assignments/scopes/{project_id}"]["get"]["res"][200]>> {
     const { projectId, xProjectId } = data;
     return __request(OpenAPI, {
       method: "GET",
-      url: "/api/annotations/annotate/scopes/{project_id}",
+      url: "/api/annotations/assignments/scopes/{project_id}",
       path: {
         project_id: projectId,
       },
@@ -314,14 +314,14 @@ export class AnnotationsService {
     });
   }
 
-  public static getAssignmentScopesForProjectApiAnnotationsAnnotateScopesGet(
-    data: $OpenApiTs["/api/annotations/annotate/scopes/"]["get"]["req"],
+  public static getAssignmentScopesForProjectApiAnnotationsAssignmentsScopesGet(
+    data: $OpenApiTs["/api/annotations/assignments/scopes/"]["get"]["req"],
     options?: Partial<AxiosRequestConfig>,
-  ): CancelablePromise<ApiResult<$OpenApiTs["/api/annotations/annotate/scopes/"]["get"]["res"][200]>> {
+  ): CancelablePromise<ApiResult<$OpenApiTs["/api/annotations/assignments/scopes/"]["get"]["res"][200]>> {
     const { xProjectId } = data;
     return __request(OpenAPI, {
       method: "GET",
-      url: "/api/annotations/annotate/scopes/",
+      url: "/api/annotations/assignments/scopes/",
       headers: {
         "x-project-id": xProjectId,
       },
@@ -332,22 +332,42 @@ export class AnnotationsService {
     });
   }
 
-  public static getAssignmentScopeApiAnnotationsAnnotateScopeAssignmentScopeIdGet(
-    data: $OpenApiTs["/api/annotations/annotate/scope/{assignment_scope_id}"]["get"]["req"],
+  public static getAssignmentScopeApiAnnotationsAssignmentsScopeAssignmentScopeIdGet(
+    data: $OpenApiTs["/api/annotations/assignments/scope/{assignment_scope_id}"]["get"]["req"],
     options?: Partial<AxiosRequestConfig>,
   ): CancelablePromise<
-    ApiResult<$OpenApiTs["/api/annotations/annotate/scope/{assignment_scope_id}"]["get"]["res"][200]>
+    ApiResult<$OpenApiTs["/api/annotations/assignments/scope/{assignment_scope_id}"]["get"]["res"][200]>
   > {
     const { assignmentScopeId, xProjectId } = data;
     return __request(OpenAPI, {
       method: "GET",
-      url: "/api/annotations/annotate/scope/{assignment_scope_id}",
+      url: "/api/annotations/assignments/scope/{assignment_scope_id}",
       path: {
         assignment_scope_id: assignmentScopeId,
       },
       headers: {
         "x-project-id": xProjectId,
       },
+      errors: {
+        422: "Validation Error",
+      },
+      customRequestConfig: options,
+    });
+  }
+
+  public static putAssignmentScopeApiAnnotationsAssignmentsScopePut(
+    data: $OpenApiTs["/api/annotations/assignments/scope/"]["put"]["req"],
+    options?: Partial<AxiosRequestConfig>,
+  ): CancelablePromise<ApiResult<$OpenApiTs["/api/annotations/assignments/scope/"]["put"]["res"][200]>> {
+    const { xProjectId, requestBody } = data;
+    return __request(OpenAPI, {
+      method: "PUT",
+      url: "/api/annotations/assignments/scope/",
+      headers: {
+        "x-project-id": xProjectId,
+      },
+      body: requestBody,
+      mediaType: "application/json",
       errors: {
         422: "Validation Error",
       },
@@ -371,26 +391,6 @@ export class AnnotationsService {
       headers: {
         "x-project-id": xProjectId,
       },
-      errors: {
-        422: "Validation Error",
-      },
-      customRequestConfig: options,
-    });
-  }
-
-  public static putAssignmentScopeApiAnnotationsAnnotateScopePut(
-    data: $OpenApiTs["/api/annotations/annotate/scope/"]["put"]["req"],
-    options?: Partial<AxiosRequestConfig>,
-  ): CancelablePromise<ApiResult<$OpenApiTs["/api/annotations/annotate/scope/"]["put"]["res"][200]>> {
-    const { xProjectId, requestBody } = data;
-    return __request(OpenAPI, {
-      method: "PUT",
-      url: "/api/annotations/annotate/scope/",
-      headers: {
-        "x-project-id": xProjectId,
-      },
-      body: requestBody,
-      mediaType: "application/json",
       errors: {
         422: "Validation Error",
       },
@@ -551,19 +551,22 @@ export class AnnotationsService {
     });
   }
 
-  public static makeAssignmentsApiAnnotationsConfigAssignmentsPost(
-    data: $OpenApiTs["/api/annotations/config/assignments/"]["post"]["req"],
+  public static makeAssignmentsApiAnnotationsConfigAssignmentsAssignmentScopeIdPut(
+    data: $OpenApiTs["/api/annotations/config/assignments/{assignment_scope_id}"]["put"]["req"],
     options?: Partial<AxiosRequestConfig>,
-  ): CancelablePromise<ApiResult<$OpenApiTs["/api/annotations/config/assignments/"]["post"]["res"][200]>> {
-    const { xProjectId, requestBody } = data;
+  ): CancelablePromise<
+    ApiResult<$OpenApiTs["/api/annotations/config/assignments/{assignment_scope_id}"]["put"]["res"][200]>
+  > {
+    const { assignmentScopeId, xProjectId } = data;
     return __request(OpenAPI, {
-      method: "POST",
-      url: "/api/annotations/config/assignments/",
+      method: "PUT",
+      url: "/api/annotations/config/assignments/{assignment_scope_id}",
+      path: {
+        assignment_scope_id: assignmentScopeId,
+      },
       headers: {
         "x-project-id": xProjectId,
       },
-      body: requestBody,
-      mediaType: "application/json",
       errors: {
         422: "Validation Error",
       },
@@ -2524,7 +2527,7 @@ export class PrioService {
     });
   }
 
-  public static readProjectSetupApiPrioSetupsGet(
+  public static readProjectSetupsApiPrioSetupsGet(
     data: $OpenApiTs["/api/prio/setups"]["get"]["req"],
     options?: Partial<AxiosRequestConfig>,
   ): CancelablePromise<ApiResult<$OpenApiTs["/api/prio/setups"]["get"]["res"][200]>> {
