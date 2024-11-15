@@ -157,7 +157,10 @@ function makeAssignments() {
               toastSuccess(`Successfully created assignments.`)();
               loadCounts().then().catch();
             })
-            .catch(toastReject);
+            .catch((reason) => {
+              toastReject(reason);
+              counts.value = null;
+            });
         }
       },
       "Create assignments",
