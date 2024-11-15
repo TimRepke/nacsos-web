@@ -135,7 +135,7 @@ function save() {
     .then(() => {
       toastSuccess("Saved assignment scope details!")();
       router.push({ name: route.name, params: { scope_id: config.value?.assignment_scope_id } });
-      config.value.time_created = pyDTNow();
+      config.value!.time_created = pyDTNow();
     })
     .catch(toastReject);
 }
