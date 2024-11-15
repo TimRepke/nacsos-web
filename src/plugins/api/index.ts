@@ -17,6 +17,7 @@ import {
   UsersService,
   PipesService,
   ItemService,
+  PrioService,
 } from "@/plugins/api/spec/services.gen";
 import type { ApiResponseReject } from "@/plugins/api/spec/core/ApiResult";
 import { EventBus } from "@/plugins/events";
@@ -41,6 +42,7 @@ export const API = {
   users: UsersService,
   pipes: PipesService,
   item: ItemService,
+  prio: PrioService,
 };
 
 export function ignore() {}

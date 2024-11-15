@@ -20,9 +20,10 @@
     <div class="table-responsive">
       <table class="table table-bordered table-sm">
         <tbody>
-          <tr v-for="username in shownUsernames" :key="username" :class="{ 'edit-mode': assiEditMode }">
+          <tr v-for="(cnt, username) in shownUsernames" :key="username" :class="{ 'edit-mode': assiEditMode }">
             <th>
               {{ username }}
+              <span class="fw-light text-muted small">({{ cnt }})</span>
               <inline-tool-tip v-show="assiEditMode" info="Assign all to user" placement="right" class="ms-2">
                 <font-awesome-icon icon="user-tag" @click="assignAll(username)" class="clickable-icon" />
               </inline-tool-tip>
@@ -95,18 +96,21 @@ export default defineComponent({
     };
   },
   computed: {
-    assignedUsers(): Array<string> {
-      return [
-        ...new Set(
-          this.entries.flatMap((entry: AssignmentScopeEntry) =>
-            entry.assignments.map((assignment: AssignmentInfo) => assignment.username),
-          ),
+    assignedUsers(): Record<string, number> {
+      const count: Record<string, number> = {};
+      this.entries.forEach((entry: AssignmentScopeEntry) =>
+        entry.assignments.forEach(
+          (assignment: AssignmentInfo) => (count[assignment.username] = (count[assignment.username] ?? 0) + 1),
         ),
-      ] as string[];
+      );
+      return count;
     },
-    shownUsernames(): Array<string> {
+    shownUsernames(): Record<string, number> {
       if (this.assiEditMode) {
-        return currentProjectStore.projectUsers.usernames;
+        return {
+          ...Object.fromEntries(currentProjectStore.projectUsers.usernames.map((username) => [username, 0])),
+          ...this.assignedUsers,
+        };
       }
       return this.assignedUsers;
     },

@@ -5,6 +5,7 @@ import { ref } from "vue";
 const props = defineProps({
   refresh: { type: Function, required: true },
   timeout: { type: Number, required: false, default: 1000 },
+  icon: { type: String, required: false, default: "refresh" },
 });
 
 enum IconState {
@@ -37,7 +38,7 @@ async function reload() {
     </span>
 
     <span v-else-if="state == IconState.Ready" class="clickable-icon" @click="reload">
-      <font-awesome-icon icon="refresh" />
+      <font-awesome-icon :icon="icon" />
     </span>
 
     <span v-else-if="state == IconState.Success" class="text-success">

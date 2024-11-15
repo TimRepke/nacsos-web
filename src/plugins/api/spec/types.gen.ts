@@ -280,6 +280,60 @@ export type AnnotationValue = {
   multi_int?: Array<number> | null;
 };
 
+export type AssignmentConfigLegacy = {
+  users: {
+    [key: string]: number;
+  };
+  overlaps: {
+    [key: string]: number;
+  };
+  random_seed?: number;
+  config_type?: "LEGACY";
+  legacy: {
+    [key: string]: unknown;
+  };
+};
+
+export type AssignmentConfigPriority = {
+  users: {
+    [key: string]: number;
+  };
+  overlaps: {
+    [key: string]: number;
+  };
+  random_seed?: number;
+  config_type?: "PRIORITY";
+  priority_id: string;
+  prio_offset: number;
+};
+
+export type AssignmentConfigRandom = {
+  users: {
+    [key: string]: number;
+  };
+  overlaps: {
+    [key: string]: number;
+  };
+  random_seed?: number;
+  config_type?: "RANDOM";
+  nql: string;
+  nql_parsed?:
+    | FieldFilter
+    | FieldFilters
+    | LabelFilterMulti
+    | LabelFilterBool
+    | LabelFilterInt
+    | AssignmentFilter
+    | AnnotationFilter
+    | AbstractFilter
+    | ImportFilter
+    | MetaFilterBool
+    | MetaFilterInt
+    | MetaFilterStr
+    | SubQuery
+    | null;
+};
+
 export type AssignmentCounts = {
   num_total: number;
   num_open: number;
@@ -368,57 +422,7 @@ export type AssignmentScopeModel = {
   time_created?: string | null;
   name: string;
   description?: string | null;
-  config?:
-    | AssignmentScopeRandomWithExclusionConfig
-    | AssignmentScopeRandomWithNQLConfig
-    | AssignmentScopeRandomConfig
-    | null;
-};
-
-export type AssignmentScopeRandomConfig = {
-  config_type?: "random";
-  users?: Array<string> | null;
-  num_items: number;
-  min_assignments_per_item: number;
-  max_assignments_per_item: number;
-  num_multi_coded_items: number;
-  random_seed: number;
-};
-
-export type AssignmentScopeRandomWithExclusionConfig = {
-  config_type?: "random_exclusion";
-  users?: Array<string> | null;
-  num_items: number;
-  min_assignments_per_item: number;
-  max_assignments_per_item: number;
-  num_multi_coded_items: number;
-  random_seed: number;
-  excluded_scopes: Array<string>;
-};
-
-export type AssignmentScopeRandomWithNQLConfig = {
-  config_type?: "random_nql";
-  users?: Array<string> | null;
-  num_items: number;
-  min_assignments_per_item: number;
-  max_assignments_per_item: number;
-  num_multi_coded_items: number;
-  random_seed: number;
-  query_parsed:
-    | FieldFilter
-    | FieldFilters
-    | LabelFilterMulti
-    | LabelFilterBool
-    | LabelFilterInt
-    | AssignmentFilter
-    | AnnotationFilter
-    | AbstractFilter
-    | ImportFilter
-    | MetaFilterBool
-    | MetaFilterInt
-    | MetaFilterStr
-    | SubQuery;
-  query_str: string;
+  config?: AssignmentConfigRandom | AssignmentConfigPriority | AssignmentConfigLegacy | null;
 };
 
 export type AssignmentStatus = "FULL" | "PARTIAL" | "OPEN" | "INVALID";
@@ -480,6 +484,18 @@ export type BotAnnotationMetaDataBaseModel = {
   time_updated?: string | null;
   assignment_scope_id?: string | null;
   annotation_scheme_id?: string | null;
+};
+
+export type BotAnnotationMetaDataModel = {
+  bot_annotation_metadata_id?: string | null;
+  name: string;
+  kind: BotKind;
+  project_id: string;
+  time_created?: string | null;
+  time_updated?: string | null;
+  assignment_scope_id?: string | null;
+  annotation_scheme_id?: string | null;
+  meta?: BotMetaResolve | null;
 };
 
 export type BotAnnotationModel = {
@@ -554,6 +570,22 @@ export type Cashtag = {
   tag: string;
 };
 
+export type ClimateBERTModel = {
+  max_len?: number;
+  train_split?: number;
+  n_epochs?: number;
+  batch_size_predict?: number;
+  batch_size_train?: number;
+  batch_size_eval?: number;
+  warmup_steps?: number;
+  weight_decay?: number;
+  logging_steps?: number;
+  eval_strategy?: string;
+  eval_steps?: number;
+  conf?: "CLIMBERT";
+  model?: string;
+};
+
 /**
  * Flattened and reduced version of the context_annotation object
  * https://developer.twitter.com/en/docs/twitter-api/annotations/overview
@@ -582,6 +614,17 @@ export type DehydratedAssignment = {
   order: number;
 };
 
+export type DehydratedPriorityModel = {
+  priority_id?: string | null;
+  project_id?: string | null;
+  name?: string | null;
+  time_created?: string | null;
+  time_started?: string | null;
+  time_ready?: string | null;
+  time_assigned?: string | null;
+  num_prioritised?: number | null;
+};
+
 export type DehydratedUser = {
   user_id?: string | null;
   username?: string | null;
@@ -589,8 +632,8 @@ export type DehydratedUser = {
 };
 
 export type Event = {
-  event: "ExampleEvent" | "ExampleSubEvent";
-  payload: ExampleEvent | ExampleSubEvent;
+  event: "ExampleSubEvent" | "ExampleEvent";
+  payload: ExampleSubEvent | ExampleEvent;
 };
 
 export type ExampleEvent = {
@@ -860,6 +903,16 @@ export type Label = {
   value?: number | null;
 };
 
+export type LabelCount = {
+  num_items: number;
+  key: string;
+  value_bool?: boolean | null;
+  value_int?: number | null;
+  value_float?: number | null;
+  value_str?: string | null;
+  multi?: number | null;
+};
+
 export type LabelFilterBool = {
   scopes?: Array<string> | null;
   scheme?: string | null;
@@ -951,13 +1004,6 @@ export type LexisNexisItemSourceModel = {
  */
 export type M2MImportItemType = "explicit" | "implicit";
 
-export type MakeAssignmentsRequestModel = {
-  annotation_scheme_id: string;
-  scope_id: string;
-  config: AssignmentScopeRandomWithExclusionConfig | AssignmentScopeRandomWithNQLConfig | AssignmentScopeRandomConfig;
-  save?: boolean;
-};
-
 export type Mention = {
   start: number;
   end: number;
@@ -1000,6 +1046,61 @@ export type OpenAlexSolrImport = {
   def_type?: "edismax" | "lucene" | "dismax";
   field?: "title" | "abstract" | "title_abstract";
   op?: "OR" | "AND";
+};
+
+export type PrioTableParams = {
+  scope_ids: Array<string>;
+  incl?: string;
+  query?:
+    | FieldFilter
+    | FieldFilters
+    | LabelFilterMulti
+    | LabelFilterBool
+    | LabelFilterInt
+    | AssignmentFilter
+    | AnnotationFilter
+    | AbstractFilter
+    | ImportFilter
+    | MetaFilterBool
+    | MetaFilterInt
+    | MetaFilterStr
+    | SubQuery
+    | null;
+  limit?: number;
+};
+
+export type PriorityModel = {
+  priority_id?: string | null;
+  project_id?: string | null;
+  name?: string | null;
+  time_created?: string | null;
+  time_started?: string | null;
+  time_ready?: string | null;
+  time_assigned?: string | null;
+  source_scopes?: Array<string> | null;
+  nql?: string | null;
+  nql_parsed?:
+    | FieldFilter
+    | FieldFilters
+    | LabelFilterMulti
+    | LabelFilterBool
+    | LabelFilterInt
+    | AssignmentFilter
+    | AnnotationFilter
+    | AbstractFilter
+    | ImportFilter
+    | MetaFilterBool
+    | MetaFilterInt
+    | MetaFilterStr
+    | SubQuery
+    | null;
+  incl_rule?: string | null;
+  incl_field?: string | null;
+  incl_pred_field?: string | null;
+  train_split?: number | null;
+  n_predictions?: number | null;
+  config?: SciBERTModel | ClimateBERTModel | RegressionModel | SVMModel | null;
+  prioritised_ids?: Array<string> | null;
 };
 
 export type ProjectBaseInfo = {
@@ -1072,6 +1173,7 @@ export type ProjectPermissionsModel = {
   imports_edit?: boolean;
   annotations_read?: boolean;
   annotations_edit?: boolean;
+  annotations_prio?: boolean;
   pipelines_read?: boolean;
   pipelines_edit?: boolean;
   artefacts_read?: boolean;
@@ -1099,6 +1201,15 @@ export type RankEntry = {
 export type ReferencedTweet = {
   id: string | number;
   type: "retweeted" | "quoted" | "replied_to";
+};
+
+export type RegressionModel = {
+  stop_words?: "english" | Array<string> | null;
+  ngram_range?: unknown[];
+  max_df?: number;
+  min_df?: number;
+  max_features?: number | null;
+  conf?: "REG";
 };
 
 export type ResolutionCell = {
@@ -1143,9 +1254,37 @@ export type ResolutionUserEntry = {
   status?: ResolutionStatus;
 };
 
+export type SVMModel = {
+  stop_words?: "english" | Array<string> | null;
+  ngram_range?: unknown[];
+  max_df?: number;
+  min_df?: number;
+  max_features?: number | null;
+  conf?: "SVM";
+  C?: number;
+  kernel?: "linear" | "poly" | "rbf" | "sigmoid" | "precomputed";
+  degree?: number;
+};
+
 export type SavedResolution = {
   meta: BotAnnotationResolution;
   proposal: ResolutionProposal;
+};
+
+export type SciBERTModel = {
+  max_len?: number;
+  train_split?: number;
+  n_epochs?: number;
+  batch_size_predict?: number;
+  batch_size_train?: number;
+  batch_size_eval?: number;
+  warmup_steps?: number;
+  weight_decay?: number;
+  logging_steps?: number;
+  eval_strategy?: string;
+  eval_steps?: number;
+  conf?: "SCIBERT";
+  model?: string;
 };
 
 export type ScopusImport = {
@@ -1382,6 +1521,7 @@ export type UserPermission = {
   imports_edit?: boolean;
   annotations_read?: boolean;
   annotations_edit?: boolean;
+  annotations_prio?: boolean;
   pipelines_read?: boolean;
   pipelines_edit?: boolean;
   artefacts_read?: boolean;
@@ -1669,7 +1809,7 @@ export type $OpenApiTs = {
       };
     };
   };
-  "/api/annotations/annotate/scopes/{project_id}": {
+  "/api/annotations/assignments/scopes/{project_id}": {
     get: {
       req: {
         projectId: string;
@@ -1687,7 +1827,7 @@ export type $OpenApiTs = {
       };
     };
   };
-  "/api/annotations/annotate/scopes/": {
+  "/api/annotations/assignments/scopes/": {
     get: {
       req: {
         xProjectId: string;
@@ -1704,7 +1844,7 @@ export type $OpenApiTs = {
       };
     };
   };
-  "/api/annotations/annotate/scope/{assignment_scope_id}": {
+  "/api/annotations/assignments/scope/{assignment_scope_id}": {
     get: {
       req: {
         assignmentScopeId: string;
@@ -1714,16 +1854,18 @@ export type $OpenApiTs = {
         /**
          * Successful Response
          */
-        200: AssignmentScopeModel;
+        200: AssignmentScopeModel | null;
         /**
          * Validation Error
          */
         422: HTTPValidationError;
       };
     };
-    delete: {
+  };
+  "/api/annotations/assignments/scope/": {
+    put: {
       req: {
-        assignmentScopeId: string;
+        requestBody: AssignmentScopeModel;
         xProjectId: string;
       };
       res: {
@@ -1738,17 +1880,17 @@ export type $OpenApiTs = {
       };
     };
   };
-  "/api/annotations/annotate/scope/": {
-    put: {
+  "/api/annotations/annotate/scope/{assignment_scope_id}": {
+    delete: {
       req: {
-        requestBody: AssignmentScopeModel;
+        assignmentScopeId: string;
         xProjectId: string;
       };
       res: {
         /**
          * Successful Response
          */
-        200: string;
+        200: unknown;
         /**
          * Validation Error
          */
@@ -1881,17 +2023,17 @@ export type $OpenApiTs = {
       };
     };
   };
-  "/api/annotations/config/assignments/": {
-    post: {
+  "/api/annotations/config/assignments/{assignment_scope_id}": {
+    put: {
       req: {
-        requestBody: MakeAssignmentsRequestModel;
+        assignmentScopeId: string;
         xProjectId: string;
       };
       res: {
         /**
          * Successful Response
          */
-        200: Array<AssignmentModel>;
+        200: unknown;
         /**
          * Validation Error
          */
@@ -1928,7 +2070,7 @@ export type $OpenApiTs = {
         /**
          * Successful Response
          */
-        200: AssignmentModel;
+        200: unknown;
         /**
          * Validation Error
          */
@@ -2123,6 +2265,24 @@ export type $OpenApiTs = {
          * Successful Response
          */
         200: Array<BotMetaInfo>;
+        /**
+         * Validation Error
+         */
+        422: HTTPValidationError;
+      };
+    };
+  };
+  "/api/annotations/bot/scopes": {
+    get: {
+      req: {
+        onlyResolve?: boolean;
+        xProjectId: string;
+      };
+      res: {
+        /**
+         * Successful Response
+         */
+        200: Array<BotAnnotationMetaDataModel>;
         /**
          * Validation Error
          */
@@ -2898,6 +3058,38 @@ export type $OpenApiTs = {
       };
     };
   };
+  "/api/stats/labels": {
+    post: {
+      req: {
+        requestBody?:
+          | FieldFilter
+          | FieldFilters
+          | LabelFilterMulti
+          | LabelFilterBool
+          | LabelFilterInt
+          | AssignmentFilter
+          | AnnotationFilter
+          | AbstractFilter
+          | ImportFilter
+          | MetaFilterBool
+          | MetaFilterInt
+          | MetaFilterStr
+          | SubQuery
+          | null;
+        xProjectId: string;
+      };
+      res: {
+        /**
+         * Successful Response
+         */
+        200: Array<LabelCount>;
+        /**
+         * Validation Error
+         */
+        422: HTTPValidationError;
+      };
+    };
+  };
   "/api/export/annotations/csv": {
     post: {
       req: {
@@ -3006,7 +3198,7 @@ export type $OpenApiTs = {
   "/api/search/nql/count": {
     post: {
       req: {
-        requestBody:
+        requestBody?:
           | FieldFilter
           | FieldFilters
           | LabelFilterMulti
@@ -3019,7 +3211,8 @@ export type $OpenApiTs = {
           | MetaFilterBool
           | MetaFilterInt
           | MetaFilterStr
-          | SubQuery;
+          | SubQuery
+          | null;
         xProjectId: string;
       };
       res: {
@@ -3549,6 +3742,148 @@ export type $OpenApiTs = {
     put: {
       req: {
         requestBody: AcademicItemModel;
+        xProjectId: string;
+      };
+      res: {
+        /**
+         * Successful Response
+         */
+        200: unknown;
+        /**
+         * Validation Error
+         */
+        422: HTTPValidationError;
+      };
+    };
+  };
+  "/api/prio/table/peek/html": {
+    post: {
+      req: {
+        requestBody: PrioTableParams;
+        xProjectId: string;
+      };
+      res: {
+        /**
+         * Successful Response
+         */
+        200: string;
+        /**
+         * Validation Error
+         */
+        422: HTTPValidationError;
+      };
+    };
+  };
+  "/api/prio/table/peek": {
+    post: {
+      req: {
+        requestBody: PrioTableParams;
+        xProjectId: string;
+      };
+      res: {
+        /**
+         * Successful Response
+         */
+        200: Array<{
+          [key: string]: unknown;
+        }>;
+        /**
+         * Validation Error
+         */
+        422: HTTPValidationError;
+      };
+    };
+  };
+  "/api/prio/setups": {
+    get: {
+      req: {
+        xProjectId: string;
+      };
+      res: {
+        /**
+         * Successful Response
+         */
+        200: Array<DehydratedPriorityModel>;
+        /**
+         * Validation Error
+         */
+        422: HTTPValidationError;
+      };
+    };
+  };
+  "/api/prio/setup": {
+    get: {
+      req: {
+        priorityId: string;
+        xProjectId: string;
+      };
+      res: {
+        /**
+         * Successful Response
+         */
+        200: PriorityModel | null;
+        /**
+         * Validation Error
+         */
+        422: HTTPValidationError;
+      };
+    };
+    put: {
+      req: {
+        requestBody: PriorityModel;
+        xProjectId: string;
+      };
+      res: {
+        /**
+         * Successful Response
+         */
+        200: unknown;
+        /**
+         * Validation Error
+         */
+        422: HTTPValidationError;
+      };
+    };
+    delete: {
+      req: {
+        priorityId: string;
+        xProjectId: string;
+      };
+      res: {
+        /**
+         * Successful Response
+         */
+        200: unknown;
+        /**
+         * Validation Error
+         */
+        422: HTTPValidationError;
+      };
+    };
+  };
+  "/api/prio/artefacts/list": {
+    get: {
+      req: {
+        xPriorityId: string;
+        xProjectId: string;
+      };
+      res: {
+        /**
+         * Successful Response
+         */
+        200: Array<FileOnDisk>;
+        /**
+         * Validation Error
+         */
+        422: HTTPValidationError;
+      };
+    };
+  };
+  "/api/prio/artefacts/file": {
+    get: {
+      req: {
+        filename: string;
+        xPriorityId: string;
         xProjectId: string;
       };
       res: {

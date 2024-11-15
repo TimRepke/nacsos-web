@@ -13,7 +13,8 @@ import type {
 } from "@/plugins/api/spec";
 import { API } from "@/plugins/api";
 import { Revision } from "@/types/imports";
-import SortedTable from "@/components/SortedTable.vue";
+import SortedTableHead from "@/components/SortableTable/SortedTableHead.vue";
+import SortedTable from "@/components/SortableTable/SortedTable.vue";
 
 const componentMap: { [key in ItemType]: Component } = {
   academic: markRaw(defineAsyncComponent(() => import("@/components/items-edit/AcademicItem.vue"))),
@@ -30,7 +31,6 @@ const imports = ref<ImportDetails[]>([]);
 const m2ms = ref<ImportM2M[]>([]);
 const annotations = ref<AnnotationModel[]>([]);
 const botAnnotations = ref<BotAnnotationModel[]>([]);
-await currentProjectStore.projectSchemes.ensureLoaded();
 
 onMounted(async () => {
   item.value = (
@@ -72,39 +72,22 @@ const revisions = computed<Record<string, Revision>>(() =>
 
 const table = computed(() =>
   annotations.value.map((anno) => {
-    const val = anno.value_bool ?? anno.value_int ?? anno.value_str ?? anno.value_float ?? anno.multi_int;
     return {
-      rowKey: { raw: anno.annotation_id },
-      key: { raw: anno.key, html: `<code>${anno.key}</code>` },
-      value: { raw: val, html: `<code><strong>${val}</strong></code>` },
-      user: { raw: platformUsersStore.userLookup[anno.user_id]?.username ?? "??" },
-      dt: { raw: anno.time_created?.substring(0, 19).replace("T", " ") },
+      ...anno,
+      username: platformUsersStore.userLookup[anno.user_id]?.username ?? "??",
+      value: anno.value_bool ?? anno.value_int ?? anno.value_str ?? anno.value_float ?? anno.multi_int,
     };
   }),
 );
-const tableColumns = [
-  { name: "key", key: "key" },
-  { name: "value", key: "value" },
-  { name: "user", key: "user" },
-  { name: "timestamp", key: "dt" },
-];
 
 const botTable = computed(() =>
   botAnnotations.value.map((anno) => {
-    const val = anno.value_bool ?? anno.value_int ?? anno.value_str ?? anno.value_float ?? anno.multi_int;
     return {
-      rowKey: { raw: anno.bot_annotation_id },
-      key: { raw: anno.key, html: `<code>${anno.key}</code>` },
-      value: { raw: val, html: `<code><strong>${val}</strong></code>` },
-      dt: { raw: anno.time_created?.substring(0, 19).replace("T", " ") },
+      ...anno,
+      value: anno.value_bool ?? anno.value_int ?? anno.value_str ?? anno.value_float ?? anno.multi_int,
     };
   }),
 );
-const botTableColumns = [
-  { name: "key", key: "key" },
-  { name: "value", key: "value" },
-  { name: "timestamp", key: "dt" },
-];
 </script>
 
 <template>
@@ -120,10 +103,56 @@ const botTableColumns = [
     </div>
     <div class="col-lg-6 col">
       <h2>Human labels</h2>
-      <SortedTable :data="table" :columns="tableColumns" default-sort="key" class="mb-3" />
+      <SortedTable :data="table" class="mb-3" default-sort="key">
+        <template v-slot:head>
+          <tr>
+            <SortedTableHead col-key="key">key</SortedTableHead>
+            <SortedTableHead col-key="value">value</SortedTableHead>
+            <SortedTableHead col-key="username">user</SortedTableHead>
+            <SortedTableHead col-key="time_created">timestamp</SortedTableHead>
+          </tr>
+        </template>
+        <template v-slot:body="sortedRows">
+          <tr v-for="row in sortedRows.sortedRows" :key="row.bot_annotation_id">
+            <td>
+              <code>{{ row.key }}</code>
+            </td>
+            <td>
+              <code>
+                <strong>{{ row.value }}</strong>
+              </code>
+            </td>
+            <td>
+              {{ row.username }}
+            </td>
+            <td>{{ row.time_created?.substring(0, 19).replace("T", " ") }}</td>
+          </tr>
+        </template>
+      </SortedTable>
 
       <h2>Bot labels (incl resolutions)</h2>
-      <SortedTable :data="botTable" :columns="botTableColumns" default-sort="key" class="mb-3" />
+      <SortedTable :data="botTable" class="mb-3" default-sort="key">
+        <template v-slot:head>
+          <tr>
+            <SortedTableHead col-key="key">key</SortedTableHead>
+            <SortedTableHead col-key="value">value</SortedTableHead>
+            <SortedTableHead col-key="time_created">timestamp</SortedTableHead>
+          </tr>
+        </template>
+        <template v-slot:body="sortedRows">
+          <tr v-for="row in sortedRows.sortedRows" :key="row.bot_annotation_id">
+            <td>
+              <code>{{ row.key }}</code>
+            </td>
+            <td>
+              <code>
+                <strong>{{ row.value }}</strong>
+              </code>
+            </td>
+            <td>{{ row.time_created?.substring(0, 19).replace("T", " ") }}</td>
+          </tr>
+        </template>
+      </SortedTable>
 
       <h2>Linked import revisions</h2>
       <ul>

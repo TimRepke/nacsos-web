@@ -10,7 +10,7 @@ export enum KindEnum {
 }
 
 export enum ConfigTypeEnum {
-  RANDOM = "random",
+  LEGACY = "LEGACY",
 }
 
 export enum AssignmentStatusEnum {
@@ -28,9 +28,13 @@ export enum BotKindEnum {
   SCRIPT = "SCRIPT",
 }
 
+export enum ConfEnum {
+  CLIMBERT = "CLIMBERT",
+}
+
 export enum EventEnum {
-  EXAMPLE_EVENT = "ExampleEvent",
   EXAMPLE_SUB_EVENT = "ExampleSubEvent",
+  EXAMPLE_EVENT = "ExampleEvent",
 }
 
 export enum FieldEnum {
@@ -102,6 +106,14 @@ export enum ResolutionStatusEnum {
   NEW = "NEW",
   CHANGED = "CHANGED",
   UNCHANGED = "UNCHANGED",
+}
+
+export enum KernelEnum {
+  LINEAR = "linear",
+  POLY = "poly",
+  RBF = "rbf",
+  SIGMOID = "sigmoid",
+  PRECOMPUTED = "precomputed",
 }
 
 export enum TaskStatusEnum {

@@ -122,7 +122,7 @@ export default defineComponent({
   },
   async mounted() {
     API.annotations
-      .getAssignmentScopesForUserApiAnnotationsAnnotateScopesProjectIdGet({
+      .getAssignmentScopesForUserApiAnnotationsAssignmentsScopesProjectIdGet({
         projectId: currentProjectStore.projectId as string,
         xProjectId: currentProjectStore.projectId as string,
       })

@@ -1,6 +1,6 @@
 {
   "name": "nacsos-web",
-  "version": "0.18.0",
+  "version": "0.20.0",
   "engines": {
     "npm": "^10.8.2",
     "node": "^v20.18.0"

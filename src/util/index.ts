@@ -87,14 +87,39 @@ export function padZero(num: number, padding: number): string {
   return num.toString(10).padStart(padding, "0");
 }
 
+export const zPad = padZero;
+
 export function dt2str(datetime: string | null | undefined): string | null {
+  // 2024-10-28 18:30
   if (datetime !== null && datetime !== undefined) {
     const dt = new Date(datetime);
-    return `
-    ${dt.getFullYear()}-${padZero(dt.getMonth() + 1, 2)}-${padZero(dt.getDate(), 2)} 
-    ${padZero(dt.getHours() + dt.getTimezoneOffset(), 2)}:${padZero(dt.getMinutes(), 2)}`;
+    // eslint-disable-next-line vue/max-len
+    return `${dt.getFullYear()}-${padZero(dt.getMonth() + 1, 2)}-${padZero(dt.getDate(), 2)} ${padZero(dt.getHours() + dt.getTimezoneOffset(), 2)}:${padZero(dt.getMinutes(), 2)}`;
   }
   return null;
+}
+
+function _dt2pstr(dt: Date): string {
+  // 2024-07-30T17:43:46.095103Z
+  // eslint-disable-next-line vue/max-len
+  return `${dt.getFullYear()}-${padZero(dt.getMonth() + 1, 2)}-${padZero(dt.getDate(), 2)}T${padZero(dt.getHours() + dt.getTimezoneOffset(), 2)}:${padZero(dt.getMinutes(), 2)}:${padZero(dt.getSeconds(), 2)}.000000Z`;
+}
+
+export function dt2pstr(datetime: string | null | undefined): string | null {
+  // 2024-07-30T17:43:46.095103Z
+  if (datetime !== null && datetime !== undefined) {
+    return _dt2pstr(new Date(datetime));
+  }
+  return null;
+}
+
+export function pyDTNow() {
+  return _dt2pstr(new Date());
+}
+
+export function timestampNow() {
+  const now = new Date();
+  return `${now.getFullYear()}-${zPad(now.getMonth(), 2)}-${zPad(now.getDate(), 2)}`;
 }
 
 export function clearString(s: string | null | undefined): string | null {
@@ -155,6 +180,14 @@ export function useDelay<T extends Array<any>, U>(fn: (...args: T) => U, delay: 
   return { call, delayedCall, clear };
 }
 
+export function delay(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+export function isElem(obj: unknown): obj is HTMLElement | Node {
+  return !!obj && (obj instanceof Node || obj instanceof HTMLElement);
+}
+export const sum = (arr: number[]) => arr.reduce((acc, v) => acc + v, 0);
 export default {
   install(app: App) {
     app.config.globalProperties.$util = {
@@ -166,6 +199,7 @@ export default {
       isNone,
       is,
       md2html,
+      delay,
       useDelay,
       dt2str,
       isOnRoute,

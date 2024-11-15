@@ -11,6 +11,7 @@
   --safeLightAccent-hsl: 39.89189189, 74.29718876%, 51.17647059%;
   --safeDarkAccent-hsl: 39.89189189, 74.29718876%, 51.17647059%;
 
+  --socdr-grey: #C8C8C8;
   --grey-1: hsl(0, 0%, 60%); // normal or unselected
   --grey-2: hsl(0, 0%, 45%); // hovered
   --grey-3: hsl(0, 0%, 30%); // selected
@@ -207,18 +208,108 @@ Analogous to LaTeX
   background-color: var(--bd-callout-bg, var(--bs-gray-100));
   border-left: 0.25rem solid var(--bd-callout-border, var(--bs-gray-300));
 }
+
 .callout-info {
   --bd-callout-color: var(--bs-info-text-emphasis);
   --bd-callout-bg: var(--bs-info-bg-subtle);
   --bd-callout-border: var(--bs-info-border-subtle);
 }
+
 .callout-warning {
   --bd-callout-color: var(--bs-warning-text-emphasis);
   --bd-callout-bg: var(--bs-warning-bg-subtle);
   --bd-callout-border: var(--bs-warning-border-subtle);
 }
+
 .callout-danger {
   --bd-callout-color: var(--bs-danger-text-emphasis);
   --bd-callout-bg: var(--bs-danger-bg-subtle);
   --bd-callout-border: var(--bs-danger-border-subtle);
+}
+
+
+@mixin icon-toggle {
+  input {
+    display: none;
+  }
+
+  input:checked + label {
+    color: var(--grey-3);
+    border-bottom: 1px solid var(--grey-3);
+
+    > svg {
+      fill: var(--grey-3);
+    }
+  }
+
+  &.no-border {
+    input:checked + label {
+      border: 0 !important;
+    }
+  }
+
+  input + label {
+    /*margin-left: 0.25em;*/
+    color: var(--grey-1);
+    cursor: pointer;
+
+    > svg {
+      fill: var(--grey-1);
+      width: 1.5em;
+    }
+
+    &:hover {
+      color: var(--grey-2);
+
+      > svg {
+        fill: var(--grey-2);
+      }
+    }
+  }
+}
+
+.icon {
+  color: var(--grey-1);
+  cursor: pointer;
+
+  &:hover {
+    color: var(--grey-2);
+
+    > svg {
+      fill: var(--grey-2);
+    }
+  }
+}
+
+.icon-toggle {
+  @include icon-toggle;
+}
+
+.filter {
+  margin-top: 0.5em;
+  padding: 0.5em 1ch 0.5em 1ch;
+  border: {
+    top: 1px solid var(--socdr-grey);
+    bottom: 1px solid var(--socdr-grey);
+  }
+
+  .filter-head {
+    display: flex;
+    flex-direction: row;
+    font-weight: bold;
+    margin-bottom: 0.5em;
+
+    & > div {
+      display: flex;
+      justify-content: center;
+      align-content: center;
+      flex-wrap: wrap;
+    }
+
+    @include icon-toggle;
+
+    & > :first-child {
+      margin-right: auto;
+    }
+  }
 }

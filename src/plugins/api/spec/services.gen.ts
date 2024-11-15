@@ -293,14 +293,14 @@ export class AnnotationsService {
     });
   }
 
-  public static getAssignmentScopesForUserApiAnnotationsAnnotateScopesProjectIdGet(
-    data: $OpenApiTs["/api/annotations/annotate/scopes/{project_id}"]["get"]["req"],
+  public static getAssignmentScopesForUserApiAnnotationsAssignmentsScopesProjectIdGet(
+    data: $OpenApiTs["/api/annotations/assignments/scopes/{project_id}"]["get"]["req"],
     options?: Partial<AxiosRequestConfig>,
-  ): CancelablePromise<ApiResult<$OpenApiTs["/api/annotations/annotate/scopes/{project_id}"]["get"]["res"][200]>> {
+  ): CancelablePromise<ApiResult<$OpenApiTs["/api/annotations/assignments/scopes/{project_id}"]["get"]["res"][200]>> {
     const { projectId, xProjectId } = data;
     return __request(OpenAPI, {
       method: "GET",
-      url: "/api/annotations/annotate/scopes/{project_id}",
+      url: "/api/annotations/assignments/scopes/{project_id}",
       path: {
         project_id: projectId,
       },
@@ -314,14 +314,14 @@ export class AnnotationsService {
     });
   }
 
-  public static getAssignmentScopesForProjectApiAnnotationsAnnotateScopesGet(
-    data: $OpenApiTs["/api/annotations/annotate/scopes/"]["get"]["req"],
+  public static getAssignmentScopesForProjectApiAnnotationsAssignmentsScopesGet(
+    data: $OpenApiTs["/api/annotations/assignments/scopes/"]["get"]["req"],
     options?: Partial<AxiosRequestConfig>,
-  ): CancelablePromise<ApiResult<$OpenApiTs["/api/annotations/annotate/scopes/"]["get"]["res"][200]>> {
+  ): CancelablePromise<ApiResult<$OpenApiTs["/api/annotations/assignments/scopes/"]["get"]["res"][200]>> {
     const { xProjectId } = data;
     return __request(OpenAPI, {
       method: "GET",
-      url: "/api/annotations/annotate/scopes/",
+      url: "/api/annotations/assignments/scopes/",
       headers: {
         "x-project-id": xProjectId,
       },
@@ -332,22 +332,42 @@ export class AnnotationsService {
     });
   }
 
-  public static getAssignmentScopeApiAnnotationsAnnotateScopeAssignmentScopeIdGet(
-    data: $OpenApiTs["/api/annotations/annotate/scope/{assignment_scope_id}"]["get"]["req"],
+  public static getAssignmentScopeApiAnnotationsAssignmentsScopeAssignmentScopeIdGet(
+    data: $OpenApiTs["/api/annotations/assignments/scope/{assignment_scope_id}"]["get"]["req"],
     options?: Partial<AxiosRequestConfig>,
   ): CancelablePromise<
-    ApiResult<$OpenApiTs["/api/annotations/annotate/scope/{assignment_scope_id}"]["get"]["res"][200]>
+    ApiResult<$OpenApiTs["/api/annotations/assignments/scope/{assignment_scope_id}"]["get"]["res"][200]>
   > {
     const { assignmentScopeId, xProjectId } = data;
     return __request(OpenAPI, {
       method: "GET",
-      url: "/api/annotations/annotate/scope/{assignment_scope_id}",
+      url: "/api/annotations/assignments/scope/{assignment_scope_id}",
       path: {
         assignment_scope_id: assignmentScopeId,
       },
       headers: {
         "x-project-id": xProjectId,
       },
+      errors: {
+        422: "Validation Error",
+      },
+      customRequestConfig: options,
+    });
+  }
+
+  public static putAssignmentScopeApiAnnotationsAssignmentsScopePut(
+    data: $OpenApiTs["/api/annotations/assignments/scope/"]["put"]["req"],
+    options?: Partial<AxiosRequestConfig>,
+  ): CancelablePromise<ApiResult<$OpenApiTs["/api/annotations/assignments/scope/"]["put"]["res"][200]>> {
+    const { xProjectId, requestBody } = data;
+    return __request(OpenAPI, {
+      method: "PUT",
+      url: "/api/annotations/assignments/scope/",
+      headers: {
+        "x-project-id": xProjectId,
+      },
+      body: requestBody,
+      mediaType: "application/json",
       errors: {
         422: "Validation Error",
       },
@@ -371,26 +391,6 @@ export class AnnotationsService {
       headers: {
         "x-project-id": xProjectId,
       },
-      errors: {
-        422: "Validation Error",
-      },
-      customRequestConfig: options,
-    });
-  }
-
-  public static putAssignmentScopeApiAnnotationsAnnotateScopePut(
-    data: $OpenApiTs["/api/annotations/annotate/scope/"]["put"]["req"],
-    options?: Partial<AxiosRequestConfig>,
-  ): CancelablePromise<ApiResult<$OpenApiTs["/api/annotations/annotate/scope/"]["put"]["res"][200]>> {
-    const { xProjectId, requestBody } = data;
-    return __request(OpenAPI, {
-      method: "PUT",
-      url: "/api/annotations/annotate/scope/",
-      headers: {
-        "x-project-id": xProjectId,
-      },
-      body: requestBody,
-      mediaType: "application/json",
       errors: {
         422: "Validation Error",
       },
@@ -551,19 +551,22 @@ export class AnnotationsService {
     });
   }
 
-  public static makeAssignmentsApiAnnotationsConfigAssignmentsPost(
-    data: $OpenApiTs["/api/annotations/config/assignments/"]["post"]["req"],
+  public static makeAssignmentsApiAnnotationsConfigAssignmentsAssignmentScopeIdPut(
+    data: $OpenApiTs["/api/annotations/config/assignments/{assignment_scope_id}"]["put"]["req"],
     options?: Partial<AxiosRequestConfig>,
-  ): CancelablePromise<ApiResult<$OpenApiTs["/api/annotations/config/assignments/"]["post"]["res"][200]>> {
-    const { xProjectId, requestBody } = data;
+  ): CancelablePromise<
+    ApiResult<$OpenApiTs["/api/annotations/config/assignments/{assignment_scope_id}"]["put"]["res"][200]>
+  > {
+    const { assignmentScopeId, xProjectId } = data;
     return __request(OpenAPI, {
-      method: "POST",
-      url: "/api/annotations/config/assignments/",
+      method: "PUT",
+      url: "/api/annotations/config/assignments/{assignment_scope_id}",
+      path: {
+        assignment_scope_id: assignmentScopeId,
+      },
       headers: {
         "x-project-id": xProjectId,
       },
-      body: requestBody,
-      mediaType: "application/json",
       errors: {
         422: "Validation Error",
       },
@@ -839,6 +842,27 @@ export class AnnotationsService {
       },
       query: {
         include_resolve: includeResolve,
+      },
+      errors: {
+        422: "Validation Error",
+      },
+      customRequestConfig: options,
+    });
+  }
+
+  public static getBotScopesApiAnnotationsBotScopesGet(
+    data: $OpenApiTs["/api/annotations/bot/scopes"]["get"]["req"],
+    options?: Partial<AxiosRequestConfig>,
+  ): CancelablePromise<ApiResult<$OpenApiTs["/api/annotations/bot/scopes"]["get"]["res"][200]>> {
+    const { xProjectId, onlyResolve } = data;
+    return __request(OpenAPI, {
+      method: "GET",
+      url: "/api/annotations/bot/scopes",
+      headers: {
+        "x-project-id": xProjectId,
+      },
+      query: {
+        only_resolve: onlyResolve,
       },
       errors: {
         422: "Validation Error",
@@ -1712,6 +1736,26 @@ export class StatsService {
       customRequestConfig: options,
     });
   }
+
+  public static labelStatsApiStatsLabelsPost(
+    data: $OpenApiTs["/api/stats/labels"]["post"]["req"],
+    options?: Partial<AxiosRequestConfig>,
+  ): CancelablePromise<ApiResult<$OpenApiTs["/api/stats/labels"]["post"]["res"][200]>> {
+    const { xProjectId, requestBody } = data;
+    return __request(OpenAPI, {
+      method: "POST",
+      url: "/api/stats/labels",
+      headers: {
+        "x-project-id": xProjectId,
+      },
+      body: requestBody,
+      mediaType: "application/json",
+      errors: {
+        422: "Validation Error",
+      },
+      customRequestConfig: options,
+    });
+  }
 }
 
 export class ExportService {
@@ -2434,6 +2478,169 @@ export class ItemService {
       },
       body: requestBody,
       mediaType: "application/json",
+      errors: {
+        422: "Validation Error",
+      },
+      customRequestConfig: options,
+    });
+  }
+}
+
+export class PrioService {
+  public static getTableSampleHtmlApiPrioTablePeekHtmlPost(
+    data: $OpenApiTs["/api/prio/table/peek/html"]["post"]["req"],
+    options?: Partial<AxiosRequestConfig>,
+  ): CancelablePromise<ApiResult<$OpenApiTs["/api/prio/table/peek/html"]["post"]["res"][200]>> {
+    const { xProjectId, requestBody } = data;
+    return __request(OpenAPI, {
+      method: "POST",
+      url: "/api/prio/table/peek/html",
+      headers: {
+        "x-project-id": xProjectId,
+      },
+      body: requestBody,
+      mediaType: "application/json",
+      errors: {
+        422: "Validation Error",
+      },
+      customRequestConfig: options,
+    });
+  }
+
+  public static getTableSampleApiPrioTablePeekPost(
+    data: $OpenApiTs["/api/prio/table/peek"]["post"]["req"],
+    options?: Partial<AxiosRequestConfig>,
+  ): CancelablePromise<ApiResult<$OpenApiTs["/api/prio/table/peek"]["post"]["res"][200]>> {
+    const { xProjectId, requestBody } = data;
+    return __request(OpenAPI, {
+      method: "POST",
+      url: "/api/prio/table/peek",
+      headers: {
+        "x-project-id": xProjectId,
+      },
+      body: requestBody,
+      mediaType: "application/json",
+      errors: {
+        422: "Validation Error",
+      },
+      customRequestConfig: options,
+    });
+  }
+
+  public static readProjectSetupsApiPrioSetupsGet(
+    data: $OpenApiTs["/api/prio/setups"]["get"]["req"],
+    options?: Partial<AxiosRequestConfig>,
+  ): CancelablePromise<ApiResult<$OpenApiTs["/api/prio/setups"]["get"]["res"][200]>> {
+    const { xProjectId } = data;
+    return __request(OpenAPI, {
+      method: "GET",
+      url: "/api/prio/setups",
+      headers: {
+        "x-project-id": xProjectId,
+      },
+      errors: {
+        422: "Validation Error",
+      },
+      customRequestConfig: options,
+    });
+  }
+
+  public static readPrioSetupApiPrioSetupGet(
+    data: $OpenApiTs["/api/prio/setup"]["get"]["req"],
+    options?: Partial<AxiosRequestConfig>,
+  ): CancelablePromise<ApiResult<$OpenApiTs["/api/prio/setup"]["get"]["res"][200]>> {
+    const { priorityId, xProjectId } = data;
+    return __request(OpenAPI, {
+      method: "GET",
+      url: "/api/prio/setup",
+      headers: {
+        "x-project-id": xProjectId,
+      },
+      query: {
+        priority_id: priorityId,
+      },
+      errors: {
+        422: "Validation Error",
+      },
+      customRequestConfig: options,
+    });
+  }
+
+  public static savePrioSetupApiPrioSetupPut(
+    data: $OpenApiTs["/api/prio/setup"]["put"]["req"],
+    options?: Partial<AxiosRequestConfig>,
+  ): CancelablePromise<ApiResult<$OpenApiTs["/api/prio/setup"]["put"]["res"][200]>> {
+    const { xProjectId, requestBody } = data;
+    return __request(OpenAPI, {
+      method: "PUT",
+      url: "/api/prio/setup",
+      headers: {
+        "x-project-id": xProjectId,
+      },
+      body: requestBody,
+      mediaType: "application/json",
+      errors: {
+        422: "Validation Error",
+      },
+      customRequestConfig: options,
+    });
+  }
+
+  public static dropPrioSetupApiPrioSetupDelete(
+    data: $OpenApiTs["/api/prio/setup"]["delete"]["req"],
+    options?: Partial<AxiosRequestConfig>,
+  ): CancelablePromise<ApiResult<$OpenApiTs["/api/prio/setup"]["delete"]["res"][200]>> {
+    const { priorityId, xProjectId } = data;
+    return __request(OpenAPI, {
+      method: "DELETE",
+      url: "/api/prio/setup",
+      headers: {
+        "x-project-id": xProjectId,
+      },
+      query: {
+        priority_id: priorityId,
+      },
+      errors: {
+        422: "Validation Error",
+      },
+      customRequestConfig: options,
+    });
+  }
+
+  public static getArtefactsApiPrioArtefactsListGet(
+    data: $OpenApiTs["/api/prio/artefacts/list"]["get"]["req"],
+    options?: Partial<AxiosRequestConfig>,
+  ): CancelablePromise<ApiResult<$OpenApiTs["/api/prio/artefacts/list"]["get"]["res"][200]>> {
+    const { xPriorityId, xProjectId } = data;
+    return __request(OpenAPI, {
+      method: "GET",
+      url: "/api/prio/artefacts/list",
+      headers: {
+        "x-priority-id": xPriorityId,
+        "x-project-id": xProjectId,
+      },
+      errors: {
+        422: "Validation Error",
+      },
+      customRequestConfig: options,
+    });
+  }
+
+  public static getFileApiPrioArtefactsFileGet(
+    data: $OpenApiTs["/api/prio/artefacts/file"]["get"]["req"],
+    options?: Partial<AxiosRequestConfig>,
+  ): CancelablePromise<ApiResult<$OpenApiTs["/api/prio/artefacts/file"]["get"]["res"][200]>> {
+    const { filename, xPriorityId, xProjectId } = data;
+    return __request(OpenAPI, {
+      method: "GET",
+      url: "/api/prio/artefacts/file",
+      headers: {
+        "x-priority-id": xPriorityId,
+        "x-project-id": xProjectId,
+      },
+      query: {
+        filename,
+      },
       errors: {
         422: "Validation Error",
       },

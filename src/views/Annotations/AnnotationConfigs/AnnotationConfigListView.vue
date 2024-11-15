@@ -229,7 +229,7 @@ export default defineComponent({
         ).data;
 
         this.projectScopes = (
-          await API.annotations.getAssignmentScopesForProjectApiAnnotationsAnnotateScopesGet({
+          await API.annotations.getAssignmentScopesForProjectApiAnnotationsAssignmentsScopesGet({
             xProjectId: currentProjectStore.projectId as string,
           })
         ).data;

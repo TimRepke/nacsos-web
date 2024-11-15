@@ -136,7 +136,7 @@ import type {
 import { currentProjectStore, interfaceSettingsStore } from "@/stores";
 import { API, ignore, toastReject } from "@/plugins/api";
 import type { AssignmentScopeModel } from "@/plugins/api/types";
-import AssignmentsVisualiser from "@/components/annotations/assignments/AssignmentsVisualiser.vue";
+import AssignmentsVisualiser from "@/components/annotations/AssignmentsVisualiser.vue";
 import { isArray, isNone } from "@/util";
 import ScopeQualityEntry from "@/components/annotations/ScopeQualityEntry.vue";
 
