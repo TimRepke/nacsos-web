@@ -12,6 +12,7 @@ export interface ProjectHighlighterStore extends DeferredValue<HighlighterModel[
 
 export function useProjectHighlighters(): ProjectHighlighterStore {
   async function request(): Promise<HighlighterModel[]> {
+    if (!currentProjectStore.projectId) return [];
     return (
       await API.highlighters.getProjectHighlightersApiHighlightersProjectGet({
         xProjectId: currentProjectStore.projectId as string,

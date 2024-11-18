@@ -1,5 +1,6 @@
 import { Ref, ref, toRef } from "vue";
 import { ignore, toastReject } from "@/plugins/api";
+import { currentProjectStore } from "@/stores/index";
 
 export interface LoadStatus {
   loading: boolean;
@@ -29,6 +30,10 @@ export function useDeferredValue<T>(fallback: T, request: () => Promise<T>) {
   }
 
   async function reload(): Promise<T> {
+    if (!currentProjectStore.projectId) {
+      clear();
+      return fallback;
+    }
     status.value.loading = true;
     const ret = await request();
     value.value = ret;

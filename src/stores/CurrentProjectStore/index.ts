@@ -58,34 +58,34 @@ export const useCurrentProjectStore = defineStore("CurrentProjectStore", () => {
   }
 
   async function refreshInfo(): Promise<ProjectModel> {
-    const { data } = await API.project.getProjectApiProjectInfoGet({ xProjectId: this.projectId });
-    this.project = data;
+    const { data } = await API.project.getProjectApiProjectInfoGet({ xProjectId: projectId.value });
+    project.value = data;
     return data;
   }
 
   async function refreshPermissions(): Promise<ProjectPermissionsModel> {
     const { data } = await API.project.getProjectPermissionsCurrentUserApiProjectPermissionsMeGet({
-      xProjectId: this.projectId,
+      xProjectId: projectId.value,
     });
-    this.projectPermissions = data;
+    permissions.value = data;
     return data;
   }
 
   async function unsetImportMutex() {
-    await API.project.resetImportMutexApiProjectImportMutexPut({ xProjectId: this.projectId });
-    await this.refreshInfo();
+    await API.project.resetImportMutexApiProjectImportMutexPut({ xProjectId: projectId.value });
+    await refreshInfo();
   }
 
-  async function load(projectId: string) {
+  async function load(newProjectId: string) {
     // clear the current project from the store temporarily to prevent side effects
-    this.clear();
+    clear();
     // set the projectId first, so it can be used during the following requests
-    this.projectId = projectId;
+    projectId.value = newProjectId;
 
-    const project = await this.refreshInfo();
-    const permissions = await this.refreshPermissions();
-    this.users.reload();
-    this.highlighters.reload();
+    const project = await refreshInfo();
+    const permissions = await refreshPermissions();
+    users.ensureLoaded();
+    highlighters.ensureLoaded();
 
     // These are on-demand, so no need to load it here
     // this.scopes.reload();

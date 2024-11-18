@@ -15,6 +15,7 @@ export interface ScopesStore extends DeferredValue<Scopes> {
 
 export function useScopesStore(): ScopesStore {
   async function request(): Promise<Scopes> {
+    if (!currentProjectStore.projectId) return { bot: [], human: [] };
     return {
       bot: (
         await API.annotations.getBotScopesApiAnnotationsBotScopesGet({
