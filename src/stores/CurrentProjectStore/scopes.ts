@@ -34,18 +34,10 @@ export function useScopesStore(): ScopesStore {
   return {
     ...base,
     lookup: computed(() =>
-      Object.fromEntries(
-        (base.value.value.bot as (BotAnnotationMetaDataModel | AssignmentScopeModel)[])
-          .concat(base.value.value.human)
-          .map((entry) => [
-            ((entry as AssignmentScopeModel).assignment_scope_id ??
-              (entry as BotAnnotationMetaDataModel).bot_annotation_metadata_id) as string,
-            {
-              bot: "bot_annotation_metadata_id" in entry ? (entry as BotAnnotationMetaDataModel) : undefined,
-              human: "assignment_scope_id" in entry ? (entry as AssignmentScopeModel) : undefined,
-            },
-          ]),
-      ),
+      Object.fromEntries([
+        ...base.value.value.bot.map((entry) => [entry.bot_annotation_metadata_id as string, { bot: entry }]),
+        ...base.value.value.human.map((entry) => [entry.assignment_scope_id as string, { human: entry }]),
+      ]),
     ),
   };
 }

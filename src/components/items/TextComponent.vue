@@ -54,7 +54,7 @@ export default defineComponent({
       let txt = this.text;
       txt = txt.replaceAll("`", "'");
       txt = marked.parse(txt);
-      txt = currentProjectStore.projectHighlighters.applyActiveHighlighters(txt);
+      txt = currentProjectStore.highlighters.applyActiveHighlighters(txt);
       return txt.replaceAll("\n", "<br />");
     },
     columnStyle(): Record<string, string> {

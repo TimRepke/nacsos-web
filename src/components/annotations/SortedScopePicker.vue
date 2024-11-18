@@ -7,7 +7,9 @@ const selectedScopes = defineModel<string[]>({ required: true });
 
 const scopes = useScopesStore();
 scopes.ensureLoaded();
-
+scopes.awaitLoaded().then(() => {
+  console.log(scopes);
+})
 const sortedFilteredScopes = computed(() =>
   Object.values(scopes.lookup.value)
     .map((scope) => ({ ...scope, scopeKey: scope.bot?.bot_annotation_metadata_id ?? scope.human?.assignment_scope_id }))

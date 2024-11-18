@@ -83,12 +83,10 @@ export default defineComponent({
   },
   computed: {
     htmlTitle() {
-      return (
-        currentProjectStore.projectHighlighters.applyActiveHighlighters(this.item.sources?.[0]?.title) ?? "[MISSING]"
-      );
+      return currentProjectStore.highlighters.applyActiveHighlighters(this.item.sources?.[0]?.title) ?? "[MISSING]";
     },
     htmlTeaser(): string | null {
-      return currentProjectStore.projectHighlighters.applyActiveHighlighters(this.item.teaser);
+      return currentProjectStore.highlighters.applyActiveHighlighters(this.item.teaser);
     },
   },
 });

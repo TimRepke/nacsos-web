@@ -88,7 +88,7 @@ export default defineComponent({
     },
   },
   data() {
-    currentProjectStore.projectUsers.ensureLoaded();
+    currentProjectStore.users.ensureLoaded();
 
     return {
       assiEditMode: false,
@@ -108,7 +108,7 @@ export default defineComponent({
     shownUsernames(): Record<string, number> {
       if (this.assiEditMode) {
         return {
-          ...Object.fromEntries(currentProjectStore.projectUsers.usernames.map((username) => [username, 0])),
+          ...Object.fromEntries(currentProjectStore.users.usernames.map((username) => [username, 0])),
           ...this.assignedUsers,
         };
       }
@@ -178,7 +178,7 @@ export default defineComponent({
       API.annotations
         .clearEmptyAssignmentsApiAnnotationsConfigScopesClearSchemeIdPost({
           scopeId: this.assignmentScopeId,
-          userId: currentProjectStore.projectUsers.name2id[username],
+          userId: currentProjectStore.users.name2id[username],
           xProjectId: currentProjectStore.projectId as string,
         })
         .then(toastSuccess(`All open assignments for ${username} cleared; reload page (F5) to see result!`))
@@ -192,7 +192,7 @@ export default defineComponent({
               item_ids: this.itemIds,
               scheme_id: this.annotationSchemeId,
               scope_id: this.assignmentScopeId,
-              user_id: currentProjectStore.projectUsers.name2id[username],
+              user_id: currentProjectStore.users.name2id[username],
             },
             xProjectId: currentProjectStore.projectId as string,
           })
@@ -209,7 +209,7 @@ export default defineComponent({
             .editAssignmentApiAnnotationsConfigAssignmentsEditPut({
               requestBody: {
                 item_id: itemId,
-                user_id: currentProjectStore.projectUsers.name2id[username],
+                user_id: currentProjectStore.users.name2id[username],
                 order,
                 scheme_id: this.annotationSchemeId,
                 scope_id: this.assignmentScopeId,
@@ -222,7 +222,7 @@ export default defineComponent({
               } else {
                 this.entries[item.index].assignments.push({
                   user_id: res.data.user_id,
-                  username: currentProjectStore.projectUsers.id2name[res.data.user_id],
+                  username: currentProjectStore.users.id2name[res.data.user_id],
                   order: res.data.order,
                   assignment_id: res.data.assignment_id,
                   status: res.data.status,

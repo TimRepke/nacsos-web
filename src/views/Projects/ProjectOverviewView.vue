@@ -1,21 +1,21 @@
 <template>
   <div>
-    <div v-if="project && permissions">
-      <h1>{{ project.name }}</h1>
+    <div v-if="currentProjectStore.project && currentProjectStore.permissions">
+      <h1>{{ currentProjectStore.project.name }}</h1>
       <div class="row mb-3">
         <div class="col">
-          Project ID: <code>{{ project.project_id }}</code>
+          Project ID: <code>{{ currentProjectStore.project.project_id }}</code>
         </div>
-        <div class="col">Created at {{ project.time_created }}</div>
+        <div class="col">Created at {{ currentProjectStore.project.time_created }}</div>
       </div>
       <div class="row mb-3">
-        <div class="col" v-html="markdownToHtml(project.description)" />
+        <div class="col" v-html="markdownToHtml(currentProjectStore.project.description)" />
       </div>
       <div class="row mb-3">
         <div class="col">
           <h5>Your permissions</h5>
           <h6>In this project, you have the following permissions</h6>
-          <permission-settings-card-read-only :permissions="permissions" />
+          <permission-settings-card-read-only :permissions="currentProjectStore.permissions" />
         </div>
       </div>
     </div>
@@ -32,43 +32,14 @@
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from "vue";
+<script setup lang="ts">
 import { marked } from "marked";
-import type { ProjectModel, ProjectPermissionsModel } from "@/plugins/api/types";
 import { currentProjectStore } from "@/stores";
 import PermissionSettingsCardReadOnly from "@/components/users/PermissionSettingsCardReadOnly.vue";
 
-type ProjectOverview = {
-  project?: ProjectModel;
-  permissions?: ProjectPermissionsModel;
-};
-
-export default defineComponent({
-  name: "ProjectOverviewView",
-  components: { PermissionSettingsCardReadOnly },
-  data(): ProjectOverview {
-    return {
-      // pass
-    };
-  },
-  computed: {
-    project(): ProjectModel | undefined {
-      return currentProjectStore.project;
-    },
-    permissions(): ProjectPermissionsModel | undefined {
-      return currentProjectStore.projectPermissions;
-    },
-  },
-  methods: {
-    markdownToHtml(txt: string | null | undefined) {
-      if (txt) {
-        return marked(txt);
-      }
-      return "";
-    },
-  },
-});
+function markdownToHtml(txt: string | null | undefined): string {
+  return txt ? marked(txt, { async: false }) : "";
+}
 </script>
 
 <style scoped></style>

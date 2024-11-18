@@ -281,13 +281,6 @@ export type AnnotationValue = {
 };
 
 export type AssignmentConfigLegacy = {
-  users: {
-    [key: string]: number;
-  };
-  overlaps: {
-    [key: string]: number;
-  };
-  random_seed?: number;
   config_type?: "LEGACY";
   legacy: {
     [key: string]: unknown;

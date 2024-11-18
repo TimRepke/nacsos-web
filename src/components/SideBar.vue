@@ -96,7 +96,7 @@ interface SideMenuEntry extends MenuEntry {
 export default defineComponent({
   name: "SideBar",
   data() {
-    const perm: ProjectPermissionsModel | Record<string, never> = currentProjectStore.projectPermissions || {};
+    const perm: ProjectPermissionsModel | Record<string, never> = currentProjectStore.permissions || {};
     return {
       menu: [
         { name: "Overview", permission: true, target: "/project/overview", routes: ["project-overview"] },
@@ -285,7 +285,7 @@ export default defineComponent({
       });
     },
     projectPermissions(): ProjectPermissionsModel | Record<string, never> {
-      return currentProjectStore.projectPermissions || {};
+      return currentProjectStore.permissions || {};
     },
   },
   methods: {

@@ -16,7 +16,7 @@ export default defineComponent({
   name: "AnnotationConfigsContainer",
   data() {
     return {
-      projectPermissions: currentProjectStore.projectPermissions as ProjectPermissionsModel,
+      projectPermissions: currentProjectStore.permissions as ProjectPermissionsModel,
     };
   },
 });
