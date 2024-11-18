@@ -268,7 +268,7 @@ export default defineComponent({
   components: { BuscarChart, ToolTip, ExpandableBox },
   data() {
     return {
-      permissions: currentProjectStore.projectPermissions as ProjectPermissionsModel,
+      permissions: currentProjectStore.permissions as ProjectPermissionsModel,
       scopes: [] as LabelScope[],
       trackers: [] as DehydratedAnnotationTracker[],
       trackerDetails: null as AnnotationTrackerModel | null,

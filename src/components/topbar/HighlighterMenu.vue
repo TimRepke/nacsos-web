@@ -21,7 +21,7 @@ if (!interfaceSettingsStore.highlighters.active[currentProjectStore.projectId as
       <font-awesome-icon class="me-1 mb-1" style="vertical-align: middle" :icon="['fas', 'highlighter']" />
       Highlighters
     </a>
-    <ul class="dropdown-menu">
+    <ul class="dropdown-menu dropdown-menu-lg-end">
       <li class="dropdown-item">
         <div class="form-check form-switch">
           <input
@@ -35,7 +35,7 @@ if (!interfaceSettingsStore.highlighters.active[currentProjectStore.projectId as
         </div>
       </li>
       <li class="dropdown-item">
-        <RefreshIcon :refresh="currentProjectStore.projectHighlighters.reload" class="me-2" />
+        <RefreshIcon :refresh="currentProjectStore.highlighters.reload" class="me-2" />
         Reload highlighters
       </li>
       <li>
@@ -47,11 +47,7 @@ if (!interfaceSettingsStore.highlighters.active[currentProjectStore.projectId as
           Project highlighters
         </h6>
       </li>
-      <li
-        class="dropdown-item"
-        v-for="hl in currentProjectStore.projectHighlighters.value"
-        v-bind:key="hl.highlighter_id"
-      >
+      <li class="dropdown-item" v-for="hl in currentProjectStore.highlighters.value" v-bind:key="hl.highlighter_id">
         <div class="form-check">
           <input
             class="form-check-input"

@@ -2095,25 +2095,6 @@ export const $AnnotationValue = {
 
 export const $AssignmentConfigLegacy = {
   properties: {
-    users: {
-      additionalProperties: {
-        type: "integer",
-      },
-      type: "object",
-      title: "Users",
-    },
-    overlaps: {
-      additionalProperties: {
-        type: "integer",
-      },
-      type: "object",
-      title: "Overlaps",
-    },
-    random_seed: {
-      type: "integer",
-      title: "Random Seed",
-      default: 1337,
-    },
     config_type: {
       type: "string",
       enum: ["LEGACY"],
@@ -2127,7 +2108,7 @@ export const $AssignmentConfigLegacy = {
     },
   },
   type: "object",
-  required: ["users", "overlaps", "legacy"],
+  required: ["legacy"],
   title: "AssignmentConfigLegacy",
 } as const;
 

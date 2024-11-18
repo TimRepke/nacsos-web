@@ -6,6 +6,11 @@ import { API } from "@/plugins/api";
 import type { ProjectModel, ProjectPermissionsModel } from "@/plugins/api/spec/types.gen";
 import { type Users, useProjectUsers } from "@/stores/CurrentProjectStore/users";
 import { type ProjectHighlighterStore, useProjectHighlighters } from "@/stores/CurrentProjectStore/highlighters";
+import { EventBus } from "@/plugins/events";
+import { CurrentProjectSetEvent } from "@/plugins/events/events/projects";
+import { ScopesStore, useScopesStore } from "@/stores/CurrentProjectStore/scopes";
+import { ProjectAnnotationSchemesStore, useProjectAnnotationSchemesStore } from "@/stores/CurrentProjectStore/schemes";
+import { ComputedGetter, computed } from "vue";
 
 const ProjectSerializer = Serializer<ProjectModel>();
 const ProjectPermissionSerializer = Serializer<ProjectPermissionsModel>();
@@ -13,55 +18,97 @@ const ProjectPermissionSerializer = Serializer<ProjectPermissionsModel>();
 export type CurrentProjectStoreType = {
   projectId: RemovableRef<string | undefined>;
   project: RemovableRef<ProjectModel | undefined>;
-  projectPermissions: RemovableRef<ProjectPermissionsModel | undefined>;
-  projectUsers: Users;
-  projectHighlighters: ProjectHighlighterStore;
+  permissions: RemovableRef<ProjectPermissionsModel | undefined>;
+  users: Users;
+  highlighters: ProjectHighlighterStore;
+  scopes: ScopesStore;
+  schemes: ProjectAnnotationSchemesStore;
+  hasRunningImport: ComputedGetter<boolean>;
 };
 
-export const useCurrentProjectStore = defineStore("CurrentProjectStore", {
-  state(): CurrentProjectStoreType {
-    // When a user logs out, also clear the current project to prevent side effects
-    // EventBus.on(LoggedOutEvent, this.clear); // FIXME: may not be the desired behaviour
-    return {
-      projectId: useStorage<string>("nacsos:ProjectStore:currentProjectId", null, undefined),
-      project: useStorage<ProjectModel>("nacsos:ProjectStore:currentProject", null, undefined, {
-        serializer: ProjectSerializer,
-      }),
-      projectPermissions: useStorage<ProjectPermissionsModel>(
-        "nacsos:ProjectStore:currentProjectPermissions",
-        null,
-        undefined,
-        { serializer: ProjectPermissionSerializer },
-      ),
-      projectUsers: useProjectUsers(),
-      projectHighlighters: useProjectHighlighters(),
-    };
-  },
-  actions: {
-    clear() {
-      this.projectId = undefined;
-      this.project = undefined;
-      this.projectPermissions = undefined;
-    },
-    async refreshInfo() {
-      this.project = (await API.project.getProjectApiProjectInfoGet({ xProjectId: this.projectId })).data;
-    },
-    async refreshPermissions() {
-      this.projectPermissions = (
-        await API.project.getProjectPermissionsCurrentUserApiProjectPermissionsMeGet({ xProjectId: this.projectId })
-      ).data;
-    },
-    async unsetImportMutex() {
-      await API.project.resetImportMutexApiProjectImportMutexPut({ xProjectId: this.projectId });
-      await this.refreshInfo();
-    },
-  },
-  getters: {
-    projectSelected: (state): boolean => !!state.project && !!state.projectId && !!state.projectPermissions,
-    hasRunningImport: (state): boolean => !!state.project?.import_mutex,
+export const useCurrentProjectStore = defineStore("CurrentProjectStore", () => {
+  const projectId = useStorage<string>("nacsos:ProjectStore:currentProjectId", null, undefined);
+  const project = useStorage<ProjectModel>("nacsos:ProjectStore:currentProject", null, undefined, {
+    serializer: ProjectSerializer,
+  });
+  const permissions = useStorage<ProjectPermissionsModel>(
+    "nacsos:ProjectStore:currentProjectPermissions",
+    null,
+    undefined,
+    { serializer: ProjectPermissionSerializer },
+  );
 
-    // FIXME
-    // @ts-ignore
-    userCanResetImportMutex: (state): boolean => state.projectPermissions?.imports_edit && state.hasRunningImport,
-  },
+  const users = useProjectUsers();
+  const highlighters = useProjectHighlighters();
+  const scopes = useScopesStore();
+  const schemes = useProjectAnnotationSchemesStore();
+
+  const projectSelected = computed<boolean>(() => !!project.value && !!projectId.value && !!permissions.value);
+  const hasRunningImport = computed<boolean>(() => !!project.value.import_mutex);
+  const userCanResetImportMutex = computed<boolean>(() => !!permissions.value.imports_edit && hasRunningImport.value);
+
+  function clear() {
+    projectId.value = undefined;
+    project.value = undefined;
+    permissions.value = undefined;
+    highlighters.clear();
+    users.clear();
+    scopes.clear();
+    schemes.clear();
+  }
+
+  async function refreshInfo(): Promise<ProjectModel> {
+    const { data } = await API.project.getProjectApiProjectInfoGet({ xProjectId: this.projectId });
+    this.project = data;
+    return data;
+  }
+
+  async function refreshPermissions(): Promise<ProjectPermissionsModel> {
+    const { data } = await API.project.getProjectPermissionsCurrentUserApiProjectPermissionsMeGet({
+      xProjectId: this.projectId,
+    });
+    this.projectPermissions = data;
+    return data;
+  }
+
+  async function unsetImportMutex() {
+    await API.project.resetImportMutexApiProjectImportMutexPut({ xProjectId: this.projectId });
+    await this.refreshInfo();
+  }
+
+  async function load(projectId: string) {
+    // clear the current project from the store temporarily to prevent side effects
+    this.clear();
+    // set the projectId first, so it can be used during the following requests
+    this.projectId = projectId;
+
+    const project = await this.refreshInfo();
+    const permissions = await this.refreshPermissions();
+    this.users.reload();
+    this.highlighters.reload();
+
+    // These are on-demand, so no need to load it here
+    // this.scopes.reload();
+    // this.schemes.reload();
+
+    EventBus.emit(new CurrentProjectSetEvent(project, permissions));
+  }
+
+  return {
+    projectId,
+    project,
+    permissions,
+    users,
+    highlighters,
+    schemes,
+    scopes,
+    projectSelected,
+    hasRunningImport,
+    userCanResetImportMutex,
+    refreshInfo,
+    refreshPermissions,
+    unsetImportMutex,
+    load,
+    clear,
+  };
 });

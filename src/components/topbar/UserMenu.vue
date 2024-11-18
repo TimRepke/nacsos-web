@@ -17,7 +17,7 @@ function logout() {
       <font-awesome-icon class="me-1 mb-1" style="vertical-align: middle" :icon="['fas', 'circle-user']" />
       {{ currentUserStore.user?.username || "Username" }}
     </a>
-    <ul class="dropdown-menu">
+    <ul class="dropdown-menu dropdown-menu-lg-end">
       <template v-if="currentUserStore.user?.is_superuser">
         <li>
           <h6 class="dropdown-header">

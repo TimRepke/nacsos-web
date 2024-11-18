@@ -109,7 +109,7 @@ export default defineComponent({
   },
   computed: {
     htmlTitle() {
-      return currentProjectStore.projectHighlighters.applyActiveHighlighters(this.item.title) ?? "[Missing title]";
+      return currentProjectStore.highlighters.applyActiveHighlighters(this.item.title) ?? "[Missing title]";
     },
     columnStyle(): Record<string, string> {
       return interfaceSettingsStore.itemColumnStyle;
