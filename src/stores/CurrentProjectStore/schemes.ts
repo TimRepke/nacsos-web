@@ -10,6 +10,7 @@ export interface ProjectAnnotationSchemesStore extends DeferredValue<AnnotationS
 
 export function useProjectAnnotationSchemesStore(): ProjectAnnotationSchemesStore {
   async function request(): Promise<AnnotationSchemeModel[]> {
+    if (!currentProjectStore.projectId) return [];
     return (
       await API.annotations.getSchemeDefinitionsForProjectApiAnnotationsSchemesListGet({
         xProjectId: currentProjectStore.projectId as string,

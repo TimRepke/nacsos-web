@@ -15,6 +15,7 @@ export interface Users extends DeferredValue<UserModel[]> {
 
 export function useProjectUsers(): Users {
   async function request(): Promise<UserModel[]> {
+    if (!currentProjectStore.projectId) return [];
     return (
       await API.users.getProjectUsersApiUsersListProjectProjectIdGet({
         projectId: currentProjectStore.projectId as string,
