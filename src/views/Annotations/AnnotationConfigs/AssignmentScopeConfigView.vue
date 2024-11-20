@@ -21,6 +21,13 @@ import { EventBus } from "@/plugins/events";
 import { ToastEvent } from "@/plugins/events/events/toast";
 import { ConfirmationRequestEvent } from "@/plugins/events/events/confirmation";
 
+enum Plausibility {
+  OK,
+  USER_POOL,
+  ITEM_POOL,
+  ERROR,
+}
+
 function isValid(
   conf: AssignmentConfigRandom | AssignmentConfigPriority | AssignmentConfigLegacy | null | undefined,
 ): conf is AssignmentConfigRandom | AssignmentConfigPriority {
@@ -53,30 +60,33 @@ const numRequiredAssignments = computed<number>(() =>
     : 0,
 );
 const numAssignmentDifference = computed<number>(() => numAvailableAssignments.value - numRequiredAssignments.value);
-const assignmentPlausible = computed<boolean>(() => {
+const assignmentPlausible = computed<Plausibility>(() => {
   const conf = config.value?.config;
-  if (!isValid(conf)) return false;
-  const pool = Object.values(conf.users ?? {});
-  for (const [overlap, count] of Object.entries(conf.overlaps ?? {})) {
-    let cnt;
+  if (!isValid(conf)) return Plausibility.ERROR;
+  let itemPool = numAssignedItems.value;
+  let userPool = Object.entries(conf.users ?? {}).map((entry) => ({ user: entry[0], budget: entry[1] }));
+
+  let overlap: number;
+  let userIndex: number;
+  for (const [ol, count] of Object.entries(conf.overlaps ?? {})) {
+    overlap = parseInt(ol);
+    // Configuration impossible, item pool ran out early!
+    if (itemPool < count) return Plausibility.ITEM_POOL;
+    if (count == 0 || overlap == 0) continue;
+
     for (let i = 0; i < count; i++) {
-      cnt = 0;
-      for (let j = 0; j < pool.length; j++) {
-        if (pool[j] > 0) {
-          pool[j]--;
-          cnt++;
-        }
-        if (cnt >= parseInt(overlap)) {
-          break;
-        }
-        if (j + 1 === pool.length) {
-          // Wasn't able to fulfil proper required overlap; returning with error
-          return false;
-        }
+      // Configuration impossible, user pool ran out early
+      if (userPool.length < overlap) return Plausibility.USER_POOL;
+      for (let j = 0; j < overlap; j++) {
+        userIndex = (i + j) % userPool.length;
+        userPool[userIndex].budget -= 1;
+        userPool = userPool.filter((usr) => usr.budget > 0);
+        userPool.sort((u1, u2) => u1.budget - u2.budget);
       }
     }
+    itemPool -= count;
   }
-  return sum(pool) === 0;
+  return Plausibility.OK;
 });
 const availablePrioritisedItems = computed<Record<string, number>>(() =>
   Object.fromEntries(priorities.value.map((prio) => [prio.priority_id, prio.num_prioritised])),
@@ -285,14 +295,14 @@ function makeAssignments() {
                   </li>
                   <li>
                     Plausible:
-                    <strong
-                      :class="{
-                        'bg-success-subtle': assignmentPlausible,
-                        'bg-danger-subtle': !assignmentPlausible,
-                      }"
-                    >
-                      {{ assignmentPlausible }}
+                    <strong v-if="assignmentPlausible == Plausibility.OK" class="bg-success-subtle">OK!</strong>
+                    <strong v-else-if="assignmentPlausible == Plausibility.ITEM_POOL" class="bg-warning-subtle">
+                      User pool too large (ok)
                     </strong>
+                    <strong v-else-if="assignmentPlausible == Plausibility.USER_POOL" class="bg-danger-subtle">
+                      User pool ran out!
+                    </strong>
+                    <strong v-else class="bg-danger-subtle">NO!</strong>
                   </li>
                 </ul>
               </div>
