@@ -7,7 +7,7 @@ import { EventBus } from "@/plugins/events";
 import { ToastEvent } from "@/plugins/events/events/toast";
 import { ConfirmationRequestEvent } from "@/plugins/events/events/confirmation";
 import { API, toastReject, toastSuccess } from "@/plugins/api";
-import type { ClimateBERTModel, SciBERTModel, PriorityModel, FileOnDisk } from "@/plugins/api/spec";
+import type { ClimateBERTModel, SciBERTModel, PriorityModel, FileOnDisk, SampleResponse } from "@/plugins/api/spec";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import SortedScopePicker from "@/components/annotations/SortedScopePicker.vue";
 import ExpandableBox from "@/components/ExpandableBox.vue";
@@ -36,12 +36,17 @@ const nql = ref<object[]>([]);
 const focusItem = ref<string | null>(null);
 const setup = ref<PriorityModel | null>(null);
 
-const peekTable = ref<PeekRow[]>([]);
+const peekTable = ref<SampleResponse>({
+  n_excl: 0,
+  n_incl: 0,
+  n_total: 0,
+  data: [],
+});
 const peekTableExtraColumns = computed<string[]>(() =>
-  peekTable.value.length === 0
+  peekTable.value.data.length === 0
     ? []
     : [
-        ...new Set(Object.keys(peekTable.value[0])).difference(
+        ...new Set(Object.keys(peekTable.value.data[0])).difference(
           new Set(["scope_order", "item_order", "item_id", "wos_id", "oa_id", "doi", "py", setup.value?.incl_field]),
         ),
       ],
@@ -58,7 +63,7 @@ async function peek() {
           incl: setup.value.incl_rule as string,
         },
       })
-    ).data as unknown as PeekRow[];
+    ).data;
   }
 }
 
@@ -306,8 +311,9 @@ async function loadDF(event: MouseEvent, filename: string) {
         <template v-slot:head><strong>2) Verify data</strong></template>
         <template v-slot:body>
           <button class="btn btn-outline-secondary" @click="peek">Preview table</button>
-          <div v-if="peekTable.length > 0" class="w-100 overflow-x-scroll">
-            <SortedTable :data="peekTable">
+          <div v-if="peekTable.data.length > 0" class="w-100 overflow-x-scroll">
+            Total: {{ peekTable.n_total }} (include: {{ peekTable.n_incl }} / exclude: {{ peekTable.n_excl }})
+            <SortedTable :data="peekTable.data">
               <template v-slot:head>
                 <tr>
                   <SortedTableHead col-key="item_id">ID</SortedTableHead>

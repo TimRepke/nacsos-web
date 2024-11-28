@@ -1259,6 +1259,15 @@ export type SVMModel = {
   degree?: number;
 };
 
+export type SampleResponse = {
+  data: Array<{
+    [key: string]: unknown;
+  }>;
+  n_total: number;
+  n_incl: number;
+  n_excl: number;
+};
+
 export type SavedResolution = {
   meta: BotAnnotationResolution;
   proposal: ResolutionProposal;
@@ -3777,9 +3786,7 @@ export type $OpenApiTs = {
         /**
          * Successful Response
          */
-        200: Array<{
-          [key: string]: unknown;
-        }>;
+        200: SampleResponse;
         /**
          * Validation Error
          */
