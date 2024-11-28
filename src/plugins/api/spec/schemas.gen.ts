@@ -7762,6 +7762,33 @@ export const $SVMModel = {
   title: "SVMModel",
 } as const;
 
+export const $SampleResponse = {
+  properties: {
+    data: {
+      items: {
+        type: "object",
+      },
+      type: "array",
+      title: "Data",
+    },
+    n_total: {
+      type: "integer",
+      title: "N Total",
+    },
+    n_incl: {
+      type: "integer",
+      title: "N Incl",
+    },
+    n_excl: {
+      type: "integer",
+      title: "N Excl",
+    },
+  },
+  type: "object",
+  required: ["data", "n_total", "n_incl", "n_excl"],
+  title: "SampleResponse",
+} as const;
+
 export const $SavedResolution = {
   properties: {
     meta: {
