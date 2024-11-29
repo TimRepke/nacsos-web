@@ -124,6 +124,7 @@ function save() {
 const files = ref<FileOnDisk[]>([]);
 
 onMounted(async () => {
+  // try to load existing data
   if (route.query.priority_id) {
     setup.value = (
       await API.prio.readPrioSetupApiPrioSetupGet({
@@ -132,6 +133,7 @@ onMounted(async () => {
       })
     ).data;
 
+    // looks like setup might already have artefacts --> fetch them
     if (setup.value?.time_ready) {
       files.value = (
         await API.prio.getArtefactsApiPrioArtefactsListGet({
@@ -141,6 +143,8 @@ onMounted(async () => {
       ).data;
     }
   }
+
+  // fallback to default values
   if (!setup.value) {
     setup.value = {
       priority_id: (route.query.priority_id as string | undefined) ?? crypto.randomUUID().toString(),
@@ -301,7 +305,12 @@ async function loadDF(event: MouseEvent, filename: string) {
             </div>
             <div class="col">
               <h5>NQL filter <span class="text-muted">(leave empty to use all items in project)</span></h5>
-              <NQLBox :query="setup.nql as string" @update:query-parsed="(nq) => (nql = nq)" :rows="2" />
+              <NQLBox
+                :query="setup.nql as string"
+                @update:query-parsed="(nq) => (nql = nq)"
+                @update:query="(nq) => (setup!.nql = nq)"
+                :rows="2"
+              />
             </div>
           </div>
         </template>
