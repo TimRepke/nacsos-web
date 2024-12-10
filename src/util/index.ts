@@ -89,20 +89,30 @@ export function padZero(num: number, padding: number): string {
 
 export const zPad = padZero;
 
+export function paddedDT(dt: Date) {
+  return {
+    Y: dt.getFullYear(),
+    M: padZero(dt.getMonth() + 1, 2),
+    D: padZero(dt.getDate(), 2),
+    H: padZero(dt.getHours() + Math.floor(dt.getTimezoneOffset() / 60), 2),
+    min: padZero(dt.getMinutes(), 2),
+    s: padZero(dt.getSeconds(), 2),
+  };
+}
+
 export function dt2str(datetime: string | null | undefined): string | null {
   // 2024-10-28 18:30
   if (datetime !== null && datetime !== undefined) {
-    const dt = new Date(datetime);
-    // eslint-disable-next-line vue/max-len
-    return `${dt.getFullYear()}-${padZero(dt.getMonth() + 1, 2)}-${padZero(dt.getDate(), 2)} ${padZero(dt.getHours() + dt.getTimezoneOffset(), 2)}:${padZero(dt.getMinutes(), 2)}`;
+    const dt = paddedDT(new Date(datetime));
+    return `${dt.Y}-${dt.M}-${dt.D} ${dt.H}:${dt.min}`;
   }
   return null;
 }
 
-function _dt2pstr(dt: Date): string {
+function _dt2pstr(date: Date): string {
   // 2024-07-30T17:43:46.095103Z
-  // eslint-disable-next-line vue/max-len
-  return `${dt.getFullYear()}-${padZero(dt.getMonth() + 1, 2)}-${padZero(dt.getDate(), 2)}T${padZero(dt.getHours() + dt.getTimezoneOffset(), 2)}:${padZero(dt.getMinutes(), 2)}:${padZero(dt.getSeconds(), 2)}.000000Z`;
+  const dt = paddedDT(date);
+  return `${dt.Y}-${dt.M}-${dt.D}T${dt.H}:${dt.min}:${dt.s}.000000Z`;
 }
 
 export function dt2pstr(datetime: string | null | undefined): string | null {
@@ -187,6 +197,7 @@ export function delay(ms: number) {
 export function isElem(obj: unknown): obj is HTMLElement | Node {
   return !!obj && (obj instanceof Node || obj instanceof HTMLElement);
 }
+
 export const sum = (arr: number[]) => arr.reduce((acc, v) => acc + v, 0);
 export default {
   install(app: App) {
