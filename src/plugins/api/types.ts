@@ -26,6 +26,7 @@ export type AnnotationSchemeLabelKindTypes = EnumLiteral<AnnotationSchemeLabelKi
 export enum ImportConfigEnum {
   WOS = "wos",
   SCOPUS = "scopus",
+  SCOPUS_API = "scopus-api",
   ACADEMIC = "academic",
   OA_FILE = "oa-file",
   OA_SOLR = "oa-solr",

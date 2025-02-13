@@ -7,6 +7,7 @@ import ConfigScopus from "@/components/imports/ConfigScopus.vue";
 import ConfigOpenAlex from "@/components/imports/ConfigOpenAlex.vue";
 import ConfigJSONLOpenAlexWorks from "@/components/imports/ConfigJSONLOpenAlexWorks.vue";
 import ConfigJSONLAcademicItem from "@/components/imports/ConfigJSONLAcademicItem.vue";
+import ConfigScopusAPI from "@/components/imports/ConfigScopusAPI.vue";
 import { currentProjectStore, currentUserStore } from "@/stores";
 import { useRoute, useRouter } from "vue-router";
 import { API, ignore, toastReject } from "@/plugins/api";
@@ -33,6 +34,10 @@ const configs: { [key in ProjectModel["type"]]: Record<string, ConfigOption> } =
     scopusCSV: {
       component: ConfigScopus,
       name: "Upload Scopus CSV file(s)",
+    },
+    scopusAPI: {
+      component: ConfigScopusAPI,
+      name: "Import from Scopus API",
     },
     oa: {
       component: ConfigOpenAlex,
@@ -148,6 +153,24 @@ function initiateRevision() {
   );
 }
 
+function apiSave() {
+  API.imports
+    .putImportDetailsApiImportsImportPut({
+      // @ts-ignore
+      requestBody: importInfo.value,
+      xProjectId: currentProjectStore.projectId as string,
+    })
+    .then((response) => {
+      EventBus.emit(new ToastEvent("SUCCESS", `Saved import settings.  \n**ID:** ${response.data}`));
+      router.replace({ name: "project-imports-details", params: { import_id: response.data } });
+      wasSaved.value = true;
+      reloadInfo();
+    })
+    .catch((reason) => {
+      EventBus.emit(new ToastEvent("ERROR", `Failed to save your import settings. (${reason.error?.type})`));
+    });
+}
+
 function save() {
   EventBus.emit(
     new ConfirmationRequestEvent(
@@ -155,21 +178,7 @@ function save() {
         "In case the import has already started, you should not change the settings (name and description should be fine though).",
       (confirmationResponse) => {
         if (confirmationResponse === "ACCEPT") {
-          API.imports
-            .putImportDetailsApiImportsImportPut({
-              // @ts-ignore
-              requestBody: importInfo.value,
-              xProjectId: currentProjectStore.projectId as string,
-            })
-            .then((response) => {
-              EventBus.emit(new ToastEvent("SUCCESS", `Saved import settings.  \n**ID:** ${response.data}`));
-              router.replace({ name: "project-imports-details", params: { import_id: response.data } });
-              wasSaved.value = true;
-              reloadInfo();
-            })
-            .catch((reason) => {
-              EventBus.emit(new ToastEvent("ERROR", `Failed to save your import settings. (${reason.error?.type})`));
-            });
+          apiSave();
         } else {
           EventBus.emit(new ToastEvent("WARN", "Did not save your import config."));
         }
@@ -262,6 +271,7 @@ onMounted(reloadInfo);
             :editable="settingsEditable"
             :import-id="importInfo.import_id"
             @config-changed="updateConfig($event)"
+            @requesting-save="apiSave()"
           />
         </div>
       </div>

@@ -100,7 +100,7 @@ export function paddedDT(dt: Date) {
   };
 }
 
-export function dt2str(datetime: string | null | undefined): string | null {
+export function dt2str(datetime: string | number | null | undefined): string | null {
   // 2024-10-28 18:30
   if (datetime !== null && datetime !== undefined) {
     const dt = paddedDT(new Date(datetime));

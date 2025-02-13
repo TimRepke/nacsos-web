@@ -4773,6 +4773,9 @@ export const $ImportDetails = {
               $ref: "#/components/schemas/ScopusImport",
             },
             {
+              $ref: "#/components/schemas/ScopusAPIImport",
+            },
+            {
               $ref: "#/components/schemas/AcademicItemImport",
             },
             {
@@ -4792,6 +4795,7 @@ export const $ImportDetails = {
               "oa-file": "#/components/schemas/OpenAlexFileImport",
               "oa-solr": "#/components/schemas/OpenAlexSolrImport",
               scopus: "#/components/schemas/ScopusImport",
+              "scopus-api": "#/components/schemas/ScopusAPIImport",
               wos: "#/components/schemas/WoSImport",
             },
           },
@@ -4913,6 +4917,9 @@ export const $ImportInfo = {
               $ref: "#/components/schemas/ScopusImport",
             },
             {
+              $ref: "#/components/schemas/ScopusAPIImport",
+            },
+            {
               $ref: "#/components/schemas/AcademicItemImport",
             },
             {
@@ -4932,6 +4939,7 @@ export const $ImportInfo = {
               "oa-file": "#/components/schemas/OpenAlexFileImport",
               "oa-solr": "#/components/schemas/OpenAlexSolrImport",
               scopus: "#/components/schemas/ScopusImport",
+              "scopus-api": "#/components/schemas/ScopusAPIImport",
               wos: "#/components/schemas/WoSImport",
             },
           },
@@ -5082,6 +5090,9 @@ export const $ImportModel = {
               $ref: "#/components/schemas/ScopusImport",
             },
             {
+              $ref: "#/components/schemas/ScopusAPIImport",
+            },
+            {
               $ref: "#/components/schemas/AcademicItemImport",
             },
             {
@@ -5101,6 +5112,7 @@ export const $ImportModel = {
               "oa-file": "#/components/schemas/OpenAlexFileImport",
               "oa-solr": "#/components/schemas/OpenAlexSolrImport",
               scopus: "#/components/schemas/ScopusImport",
+              "scopus-api": "#/components/schemas/ScopusAPIImport",
               wos: "#/components/schemas/WoSImport",
             },
           },
@@ -7875,6 +7887,37 @@ export const $SciBERTModel = {
   },
   type: "object",
   title: "SciBERTModel",
+} as const;
+
+export const $ScopusAPIImport = {
+  properties: {
+    kind: {
+      type: "string",
+      enum: ["scopus-api"],
+      const: "scopus-api",
+      title: "Kind",
+      default: "scopus-api",
+    },
+    file: {
+      type: "string",
+      title: "File",
+    },
+    file_date: {
+      type: "string",
+      title: "File Date",
+    },
+    query: {
+      type: "string",
+      title: "Query",
+    },
+    date: {
+      type: "string",
+      title: "Date",
+    },
+  },
+  type: "object",
+  required: ["file", "file_date", "query", "date"],
+  title: "ScopusAPIImport",
 } as const;
 
 export const $ScopusImport = {

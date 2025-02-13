@@ -785,7 +785,14 @@ export type ImportDetails = {
   description: string;
   type: string;
   time_created?: string | null;
-  config?: ScopusImport | AcademicItemImport | OpenAlexFileImport | OpenAlexSolrImport | WoSImport | null;
+  config?:
+    | ScopusImport
+    | ScopusAPIImport
+    | AcademicItemImport
+    | OpenAlexFileImport
+    | OpenAlexSolrImport
+    | WoSImport
+    | null;
   revisions: Array<ImportRevisionModel>;
 };
 
@@ -802,7 +809,14 @@ export type ImportInfo = {
   description: string;
   type: string;
   time_created?: string | null;
-  config?: ScopusImport | AcademicItemImport | OpenAlexFileImport | OpenAlexSolrImport | WoSImport | null;
+  config?:
+    | ScopusImport
+    | ScopusAPIImport
+    | AcademicItemImport
+    | OpenAlexFileImport
+    | OpenAlexSolrImport
+    | WoSImport
+    | null;
   num_revisions: number;
   num_items?: number | null;
 };
@@ -823,7 +837,14 @@ export type ImportModel = {
   description: string;
   type: string;
   time_created?: string | null;
-  config?: ScopusImport | AcademicItemImport | OpenAlexFileImport | OpenAlexSolrImport | WoSImport | null;
+  config?:
+    | ScopusImport
+    | ScopusAPIImport
+    | AcademicItemImport
+    | OpenAlexFileImport
+    | OpenAlexSolrImport
+    | WoSImport
+    | null;
 };
 
 export type ImportRevisionDetails = {
@@ -1287,6 +1308,14 @@ export type SciBERTModel = {
   eval_steps?: number;
   conf?: "SCIBERT";
   model?: string;
+};
+
+export type ScopusAPIImport = {
+  kind?: "scopus-api";
+  file: string;
+  file_date: string;
+  query: string;
+  date: string;
 };
 
 export type ScopusImport = {
