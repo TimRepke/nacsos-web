@@ -131,7 +131,7 @@ const botTable = computed(() =>
               <router-link
                 :to="{
                   name: 'config-annotation-scheme-edit',
-                  query: { annotation_scheme_id: row.annotation_scheme_id },
+                  params: { annotation_scheme_id: row.annotation_scheme_id },
                 }"
                 >{{ row.annotation_scheme_id }}
               </router-link>
@@ -164,8 +164,8 @@ const botTable = computed(() =>
             <td>
               <router-link
                 :to="{
-                  name: 'cconfig-annotation-resolve',
-                  query: { bot_annotation_metadata_id: row.bot_annotation_metadata_id },
+                  name: 'config-annotation-resolve',
+                  params: { bot_annotation_metadata_id: row.bot_annotation_metadata_id },
                 }"
                 >{{ row.bot_annotation_metadata_id }}
               </router-link>
