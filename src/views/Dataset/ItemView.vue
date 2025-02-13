@@ -110,6 +110,7 @@ const botTable = computed(() =>
             <SortedTableHead col-key="value">value</SortedTableHead>
             <SortedTableHead col-key="username">user</SortedTableHead>
             <SortedTableHead col-key="time_created">timestamp</SortedTableHead>
+            <SortedTableHead col-key="annotation_scheme_id">Scheme</SortedTableHead>
           </tr>
         </template>
         <template v-slot:body="sortedRows">
@@ -126,6 +127,15 @@ const botTable = computed(() =>
               {{ row.username }}
             </td>
             <td>{{ row.time_created?.substring(0, 19).replace("T", " ") }}</td>
+            <td>
+              <router-link
+                :to="{
+                  name: 'config-annotation-scheme-edit',
+                  query: { annotation_scheme_id: row.annotation_scheme_id },
+                }"
+                >{{ row.annotation_scheme_id }}
+              </router-link>
+            </td> <!-- FIXME-->
           </tr>
         </template>
       </SortedTable>
@@ -154,8 +164,8 @@ const botTable = computed(() =>
             <td>
               <router-link
                 :to="{
-                  name: 'config-priority-setup',
-                  query: { priority_id: row.priority_id },
+                  name: 'cconfig-annotation-resolve',
+                  query: { bot_annotation_metadata_id: row.bot_annotation_metadata_id },
                 }"
                 >{{ row.bot_annotation_metadata_id }}
               </router-link>
