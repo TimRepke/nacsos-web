@@ -137,6 +137,7 @@ const botTable = computed(() =>
             <SortedTableHead col-key="key">key</SortedTableHead>
             <SortedTableHead col-key="value">value</SortedTableHead>
             <SortedTableHead col-key="time_created">timestamp</SortedTableHead>
+            <SortedTableHead col-key="bot_annotation_metadata_id">Resolution</SortedTableHead>
           </tr>
         </template>
         <template v-slot:body="sortedRows">
@@ -150,6 +151,15 @@ const botTable = computed(() =>
               </code>
             </td>
             <td>{{ row.time_created?.substring(0, 19).replace("T", " ") }}</td>
+            <td>
+              <router-link
+                :to="{
+                  name: 'config-priority-setup',
+                  query: { priority_id: row.priority_id },
+                }"
+                >{{ row.bot_annotation_metadata_id }}
+              </router-link>
+            </td>
           </tr>
         </template>
       </SortedTable>
