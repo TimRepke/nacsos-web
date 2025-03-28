@@ -135,7 +135,8 @@ const botTable = computed(() =>
                 }"
                 >{{ row.annotation_scheme_id }}
               </router-link>
-            </td> <!-- FIXME-->
+            </td>
+            <!-- FIXME-->
           </tr>
         </template>
       </SortedTable>

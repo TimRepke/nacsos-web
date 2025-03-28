@@ -5,7 +5,6 @@ export const $AbstractFilter = {
   properties: {
     filter: {
       type: "string",
-      enum: ["abstract"],
       const: "abstract",
       title: "Filter",
       default: "abstract",
@@ -120,6 +119,17 @@ export const $AcademicAuthorModel = {
       ],
       title: "S2 Id",
     },
+    dimensions_id: {
+      anyOf: [
+        {
+          type: "string",
+        },
+        {
+          type: "null",
+        },
+      ],
+      title: "Dimensions Id",
+    },
     affiliations: {
       anyOf: [
         {
@@ -133,6 +143,18 @@ export const $AcademicAuthorModel = {
         },
       ],
       title: "Affiliations",
+    },
+    meta: {
+      anyOf: [
+        {
+          additionalProperties: true,
+          type: "object",
+        },
+        {
+          type: "null",
+        },
+      ],
+      title: "Meta",
     },
   },
   type: "object",
@@ -152,7 +174,6 @@ export const $AcademicItemImport = {
     },
     kind: {
       type: "string",
-      enum: ["academic"],
       const: "academic",
       title: "Kind",
       default: "academic",
@@ -374,6 +395,7 @@ export const $AcademicItemModel = {
     meta: {
       anyOf: [
         {
+          additionalProperties: true,
           type: "object",
         },
         {
@@ -592,6 +614,7 @@ export const $AcademicItemVariantModel = {
     meta: {
       anyOf: [
         {
+          additionalProperties: true,
           type: "object",
         },
         {
@@ -669,7 +692,6 @@ export const $AnnotationFilter = {
   properties: {
     filter: {
       type: "string",
-      enum: ["annotation"],
       const: "annotation",
       title: "Filter",
       default: "annotation",
@@ -1904,6 +1926,16 @@ export const $AnnotationTrackerModel = {
       type: "number",
       title: "Recall Target",
     },
+    confidence_level: {
+      type: "number",
+      title: "Confidence Level",
+      default: 0.9,
+    },
+    bias: {
+      type: "number",
+      title: "Bias",
+      default: 1,
+    },
     source_ids: {
       anyOf: [
         {
@@ -1993,6 +2025,30 @@ export const $AnnotationTrackerModel = {
         },
       ],
       title: "Buscar",
+    },
+    buscar_frontier: {
+      anyOf: [
+        {
+          items: {
+            prefixItems: [
+              {
+                type: "integer",
+              },
+              {
+                type: "number",
+              },
+            ],
+            type: "array",
+            maxItems: 2,
+            minItems: 2,
+          },
+          type: "array",
+        },
+        {
+          type: "null",
+        },
+      ],
+      title: "Buscar Frontier",
     },
     time_created: {
       anyOf: [
@@ -2097,12 +2153,12 @@ export const $AssignmentConfigLegacy = {
   properties: {
     config_type: {
       type: "string",
-      enum: ["LEGACY"],
       const: "LEGACY",
       title: "Config Type",
       default: "LEGACY",
     },
     legacy: {
+      additionalProperties: true,
       type: "object",
       title: "Legacy",
     },
@@ -2135,7 +2191,6 @@ export const $AssignmentConfigPriority = {
     },
     config_type: {
       type: "string",
-      enum: ["PRIORITY"],
       const: "PRIORITY",
       title: "Config Type",
       default: "PRIORITY",
@@ -2177,7 +2232,6 @@ export const $AssignmentConfigRandom = {
     },
     config_type: {
       type: "string",
-      enum: ["RANDOM"],
       const: "RANDOM",
       title: "Config Type",
       default: "RANDOM",
@@ -2317,7 +2371,6 @@ export const $AssignmentFilter = {
   properties: {
     filter: {
       type: "string",
-      enum: ["assignment"],
       const: "assignment",
       title: "Filter",
       default: "assignment",
@@ -2801,7 +2854,7 @@ export const $Body_login_for_access_token_api_login_token_post = {
       anyOf: [
         {
           type: "string",
-          pattern: "password",
+          pattern: "^password$",
         },
         {
           type: "null",
@@ -3664,7 +3717,6 @@ export const $ClimateBERTModel = {
     },
     conf: {
       type: "string",
-      enum: ["CLIMBERT"],
       const: "CLIMBERT",
       title: "Conf",
       default: "CLIMBERT",
@@ -4105,7 +4157,6 @@ export const $FieldFilter = {
   properties: {
     filter: {
       type: "string",
-      enum: ["field"],
       const: "field",
       title: "Filter",
       default: "field",
@@ -4147,7 +4198,6 @@ export const $FieldFilters = {
   properties: {
     filter: {
       type: "string",
-      enum: ["field_mul"],
       const: "field_mul",
       title: "Filter",
       default: "field_mul",
@@ -4558,6 +4608,7 @@ export const $GenericItemModel = {
       title: "Text",
     },
     meta: {
+      additionalProperties: true,
       type: "object",
       title: "Meta",
     },
@@ -4823,7 +4874,6 @@ export const $ImportFilter = {
   properties: {
     filter: {
       type: "string",
-      enum: ["import"],
       const: "import",
       title: "Filter",
       default: "import",
@@ -5780,21 +5830,18 @@ export const $LabelFilterBool = {
     },
     filter: {
       type: "string",
-      enum: ["label_bool"],
       const: "label_bool",
       title: "Filter",
       default: "label_bool",
     },
     value_type: {
       type: "string",
-      enum: ["bool"],
       const: "bool",
       title: "Value Type",
       default: "bool",
     },
     comp: {
       type: "string",
-      enum: ["="],
       const: "=",
       title: "Comp",
       default: "=",
@@ -5878,14 +5925,12 @@ export const $LabelFilterInt = {
     },
     filter: {
       type: "string",
-      enum: ["label_int"],
       const: "label_int",
       title: "Filter",
       default: "label_int",
     },
     value_type: {
       type: "string",
-      enum: ["int"],
       const: "int",
       title: "Value Type",
       default: "int",
@@ -5973,14 +6018,12 @@ export const $LabelFilterMulti = {
     },
     filter: {
       type: "string",
-      enum: ["label_multi"],
       const: "label_multi",
       title: "Filter",
       default: "label_multi",
     },
     value_type: {
       type: "string",
-      enum: ["multi"],
       const: "multi",
       title: "Value Type",
       default: "multi",
@@ -6313,6 +6356,7 @@ export const $LexisNexisItemSourceModel = {
     meta: {
       anyOf: [
         {
+          additionalProperties: true,
           type: "object",
         },
         {
@@ -6379,21 +6423,18 @@ export const $MetaFilterBool = {
     },
     filter: {
       type: "string",
-      enum: ["meta_bool"],
       const: "meta_bool",
       title: "Filter",
       default: "meta_bool",
     },
     value_type: {
       type: "string",
-      enum: ["bool"],
       const: "bool",
       title: "Value Type",
       default: "bool",
     },
     comp: {
       type: "string",
-      enum: ["="],
       const: "=",
       title: "Comp",
       default: "=",
@@ -6416,14 +6457,12 @@ export const $MetaFilterInt = {
     },
     filter: {
       type: "string",
-      enum: ["meta_int"],
       const: "meta_int",
       title: "Filter",
       default: "meta_int",
     },
     value_type: {
       type: "string",
-      enum: ["int"],
       const: "int",
       title: "Value Type",
       default: "int",
@@ -6450,21 +6489,18 @@ export const $MetaFilterStr = {
     },
     filter: {
       type: "string",
-      enum: ["meta_str"],
       const: "meta_str",
       title: "Filter",
       default: "meta_str",
     },
     value_type: {
       type: "string",
-      enum: ["str"],
       const: "str",
       title: "Value Type",
       default: "str",
     },
     comp: {
       type: "string",
-      enum: ["LIKE"],
       const: "LIKE",
       title: "Comp",
       default: "LIKE",
@@ -6491,7 +6527,6 @@ export const $OpenAlexFileImport = {
     },
     kind: {
       type: "string",
-      enum: ["oa-file"],
       const: "oa-file",
       title: "Kind",
       default: "oa-file",
@@ -6506,7 +6541,6 @@ export const $OpenAlexSolrImport = {
   properties: {
     kind: {
       type: "string",
-      enum: ["oa-solr"],
       const: "oa-solr",
       title: "Kind",
       default: "oa-solr",
@@ -7446,7 +7480,6 @@ export const $RegressionModel = {
       anyOf: [
         {
           type: "string",
-          enum: ["english"],
           const: "english",
         },
         {
@@ -7514,7 +7547,6 @@ export const $RegressionModel = {
     },
     conf: {
       type: "string",
-      enum: ["REG"],
       const: "REG",
       title: "Conf",
       default: "REG",
@@ -7680,7 +7712,6 @@ export const $SVMModel = {
       anyOf: [
         {
           type: "string",
-          enum: ["english"],
           const: "english",
         },
         {
@@ -7748,7 +7779,6 @@ export const $SVMModel = {
     },
     conf: {
       type: "string",
-      enum: ["SVM"],
       const: "SVM",
       title: "Conf",
       default: "SVM",
@@ -7778,6 +7808,7 @@ export const $SampleResponse = {
   properties: {
     data: {
       items: {
+        additionalProperties: true,
         type: "object",
       },
       type: "array",
@@ -7874,7 +7905,6 @@ export const $SciBERTModel = {
     },
     conf: {
       type: "string",
-      enum: ["SCIBERT"],
       const: "SCIBERT",
       title: "Conf",
       default: "SCIBERT",
@@ -7893,7 +7923,6 @@ export const $ScopusAPIImport = {
   properties: {
     kind: {
       type: "string",
-      enum: ["scopus-api"],
       const: "scopus-api",
       title: "Kind",
       default: "scopus-api",
@@ -7932,7 +7961,6 @@ export const $ScopusImport = {
     },
     kind: {
       type: "string",
-      enum: ["scopus"],
       const: "scopus",
       title: "Kind",
       default: "scopus",
@@ -8125,7 +8153,6 @@ export const $SubQuery = {
   properties: {
     filter: {
       type: "string",
-      enum: ["sub"],
       const: "sub",
       title: "Filter",
       default: "sub",
@@ -8200,7 +8227,7 @@ export const $SubQuery = {
           type: "null",
         },
       ],
-      title: "And ",
+      title: "And",
     },
     or_: {
       anyOf: [
@@ -8272,7 +8299,7 @@ export const $SubQuery = {
           type: "null",
         },
       ],
-      title: "Or ",
+      title: "Or",
     },
     not_: {
       anyOf: [
@@ -8341,7 +8368,7 @@ export const $SubQuery = {
           type: "null",
         },
       ],
-      title: "Not ",
+      title: "Not",
     },
   },
   type: "object",
@@ -8428,6 +8455,7 @@ export const $TaskModel = {
     params: {
       anyOf: [
         {
+          additionalProperties: true,
           type: "object",
         },
         {
@@ -9541,7 +9569,6 @@ export const $WoSImport = {
     },
     kind: {
       type: "string",
-      enum: ["wos"],
       const: "wos",
       title: "Kind",
       default: "wos",

@@ -69,6 +69,39 @@
                 type="number"
                 class="form-control"
                 placeholder="Tracker name"
+                step="0.05"
+              />
+            </div>
+            <div class="col">
+              <label for="bias" class="form-label">
+                Sampling bias
+                <ToolTip
+                  >The stopping criterion assumes that screened records were drawn at random (default=1.0). This
+                  assumption is conservative, as the machine-learning process should make it more likely that we pick a
+                  relevant document than an irrelevant document.
+                </ToolTip>
+              </label>
+              <input
+                id="bias"
+                v-model="trackerDetails.bias"
+                type="number"
+                class="form-control"
+                placeholder="Sampling bias"
+                step="0.05"
+              />
+            </div>
+            <div class="col">
+              <label for="confidence_level" class="form-label">
+                Confidence
+                <ToolTip>The score will be calculated until p is smaller than 1-`confidence_level`</ToolTip>
+              </label>
+              <input
+                id="confidence_level"
+                v-model="trackerDetails.confidence_level"
+                type="number"
+                class="form-control"
+                placeholder="Confidence stop"
+                step="0.05"
               />
             </div>
             <div class="col">
@@ -180,7 +213,7 @@
                   Updated: {{ trackerDetails.time_updated }}
                 </div>
                 <div>
-                  <button type="button" class="btn btn-outline-warning btn-sm me-2" @click="refreshTracker(true)">
+                  <button type="button" class="btn btn-outline-warning btn-sm me-2" @click="refreshTracker()">
                     <font-awesome-icon :icon="['fas', 'rotate']" />
                     Reset
                   </button>
@@ -241,6 +274,25 @@
               </ToolTip>
             </li>
           </ul>
+          <h4>Recall frontier</h4>
+          <table
+            v-if="trackerDetails.buscar_frontier"
+            style="overflow-y: auto; height: 20em; width: 50em; display: inline-block"
+            class="table table-bordered table-striped"
+          >
+            <thead style="position: sticky; top: 0; z-index: 1">
+              <tr>
+                <th>Recall</th>
+                <th>p-value</th>
+              </tr>
+            </thead>
+            <tbody style="">
+              <tr v-for="row in trackerDetails.buscar_frontier" :key="row[0] as number">
+                <td>{{ row[0] }}</td>
+                <td>{{ row[1] }}</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </div>
     </template>
@@ -331,13 +383,12 @@ export default defineComponent({
     deleteTracker() {
       // TODO
     },
-    refreshTracker(reset: boolean) {
+    refreshTracker() {
       if (this.trackerDetails) {
         API.evaluation
           .updateTrackerApiEvalTrackingRefreshPost({
             xProjectId: this.trackerDetails.project_id as string,
             trackerId: this.trackerDetails.annotation_tracking_id as string,
-            reset,
           })
           .then((response) => {
             if (this.trackerDetails) {
