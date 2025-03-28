@@ -1989,7 +1989,7 @@ export class EvaluationService {
     data: $OpenApiTs["/api/eval/tracking/refresh"]["post"]["req"],
     options?: Partial<AxiosRequestConfig>,
   ): CancelablePromise<ApiResult<$OpenApiTs["/api/eval/tracking/refresh"]["post"]["res"][200]>> {
-    const { trackerId, xProjectId, reset } = data;
+    const { trackerId, xProjectId, requestBody } = data;
     return __request(OpenAPI, {
       method: "POST",
       url: "/api/eval/tracking/refresh",
@@ -1998,8 +1998,9 @@ export class EvaluationService {
       },
       query: {
         tracker_id: trackerId,
-        reset,
       },
+      body: requestBody,
+      mediaType: "application/json",
       errors: {
         422: "Validation Error",
       },

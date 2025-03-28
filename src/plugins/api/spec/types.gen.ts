@@ -16,7 +16,11 @@ export type AcademicAuthorModel = {
   scopus_id?: string | null;
   openalex_id?: string | null;
   s2_id?: string | null;
+  dimensions_id?: string | null;
   affiliations?: Array<AffiliationModel> | null;
+  meta?: {
+    [key: string]: unknown;
+  } | null;
 };
 
 export type AcademicItemImport = {
@@ -264,10 +268,13 @@ export type AnnotationTrackerModel = {
   n_items_total: number;
   batch_size: number;
   recall_target: number;
+  confidence_level?: number;
+  bias?: number;
   source_ids?: Array<string> | null;
   labels?: Array<Array<number>> | null;
   recall?: Array<number | null> | null;
   buscar?: Array<unknown[]> | null;
+  buscar_frontier?: Array<unknown[]> | null;
   time_created?: string | null;
   time_updated?: string | null;
 };
@@ -3349,7 +3356,7 @@ export type $OpenApiTs = {
   "/api/eval/tracking/refresh": {
     post: {
       req: {
-        reset?: boolean;
+        requestBody?: boolean;
         trackerId: string;
         xProjectId: string;
       };
