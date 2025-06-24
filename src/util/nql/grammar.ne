@@ -7,9 +7,9 @@ query ->
   | ABSTRACT ":" _ dqstring           {% (d) => ({ filter: "field", field: "abstract",    value:  d[3]               }) %}
   | PYEAR    ":" _ COMP _ year        {% (d) => ({ filter: "field", field: "pub_year",    value:  d[5], comp: d[3]   }) %}
   | PDATE    ":" _ COMP _ date        {% (d) => ({ filter: "field", field: "date",        value:  d[5], comp: d[3]   }) %}
-  | "DOI"i   ":" _ dois               {% (d) => ({ filter: "field", field: "doi",         values: d[3]               }) %}
-  | "OA"i    ":" _ oa_ids             {% (d) => ({ filter: "field", field: "openalex_id", values: d[3]               }) %}
-  | "ID"i    ":" _ uuids              {% (d) => ({ filter: "field", field: "item_id",     values: d[3]               }) %}
+  | "DOI"i   ":" _ dois               {% (d) => ({ filter: "field_mul", field: "doi",         values: d[3]               }) %}
+  | "OA"i    ":" _ oa_ids             {% (d) => ({ filter: "field_mul", field: "openalex_id", values: d[3]               }) %}
+  | "ID"i    ":" _ uuids              {% (d) => ({ filter: "field_mul", field: "item_id",     values: d[3]               }) %}
   | SRC      ":" _ dqstring           {% (d) => ({ filter: "field", field: "source",      value:  d[3], comp: "LIKE" }) %}
   | META     ":" _ meta_clause        {% (d) => ({ ...d[3]                                        }) %}
   | LABEL    ":" _ label_clause       {% (d) => ({ filter: "label",   ...d[3]                     }) %}
