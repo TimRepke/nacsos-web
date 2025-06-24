@@ -12,8 +12,8 @@ import { ScopesStore, useScopesStore } from "@/stores/CurrentProjectStore/scopes
 import { ProjectAnnotationSchemesStore, useProjectAnnotationSchemesStore } from "@/stores/CurrentProjectStore/schemes";
 import { ComputedGetter, computed } from "vue";
 
-const ProjectSerializer = Serializer<ProjectModel>();
-const ProjectPermissionSerializer = Serializer<ProjectPermissionsModel>();
+const ProjectSerializer = Serializer<ProjectModel | null, null>(null);
+const ProjectPermissionSerializer = Serializer<ProjectPermissionsModel | null, null>(null);
 
 export type CurrentProjectStoreType = {
   projectId: RemovableRef<string | undefined>;
@@ -28,10 +28,10 @@ export type CurrentProjectStoreType = {
 
 export const useCurrentProjectStore = defineStore("CurrentProjectStore", () => {
   const projectId = useStorage<string>("nacsos:ProjectStore:currentProjectId", null, undefined);
-  const project = useStorage<ProjectModel>("nacsos:ProjectStore:currentProject", null, undefined, {
+  const project = useStorage<ProjectModel | null>("nacsos:ProjectStore:currentProject", null, undefined, {
     serializer: ProjectSerializer,
   });
-  const permissions = useStorage<ProjectPermissionsModel>(
+  const permissions = useStorage<ProjectPermissionsModel | null>(
     "nacsos:ProjectStore:currentProjectPermissions",
     null,
     undefined,
@@ -44,8 +44,8 @@ export const useCurrentProjectStore = defineStore("CurrentProjectStore", () => {
   const schemes = useProjectAnnotationSchemesStore();
 
   const projectSelected = computed<boolean>(() => !!project.value && !!projectId.value && !!permissions.value);
-  const hasRunningImport = computed<boolean>(() => !!project.value.import_mutex);
-  const userCanResetImportMutex = computed<boolean>(() => !!permissions.value.imports_edit && hasRunningImport.value);
+  const hasRunningImport = computed<boolean>(() => !!project.value?.import_mutex);
+  const userCanResetImportMutex = computed<boolean>(() => !!permissions.value?.imports_edit && hasRunningImport.value);
 
   function clear() {
     projectId.value = undefined;
@@ -57,23 +57,31 @@ export const useCurrentProjectStore = defineStore("CurrentProjectStore", () => {
     schemes.clear();
   }
 
-  async function refreshInfo(): Promise<ProjectModel> {
-    const { data } = await API.project.getProjectApiProjectInfoGet({ xProjectId: projectId.value });
-    project.value = data;
-    return data;
+  async function refreshInfo(): Promise<ProjectModel | undefined> {
+    if (projectId.value) {
+      const { data } = await API.project.getProjectApiProjectInfoGet({ xProjectId: projectId.value });
+      project.value = data;
+      return data;
+    }
+    return undefined;
   }
 
-  async function refreshPermissions(): Promise<ProjectPermissionsModel> {
-    const { data } = await API.project.getProjectPermissionsCurrentUserApiProjectPermissionsMeGet({
-      xProjectId: projectId.value,
-    });
-    permissions.value = data;
-    return data;
+  async function refreshPermissions(): Promise<ProjectPermissionsModel | undefined> {
+    if (projectId.value) {
+      const { data } = await API.project.getProjectPermissionsCurrentUserApiProjectPermissionsMeGet({
+        xProjectId: projectId.value,
+      });
+      permissions.value = data;
+      return data;
+    }
+    return undefined;
   }
 
   async function unsetImportMutex() {
-    await API.project.resetImportMutexApiProjectImportMutexPut({ xProjectId: projectId.value });
-    await refreshInfo();
+    if (projectId.value) {
+      await API.project.resetImportMutexApiProjectImportMutexPut({ xProjectId: projectId.value });
+      await refreshInfo();
+    }
   }
 
   async function load(newProjectId: string) {
@@ -84,14 +92,16 @@ export const useCurrentProjectStore = defineStore("CurrentProjectStore", () => {
 
     const project = await refreshInfo();
     const permissions = await refreshPermissions();
-    users.ensureLoaded();
-    highlighters.ensureLoaded();
+    if (permissions && project) {
+      users.ensureLoaded();
+      highlighters.ensureLoaded();
 
-    // These are on-demand, so no need to load it here
-    // this.scopes.reload();
-    // this.schemes.reload();
+      // These are on-demand, so no need to load it here
+      // this.scopes.reload();
+      // this.schemes.reload();
 
-    EventBus.emit(new CurrentProjectSetEvent(project, permissions));
+      EventBus.emit(new CurrentProjectSetEvent(project, permissions));
+    }
   }
 
   return {

@@ -5,7 +5,7 @@ import Serializer from "@/types/serializer";
 import type { DehydratedUser } from "@/plugins/api/spec/types.gen";
 import { API } from "@/plugins/api";
 
-const UsersSerializer = Serializer<Array<DehydratedUser>>();
+const UsersSerializer = Serializer<Array<DehydratedUser>, Array<DehydratedUser>>([]);
 
 export type PlatformUsersStoreType = {
   users: RemovableRef<Array<DehydratedUser>>;
