@@ -28,8 +28,8 @@ const labels = ref<LabelCount[]>([]);
 function refresh() {
   API.stats
     .labelStatsApiStatsLabelsPost({
-      xProjectId: currentProjectStore.projectId as string,
-      requestBody: query.value[0],
+      headers: { "x-project-id": currentProjectStore.projectId as string },
+      body: query.value[0],
     })
     .then((response) => {
       labels.value = response.data;

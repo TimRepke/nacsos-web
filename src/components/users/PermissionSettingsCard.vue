@@ -134,8 +134,8 @@ export default defineComponent({
     saveUser() {
       API.project
         .saveProjectPermissionApiProjectPermissionsPermissionPut({
-          requestBody: this.permission,
-          xProjectId: currentProjectStore.projectId as string,
+          body: this.permission,
+          headers: { "x-project-id": currentProjectStore.projectId as string },
         })
         .then(() => {
           this.$emit("userSaved", this.permission);
@@ -153,8 +153,8 @@ export default defineComponent({
             if (confirmationResponse === "ACCEPT") {
               API.project
                 .removeProjectPermissionApiProjectPermissionsPermissionDelete({
-                  projectPermissionId: this.permission.project_permission_id as string,
-                  xProjectId: currentProjectStore.projectId as string,
+                  query: { project_permission_id: this.permission.project_permission_id as string },
+                  headers: { "x-project-id": currentProjectStore.projectId as string },
                 })
                 .then(() => {
                   this.$emit("userDeleted", this.permission);

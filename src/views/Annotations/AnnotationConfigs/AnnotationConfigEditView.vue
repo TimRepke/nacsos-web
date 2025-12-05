@@ -126,9 +126,9 @@ export default defineComponent({
     if (!this.isNewScheme) {
       API.annotations
         .getSchemeDefinitionApiAnnotationsSchemesDefinitionAnnotationSchemeIdGet({
-          annotationSchemeId: this.annotationSchemeId as string,
-          xProjectId: currentProjectStore.projectId as string,
-          flat: false,
+          query: { flat: false },
+          path: { annotation_scheme_id: this.annotationSchemeId as string },
+          headers: { "x-project-id": currentProjectStore.projectId as string },
         })
         .then((response) => {
           this.scheme = ref(response.data as AnnotationSchemeModel);
@@ -149,8 +149,8 @@ export default defineComponent({
             if (response === "ACCEPT") {
               API.annotations
                 .putAnnotationSchemeApiAnnotationsSchemesDefinitionPut({
-                  xProjectId: currentProjectStore.projectId as string,
-                  requestBody: this.scheme,
+                  headers: { "x-project-id": currentProjectStore.projectId as string },
+                  body: this.scheme,
                 })
                 .then((res) => {
                   EventBus.emit(new ToastEvent("SUCCESS", `Saved annotation scheme.  \n**ID:** ${res.data}`));

@@ -199,8 +199,8 @@ export default defineComponent({
       if (newValue && !this.item) {
         API.project
           .getDetailForItemApiProjectItemsDetailItemIdGet({
-            xProjectId: currentProjectStore.projectId as string,
-            itemId: this.ordering.item_id,
+            headers: { "x-project-id": currentProjectStore.projectId as string },
+            path: { item_id: this.ordering.item_id },
           })
           .then((response) => {
             this.item = response.data;

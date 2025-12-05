@@ -147,7 +147,7 @@ export default defineComponent({
   async mounted() {
     API.highlighters
       .getProjectHighlightersApiHighlightersProjectGet({
-        xProjectId: currentProjectStore.projectId as string,
+        headers: { "x-project-id": currentProjectStore.projectId as string },
       })
       .then((result) => {
         this.highlighters = result.data.map(
@@ -176,8 +176,8 @@ export default defineComponent({
       delete highlighterCopy.error;
       API.highlighters
         .upsertHighlighterApiHighlightersProjectPut({
-          xProjectId: currentProjectStore.projectId as string,
-          requestBody: highlighter,
+          headers: { "x-project-id": currentProjectStore.projectId as string },
+          body: highlighter,
         })
         .then((response) => {
           EventBus.emit(new ToastEvent("SUCCESS", `Saved highlighter with ID: ${response.data}`));

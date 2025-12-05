@@ -7,7 +7,7 @@ import type {
   AnnotationModel,
   BotAnnotationModel,
   ImportDetails,
-  ImportM2M,
+  ImportM2m,
   ItemType,
   ProjectModel,
 } from "@/plugins/api/spec";
@@ -28,33 +28,35 @@ const component = componentMap[(currentProjectStore.project as ProjectModel).typ
 const route = useRoute();
 const item = ref<AcademicItemModel | null>(null);
 const imports = ref<ImportDetails[]>([]);
-const m2ms = ref<ImportM2M[]>([]);
+const m2ms = ref<ImportM2m[]>([]);
 const annotations = ref<AnnotationModel[]>([]);
 const botAnnotations = ref<BotAnnotationModel[]>([]);
 
 onMounted(async () => {
   item.value = (
     await API.item.getItemInfoApiItemInfoItemIdGet({
-      itemId: route.params.item_id as string,
-      xProjectId: currentProjectStore.projectId as string,
+      path: { item_id: route.params.item_id as string },
+      headers: { "x-project-id": currentProjectStore.projectId as string },
     })
   ).data;
 
   imports.value = (
-    await API.imports.getProjectImportsApiImportsListDetailsGet({ xProjectId: currentProjectStore.projectId as string })
+    await API.imports.getProjectImportsApiImportsListDetailsGet({
+      headers: { "x-project-id": currentProjectStore.projectId as string },
+    })
   ).data;
 
   [annotations.value, botAnnotations.value] = (
     await API.item.getItemLabelsApiItemLabelsItemIdGet({
-      itemId: route.params.item_id as string,
-      xProjectId: currentProjectStore.projectId as string,
+      path: { item_id: route.params.item_id as string },
+      headers: { "x-project-id": currentProjectStore.projectId as string },
     })
   ).data as [AnnotationModel[], BotAnnotationModel[]];
 
   m2ms.value = (
     await API.item.getItemM2MsApiItemM2MsItemIdGet({
-      itemId: route.params.item_id as string,
-      xProjectId: currentProjectStore.projectId as string,
+      path: { item_id: route.params.item_id as string },
+      headers: { "x-project-id": currentProjectStore.projectId as string },
     })
   ).data;
 });

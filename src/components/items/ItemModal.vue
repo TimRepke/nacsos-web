@@ -73,8 +73,8 @@ export default defineComponent({
       this.itemInfo = null;
       this.requestPromise = API.project
         .getDetailForItemApiProjectItemsDetailItemIdGet({
-          itemId,
-          xProjectId: currentProjectStore.projectId as string,
+          path: { item_id: itemId },
+          headers: { "x-project-id": currentProjectStore.projectId as string },
         })
         .then((result) => {
           this.itemInfo = result.data;

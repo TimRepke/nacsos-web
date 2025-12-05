@@ -94,8 +94,8 @@ function updateConfig(eventPayload: ImportConfig) {
 function reloadInfo() {
   API.imports
     .getImportDetailsApiImportsImportImportIdGet({
-      importId: importInfo.value.import_id as string,
-      xProjectId: currentProjectStore.projectId as string,
+      path: { import_id: importInfo.value.import_id as string },
+      headers: { "x-project-id": currentProjectStore.projectId as string },
     })
     .then((response) => {
       importInfo.value = response.data;
@@ -104,8 +104,8 @@ function reloadInfo() {
     .catch(ignore);
   API.imports
     .getImportRevisionsApiImportsImportImportIdRevisionsGet({
-      importId: importInfo.value.import_id as string,
-      xProjectId: currentProjectStore.projectId as string,
+      path: { import_id: importInfo.value.import_id as string },
+      headers: { "x-project-id": currentProjectStore.projectId as string },
     })
     .then((response) => {
       importRevisions.value = response.data;
@@ -125,8 +125,8 @@ function initiateRevision() {
         if (response === "ACCEPT") {
           API.imports
             .triggerImportApiImportsImportImportIdPost({
-              importId: importInfo.value.import_id as string,
-              xProjectId: currentProjectStore.projectId as string,
+              path: { import_id: importInfo.value.import_id as string },
+              headers: { "x-project-id": currentProjectStore.projectId as string },
             })
             .then(() => {
               _settingsEditable.value = false;
@@ -157,8 +157,8 @@ function apiSave() {
   API.imports
     .putImportDetailsApiImportsImportPut({
       // @ts-ignore
-      requestBody: importInfo.value,
-      xProjectId: currentProjectStore.projectId as string,
+      body: importInfo.value,
+      headers: { "x-project-id": currentProjectStore.projectId as string },
     })
     .then((response) => {
       EventBus.emit(new ToastEvent("SUCCESS", `Saved import settings.  \n**ID:** ${response.data}`));

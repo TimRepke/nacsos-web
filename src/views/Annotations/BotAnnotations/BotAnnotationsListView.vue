@@ -117,8 +117,8 @@ export default defineComponent({
   async mounted() {
     API.annotations
       .getBotAnnotationsApiAnnotationsBotAnnotationsGet({
-        includeResolve: true,
-        xProjectId: currentProjectStore.projectId as string,
+        query: { include_resolve: true },
+        headers: { "x-project-id": currentProjectStore.projectId as string },
       })
       .then((response) => {
         this.annotations = response.data;

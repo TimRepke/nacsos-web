@@ -123,8 +123,8 @@ export default defineComponent({
   async mounted() {
     API.annotations
       .getAssignmentScopesForUserApiAnnotationsAssignmentsScopesProjectIdGet({
-        projectId: currentProjectStore.projectId as string,
-        xProjectId: currentProjectStore.projectId as string,
+        path: { project_id: currentProjectStore.projectId as string },
+        headers: { "x-project-id": currentProjectStore.projectId as string },
       })
       .then((response) => {
         this.annotationScopes = response.data;

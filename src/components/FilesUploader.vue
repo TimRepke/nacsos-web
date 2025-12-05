@@ -106,7 +106,7 @@ export default defineComponent({
         API.pipes
           .uploadFileApiPipesArtefactsFilesUploadPost(
             {
-              xProjectId: currentProjectStore.projectId as string,
+              headers: { "x-project-id": currentProjectStore.projectId as string },
               folder,
               formData: { file: uploadFile.file },
             },

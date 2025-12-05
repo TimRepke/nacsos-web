@@ -1,16 +1,16 @@
 <script lang="ts" setup>
 import { PropType, ref, watch } from "vue";
-import { ImportConfigEnum, ScopusAPIImport } from "@/plugins/api/types";
+import { ImportConfigEnum, ScopusApiImport } from "@/plugins/api/types";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import axios from "axios";
 import { API } from "@/plugins/api";
 import { currentProjectStore } from "@/stores";
 import { pyDTNow } from "@/util";
 
-const emits = defineEmits<{ configChanged: [config: ScopusAPIImport]; requestingSave: [] }>();
+const emits = defineEmits<{ configChanged: [config: ScopusApiImport]; requestingSave: [] }>();
 const props = defineProps({
   existingConfig: {
-    type: Object as PropType<ScopusAPIImport>,
+    type: Object as PropType<ScopusApiImport>,
     required: false,
     default: null,
   },
@@ -30,7 +30,7 @@ const props = defineProps({
   },
 });
 
-const config = ref<ScopusAPIImport | null>(null);
+const config = ref<ScopusApiImport | null>(null);
 const apiKey = ref<string>("");
 const progress = ref({
   running: false,
@@ -54,20 +54,20 @@ if (!props.existingConfig || props.existingConfig.kind !== ImportConfigEnum.SCOP
     file_date: "",
     kind: "scopus-api",
   };
-  emits("configChanged", config.value as ScopusAPIImport);
+  emits("configChanged", config.value as ScopusApiImport);
 } else {
   config.value = props.existingConfig;
 }
 
 watch(
   config.value,
-  (newValue: ScopusAPIImport) => {
+  (newValue: ScopusApiImport) => {
     if (newValue) emits("configChanged", newValue);
   },
   { deep: true },
 );
 
-watch(props.existingConfig, (newValue: ScopusAPIImport) => (config.value = newValue), { deep: true });
+watch(props.existingConfig, (newValue: ScopusApiImport) => (config.value = newValue), { deep: true });
 // watch(props, (newValue) => {
 //   if (config.value && config.value.import_id !== newValue.importId) config.value.import_id = newValue.importId;
 // });
@@ -126,7 +126,7 @@ function upload(abstracts: any[]) {
     API.pipes
       .uploadFileApiPipesArtefactsFilesUploadPost(
         {
-          xProjectId: currentProjectStore.projectId as string,
+          headers: { "x-project-id": currentProjectStore.projectId as string },
           folder,
           formData: { file },
         },

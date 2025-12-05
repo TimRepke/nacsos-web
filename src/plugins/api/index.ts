@@ -1,48 +1,51 @@
-export { OpenAPI } from "@/plugins/api/spec/core/OpenAPI";
-import { OpenAPI } from "@/plugins/api/spec/core/OpenAPI";
+
+import type { AxiosResponse } from "axios";
 import {
-  AnnotationsService,
-  DefaultService,
-  EvaluationService,
-  EventsService,
-  ExportService,
-  HighlightersService,
-  ImportsService,
-  MailingService,
-  OauthService,
-  ProjectService,
-  ProjectsService,
-  SearchService,
-  StatsService,
-  UsersService,
-  PipesService,
-  ItemService,
-  PrioService,
-} from "@/plugins/api/spec/services.gen";
-import type { ApiResponseReject } from "@/plugins/api/spec/core/ApiResult";
+  Annotations,
+  Default,
+  Evaluation,
+  Events,
+  Export,
+  Highlighters,
+  Imports,
+  Mailing,
+  Oauth,
+  Project,
+  Projects,
+  Search,
+  Stats,
+  Users,
+  Pipes,
+  Item,
+  Prio,
+} from "./spec/sdk.gen";
 import { EventBus } from "@/plugins/events";
 import { ToastEvent } from "@/plugins/events/events/toast";
 
-OpenAPI.BASE = import.meta.env.VITE_NACSOS_CORE_URL;
+import { client } from "./spec/client.gen";
+
+client.setConfig({
+  baseURL: import.meta.env.VITE_NACSOS_CORE_URL,
+});
 
 export const API = {
-  annotations: AnnotationsService,
-  ping: DefaultService,
-  evaluation: EvaluationService,
-  events: EventsService,
-  export: ExportService,
-  highlighters: HighlightersService,
-  imports: ImportsService,
-  mailing: MailingService,
-  oauth: OauthService,
-  project: ProjectService,
-  projects: ProjectsService,
-  search: SearchService,
-  stats: StatsService,
-  users: UsersService,
-  pipes: PipesService,
-  item: ItemService,
-  prio: PrioService,
+  annotations: Annotations,
+  ping: Default,
+  evaluation: Evaluation,
+  events: Events,
+  export: Export,
+  highlighters: Highlighters,
+  imports: Imports,
+  mailing: Mailing,
+  oauth: Oauth,
+  project: Project,
+  projects: Projects,
+  search: Search,
+  stats: Stats,
+  users: Users,
+  pipes: Pipes,
+  item: Item,
+  prio: Prio,
 };
 
 export function ignore() {}
@@ -67,5 +70,33 @@ export function toastSuccess(txt: string) {
   };
 }
 
-export type { ApiResult, ApiResponseReject, ErrorDetails } from "@/plugins/api/spec/core/ApiResult";
-export { ErrorLevel } from "@/plugins/api/spec/core/ApiResult";
+export type ApiResultIntern<TData = any> = {
+  readonly body: TData;
+  readonly ok: boolean;
+  readonly status: number;
+  readonly statusText: string;
+  readonly url: string;
+  readonly response: AxiosResponse;
+};
+
+export enum ErrorLevel {
+  WARNING = "WARNING",
+  ERROR = "ERROR",
+}
+
+export type ErrorDetails = {
+  level: ErrorLevel;
+  type: string;
+  message: string;
+  args?: unknown[];
+  error?: Error;
+};
+
+type ApiResponseBase = {
+  readonly ok: boolean;
+  readonly status: number;
+  readonly response?: AxiosResponse;
+};
+
+export type ApiResult<T> = ApiResponseBase & { data: T };
+export type ApiResponseReject = ApiResponseBase & { error: { detail: ErrorDetails } };

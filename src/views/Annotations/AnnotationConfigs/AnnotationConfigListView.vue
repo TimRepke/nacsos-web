@@ -224,19 +224,19 @@ export default defineComponent({
       try {
         this.projectSchemes = (
           await API.annotations.getSchemeDefinitionsForProjectApiAnnotationsSchemesListGet({
-            xProjectId: currentProjectStore.projectId as string,
+            headers: { "x-project-id": currentProjectStore.projectId as string },
           })
         ).data;
 
         this.projectScopes = (
           await API.annotations.getAssignmentScopesForProjectApiAnnotationsAssignmentsScopesGet({
-            xProjectId: currentProjectStore.projectId as string,
+            headers: { "x-project-id": currentProjectStore.projectId as string },
           })
         ).data;
 
         this.projectResolutions = (
           await API.annotations.listSavedResolvedAnnotationsApiAnnotationsConfigResolvedListGet({
-            xProjectId: currentProjectStore.projectId as string,
+            headers: { "x-project-id": currentProjectStore.projectId as string },
           })
         ).data;
       } catch (e) {
@@ -255,15 +255,15 @@ export default defineComponent({
 
       try {
         const copyId = await API.annotations.putAnnotationSchemeApiAnnotationsSchemesDefinitionPut({
-          xProjectId: currentProjectStore.projectId as string,
-          requestBody: copy,
+          headers: { "x-project-id": currentProjectStore.projectId as string },
+          body: copy,
         });
         EventBus.emit(
           new ToastEvent("SUCCESS", `Created copy of the annotation scheme "${scheme.name}" with ID ${copyId.data}.`),
         );
 
         const schemes = await API.annotations.getSchemeDefinitionsForProjectApiAnnotationsSchemesListGet({
-          xProjectId: currentProjectStore.projectId as string,
+          headers: { "x-project-id": currentProjectStore.projectId as string },
         });
         this.projectSchemes = schemes.data;
       } catch {
@@ -281,8 +281,8 @@ export default defineComponent({
             if (confirmationResponse === "ACCEPT") {
               API.annotations
                 .removeAnnotationSchemeApiAnnotationsSchemesDefinitionSchemeIdDelete({
-                  xProjectId: currentProjectStore.projectId as string,
-                  annotationSchemeId: scheme.annotation_scheme_id as string,
+                  headers: { "x-project-id": currentProjectStore.projectId as string },
+                  query: { annotation_scheme_id: scheme.annotation_scheme_id as string },
                 })
                 .then(() => {
                   EventBus.emit(new ToastEvent("SUCCESS", "Annotation scheme deleted!"));
@@ -308,8 +308,8 @@ export default defineComponent({
             if (confirmationResponse === "ACCEPT") {
               API.annotations
                 .removeAssignmentScopeApiAnnotationsAnnotateScopeAssignmentScopeIdDelete({
-                  xProjectId: currentProjectStore.projectId as string,
-                  assignmentScopeId: scope.assignment_scope_id as string,
+                  headers: { "x-project-id": currentProjectStore.projectId as string },
+                  path: { assignment_scope_id: scope.assignment_scope_id as string },
                 })
                 .then(() => {
                   EventBus.emit(new ToastEvent("SUCCESS", "Assignment scope deleted!"));
@@ -334,8 +334,8 @@ export default defineComponent({
             if (confirmationResponse === "ACCEPT") {
               API.annotations
                 .deleteSavedResolvedAnnotationsApiAnnotationsConfigResolvedBotAnnotationMetaIdDelete({
-                  botAnnotationMetadataId: meta.bot_annotation_metadata_id!,
-                  xProjectId: currentProjectStore.projectId as string,
+                  query: { bot_annotation_metadata_id: meta.bot_annotation_metadata_id! },
+                  headers: { "x-project-id": currentProjectStore.projectId as string },
                 })
                 .then(() => {
                   EventBus.emit(new ToastEvent("SUCCESS", `Deleted ${meta.bot_annotation_metadata_id}`));

@@ -82,7 +82,7 @@ import { EventBus } from "@/plugins/events";
 import { CurrentProjectSelectedEvent, CurrentProjectSetEvent } from "@/plugins/events/events/projects";
 import type { ProjectInfo } from "@/plugins/api/types";
 import { API, toastReject } from "@/plugins/api";
-import { ItemTypeEnum as ItemType } from "@/plugins/api/types";
+import { ItemType } from "@/plugins/api/types";
 import ProjectTypeIcon from "@/components/ProjectTypeIcon.vue";
 
 enum Sort {

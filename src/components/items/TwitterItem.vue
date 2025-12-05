@@ -40,7 +40,7 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import type { PropType } from "vue";
-import type { TwitterItemModel, Hashtag, Mention, URL } from "@/plugins/api/types";
+import type { TwitterItemModel, Hashtag, Mention, Url } from "@/plugins/api/types";
 import TextComponent from "@/components/items/TextComponent.vue";
 
 interface Replacement {
@@ -81,7 +81,7 @@ export default defineComponent({
         });
       }
       if (this.item.urls) {
-        this.item.urls.forEach((url: URL) => {
+        this.item.urls.forEach((url: Url) => {
           replacements.push({
             start: url.start,
             end: url.end,

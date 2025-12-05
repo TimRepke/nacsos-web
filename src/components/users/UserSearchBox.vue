@@ -68,8 +68,8 @@ export default defineComponent({
     if (this.projectId) {
       API.users
         .getProjectUsersApiUsersListProjectProjectIdGet({
-          xProjectId: currentProjectStore.projectId as string,
-          projectId: currentProjectStore.projectId as string,
+          headers: { "x-project-id": currentProjectStore.projectId as string },
+          path: { project_id: currentProjectStore.projectId as string },
         })
         .then((response) => {
           this.users = response.data;

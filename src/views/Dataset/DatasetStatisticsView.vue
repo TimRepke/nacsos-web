@@ -98,19 +98,21 @@ const histogramChart = computed(() => {
 });
 onMounted(() => {
   API.stats
-    .getBasicStatsApiStatsBasicsGet({ xProjectId: currentProjectStore.projectId as string })
+    .getBasicStatsApiStatsBasicsGet({ headers: { "x-project-id": currentProjectStore.projectId as string } })
     .then((response) => {
       basic.value = response.data;
     })
     .catch(ignore);
   API.stats
-    .getAnnotatorRankingApiStatsRankGet({ xProjectId: currentProjectStore.projectId as string })
+    .getAnnotatorRankingApiStatsRankGet({ headers: { "x-project-id": currentProjectStore.projectId as string } })
     .then((response) => {
       leaderboard.value = response.data;
     })
     .catch(ignore);
   API.stats
-    .getPublicationYearHistogramApiStatsHistogramYearsGet({ xProjectId: currentProjectStore.projectId as string })
+    .getPublicationYearHistogramApiStatsHistogramYearsGet({
+      headers: { "x-project-id": currentProjectStore.projectId as string },
+    })
     .then((response) => {
       histogramYears.value = response.data;
     })

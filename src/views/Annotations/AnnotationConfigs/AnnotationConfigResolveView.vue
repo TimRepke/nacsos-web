@@ -175,7 +175,7 @@ import type {
   BotMetaResolveBase,
   DehydratedUser,
 } from "@/plugins/api/spec/types.gen";
-import { ResolutionMethodEnum } from "@/plugins/api/spec/enums.gen";
+import { ResolutionMethod } from "@/plugins/api/spec/types.gen";
 import { API, toastReject } from "@/plugins/api";
 import ItemModal from "@/components/items/ItemModal.vue";
 import ToolTip from "@/components/ToolTip.vue";
@@ -214,7 +214,7 @@ export default defineComponent({
       settings: {
         ignore_hierarchy: false,
         ignore_repeat: false,
-        algorithm: ResolutionMethodEnum.MAJORITY,
+        algorithm: ResolutionMethod.MAJORITY,
       } as BotMetaResolveBase,
 
       // Models
@@ -250,8 +250,8 @@ export default defineComponent({
       if (!this.isNew && this.bot_annotation_metadata_id) {
         const { meta, proposal } = (
           await API.annotations.getSavedResolvedAnnotationsApiAnnotationsConfigResolvedBotAnnotationMetadataIdGet({
-            botAnnotationMetadataId: this.bot_annotation_metadata_id,
-            xProjectId: currentProjectStore.projectId as string,
+            path: { bot_annotation_metadata_id: this.bot_annotation_metadata_id },
+            headers: { "x-project-id": currentProjectStore.projectId as string },
           })
         ).data;
         this.name = meta.name;
@@ -264,17 +264,17 @@ export default defineComponent({
       if (this.annotation_scheme_id) {
         this.annotationScheme = (
           await API.annotations.getSchemeDefinitionApiAnnotationsSchemesDefinitionAnnotationSchemeIdGet({
-            annotationSchemeId: this.annotation_scheme_id,
-            xProjectId: currentProjectStore.projectId as string,
-            flat: true,
+            path: { annotation_scheme_id: this.annotation_scheme_id },
+            headers: { "x-project-id": currentProjectStore.projectId as string },
+            query: { flat: true },
           })
         ).data as AnnotationSchemeModelFlat;
       }
       if (this.assignment_scope_id) {
         this.assignmentScope = (
           await API.annotations.getAssignmentScopeApiAnnotationsAssignmentsScopeAssignmentScopeIdGet({
-            assignmentScopeId: this.assignment_scope_id,
-            xProjectId: currentProjectStore.projectId as string,
+            path: { assignment_scope_id: this.assignment_scope_id },
+            headers: { "x-project-id": currentProjectStore.projectId as string },
           })
         ).data;
 
@@ -306,10 +306,12 @@ export default defineComponent({
       } else {
         API.annotations
           .updateResolvedAnnotationsApiAnnotationsConfigResolveUpdatePut({
-            botAnnotationMetadataId: this.bot_annotation_metadata_id as string,
-            name: this.name,
-            xProjectId: currentProjectStore.projectId as string,
-            requestBody: this.proposal.matrix,
+            query: {
+              bot_annotation_metadata_id: this.bot_annotation_metadata_id as string,
+              name: this.name,
+            },
+            headers: { "x-project-id": currentProjectStore.projectId as string },
+            body: this.proposal.matrix,
           })
           .then(() => EventBus.emit(new ToastEvent("SUCCESS", "Updated resolution")))
           .catch(toastReject)
@@ -325,11 +327,13 @@ export default defineComponent({
       } else {
         API.annotations
           .saveResolvedAnnotationsApiAnnotationsConfigResolvePut({
-            xProjectId: currentProjectStore.projectId as string,
-            assignmentScopeId: this.assignment_scope_id,
-            annotationSchemeId: this.annotation_scheme_id,
-            name: this.name,
-            requestBody: {
+            headers: { "x-project-id": currentProjectStore.projectId as string },
+            query: {
+              assignment_scope_id: this.assignment_scope_id,
+              annotation_scheme_id: this.annotation_scheme_id,
+              name: this.name,
+            },
+            body: {
               settings: this.settings,
               matrix: this.proposal.matrix,
             },
@@ -354,13 +358,15 @@ export default defineComponent({
       this.loadingProposals = true;
       API.annotations
         .getResolvedAnnotationsApiAnnotationsConfigResolvePost({
-          assignmentScopeId: this.assignment_scope_id,
-          botAnnotationMetadatId: this.bot_annotation_metadata_id,
-          includeEmpty: true,
-          includeNew: true,
-          updateExisting: false,
-          requestBody: this.settings,
-          xProjectId: currentProjectStore.projectId as string,
+          query: {
+            assignment_scope_id: this.assignment_scope_id,
+            bot_annotation_metadat_id: this.bot_annotation_metadata_id,
+            include_empty: true,
+            include_new: true,
+            update_existing: false,
+          },
+          body: this.settings,
+          headers: { "x-project-id": currentProjectStore.projectId as string },
         })
         .then((response) => {
           const { data } = response;

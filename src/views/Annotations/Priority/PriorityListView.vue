@@ -21,8 +21,8 @@ async function drop(priority: DehydratedPriorityModel) {
         if (response === "ACCEPT") {
           API.prio
             .dropPrioSetupApiPrioSetupDelete({
-              xProjectId: currentProjectStore.projectId as string,
-              priorityId: priority.priority_id as string,
+              headers: { "x-project-id": currentProjectStore.projectId as string },
+              query: { priority_id: priority.priority_id as string },
             })
             .then(() => {
               reload();
@@ -41,8 +41,8 @@ async function drop(priority: DehydratedPriorityModel) {
 async function clone(priority: DehydratedPriorityModel) {
   const cloned = (
     await API.prio.readPrioSetupApiPrioSetupGet({
-      xProjectId: currentProjectStore.projectId as string,
-      priorityId: priority.priority_id as string,
+      headers: { "x-project-id": currentProjectStore.projectId as string },
+      query: { priority_id: priority.priority_id as string },
     })
   ).data;
   if (!cloned) return;
@@ -57,15 +57,15 @@ async function clone(priority: DehydratedPriorityModel) {
   delete cloned.prioritised_ids;
   delete cloned.prioritised_ids;
   await API.prio.savePrioSetupApiPrioSetupPut({
-    xProjectId: currentProjectStore.projectId as string,
-    requestBody: cloned,
+    headers: { "x-project-id": currentProjectStore.projectId as string },
+    body: cloned,
   });
 }
 
 function reload() {
   API.prio
     .readProjectSetupsApiPrioSetupsGet({
-      xProjectId: currentProjectStore.projectId as string,
+      headers: { "x-project-id": currentProjectStore.projectId as string },
     })
     .then((res) => (setups.value = res.data))
     .catch(ignore);

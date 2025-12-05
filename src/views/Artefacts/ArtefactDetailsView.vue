@@ -117,7 +117,7 @@ export default defineComponent({
     // API.pipes
     //   .streamTaskLogApiPipesArtefactsLogStreamGet({
     //     xTaskId: this.taskId,
-    //     xProjectId: currentProjectStore.projectId as string,
+    //     headers: {'x-project-id': currentProjectStore.projectId as string},
     //   })
     //   .then((response) => {
     //     this.log = response.data;
@@ -126,8 +126,7 @@ export default defineComponent({
 
     API.pipes
       .getTaskApiPipesTaskGet({
-        xTaskId: this.taskId as string,
-        xProjectId: currentProjectStore.projectId as string,
+        headers: { "x-project-id": currentProjectStore.projectId as string, "x-task-id": this.taskId },
       })
       .then((response) => {
         this.task = response.data;
@@ -136,8 +135,7 @@ export default defineComponent({
 
     API.pipes
       .getArtefactsApiPipesArtefactsListGet({
-        xTaskId: this.taskId as string,
-        xProjectId: currentProjectStore.projectId as string,
+        headers: { "x-project-id": currentProjectStore.projectId as string, "x-task-id": this.taskId },
       })
       .then((response) => {
         this.artefacts = response.data;
@@ -148,8 +146,7 @@ export default defineComponent({
     downloadArchive() {
       API.pipes
         .getArchiveApiPipesArtefactsFilesGet({
-          xTaskId: this.taskId,
-          xProjectId: currentProjectStore.projectId as string,
+          headers: { "x-project-id": currentProjectStore.projectId as string, "x-task-id": this.taskId },
         })
         .then((response) => {
           const file = new File([response.data as Blob], "archive.zip", { type: "application/zip;charset=utf-8" });
@@ -162,9 +159,8 @@ export default defineComponent({
       const parts = filename.split("/");
       API.pipes
         .getFileApiPipesArtefactsFileGet({
-          filename,
-          xTaskId: this.taskId,
-          xProjectId: currentProjectStore.projectId as string,
+          query: { filename },
+          headers: { "x-project-id": currentProjectStore.projectId as string, "x-task-id": this.taskId },
         })
         .then((response) => {
           const file = new File([response.data as Blob], parts[parts.length - 1]);
@@ -176,8 +172,7 @@ export default defineComponent({
     loadLog() {
       API.pipes
         .getTaskLogApiPipesArtefactsLogGet({
-          xTaskId: this.taskId,
-          xProjectId: currentProjectStore.projectId as string,
+          headers: { "x-project-id": currentProjectStore.projectId as string, "x-task-id": this.taskId },
         })
         .then((response) => {
           this.log = response.data;

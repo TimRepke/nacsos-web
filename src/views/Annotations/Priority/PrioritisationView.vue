@@ -7,7 +7,8 @@ import { EventBus } from "@/plugins/events";
 import { ToastEvent } from "@/plugins/events/events/toast";
 import { ConfirmationRequestEvent } from "@/plugins/events/events/confirmation";
 import { API, toastReject, toastSuccess } from "@/plugins/api";
-import type { ClimateBERTModel, SciBERTModel, PriorityModel, FileOnDisk, SampleResponse } from "@/plugins/api/spec";
+import type { PriorityModel, FileOnDisk, SampleResponse } from "@/plugins/api/spec";
+import type { ClimateBERTModel, SciBERTModel } from "@/plugins/api/types";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import SortedScopePicker from "@/components/annotations/SortedScopePicker.vue";
 import ExpandableBox from "@/components/ExpandableBox.vue";
@@ -56,8 +57,8 @@ async function peek() {
   if (setup.value) {
     peekTable.value = (
       await API.prio.getTableSampleApiPrioTablePeekPost({
-        xProjectId: currentProjectStore.projectId as string,
-        requestBody: {
+        headers: { "x-project-id": currentProjectStore.projectId as string },
+        body: {
           query: nql.value[0],
           scope_ids: setup.value.source_scopes as string[],
           incl: setup.value.incl_rule as string,
@@ -73,8 +74,8 @@ async function apiSave() {
       setup.value.time_created = pyDTNow();
     }
     await API.prio.savePrioSetupApiPrioSetupPut({
-      xProjectId: currentProjectStore.projectId as string,
-      requestBody: {
+      headers: { "x-project-id": currentProjectStore.projectId as string },
+      body: {
         ...setup.value,
         nql_parsed: nql.value[0],
       } as PriorityModel,
@@ -128,8 +129,12 @@ onMounted(async () => {
   if (route.query.priority_id) {
     setup.value = (
       await API.prio.readPrioSetupApiPrioSetupGet({
-        priorityId: route.query.priority_id as string,
-        xProjectId: currentProjectStore.projectId as string,
+        headers: {
+          "x-project-id": currentProjectStore.projectId as string,
+        },
+        query: {
+          priority_id: route.query.priority_id as string,
+        },
       })
     ).data;
 
@@ -137,8 +142,10 @@ onMounted(async () => {
     if (setup.value?.time_ready) {
       files.value = (
         await API.prio.getArtefactsApiPrioArtefactsListGet({
-          xPriorityId: route.query.priority_id as string,
-          xProjectId: currentProjectStore.projectId as string,
+          headers: {
+            "x-project-id": currentProjectStore.projectId as string,
+            "x-priority-id": route.query.priority_id as string,
+          },
         })
       ).data;
     }
@@ -167,8 +174,10 @@ onMounted(async () => {
 async function loadImage(event: MouseEvent, filename: string) {
   const res = await API.prio.getFileApiPrioArtefactsFileGet(
     {
-      xPriorityId: route.query.priority_id as string,
-      xProjectId: currentProjectStore.projectId as string,
+      headers: {
+        "x-project-id": currentProjectStore.projectId as string,
+        "x-priority-id": route.query.priority_id as string,
+      },
       filename,
     },
     { responseType: "blob" },
@@ -189,9 +198,11 @@ async function loadImage(event: MouseEvent, filename: string) {
 async function loadDF(event: MouseEvent, filename: string) {
   const res = (
     await API.prio.getFileApiPrioArtefactsFileGet({
-      xPriorityId: route.query.priority_id as string,
-      xProjectId: currentProjectStore.projectId as string,
-      filename,
+      headers: {
+        "x-project-id": currentProjectStore.projectId as string,
+        "x-priority-id": route.query.priority_id as string,
+      },
+      query: { filename },
     })
   ).data;
   const { el } = mount(DataFrame, { props: { df: res } });

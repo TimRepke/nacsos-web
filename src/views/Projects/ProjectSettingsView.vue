@@ -120,7 +120,7 @@ export default defineComponent({
   },
   mounted() {
     API.project
-      .getProjectApiProjectInfoGet({ xProjectId: currentProjectStore.projectId as string })
+      .getProjectApiProjectInfoGet({ headers: { "x-project-id": currentProjectStore.projectId as string } })
       .then((response) => {
         const { data } = response;
         this.project = data;
@@ -128,7 +128,7 @@ export default defineComponent({
       .catch(logReject);
     API.project
       .getAllUserPermissionsApiProjectPermissionsListUsersGet({
-        xProjectId: currentProjectStore.projectId as string,
+        headers: { "x-project-id": currentProjectStore.projectId as string },
       })
       .then((response) => {
         const { data } = response;
@@ -167,8 +167,8 @@ export default defineComponent({
       if (this.project !== undefined) {
         API.project
           .saveProjectApiProjectInfoPut({
-            requestBody: this.project,
-            xProjectId: currentProjectStore.projectId as string,
+            body: this.project,
+            headers: { "x-project-id": currentProjectStore.projectId as string },
           })
           .then(() => {
             EventBus.emit(new ToastEvent("SUCCESS", "Saved!"));
