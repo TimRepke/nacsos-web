@@ -2,10 +2,22 @@
 import { PropType, ref, watch } from "vue";
 import { ImportConfigEnum, ScopusApiImport } from "@/plugins/api/types";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
-import axios from "axios";
 import { API } from "@/plugins/api";
 import { currentProjectStore } from "@/stores";
 import { pyDTNow } from "@/util";
+import { InvalidArgumentError } from "commander";
+
+type ScopusResponse = {
+  "search-results": {
+    cursor: { "@next": string };
+    "opensearch:totalResults": number;
+    entry?: Record<string, any>[];
+  };
+};
+// Scopus doesn't set Access-Control-Allow-Headers, hence we can't read the following :-\
+// progress.value.rateLimit = page.headers["x-ratelimit-limit"];
+// progress.value.rateRemaining = page.headers["x-ratelimit-remaining"];
+// progress.value.rateReset = page.headers["x-ratelimit-reset"];
 
 const emits = defineEmits<{ configChanged: [config: ScopusApiImport]; requestingSave: [] }>();
 const props = defineProps({
@@ -49,7 +61,7 @@ const progress = ref({
 if (!props.existingConfig || props.existingConfig.kind !== ImportConfigEnum.SCOPUS_API) {
   config.value = {
     query: "TITLE-ABS(...)",
-    date: "1990-2025",
+    date: "1990-2026",
     file: "",
     file_date: "",
     kind: "scopus-api",
@@ -80,36 +92,50 @@ async function fetchData() {
 
 // https://dev.elsevier.com/documentation/ScopusSearchAPI.wadl
 // https://dev.elsevier.com/documentation/AbstractRetrievalAPI.wadl
-async function scopusAPI() {
+async function scopusAPI(): Promise<Record<string, any>[]> {
+  const query = config.value?.query;
+  const date = config.value?.date;
+  if (!query || !date) throw new InvalidArgumentError("Query or date missing; this should have never happened!");
+
   progress.value.running = true;
   progress.value.currentPage = 0;
 
   let nextCursor = "*";
-  let page;
+  let page: ScopusResponse;
+  let response: Response;
   const abstracts = [];
   while (true) {
-    page = await axios.get("https://api.elsevier.com/content/search/scopus", {
-      headers: { Accept: "application/json", "X-ELS-APIKey": apiKey.value },
-      params: {
-        query: config.value?.query,
-        cursor: nextCursor,
-        view: "COMPLETE",
-        date: config.value?.date,
-      },
-    });
-    nextCursor = page.data["search-results"].cursor["@next"];
+    response = await fetch(
+      new Request(
+        `https://api.elsevier.com/content/search/scopus?${new URLSearchParams({
+          query,
+          date,
+          cursor: nextCursor,
+          view: "COMPLETE",
+        }).toString()}`,
+        {
+          method: "GET",
+          headers: {
+            Accept: "application/json",
+            "X-ELS-APIKey": apiKey.value,
+          },
+        },
+      ),
+    );
+    page = await response.json();
+    nextCursor = page["search-results"].cursor["@next"];
     progress.value.currentPage += 1;
-    progress.value.nResults = page.data["search-results"]["opensearch:totalResults"];
-    if (!page.data["search-results"].entry || page.data["search-results"].entry.length === 0) break;
-    for await (const entry of page.data["search-results"].entry) {
+    progress.value.nResults = page["search-results"]["opensearch:totalResults"];
+    if (!page["search-results"].entry || page["search-results"].entry.length === 0) break;
+    for await (const entry of page["search-results"].entry) {
       abstracts.push(entry);
       progress.value.nRetrievedAbstracts += 1;
     }
 
     // Scopus doesn't set Access-Control-Allow-Headers, hence we can't read the following :-\
-    progress.value.rateLimit = page.headers["x-ratelimit-limit"];
-    progress.value.rateRemaining = page.headers["x-ratelimit-remaining"];
-    progress.value.rateReset = page.headers["x-ratelimit-reset"];
+    progress.value.rateLimit = parseInt(response.headers.get("x-ratelimit-limit") ?? "0");
+    progress.value.rateRemaining = parseInt(response.headers.get("x-ratelimit-remaining") ?? "0");
+    progress.value.rateReset = parseInt(response.headers.get("x-ratelimit-reset") ?? "0");
   }
   progress.value.fetched = true;
   return abstracts;
