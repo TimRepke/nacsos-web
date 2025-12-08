@@ -1,15 +1,18 @@
-# This file is a template, and might need editing before it works on your project.
-# To contribute improvements to CI/CD templates, please follow the Development guide at:
-# https://docs.gitlab.com/ee/development/cicd/templates.html
-# This specific template is located at:
-# https://gitlab.com/gitlab-org/gitlab/-/blob/master/lib/gitlab/ci/templates/Python.gitlab-ci.yml
+variables:
+  NACSOS_WWW_DIR:
+    description: "Absolute path on server to public_html for nacsos frontend"
+    value: "/var/www/nacsos"
+  VITE_NACSOS_BASE_URL:
+    description: "Complete URL to nacsos-web"
+    value: "http://127.0.0.1:8080"
+  VITE_NACSOS_CORE_URL:
+    description: "Complete URL to nacsos-core backend"
+    value: "http://127.0.0.1:8081"
 
-# Official language image. Look for the different tagged releases at:
-# https://hub.docker.com/r/library/python/tags/
 image: node:24-alpine
 
 before_script:
-  - apk add lftp
+  - apk add rsync
 
 stages:
   - build
@@ -21,6 +24,8 @@ cache:
     - node_modules/
 
 build-job:
+  tags:
+    - se164-docker
   stage: build
   script:
     - echo "Building the static sources"
@@ -32,25 +37,36 @@ build-job:
     expire_in: 24 hours
 
 test-job1:
+  tags:
+    - se164-docker
   stage: test
   script:
     - npm run lint
 
 test-job2:
+  tags:
+    - se164-docker
   stage: test
   script:
     - npm run type-check
 
 deploy-to-production:
+  tags:
+    - se164-bare
   stage: deploy
   script:
     - echo "Deploying to production"
-    - lftp --version
     - ls -lisah
     - ls -lisah dist
-    - echo "$NACSOS_WEB_WWW"
-    - echo "$FTP_HOSTNAME"
-    - lftp -c "open -u $FTP_USERNAME,$FTP_PASSWORD $FTP_HOSTNAME; mirror -Renv dist/ $NACSOS_WEB_WWW"
+    - /bin/chown -R gitlab-runner "${NACSOS_WWW_DIR}"
+    - ls -lisah
+    - rm -rf "${NACSOS_WWW_DIR}/*"
+    - cp -r dist/ "${NACSOS_WWW_DIR}"
+    - ls -lisah
+    - /bin/chown -R nacsos "${NACSOS_WWW_DIR}"
+#    - echo "$NACSOS_WEB_WWW"
+#    - echo "$FTP_HOSTNAME"
+#    - lftp -c "open -u $FTP_USERNAME,$FTP_PASSWORD $FTP_HOSTNAME; mirror -Renv dist/ $NACSOS_WEB_WWW"
   when: manual
   only:
     - production

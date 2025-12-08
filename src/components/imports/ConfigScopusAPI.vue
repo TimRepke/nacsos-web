@@ -14,10 +14,6 @@ type ScopusResponse = {
     entry?: Record<string, any>[];
   };
 };
-// Scopus doesn't set Access-Control-Allow-Headers, hence we can't read the following :-\
-// progress.value.rateLimit = page.headers["x-ratelimit-limit"];
-// progress.value.rateRemaining = page.headers["x-ratelimit-remaining"];
-// progress.value.rateReset = page.headers["x-ratelimit-reset"];
 
 const emits = defineEmits<{ configChanged: [config: ScopusApiImport]; requestingSave: [] }>();
 const props = defineProps({
