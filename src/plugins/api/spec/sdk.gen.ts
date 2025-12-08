@@ -23,88 +23,56 @@ export class Default {
      * Tracked Task
      */
     public static trackedTaskApiPingTrackedSleepTaskGet<ThrowOnError extends boolean = true>(options?: Options<TrackedTaskApiPingTrackedSleepTaskGetData, ThrowOnError>) {
-        return (options?.client ?? client).get<TrackedTaskApiPingTrackedSleepTaskGetResponses, TrackedTaskApiPingTrackedSleepTaskGetErrors, ThrowOnError>({
-            responseType: 'json',
-            url: '/api/ping/tracked-sleep-task',
-            ...options
-        });
+        return (options?.client ?? client).get<TrackedTaskApiPingTrackedSleepTaskGetResponses, TrackedTaskApiPingTrackedSleepTaskGetErrors, ThrowOnError>({ url: '/api/ping/tracked-sleep-task', ...options });
     }
     
     /**
      * Task
      */
     public static taskApiPingSleepTaskGet<ThrowOnError extends boolean = true>(options?: Options<TaskApiPingSleepTaskGetData, ThrowOnError>) {
-        return (options?.client ?? client).get<TaskApiPingSleepTaskGetResponses, TaskApiPingSleepTaskGetErrors, ThrowOnError>({
-            responseType: 'json',
-            url: '/api/ping/sleep-task',
-            ...options
-        });
+        return (options?.client ?? client).get<TaskApiPingSleepTaskGetResponses, TaskApiPingSleepTaskGetErrors, ThrowOnError>({ url: '/api/ping/sleep-task', ...options });
     }
     
     /**
      *  Pong
      */
     public static pongApiPingGet<ThrowOnError extends boolean = true>(options?: Options<PongApiPingGetData, ThrowOnError>) {
-        return (options?.client ?? client).get<PongApiPingGetResponses, unknown, ThrowOnError>({
-            responseType: 'text',
-            url: '/api/ping/',
-            ...options
-        });
+        return (options?.client ?? client).get<PongApiPingGetResponses, unknown, ThrowOnError>({ url: '/api/ping/', ...options });
     }
     
     /**
      *  Err
      */
     public static errApiPingErrorGet<ThrowOnError extends boolean = true>(options?: Options<ErrApiPingErrorGetData, ThrowOnError>) {
-        return (options?.client ?? client).get<ErrApiPingErrorGetResponses, unknown, ThrowOnError>({
-            responseType: 'text',
-            url: '/api/ping/error',
-            ...options
-        });
+        return (options?.client ?? client).get<ErrApiPingErrorGetResponses, unknown, ThrowOnError>({ url: '/api/ping/error', ...options });
     }
     
     /**
      *  Warn
      */
     public static warnApiPingWarnGet<ThrowOnError extends boolean = true>(options?: Options<WarnApiPingWarnGetData, ThrowOnError>) {
-        return (options?.client ?? client).get<WarnApiPingWarnGetResponses, unknown, ThrowOnError>({
-            responseType: 'text',
-            url: '/api/ping/warn',
-            ...options
-        });
+        return (options?.client ?? client).get<WarnApiPingWarnGetResponses, unknown, ThrowOnError>({ url: '/api/ping/warn', ...options });
     }
     
     /**
      * Perm
      */
     public static permApiPingPermissionGet<ThrowOnError extends boolean = true>(options?: Options<PermApiPingPermissionGetData, ThrowOnError>) {
-        return (options?.client ?? client).get<PermApiPingPermissionGetResponses, unknown, ThrowOnError>({
-            responseType: 'json',
-            url: '/api/ping/permission',
-            ...options
-        });
+        return (options?.client ?? client).get<PermApiPingPermissionGetResponses, unknown, ThrowOnError>({ url: '/api/ping/permission', ...options });
     }
     
     /**
      * Db Test
      */
     public static dbTestApiPingDatabaseGet<ThrowOnError extends boolean = true>(options?: Options<DbTestApiPingDatabaseGetData, ThrowOnError>) {
-        return (options?.client ?? client).get<DbTestApiPingDatabaseGetResponses, unknown, ThrowOnError>({
-            responseType: 'json',
-            url: '/api/ping/database',
-            ...options
-        });
+        return (options?.client ?? client).get<DbTestApiPingDatabaseGetResponses, unknown, ThrowOnError>({ url: '/api/ping/database', ...options });
     }
     
     /**
      *  Ping
      */
     public static pingApiPingNamePost<ThrowOnError extends boolean = true>(options: Options<PingApiPingNamePostData, ThrowOnError>) {
-        return (options.client ?? client).post<PingApiPingNamePostResponses, PingApiPingNamePostErrors, ThrowOnError>({
-            responseType: 'text',
-            url: '/api/ping/{name}',
-            ...options
-        });
+        return (options.client ?? client).post<PingApiPingNamePostResponses, PingApiPingNamePostErrors, ThrowOnError>({ url: '/api/ping/{name}', ...options });
     }
 }
 
@@ -121,7 +89,6 @@ export class Annotations {
      */
     public static getSchemeDefinitionApiAnnotationsSchemesDefinitionAnnotationSchemeIdGet<ThrowOnError extends boolean = true>(options: Options<GetSchemeDefinitionApiAnnotationsSchemesDefinitionAnnotationSchemeIdGetData, ThrowOnError>) {
         return (options.client ?? client).get<GetSchemeDefinitionApiAnnotationsSchemesDefinitionAnnotationSchemeIdGetResponses, GetSchemeDefinitionApiAnnotationsSchemesDefinitionAnnotationSchemeIdGetErrors, ThrowOnError>({
-            responseType: 'json',
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/api/annotations/schemes/definition/{annotation_scheme_id}',
             ...options
@@ -133,7 +100,6 @@ export class Annotations {
      */
     public static putAnnotationSchemeApiAnnotationsSchemesDefinitionPut<ThrowOnError extends boolean = true>(options: Options<PutAnnotationSchemeApiAnnotationsSchemesDefinitionPutData, ThrowOnError>) {
         return (options.client ?? client).put<PutAnnotationSchemeApiAnnotationsSchemesDefinitionPutResponses, PutAnnotationSchemeApiAnnotationsSchemesDefinitionPutErrors, ThrowOnError>({
-            responseType: 'json',
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/api/annotations/schemes/definition/',
             ...options,
@@ -149,7 +115,6 @@ export class Annotations {
      */
     public static removeAnnotationSchemeApiAnnotationsSchemesDefinitionSchemeIdDelete<ThrowOnError extends boolean = true>(options: Options<RemoveAnnotationSchemeApiAnnotationsSchemesDefinitionSchemeIdDeleteData, ThrowOnError>) {
         return (options.client ?? client).delete<RemoveAnnotationSchemeApiAnnotationsSchemesDefinitionSchemeIdDeleteResponses, RemoveAnnotationSchemeApiAnnotationsSchemesDefinitionSchemeIdDeleteErrors, ThrowOnError>({
-            responseType: 'json',
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/api/annotations/schemes/definition/{scheme_id}',
             ...options
@@ -166,7 +131,6 @@ export class Annotations {
      */
     public static getSchemeDefinitionsForProjectApiAnnotationsSchemesListGet<ThrowOnError extends boolean = true>(options: Options<GetSchemeDefinitionsForProjectApiAnnotationsSchemesListGetData, ThrowOnError>) {
         return (options.client ?? client).get<GetSchemeDefinitionsForProjectApiAnnotationsSchemesListGetResponses, GetSchemeDefinitionsForProjectApiAnnotationsSchemesListGetErrors, ThrowOnError>({
-            responseType: 'json',
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/api/annotations/schemes/list',
             ...options
@@ -178,7 +142,6 @@ export class Annotations {
      */
     public static getAnnotationSchemeFingerprintsApiAnnotationsSchemesFingerprintsGet<ThrowOnError extends boolean = true>(options: Options<GetAnnotationSchemeFingerprintsApiAnnotationsSchemesFingerprintsGetData, ThrowOnError>) {
         return (options.client ?? client).get<GetAnnotationSchemeFingerprintsApiAnnotationsSchemesFingerprintsGetResponses, GetAnnotationSchemeFingerprintsApiAnnotationsSchemesFingerprintsGetErrors, ThrowOnError>({
-            responseType: 'json',
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/api/annotations/schemes/fingerprints',
             ...options
@@ -190,7 +153,6 @@ export class Annotations {
      */
     public static getNextAssignmentForScopeForUserApiAnnotationsAnnotateNextAssignmentScopeIdCurrentAssignmentIdGet<ThrowOnError extends boolean = true>(options: Options<GetNextAssignmentForScopeForUserApiAnnotationsAnnotateNextAssignmentScopeIdCurrentAssignmentIdGetData, ThrowOnError>) {
         return (options.client ?? client).get<GetNextAssignmentForScopeForUserApiAnnotationsAnnotateNextAssignmentScopeIdCurrentAssignmentIdGetResponses, GetNextAssignmentForScopeForUserApiAnnotationsAnnotateNextAssignmentScopeIdCurrentAssignmentIdGetErrors, ThrowOnError>({
-            responseType: 'json',
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/api/annotations/annotate/next/{assignment_scope_id}/{current_assignment_id}',
             ...options
@@ -202,7 +164,6 @@ export class Annotations {
      */
     public static getNextOpenAssignmentForScopeForUserApiAnnotationsAnnotateNextAssignmentScopeIdGet<ThrowOnError extends boolean = true>(options: Options<GetNextOpenAssignmentForScopeForUserApiAnnotationsAnnotateNextAssignmentScopeIdGetData, ThrowOnError>) {
         return (options.client ?? client).get<GetNextOpenAssignmentForScopeForUserApiAnnotationsAnnotateNextAssignmentScopeIdGetResponses, GetNextOpenAssignmentForScopeForUserApiAnnotationsAnnotateNextAssignmentScopeIdGetErrors, ThrowOnError>({
-            responseType: 'json',
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/api/annotations/annotate/next/{assignment_scope_id}',
             ...options
@@ -214,7 +175,6 @@ export class Annotations {
      */
     public static getAssignmentApiAnnotationsAnnotateAssignmentAssignmentIdGet<ThrowOnError extends boolean = true>(options: Options<GetAssignmentApiAnnotationsAnnotateAssignmentAssignmentIdGetData, ThrowOnError>) {
         return (options.client ?? client).get<GetAssignmentApiAnnotationsAnnotateAssignmentAssignmentIdGetResponses, GetAssignmentApiAnnotationsAnnotateAssignmentAssignmentIdGetErrors, ThrowOnError>({
-            responseType: 'json',
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/api/annotations/annotate/assignment/{assignment_id}',
             ...options
@@ -226,7 +186,6 @@ export class Annotations {
      */
     public static getAssignmentScopesForUserApiAnnotationsAssignmentsScopesProjectIdGet<ThrowOnError extends boolean = true>(options: Options<GetAssignmentScopesForUserApiAnnotationsAssignmentsScopesProjectIdGetData, ThrowOnError>) {
         return (options.client ?? client).get<GetAssignmentScopesForUserApiAnnotationsAssignmentsScopesProjectIdGetResponses, GetAssignmentScopesForUserApiAnnotationsAssignmentsScopesProjectIdGetErrors, ThrowOnError>({
-            responseType: 'json',
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/api/annotations/assignments/scopes/{project_id}',
             ...options
@@ -238,7 +197,6 @@ export class Annotations {
      */
     public static getAssignmentScopesForProjectApiAnnotationsAssignmentsScopesGet<ThrowOnError extends boolean = true>(options: Options<GetAssignmentScopesForProjectApiAnnotationsAssignmentsScopesGetData, ThrowOnError>) {
         return (options.client ?? client).get<GetAssignmentScopesForProjectApiAnnotationsAssignmentsScopesGetResponses, GetAssignmentScopesForProjectApiAnnotationsAssignmentsScopesGetErrors, ThrowOnError>({
-            responseType: 'json',
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/api/annotations/assignments/scopes/',
             ...options
@@ -250,7 +208,6 @@ export class Annotations {
      */
     public static getAssignmentScopeApiAnnotationsAssignmentsScopeAssignmentScopeIdGet<ThrowOnError extends boolean = true>(options: Options<GetAssignmentScopeApiAnnotationsAssignmentsScopeAssignmentScopeIdGetData, ThrowOnError>) {
         return (options.client ?? client).get<GetAssignmentScopeApiAnnotationsAssignmentsScopeAssignmentScopeIdGetResponses, GetAssignmentScopeApiAnnotationsAssignmentsScopeAssignmentScopeIdGetErrors, ThrowOnError>({
-            responseType: 'json',
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/api/annotations/assignments/scope/{assignment_scope_id}',
             ...options
@@ -262,7 +219,6 @@ export class Annotations {
      */
     public static putAssignmentScopeApiAnnotationsAssignmentsScopePut<ThrowOnError extends boolean = true>(options: Options<PutAssignmentScopeApiAnnotationsAssignmentsScopePutData, ThrowOnError>) {
         return (options.client ?? client).put<PutAssignmentScopeApiAnnotationsAssignmentsScopePutResponses, PutAssignmentScopeApiAnnotationsAssignmentsScopePutErrors, ThrowOnError>({
-            responseType: 'json',
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/api/annotations/assignments/scope/',
             ...options,
@@ -278,7 +234,6 @@ export class Annotations {
      */
     public static removeAssignmentScopeApiAnnotationsAnnotateScopeAssignmentScopeIdDelete<ThrowOnError extends boolean = true>(options: Options<RemoveAssignmentScopeApiAnnotationsAnnotateScopeAssignmentScopeIdDeleteData, ThrowOnError>) {
         return (options.client ?? client).delete<RemoveAssignmentScopeApiAnnotationsAnnotateScopeAssignmentScopeIdDeleteResponses, RemoveAssignmentScopeApiAnnotationsAnnotateScopeAssignmentScopeIdDeleteErrors, ThrowOnError>({
-            responseType: 'json',
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/api/annotations/annotate/scope/{assignment_scope_id}',
             ...options
@@ -290,7 +245,6 @@ export class Annotations {
      */
     public static getNumAssignmentsForScopeApiAnnotationsAnnotateScopeCountsAssignmentScopeIdGet<ThrowOnError extends boolean = true>(options: Options<GetNumAssignmentsForScopeApiAnnotationsAnnotateScopeCountsAssignmentScopeIdGetData, ThrowOnError>) {
         return (options.client ?? client).get<GetNumAssignmentsForScopeApiAnnotationsAnnotateScopeCountsAssignmentScopeIdGetResponses, GetNumAssignmentsForScopeApiAnnotationsAnnotateScopeCountsAssignmentScopeIdGetErrors, ThrowOnError>({
-            responseType: 'json',
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/api/annotations/annotate/scope/counts/{assignment_scope_id}',
             ...options
@@ -302,7 +256,6 @@ export class Annotations {
      */
     public static getAssignmentsApiAnnotationsAnnotateAssignmentsAssignmentScopeIdGet<ThrowOnError extends boolean = true>(options: Options<GetAssignmentsApiAnnotationsAnnotateAssignmentsAssignmentScopeIdGetData, ThrowOnError>) {
         return (options.client ?? client).get<GetAssignmentsApiAnnotationsAnnotateAssignmentsAssignmentScopeIdGetResponses, GetAssignmentsApiAnnotationsAnnotateAssignmentsAssignmentScopeIdGetErrors, ThrowOnError>({
-            responseType: 'json',
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/api/annotations/annotate/assignments/{assignment_scope_id}',
             ...options
@@ -314,7 +267,6 @@ export class Annotations {
      */
     public static getAssignmentIndicatorsForScopeApiAnnotationsAnnotateAssignmentProgressAssignmentScopeIdGet<ThrowOnError extends boolean = true>(options: Options<GetAssignmentIndicatorsForScopeApiAnnotationsAnnotateAssignmentProgressAssignmentScopeIdGetData, ThrowOnError>) {
         return (options.client ?? client).get<GetAssignmentIndicatorsForScopeApiAnnotationsAnnotateAssignmentProgressAssignmentScopeIdGetResponses, GetAssignmentIndicatorsForScopeApiAnnotationsAnnotateAssignmentProgressAssignmentScopeIdGetErrors, ThrowOnError>({
-            responseType: 'json',
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/api/annotations/annotate/assignment/progress/{assignment_scope_id}',
             ...options
@@ -326,7 +278,6 @@ export class Annotations {
      */
     public static getAssignmentsForScopeApiAnnotationsAnnotateAssignmentsScopeAssignmentScopeIdGet<ThrowOnError extends boolean = true>(options: Options<GetAssignmentsForScopeApiAnnotationsAnnotateAssignmentsScopeAssignmentScopeIdGetData, ThrowOnError>) {
         return (options.client ?? client).get<GetAssignmentsForScopeApiAnnotationsAnnotateAssignmentsScopeAssignmentScopeIdGetResponses, GetAssignmentsForScopeApiAnnotationsAnnotateAssignmentsScopeAssignmentScopeIdGetErrors, ThrowOnError>({
-            responseType: 'json',
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/api/annotations/annotate/assignments/scope/{assignment_scope_id}',
             ...options
@@ -338,7 +289,6 @@ export class Annotations {
      */
     public static getAnnotationsApiAnnotationsAnnotateAnnotationsAssignmentScopeIdGet<ThrowOnError extends boolean = true>(options: Options<GetAnnotationsApiAnnotationsAnnotateAnnotationsAssignmentScopeIdGetData, ThrowOnError>) {
         return (options.client ?? client).get<GetAnnotationsApiAnnotationsAnnotateAnnotationsAssignmentScopeIdGetResponses, GetAnnotationsApiAnnotationsAnnotateAnnotationsAssignmentScopeIdGetErrors, ThrowOnError>({
-            responseType: 'json',
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/api/annotations/annotate/annotations/{assignment_scope_id}',
             ...options
@@ -350,7 +300,6 @@ export class Annotations {
      */
     public static saveAnnotationApiAnnotationsAnnotateSavePost<ThrowOnError extends boolean = true>(options: Options<SaveAnnotationApiAnnotationsAnnotateSavePostData, ThrowOnError>) {
         return (options.client ?? client).post<SaveAnnotationApiAnnotationsAnnotateSavePostResponses, SaveAnnotationApiAnnotationsAnnotateSavePostErrors, ThrowOnError>({
-            responseType: 'json',
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/api/annotations/annotate/save',
             ...options,
@@ -366,7 +315,6 @@ export class Annotations {
      */
     public static getItemsWithCountApiAnnotationsConfigItemsGet<ThrowOnError extends boolean = true>(options: Options<GetItemsWithCountApiAnnotationsConfigItemsGetData, ThrowOnError>) {
         return (options.client ?? client).get<GetItemsWithCountApiAnnotationsConfigItemsGetResponses, GetItemsWithCountApiAnnotationsConfigItemsGetErrors, ThrowOnError>({
-            responseType: 'json',
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/api/annotations/config/items/',
             ...options
@@ -378,7 +326,6 @@ export class Annotations {
      */
     public static makeAssignmentsApiAnnotationsConfigAssignmentsAssignmentScopeIdPut<ThrowOnError extends boolean = true>(options: Options<MakeAssignmentsApiAnnotationsConfigAssignmentsAssignmentScopeIdPutData, ThrowOnError>) {
         return (options.client ?? client).put<MakeAssignmentsApiAnnotationsConfigAssignmentsAssignmentScopeIdPutResponses, MakeAssignmentsApiAnnotationsConfigAssignmentsAssignmentScopeIdPutErrors, ThrowOnError>({
-            responseType: 'json',
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/api/annotations/config/assignments/{assignment_scope_id}',
             ...options
@@ -397,7 +344,6 @@ export class Annotations {
      */
     public static clearEmptyAssignmentsApiAnnotationsConfigScopesClearSchemeIdPost<ThrowOnError extends boolean = true>(options: Options<ClearEmptyAssignmentsApiAnnotationsConfigScopesClearSchemeIdPostData, ThrowOnError>) {
         return (options.client ?? client).post<ClearEmptyAssignmentsApiAnnotationsConfigScopesClearSchemeIdPostResponses, ClearEmptyAssignmentsApiAnnotationsConfigScopesClearSchemeIdPostErrors, ThrowOnError>({
-            responseType: 'json',
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/api/annotations/config/scopes/clear/{scheme_id}',
             ...options
@@ -409,7 +355,6 @@ export class Annotations {
      */
     public static bulkAddAssignmentApiAnnotationsConfigScopesBulkAddPut<ThrowOnError extends boolean = true>(options: Options<BulkAddAssignmentApiAnnotationsConfigScopesBulkAddPutData, ThrowOnError>) {
         return (options.client ?? client).put<BulkAddAssignmentApiAnnotationsConfigScopesBulkAddPutResponses, BulkAddAssignmentApiAnnotationsConfigScopesBulkAddPutErrors, ThrowOnError>({
-            responseType: 'json',
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/api/annotations/config/scopes/bulk-add/',
             ...options,
@@ -425,7 +370,6 @@ export class Annotations {
      */
     public static editAssignmentApiAnnotationsConfigAssignmentsEditPut<ThrowOnError extends boolean = true>(options: Options<EditAssignmentApiAnnotationsConfigAssignmentsEditPutData, ThrowOnError>) {
         return (options.client ?? client).put<EditAssignmentApiAnnotationsConfigAssignmentsEditPutResponses, EditAssignmentApiAnnotationsConfigAssignmentsEditPutErrors, ThrowOnError>({
-            responseType: 'json',
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/api/annotations/config/assignments/edit/',
             ...options,
@@ -441,7 +385,6 @@ export class Annotations {
      */
     public static getAssignmentScopesForSchemeApiAnnotationsConfigScopesSchemeIdGet<ThrowOnError extends boolean = true>(options: Options<GetAssignmentScopesForSchemeApiAnnotationsConfigScopesSchemeIdGetData, ThrowOnError>) {
         return (options.client ?? client).get<GetAssignmentScopesForSchemeApiAnnotationsConfigScopesSchemeIdGetResponses, GetAssignmentScopesForSchemeApiAnnotationsConfigScopesSchemeIdGetErrors, ThrowOnError>({
-            responseType: 'json',
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/api/annotations/config/scopes/{scheme_id}',
             ...options
@@ -453,7 +396,6 @@ export class Annotations {
      */
     public static getAnnotatorsForSchemeApiAnnotationsConfigAnnotatorsSchemeIdGet<ThrowOnError extends boolean = true>(options: Options<GetAnnotatorsForSchemeApiAnnotationsConfigAnnotatorsSchemeIdGetData, ThrowOnError>) {
         return (options.client ?? client).get<GetAnnotatorsForSchemeApiAnnotationsConfigAnnotatorsSchemeIdGetResponses, GetAnnotatorsForSchemeApiAnnotationsConfigAnnotatorsSchemeIdGetErrors, ThrowOnError>({
-            responseType: 'json',
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/api/annotations/config/annotators/{scheme_id}',
             ...options
@@ -476,7 +418,6 @@ export class Annotations {
      */
     public static getResolvedAnnotationsApiAnnotationsConfigResolvePost<ThrowOnError extends boolean = true>(options: Options<GetResolvedAnnotationsApiAnnotationsConfigResolvePostData, ThrowOnError>) {
         return (options.client ?? client).post<GetResolvedAnnotationsApiAnnotationsConfigResolvePostResponses, GetResolvedAnnotationsApiAnnotationsConfigResolvePostErrors, ThrowOnError>({
-            responseType: 'json',
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/api/annotations/config/resolve',
             ...options,
@@ -492,7 +433,6 @@ export class Annotations {
      */
     public static getSavedResolvedAnnotationsApiAnnotationsConfigResolvedBotAnnotationMetadataIdGet<ThrowOnError extends boolean = true>(options: Options<GetSavedResolvedAnnotationsApiAnnotationsConfigResolvedBotAnnotationMetadataIdGetData, ThrowOnError>) {
         return (options.client ?? client).get<GetSavedResolvedAnnotationsApiAnnotationsConfigResolvedBotAnnotationMetadataIdGetResponses, GetSavedResolvedAnnotationsApiAnnotationsConfigResolvedBotAnnotationMetadataIdGetErrors, ThrowOnError>({
-            responseType: 'json',
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/api/annotations/config/resolved/{bot_annotation_metadata_id}',
             ...options
@@ -504,7 +444,6 @@ export class Annotations {
      */
     public static saveResolvedAnnotationsApiAnnotationsConfigResolvePut<ThrowOnError extends boolean = true>(options: Options<SaveResolvedAnnotationsApiAnnotationsConfigResolvePutData, ThrowOnError>) {
         return (options.client ?? client).put<SaveResolvedAnnotationsApiAnnotationsConfigResolvePutResponses, SaveResolvedAnnotationsApiAnnotationsConfigResolvePutErrors, ThrowOnError>({
-            responseType: 'json',
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/api/annotations/config/resolve/',
             ...options,
@@ -520,7 +459,6 @@ export class Annotations {
      */
     public static updateResolvedAnnotationsApiAnnotationsConfigResolveUpdatePut<ThrowOnError extends boolean = true>(options: Options<UpdateResolvedAnnotationsApiAnnotationsConfigResolveUpdatePutData, ThrowOnError>) {
         return (options.client ?? client).put<UpdateResolvedAnnotationsApiAnnotationsConfigResolveUpdatePutResponses, UpdateResolvedAnnotationsApiAnnotationsConfigResolveUpdatePutErrors, ThrowOnError>({
-            responseType: 'json',
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/api/annotations/config/resolve/update',
             ...options,
@@ -536,7 +474,6 @@ export class Annotations {
      */
     public static listSavedResolvedAnnotationsApiAnnotationsConfigResolvedListGet<ThrowOnError extends boolean = true>(options: Options<ListSavedResolvedAnnotationsApiAnnotationsConfigResolvedListGetData, ThrowOnError>) {
         return (options.client ?? client).get<ListSavedResolvedAnnotationsApiAnnotationsConfigResolvedListGetResponses, ListSavedResolvedAnnotationsApiAnnotationsConfigResolvedListGetErrors, ThrowOnError>({
-            responseType: 'json',
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/api/annotations/config/resolved-list/',
             ...options
@@ -548,7 +485,6 @@ export class Annotations {
      */
     public static deleteSavedResolvedAnnotationsApiAnnotationsConfigResolvedBotAnnotationMetaIdDelete<ThrowOnError extends boolean = true>(options: Options<DeleteSavedResolvedAnnotationsApiAnnotationsConfigResolvedBotAnnotationMetaIdDeleteData, ThrowOnError>) {
         return (options.client ?? client).delete<DeleteSavedResolvedAnnotationsApiAnnotationsConfigResolvedBotAnnotationMetaIdDeleteResponses, DeleteSavedResolvedAnnotationsApiAnnotationsConfigResolvedBotAnnotationMetaIdDeleteErrors, ThrowOnError>({
-            responseType: 'json',
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/api/annotations/config/resolved/{bot_annotation_meta_id}',
             ...options
@@ -560,7 +496,6 @@ export class Annotations {
      */
     public static getBotAnnotationsApiAnnotationsBotAnnotationsGet<ThrowOnError extends boolean = true>(options: Options<GetBotAnnotationsApiAnnotationsBotAnnotationsGetData, ThrowOnError>) {
         return (options.client ?? client).get<GetBotAnnotationsApiAnnotationsBotAnnotationsGetResponses, GetBotAnnotationsApiAnnotationsBotAnnotationsGetErrors, ThrowOnError>({
-            responseType: 'json',
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/api/annotations/bot/annotations',
             ...options
@@ -572,7 +507,6 @@ export class Annotations {
      */
     public static getBotScopesApiAnnotationsBotScopesGet<ThrowOnError extends boolean = true>(options: Options<GetBotScopesApiAnnotationsBotScopesGetData, ThrowOnError>) {
         return (options.client ?? client).get<GetBotScopesApiAnnotationsBotScopesGetResponses, GetBotScopesApiAnnotationsBotScopesGetErrors, ThrowOnError>({
-            responseType: 'json',
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/api/annotations/bot/scopes',
             ...options
@@ -586,7 +520,6 @@ export class Users {
      */
     public static getAllUsersApiUsersListAllGet<ThrowOnError extends boolean = true>(options?: Options<GetAllUsersApiUsersListAllGetData, ThrowOnError>) {
         return (options?.client ?? client).get<GetAllUsersApiUsersListAllGetResponses, unknown, ThrowOnError>({
-            responseType: 'json',
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/api/users/list/all',
             ...options
@@ -598,7 +531,6 @@ export class Users {
      */
     public static getAllUsersDehydratedApiUsersListAllDehydratedGet<ThrowOnError extends boolean = true>(options?: Options<GetAllUsersDehydratedApiUsersListAllDehydratedGetData, ThrowOnError>) {
         return (options?.client ?? client).get<GetAllUsersDehydratedApiUsersListAllDehydratedGetResponses, unknown, ThrowOnError>({
-            responseType: 'json',
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/api/users/list/all/dehydrated',
             ...options
@@ -610,7 +542,6 @@ export class Users {
      */
     public static getProjectAnnotatorUsersApiUsersListProjectAnnotatorsProjectIdGet<ThrowOnError extends boolean = true>(options: Options<GetProjectAnnotatorUsersApiUsersListProjectAnnotatorsProjectIdGetData, ThrowOnError>) {
         return (options.client ?? client).get<GetProjectAnnotatorUsersApiUsersListProjectAnnotatorsProjectIdGetResponses, GetProjectAnnotatorUsersApiUsersListProjectAnnotatorsProjectIdGetErrors, ThrowOnError>({
-            responseType: 'json',
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/api/users/list/project/annotators/{project_id}',
             ...options
@@ -622,7 +553,6 @@ export class Users {
      */
     public static getProjectUsersApiUsersListProjectProjectIdGet<ThrowOnError extends boolean = true>(options: Options<GetProjectUsersApiUsersListProjectProjectIdGetData, ThrowOnError>) {
         return (options.client ?? client).get<GetProjectUsersApiUsersListProjectProjectIdGetResponses, GetProjectUsersApiUsersListProjectProjectIdGetErrors, ThrowOnError>({
-            responseType: 'json',
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/api/users/list/project/{project_id}',
             ...options
@@ -634,7 +564,6 @@ export class Users {
      */
     public static getUserByIdApiUsersDetailsUserIdGet<ThrowOnError extends boolean = true>(options: Options<GetUserByIdApiUsersDetailsUserIdGetData, ThrowOnError>) {
         return (options.client ?? client).get<GetUserByIdApiUsersDetailsUserIdGetResponses, GetUserByIdApiUsersDetailsUserIdGetErrors, ThrowOnError>({
-            responseType: 'json',
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/api/users/details/{user_id}',
             ...options
@@ -646,7 +575,6 @@ export class Users {
      */
     public static getUsersByIdsApiUsersDetailsGet<ThrowOnError extends boolean = true>(options: Options<GetUsersByIdsApiUsersDetailsGetData, ThrowOnError>) {
         return (options.client ?? client).get<GetUsersByIdsApiUsersDetailsGetResponses, GetUsersByIdsApiUsersDetailsGetErrors, ThrowOnError>({
-            responseType: 'json',
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/api/users/details',
             ...options
@@ -658,7 +586,6 @@ export class Users {
      */
     public static saveUserApiUsersDetailsPut<ThrowOnError extends boolean = true>(options: Options<SaveUserApiUsersDetailsPutData, ThrowOnError>) {
         return (options.client ?? client).put<SaveUserApiUsersDetailsPutResponses, SaveUserApiUsersDetailsPutErrors, ThrowOnError>({
-            responseType: 'json',
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/api/users/details',
             ...options,
@@ -674,7 +601,6 @@ export class Users {
      */
     public static saveUserSelfApiUsersMyDetailsPut<ThrowOnError extends boolean = true>(options: Options<SaveUserSelfApiUsersMyDetailsPutData, ThrowOnError>) {
         return (options.client ?? client).put<SaveUserSelfApiUsersMyDetailsPutResponses, SaveUserSelfApiUsersMyDetailsPutErrors, ThrowOnError>({
-            responseType: 'json',
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/api/users/my-details',
             ...options,
@@ -693,7 +619,6 @@ export class Oauth {
     public static loginForAccessTokenApiLoginTokenPost<ThrowOnError extends boolean = true>(options: Options<LoginForAccessTokenApiLoginTokenPostData, ThrowOnError>) {
         return (options.client ?? client).post<LoginForAccessTokenApiLoginTokenPostResponses, LoginForAccessTokenApiLoginTokenPostErrors, ThrowOnError>({
             ...urlSearchParamsBodySerializer,
-            responseType: 'json',
             url: '/api/login/token',
             ...options,
             headers: {
@@ -708,7 +633,6 @@ export class Oauth {
      */
     public static revokeTokenApiLoginTokenTokenIdDelete<ThrowOnError extends boolean = true>(options: Options<RevokeTokenApiLoginTokenTokenIdDeleteData, ThrowOnError>) {
         return (options.client ?? client).delete<RevokeTokenApiLoginTokenTokenIdDeleteResponses, RevokeTokenApiLoginTokenTokenIdDeleteErrors, ThrowOnError>({
-            responseType: 'json',
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/api/login/token/{token_id}',
             ...options
@@ -720,7 +644,6 @@ export class Oauth {
      */
     public static refreshTokenApiLoginTokenTokenIdPut<ThrowOnError extends boolean = true>(options: Options<RefreshTokenApiLoginTokenTokenIdPutData, ThrowOnError>) {
         return (options.client ?? client).put<RefreshTokenApiLoginTokenTokenIdPutResponses, RefreshTokenApiLoginTokenTokenIdPutErrors, ThrowOnError>({
-            responseType: 'json',
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/api/login/token/{token_id}',
             ...options
@@ -732,7 +655,6 @@ export class Oauth {
      */
     public static readTokensMeApiLoginMyTokensGet<ThrowOnError extends boolean = true>(options?: Options<ReadTokensMeApiLoginMyTokensGetData, ThrowOnError>) {
         return (options?.client ?? client).get<ReadTokensMeApiLoginMyTokensGetResponses, unknown, ThrowOnError>({
-            responseType: 'json',
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/api/login/my-tokens',
             ...options
@@ -744,7 +666,6 @@ export class Oauth {
      */
     public static readUsersMeApiLoginMeGet<ThrowOnError extends boolean = true>(options?: Options<ReadUsersMeApiLoginMeGetData, ThrowOnError>) {
         return (options?.client ?? client).get<ReadUsersMeApiLoginMeGetResponses, unknown, ThrowOnError>({
-            responseType: 'json',
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/api/login/me',
             ...options
@@ -756,7 +677,6 @@ export class Oauth {
      */
     public static logoutApiLoginLogoutGet<ThrowOnError extends boolean = true>(options?: Options<LogoutApiLoginLogoutGetData, ThrowOnError>) {
         return (options?.client ?? client).get<LogoutApiLoginLogoutGetResponses, unknown, ThrowOnError>({
-            responseType: 'json',
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/api/login/logout',
             ...options
@@ -776,7 +696,6 @@ export class Projects {
      */
     public static getAllProjectsApiProjectsListGet<ThrowOnError extends boolean = true>(options?: Options<GetAllProjectsApiProjectsListGetData, ThrowOnError>) {
         return (options?.client ?? client).get<GetAllProjectsApiProjectsListGetResponses, unknown, ThrowOnError>({
-            responseType: 'json',
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/api/projects/list',
             ...options
@@ -788,7 +707,6 @@ export class Projects {
      */
     public static createProjectApiProjectsCreatePut<ThrowOnError extends boolean = true>(options: Options<CreateProjectApiProjectsCreatePutData, ThrowOnError>) {
         return (options.client ?? client).put<CreateProjectApiProjectsCreatePutResponses, CreateProjectApiProjectsCreatePutErrors, ThrowOnError>({
-            responseType: 'json',
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/api/projects/create',
             ...options,
@@ -806,7 +724,6 @@ export class Project {
      */
     public static getProjectApiProjectInfoGet<ThrowOnError extends boolean = true>(options: Options<GetProjectApiProjectInfoGetData, ThrowOnError>) {
         return (options.client ?? client).get<GetProjectApiProjectInfoGetResponses, GetProjectApiProjectInfoGetErrors, ThrowOnError>({
-            responseType: 'json',
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/api/project/info',
             ...options
@@ -818,7 +735,6 @@ export class Project {
      */
     public static saveProjectApiProjectInfoPut<ThrowOnError extends boolean = true>(options: Options<SaveProjectApiProjectInfoPutData, ThrowOnError>) {
         return (options.client ?? client).put<SaveProjectApiProjectInfoPutResponses, SaveProjectApiProjectInfoPutErrors, ThrowOnError>({
-            responseType: 'json',
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/api/project/info',
             ...options,
@@ -834,7 +750,6 @@ export class Project {
      */
     public static resetImportMutexApiProjectImportMutexPut<ThrowOnError extends boolean = true>(options: Options<ResetImportMutexApiProjectImportMutexPutData, ThrowOnError>) {
         return (options.client ?? client).put<ResetImportMutexApiProjectImportMutexPutResponses, ResetImportMutexApiProjectImportMutexPutErrors, ThrowOnError>({
-            responseType: 'json',
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/api/project/import_mutex',
             ...options
@@ -846,7 +761,6 @@ export class Project {
      */
     public static getProjectPermissionsCurrentUserApiProjectPermissionsMeGet<ThrowOnError extends boolean = true>(options: Options<GetProjectPermissionsCurrentUserApiProjectPermissionsMeGetData, ThrowOnError>) {
         return (options.client ?? client).get<GetProjectPermissionsCurrentUserApiProjectPermissionsMeGetResponses, GetProjectPermissionsCurrentUserApiProjectPermissionsMeGetErrors, ThrowOnError>({
-            responseType: 'json',
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/api/project/permissions/me',
             ...options
@@ -858,7 +772,6 @@ export class Project {
      */
     public static getAllProjectPermissionsApiProjectPermissionsListProjectIdGet<ThrowOnError extends boolean = true>(options: Options<GetAllProjectPermissionsApiProjectPermissionsListProjectIdGetData, ThrowOnError>) {
         return (options.client ?? client).get<GetAllProjectPermissionsApiProjectPermissionsListProjectIdGetResponses, GetAllProjectPermissionsApiProjectPermissionsListProjectIdGetErrors, ThrowOnError>({
-            responseType: 'json',
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/api/project/permissions/list/{project_id}',
             ...options
@@ -870,7 +783,6 @@ export class Project {
      */
     public static getAllUserPermissionsApiProjectPermissionsListUsersGet<ThrowOnError extends boolean = true>(options: Options<GetAllUserPermissionsApiProjectPermissionsListUsersGetData, ThrowOnError>) {
         return (options.client ?? client).get<GetAllUserPermissionsApiProjectPermissionsListUsersGetResponses, GetAllUserPermissionsApiProjectPermissionsListUsersGetErrors, ThrowOnError>({
-            responseType: 'json',
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/api/project/permissions/list-users',
             ...options
@@ -882,7 +794,6 @@ export class Project {
      */
     public static removeProjectPermissionApiProjectPermissionsPermissionDelete<ThrowOnError extends boolean = true>(options: Options<RemoveProjectPermissionApiProjectPermissionsPermissionDeleteData, ThrowOnError>) {
         return (options.client ?? client).delete<RemoveProjectPermissionApiProjectPermissionsPermissionDeleteResponses, RemoveProjectPermissionApiProjectPermissionsPermissionDeleteErrors, ThrowOnError>({
-            responseType: 'json',
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/api/project/permissions/permission',
             ...options
@@ -894,7 +805,6 @@ export class Project {
      */
     public static saveProjectPermissionApiProjectPermissionsPermissionPut<ThrowOnError extends boolean = true>(options: Options<SaveProjectPermissionApiProjectPermissionsPermissionPutData, ThrowOnError>) {
         return (options.client ?? client).put<SaveProjectPermissionApiProjectPermissionsPermissionPutResponses, SaveProjectPermissionApiProjectPermissionsPermissionPutErrors, ThrowOnError>({
-            responseType: 'json',
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/api/project/permissions/permission',
             ...options,
@@ -910,7 +820,6 @@ export class Project {
      */
     public static getProjectPermissionsByIdApiProjectPermissionsProjectPermissionIdGet<ThrowOnError extends boolean = true>(options: Options<GetProjectPermissionsByIdApiProjectPermissionsProjectPermissionIdGetData, ThrowOnError>) {
         return (options.client ?? client).get<GetProjectPermissionsByIdApiProjectPermissionsProjectPermissionIdGetResponses, GetProjectPermissionsByIdApiProjectPermissionsProjectPermissionIdGetErrors, ThrowOnError>({
-            responseType: 'json',
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/api/project/permissions/{project_permission_id}',
             ...options
@@ -922,7 +831,6 @@ export class Project {
      */
     public static listProjectDataApiProjectItemsItemTypeListGet<ThrowOnError extends boolean = true>(options: Options<ListProjectDataApiProjectItemsItemTypeListGetData, ThrowOnError>) {
         return (options.client ?? client).get<ListProjectDataApiProjectItemsItemTypeListGetResponses, ListProjectDataApiProjectItemsItemTypeListGetErrors, ThrowOnError>({
-            responseType: 'json',
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/api/project/items/{item_type}/list',
             ...options
@@ -934,7 +842,6 @@ export class Project {
      */
     public static listProjectDataPagedApiProjectItemsItemTypeListPagePageSizeGet<ThrowOnError extends boolean = true>(options: Options<ListProjectDataPagedApiProjectItemsItemTypeListPagePageSizeGetData, ThrowOnError>) {
         return (options.client ?? client).get<ListProjectDataPagedApiProjectItemsItemTypeListPagePageSizeGetResponses, ListProjectDataPagedApiProjectItemsItemTypeListPagePageSizeGetErrors, ThrowOnError>({
-            responseType: 'json',
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/api/project/items/{item_type}/list/{page}/{page_size}',
             ...options
@@ -946,7 +853,6 @@ export class Project {
      */
     public static getDetailForItemApiProjectItemsDetailItemIdGet<ThrowOnError extends boolean = true>(options: Options<GetDetailForItemApiProjectItemsDetailItemIdGetData, ThrowOnError>) {
         return (options.client ?? client).get<GetDetailForItemApiProjectItemsDetailItemIdGetResponses, GetDetailForItemApiProjectItemsDetailItemIdGetErrors, ThrowOnError>({
-            responseType: 'json',
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/api/project/items/detail/{item_id}',
             ...options
@@ -958,7 +864,6 @@ export class Project {
      */
     public static getTextForItemApiProjectItemsTextItemIdGet<ThrowOnError extends boolean = true>(options: Options<GetTextForItemApiProjectItemsTextItemIdGetData, ThrowOnError>) {
         return (options.client ?? client).get<GetTextForItemApiProjectItemsTextItemIdGetResponses, GetTextForItemApiProjectItemsTextItemIdGetErrors, ThrowOnError>({
-            responseType: 'json',
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/api/project/items/text/{item_id}',
             ...options
@@ -970,7 +875,6 @@ export class Project {
      */
     public static countProjectItemsApiProjectItemsCountGet<ThrowOnError extends boolean = true>(options: Options<CountProjectItemsApiProjectItemsCountGetData, ThrowOnError>) {
         return (options.client ?? client).get<CountProjectItemsApiProjectItemsCountGetResponses, CountProjectItemsApiProjectItemsCountGetErrors, ThrowOnError>({
-            responseType: 'json',
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/api/project/items/count',
             ...options
@@ -982,7 +886,6 @@ export class Project {
      */
     public static addTweetApiProjectItemsTwitterAddPost<ThrowOnError extends boolean = true>(options: Options<AddTweetApiProjectItemsTwitterAddPostData, ThrowOnError>) {
         return (options.client ?? client).post<AddTweetApiProjectItemsTwitterAddPostResponses, AddTweetApiProjectItemsTwitterAddPostErrors, ThrowOnError>({
-            responseType: 'json',
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/api/project/items/twitter/add',
             ...options,
@@ -1000,7 +903,6 @@ export class Imports {
      */
     public static getAllImportsForProjectApiImportsListGet<ThrowOnError extends boolean = true>(options: Options<GetAllImportsForProjectApiImportsListGetData, ThrowOnError>) {
         return (options.client ?? client).get<GetAllImportsForProjectApiImportsListGetResponses, GetAllImportsForProjectApiImportsListGetErrors, ThrowOnError>({
-            responseType: 'json',
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/api/imports/list',
             ...options
@@ -1012,7 +914,6 @@ export class Imports {
      */
     public static getProjectImportsApiImportsListDetailsGet<ThrowOnError extends boolean = true>(options: Options<GetProjectImportsApiImportsListDetailsGetData, ThrowOnError>) {
         return (options.client ?? client).get<GetProjectImportsApiImportsListDetailsGetResponses, GetProjectImportsApiImportsListDetailsGetErrors, ThrowOnError>({
-            responseType: 'json',
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/api/imports/list/details',
             ...options
@@ -1024,7 +925,6 @@ export class Imports {
      */
     public static getImportDetailsApiImportsImportImportIdGet<ThrowOnError extends boolean = true>(options: Options<GetImportDetailsApiImportsImportImportIdGetData, ThrowOnError>) {
         return (options.client ?? client).get<GetImportDetailsApiImportsImportImportIdGetResponses, GetImportDetailsApiImportsImportImportIdGetErrors, ThrowOnError>({
-            responseType: 'json',
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/api/imports/import/{import_id}',
             ...options
@@ -1036,7 +936,6 @@ export class Imports {
      */
     public static triggerImportApiImportsImportImportIdPost<ThrowOnError extends boolean = true>(options: Options<TriggerImportApiImportsImportImportIdPostData, ThrowOnError>) {
         return (options.client ?? client).post<TriggerImportApiImportsImportImportIdPostResponses, TriggerImportApiImportsImportImportIdPostErrors, ThrowOnError>({
-            responseType: 'json',
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/api/imports/import/{import_id}',
             ...options
@@ -1048,7 +947,6 @@ export class Imports {
      */
     public static getImportCountsApiImportsImportImportIdCountGet<ThrowOnError extends boolean = true>(options: Options<GetImportCountsApiImportsImportImportIdCountGetData, ThrowOnError>) {
         return (options.client ?? client).get<GetImportCountsApiImportsImportImportIdCountGetResponses, GetImportCountsApiImportsImportImportIdCountGetErrors, ThrowOnError>({
-            responseType: 'json',
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/api/imports/import/{import_id}/count/',
             ...options
@@ -1060,7 +958,6 @@ export class Imports {
      */
     public static getImportRevisionsApiImportsImportImportIdRevisionsGet<ThrowOnError extends boolean = true>(options: Options<GetImportRevisionsApiImportsImportImportIdRevisionsGetData, ThrowOnError>) {
         return (options.client ?? client).get<GetImportRevisionsApiImportsImportImportIdRevisionsGetResponses, GetImportRevisionsApiImportsImportImportIdRevisionsGetErrors, ThrowOnError>({
-            responseType: 'json',
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/api/imports/import/{import_id}/revisions',
             ...options
@@ -1072,7 +969,6 @@ export class Imports {
      */
     public static putImportDetailsApiImportsImportPut<ThrowOnError extends boolean = true>(options: Options<PutImportDetailsApiImportsImportPutData, ThrowOnError>) {
         return (options.client ?? client).put<PutImportDetailsApiImportsImportPutResponses, PutImportDetailsApiImportsImportPutErrors, ThrowOnError>({
-            responseType: 'json',
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/api/imports/import',
             ...options,
@@ -1088,7 +984,6 @@ export class Imports {
      */
     public static deleteImportDetailsApiImportsImportDeleteImportIdDelete<ThrowOnError extends boolean = true>(options: Options<DeleteImportDetailsApiImportsImportDeleteImportIdDeleteData, ThrowOnError>) {
         return (options.client ?? client).delete<DeleteImportDetailsApiImportsImportDeleteImportIdDeleteResponses, DeleteImportDetailsApiImportsImportDeleteImportIdDeleteErrors, ThrowOnError>({
-            responseType: 'json',
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/api/imports/import/delete/{import_id}',
             ...options
@@ -1108,7 +1003,6 @@ export class Events {
      */
     public static emitApiEventsEmitPost<ThrowOnError extends boolean = true>(options: Options<EmitApiEventsEmitPostData, ThrowOnError>) {
         return (options.client ?? client).post<EmitApiEventsEmitPostResponses, EmitApiEventsEmitPostErrors, ThrowOnError>({
-            responseType: 'json',
             url: '/api/events/emit',
             ...options,
             headers: {
@@ -1125,7 +1019,6 @@ export class Highlighters {
      */
     public static getProjectHighlightersApiHighlightersProjectGet<ThrowOnError extends boolean = true>(options: Options<GetProjectHighlightersApiHighlightersProjectGetData, ThrowOnError>) {
         return (options.client ?? client).get<GetProjectHighlightersApiHighlightersProjectGetResponses, GetProjectHighlightersApiHighlightersProjectGetErrors, ThrowOnError>({
-            responseType: 'json',
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/api/highlighters/project',
             ...options
@@ -1137,7 +1030,6 @@ export class Highlighters {
      */
     public static upsertHighlighterApiHighlightersProjectPut<ThrowOnError extends boolean = true>(options: Options<UpsertHighlighterApiHighlightersProjectPutData, ThrowOnError>) {
         return (options.client ?? client).put<UpsertHighlighterApiHighlightersProjectPutResponses, UpsertHighlighterApiHighlightersProjectPutErrors, ThrowOnError>({
-            responseType: 'json',
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/api/highlighters/project',
             ...options,
@@ -1153,7 +1045,6 @@ export class Highlighters {
      */
     public static getHighlighterApiHighlightersHighlighterIdGet<ThrowOnError extends boolean = true>(options: Options<GetHighlighterApiHighlightersHighlighterIdGetData, ThrowOnError>) {
         return (options.client ?? client).get<GetHighlighterApiHighlightersHighlighterIdGetResponses, GetHighlighterApiHighlightersHighlighterIdGetErrors, ThrowOnError>({
-            responseType: 'json',
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/api/highlighters/{highlighter_id}',
             ...options
@@ -1167,7 +1058,6 @@ export class Stats {
      */
     public static getBasicStatsApiStatsBasicsGet<ThrowOnError extends boolean = true>(options: Options<GetBasicStatsApiStatsBasicsGetData, ThrowOnError>) {
         return (options.client ?? client).get<GetBasicStatsApiStatsBasicsGetResponses, GetBasicStatsApiStatsBasicsGetErrors, ThrowOnError>({
-            responseType: 'json',
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/api/stats/basics',
             ...options
@@ -1179,7 +1069,6 @@ export class Stats {
      */
     public static getAnnotatorRankingApiStatsRankGet<ThrowOnError extends boolean = true>(options: Options<GetAnnotatorRankingApiStatsRankGetData, ThrowOnError>) {
         return (options.client ?? client).get<GetAnnotatorRankingApiStatsRankGetResponses, GetAnnotatorRankingApiStatsRankGetErrors, ThrowOnError>({
-            responseType: 'json',
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/api/stats/rank',
             ...options
@@ -1191,7 +1080,6 @@ export class Stats {
      */
     public static getPublicationYearHistogramApiStatsHistogramYearsGet<ThrowOnError extends boolean = true>(options: Options<GetPublicationYearHistogramApiStatsHistogramYearsGetData, ThrowOnError>) {
         return (options.client ?? client).get<GetPublicationYearHistogramApiStatsHistogramYearsGetResponses, GetPublicationYearHistogramApiStatsHistogramYearsGetErrors, ThrowOnError>({
-            responseType: 'json',
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/api/stats/histogram/years',
             ...options
@@ -1203,7 +1091,6 @@ export class Stats {
      */
     public static labelStatsApiStatsLabelsPost<ThrowOnError extends boolean = true>(options: Options<LabelStatsApiStatsLabelsPostData, ThrowOnError>) {
         return (options.client ?? client).post<LabelStatsApiStatsLabelsPostResponses, LabelStatsApiStatsLabelsPostErrors, ThrowOnError>({
-            responseType: 'json',
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/api/stats/labels',
             ...options,
@@ -1221,7 +1108,6 @@ export class Export {
      */
     public static getAnnotationsCsvApiExportAnnotationsCsvPost<ThrowOnError extends boolean = true>(options: Options<GetAnnotationsCsvApiExportAnnotationsCsvPostData, ThrowOnError>) {
         return (options.client ?? client).post<GetAnnotationsCsvApiExportAnnotationsCsvPostResponses, GetAnnotationsCsvApiExportAnnotationsCsvPostErrors, ThrowOnError>({
-            responseType: 'blob',
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/api/export/annotations/csv',
             ...options,
@@ -1237,7 +1123,6 @@ export class Export {
      */
     public static getExportBaseinfoApiExportProjectBaseinfoGet<ThrowOnError extends boolean = true>(options: Options<GetExportBaseinfoApiExportProjectBaseinfoGetData, ThrowOnError>) {
         return (options.client ?? client).get<GetExportBaseinfoApiExportProjectBaseinfoGetResponses, GetExportBaseinfoApiExportProjectBaseinfoGetErrors, ThrowOnError>({
-            responseType: 'json',
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/api/export/project/baseinfo',
             ...options
@@ -1251,7 +1136,6 @@ export class Search {
      */
     public static searchOpenalexApiSearchOpenalexSelectPost<ThrowOnError extends boolean = true>(options: Options<SearchOpenalexApiSearchOpenalexSelectPostData, ThrowOnError>) {
         return (options.client ?? client).post<SearchOpenalexApiSearchOpenalexSelectPostResponses, SearchOpenalexApiSearchOpenalexSelectPostErrors, ThrowOnError>({
-            responseType: 'json',
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/api/search/openalex/select',
             ...options,
@@ -1267,7 +1151,6 @@ export class Search {
      */
     public static termExpansionApiSearchOpenalexTermsGet<ThrowOnError extends boolean = true>(options: Options<TermExpansionApiSearchOpenalexTermsGetData, ThrowOnError>) {
         return (options.client ?? client).get<TermExpansionApiSearchOpenalexTermsGetResponses, TermExpansionApiSearchOpenalexTermsGetErrors, ThrowOnError>({
-            responseType: 'json',
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/api/search/openalex/terms',
             ...options
@@ -1279,7 +1162,6 @@ export class Search {
      */
     public static nqlQueryApiSearchNqlQueryPost<ThrowOnError extends boolean = true>(options: Options<NqlQueryApiSearchNqlQueryPostData, ThrowOnError>) {
         return (options.client ?? client).post<NqlQueryApiSearchNqlQueryPostResponses, NqlQueryApiSearchNqlQueryPostErrors, ThrowOnError>({
-            responseType: 'json',
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/api/search/nql/query',
             ...options,
@@ -1295,7 +1177,6 @@ export class Search {
      */
     public static nqlQueryCountApiSearchNqlCountPost<ThrowOnError extends boolean = true>(options: Options<NqlQueryCountApiSearchNqlCountPostData, ThrowOnError>) {
         return (options.client ?? client).post<NqlQueryCountApiSearchNqlCountPostResponses, NqlQueryCountApiSearchNqlCountPostErrors, ThrowOnError>({
-            responseType: 'json',
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/api/search/nql/count',
             ...options,
@@ -1313,7 +1194,6 @@ export class Evaluation {
      */
     public static getProjectScopesApiEvalTrackingScopesGet<ThrowOnError extends boolean = true>(options: Options<GetProjectScopesApiEvalTrackingScopesGetData, ThrowOnError>) {
         return (options.client ?? client).get<GetProjectScopesApiEvalTrackingScopesGetResponses, GetProjectScopesApiEvalTrackingScopesGetErrors, ThrowOnError>({
-            responseType: 'json',
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/api/eval/tracking/scopes',
             ...options
@@ -1325,7 +1205,6 @@ export class Evaluation {
      */
     public static getResolutionsForScopeApiEvalResolutionsGet<ThrowOnError extends boolean = true>(options: Options<GetResolutionsForScopeApiEvalResolutionsGetData, ThrowOnError>) {
         return (options.client ?? client).get<GetResolutionsForScopeApiEvalResolutionsGetResponses, GetResolutionsForScopeApiEvalResolutionsGetErrors, ThrowOnError>({
-            responseType: 'json',
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/api/eval/resolutions',
             ...options
@@ -1337,7 +1216,6 @@ export class Evaluation {
      */
     public static getProjectTrackersApiEvalTrackingTrackersGet<ThrowOnError extends boolean = true>(options: Options<GetProjectTrackersApiEvalTrackingTrackersGetData, ThrowOnError>) {
         return (options.client ?? client).get<GetProjectTrackersApiEvalTrackingTrackersGetResponses, GetProjectTrackersApiEvalTrackingTrackersGetErrors, ThrowOnError>({
-            responseType: 'json',
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/api/eval/tracking/trackers',
             ...options
@@ -1349,7 +1227,6 @@ export class Evaluation {
      */
     public static getTrackerApiEvalTrackingTrackerTrackerIdGet<ThrowOnError extends boolean = true>(options: Options<GetTrackerApiEvalTrackingTrackerTrackerIdGetData, ThrowOnError>) {
         return (options.client ?? client).get<GetTrackerApiEvalTrackingTrackerTrackerIdGetResponses, GetTrackerApiEvalTrackingTrackerTrackerIdGetErrors, ThrowOnError>({
-            responseType: 'json',
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/api/eval/tracking/tracker/{tracker_id}',
             ...options
@@ -1361,7 +1238,6 @@ export class Evaluation {
      */
     public static saveTrackerApiEvalTrackingTrackerPut<ThrowOnError extends boolean = true>(options: Options<SaveTrackerApiEvalTrackingTrackerPutData, ThrowOnError>) {
         return (options.client ?? client).put<SaveTrackerApiEvalTrackingTrackerPutResponses, SaveTrackerApiEvalTrackingTrackerPutErrors, ThrowOnError>({
-            responseType: 'json',
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/api/eval/tracking/tracker',
             ...options,
@@ -1377,7 +1253,6 @@ export class Evaluation {
      */
     public static updateTrackerApiEvalTrackingRefreshPost<ThrowOnError extends boolean = true>(options: Options<UpdateTrackerApiEvalTrackingRefreshPostData, ThrowOnError>) {
         return (options.client ?? client).post<UpdateTrackerApiEvalTrackingRefreshPostResponses, UpdateTrackerApiEvalTrackingRefreshPostErrors, ThrowOnError>({
-            responseType: 'json',
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/api/eval/tracking/refresh',
             ...options,
@@ -1393,7 +1268,6 @@ export class Evaluation {
      */
     public static getIrrApiEvalQualityLoadAssignmentScopeIdGet<ThrowOnError extends boolean = true>(options: Options<GetIrrApiEvalQualityLoadAssignmentScopeIdGetData, ThrowOnError>) {
         return (options.client ?? client).get<GetIrrApiEvalQualityLoadAssignmentScopeIdGetResponses, GetIrrApiEvalQualityLoadAssignmentScopeIdGetErrors, ThrowOnError>({
-            responseType: 'json',
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/api/eval/quality/load/{assignment_scope_id}',
             ...options
@@ -1405,7 +1279,6 @@ export class Evaluation {
      */
     public static recomputeIrrApiEvalQualityComputeGet<ThrowOnError extends boolean = true>(options: Options<RecomputeIrrApiEvalQualityComputeGetData, ThrowOnError>) {
         return (options.client ?? client).get<RecomputeIrrApiEvalQualityComputeGetResponses, RecomputeIrrApiEvalQualityComputeGetErrors, ThrowOnError>({
-            responseType: 'json',
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/api/eval/quality/compute',
             ...options
@@ -1418,11 +1291,7 @@ export class Mailing {
      * Reset Password
      */
     public static resetPasswordApiMailResetPasswordUsernamePost<ThrowOnError extends boolean = true>(options: Options<ResetPasswordApiMailResetPasswordUsernamePostData, ThrowOnError>) {
-        return (options.client ?? client).post<ResetPasswordApiMailResetPasswordUsernamePostResponses, ResetPasswordApiMailResetPasswordUsernamePostErrors, ThrowOnError>({
-            responseType: 'text',
-            url: '/api/mail/reset-password/{username}',
-            ...options
-        });
+        return (options.client ?? client).post<ResetPasswordApiMailResetPasswordUsernamePostResponses, ResetPasswordApiMailResetPasswordUsernamePostErrors, ThrowOnError>({ url: '/api/mail/reset-password/{username}', ...options });
     }
     
     /**
@@ -1430,7 +1299,6 @@ export class Mailing {
      */
     public static welcomeMailApiMailWelcomePost<ThrowOnError extends boolean = true>(options: Options<WelcomeMailApiMailWelcomePostData, ThrowOnError>) {
         return (options.client ?? client).post<WelcomeMailApiMailWelcomePostResponses, WelcomeMailApiMailWelcomePostErrors, ThrowOnError>({
-            responseType: 'text',
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/api/mail/welcome',
             ...options
@@ -1442,7 +1310,6 @@ export class Mailing {
      */
     public static remindUsersAssigmentApiMailAssignmentReminderPost<ThrowOnError extends boolean = true>(options: Options<RemindUsersAssigmentApiMailAssignmentReminderPostData, ThrowOnError>) {
         return (options.client ?? client).post<RemindUsersAssigmentApiMailAssignmentReminderPostResponses, RemindUsersAssigmentApiMailAssignmentReminderPostErrors, ThrowOnError>({
-            responseType: 'json',
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/api/mail/assignment-reminder',
             ...options
@@ -1454,7 +1321,6 @@ export class Mailing {
      */
     public static newsMailApiMailNewsPost<ThrowOnError extends boolean = true>(options: Options<NewsMailApiMailNewsPostData, ThrowOnError>) {
         return (options.client ?? client).post<NewsMailApiMailNewsPostResponses, NewsMailApiMailNewsPostErrors, ThrowOnError>({
-            responseType: 'json',
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/api/mail/news',
             ...options,
@@ -1472,7 +1338,6 @@ export class Pipes {
      */
     public static getArtefactsApiPipesArtefactsListGet<ThrowOnError extends boolean = true>(options: Options<GetArtefactsApiPipesArtefactsListGetData, ThrowOnError>) {
         return (options.client ?? client).get<GetArtefactsApiPipesArtefactsListGetResponses, GetArtefactsApiPipesArtefactsListGetErrors, ThrowOnError>({
-            responseType: 'json',
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/api/pipes/artefacts/list',
             ...options
@@ -1484,7 +1349,6 @@ export class Pipes {
      */
     public static getTaskLogApiPipesArtefactsLogGet<ThrowOnError extends boolean = true>(options: Options<GetTaskLogApiPipesArtefactsLogGetData, ThrowOnError>) {
         return (options.client ?? client).get<GetTaskLogApiPipesArtefactsLogGetResponses, GetTaskLogApiPipesArtefactsLogGetErrors, ThrowOnError>({
-            responseType: 'json',
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/api/pipes/artefacts/log',
             ...options
@@ -1530,7 +1394,6 @@ export class Pipes {
     public static uploadFileApiPipesArtefactsFilesUploadPost<ThrowOnError extends boolean = true>(options: Options<UploadFileApiPipesArtefactsFilesUploadPostData, ThrowOnError>) {
         return (options.client ?? client).post<UploadFileApiPipesArtefactsFilesUploadPostResponses, UploadFileApiPipesArtefactsFilesUploadPostErrors, ThrowOnError>({
             ...formDataBodySerializer,
-            responseType: 'json',
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/api/pipes/artefacts/files/upload',
             ...options,
@@ -1547,7 +1410,6 @@ export class Pipes {
     public static uploadFilesApiPipesArtefactsFilesUploadManyPost<ThrowOnError extends boolean = true>(options: Options<UploadFilesApiPipesArtefactsFilesUploadManyPostData, ThrowOnError>) {
         return (options.client ?? client).post<UploadFilesApiPipesArtefactsFilesUploadManyPostResponses, UploadFilesApiPipesArtefactsFilesUploadManyPostErrors, ThrowOnError>({
             ...formDataBodySerializer,
-            responseType: 'json',
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/api/pipes/artefacts/files/upload-many',
             ...options,
@@ -1563,7 +1425,6 @@ export class Pipes {
      */
     public static searchTasksApiPipesTasksGet<ThrowOnError extends boolean = true>(options: Options<SearchTasksApiPipesTasksGetData, ThrowOnError>) {
         return (options.client ?? client).get<SearchTasksApiPipesTasksGetResponses, SearchTasksApiPipesTasksGetErrors, ThrowOnError>({
-            responseType: 'json',
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/api/pipes/tasks',
             ...options
@@ -1575,7 +1436,6 @@ export class Pipes {
      */
     public static deleteTaskApiPipesTaskDelete<ThrowOnError extends boolean = true>(options: Options<DeleteTaskApiPipesTaskDeleteData, ThrowOnError>) {
         return (options.client ?? client).delete<DeleteTaskApiPipesTaskDeleteResponses, DeleteTaskApiPipesTaskDeleteErrors, ThrowOnError>({
-            responseType: 'json',
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/api/pipes/task',
             ...options
@@ -1587,7 +1447,6 @@ export class Pipes {
      */
     public static getTaskApiPipesTaskGet<ThrowOnError extends boolean = true>(options: Options<GetTaskApiPipesTaskGetData, ThrowOnError>) {
         return (options.client ?? client).get<GetTaskApiPipesTaskGetResponses, GetTaskApiPipesTaskGetErrors, ThrowOnError>({
-            responseType: 'json',
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/api/pipes/task',
             ...options
@@ -1599,7 +1458,6 @@ export class Pipes {
      */
     public static terminateTaskApiPipesDramatiqTaskDelete<ThrowOnError extends boolean = true>(options: Options<TerminateTaskApiPipesDramatiqTaskDeleteData, ThrowOnError>) {
         return (options.client ?? client).delete<TerminateTaskApiPipesDramatiqTaskDeleteResponses, TerminateTaskApiPipesDramatiqTaskDeleteErrors, ThrowOnError>({
-            responseType: 'json',
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/api/pipes/dramatiq/task',
             ...options
@@ -1613,7 +1471,6 @@ export class Item {
      */
     public static getItemVariantsApiItemVariantsItemIdGet<ThrowOnError extends boolean = true>(options: Options<GetItemVariantsApiItemVariantsItemIdGetData, ThrowOnError>) {
         return (options.client ?? client).get<GetItemVariantsApiItemVariantsItemIdGetResponses, GetItemVariantsApiItemVariantsItemIdGetErrors, ThrowOnError>({
-            responseType: 'json',
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/api/item/variants/{item_id}',
             ...options
@@ -1625,7 +1482,6 @@ export class Item {
      */
     public static getItemInfoApiItemInfoItemIdGet<ThrowOnError extends boolean = true>(options: Options<GetItemInfoApiItemInfoItemIdGetData, ThrowOnError>) {
         return (options.client ?? client).get<GetItemInfoApiItemInfoItemIdGetResponses, GetItemInfoApiItemInfoItemIdGetErrors, ThrowOnError>({
-            responseType: 'json',
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/api/item/info/{item_id}',
             ...options
@@ -1637,7 +1493,6 @@ export class Item {
      */
     public static getItemM2MsApiItemM2MsItemIdGet<ThrowOnError extends boolean = true>(options: Options<GetItemM2MsApiItemM2MsItemIdGetData, ThrowOnError>) {
         return (options.client ?? client).get<GetItemM2MsApiItemM2MsItemIdGetResponses, GetItemM2MsApiItemM2MsItemIdGetErrors, ThrowOnError>({
-            responseType: 'json',
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/api/item/m2ms/{item_id}',
             ...options
@@ -1649,7 +1504,6 @@ export class Item {
      */
     public static getItemLabelsApiItemLabelsItemIdGet<ThrowOnError extends boolean = true>(options: Options<GetItemLabelsApiItemLabelsItemIdGetData, ThrowOnError>) {
         return (options.client ?? client).get<GetItemLabelsApiItemLabelsItemIdGetResponses, GetItemLabelsApiItemLabelsItemIdGetErrors, ThrowOnError>({
-            responseType: 'json',
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/api/item/labels/{item_id}',
             ...options
@@ -1661,7 +1515,6 @@ export class Item {
      */
     public static updateItemInfoApiItemInfoPut<ThrowOnError extends boolean = true>(options: Options<UpdateItemInfoApiItemInfoPutData, ThrowOnError>) {
         return (options.client ?? client).put<UpdateItemInfoApiItemInfoPutResponses, UpdateItemInfoApiItemInfoPutErrors, ThrowOnError>({
-            responseType: 'json',
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/api/item/info',
             ...options,
@@ -1679,7 +1532,6 @@ export class Prio {
      */
     public static getTableSampleHtmlApiPrioTablePeekHtmlPost<ThrowOnError extends boolean = true>(options: Options<GetTableSampleHtmlApiPrioTablePeekHtmlPostData, ThrowOnError>) {
         return (options.client ?? client).post<GetTableSampleHtmlApiPrioTablePeekHtmlPostResponses, GetTableSampleHtmlApiPrioTablePeekHtmlPostErrors, ThrowOnError>({
-            responseType: 'json',
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/api/prio/table/peek/html',
             ...options,
@@ -1695,7 +1547,6 @@ export class Prio {
      */
     public static getTableSampleApiPrioTablePeekPost<ThrowOnError extends boolean = true>(options: Options<GetTableSampleApiPrioTablePeekPostData, ThrowOnError>) {
         return (options.client ?? client).post<GetTableSampleApiPrioTablePeekPostResponses, GetTableSampleApiPrioTablePeekPostErrors, ThrowOnError>({
-            responseType: 'json',
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/api/prio/table/peek',
             ...options,
@@ -1711,7 +1562,6 @@ export class Prio {
      */
     public static readProjectSetupsApiPrioSetupsGet<ThrowOnError extends boolean = true>(options: Options<ReadProjectSetupsApiPrioSetupsGetData, ThrowOnError>) {
         return (options.client ?? client).get<ReadProjectSetupsApiPrioSetupsGetResponses, ReadProjectSetupsApiPrioSetupsGetErrors, ThrowOnError>({
-            responseType: 'json',
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/api/prio/setups',
             ...options
@@ -1723,7 +1573,6 @@ export class Prio {
      */
     public static dropPrioSetupApiPrioSetupDelete<ThrowOnError extends boolean = true>(options: Options<DropPrioSetupApiPrioSetupDeleteData, ThrowOnError>) {
         return (options.client ?? client).delete<DropPrioSetupApiPrioSetupDeleteResponses, DropPrioSetupApiPrioSetupDeleteErrors, ThrowOnError>({
-            responseType: 'json',
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/api/prio/setup',
             ...options
@@ -1735,7 +1584,6 @@ export class Prio {
      */
     public static readPrioSetupApiPrioSetupGet<ThrowOnError extends boolean = true>(options: Options<ReadPrioSetupApiPrioSetupGetData, ThrowOnError>) {
         return (options.client ?? client).get<ReadPrioSetupApiPrioSetupGetResponses, ReadPrioSetupApiPrioSetupGetErrors, ThrowOnError>({
-            responseType: 'json',
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/api/prio/setup',
             ...options
@@ -1747,7 +1595,6 @@ export class Prio {
      */
     public static savePrioSetupApiPrioSetupPut<ThrowOnError extends boolean = true>(options: Options<SavePrioSetupApiPrioSetupPutData, ThrowOnError>) {
         return (options.client ?? client).put<SavePrioSetupApiPrioSetupPutResponses, SavePrioSetupApiPrioSetupPutErrors, ThrowOnError>({
-            responseType: 'json',
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/api/prio/setup',
             ...options,
@@ -1763,7 +1610,6 @@ export class Prio {
      */
     public static getArtefactsApiPrioArtefactsListGet<ThrowOnError extends boolean = true>(options: Options<GetArtefactsApiPrioArtefactsListGetData, ThrowOnError>) {
         return (options.client ?? client).get<GetArtefactsApiPrioArtefactsListGetResponses, GetArtefactsApiPrioArtefactsListGetErrors, ThrowOnError>({
-            responseType: 'json',
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/api/prio/artefacts/list',
             ...options

@@ -16,7 +16,7 @@ export default defineConfig({
   },
   plugins: [
     {
-      name: "@hey-api/client-axios",
+      name: "@hey-api/client-fetch",
       exportFromIndex: true,
       bundle: true,
       baseUrl: false,

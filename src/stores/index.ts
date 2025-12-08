@@ -19,7 +19,7 @@ export const requestsStore = useRequestsStore(pinia);
 EventBus.on(ClearUserStoreEvent, currentUserStore.clear);
 
 if (currentUserStore.isAuthTokenValid) {
-  OpenAPI.TOKEN = currentUserStore.authToken?.token_id;
+  OpenAPI.setToken(currentUserStore.authToken?.token_id);
 }
 
 export default pinia;

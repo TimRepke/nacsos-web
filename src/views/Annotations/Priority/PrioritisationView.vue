@@ -59,6 +59,7 @@ async function peek() {
       await API.prio.getTableSampleApiPrioTablePeekPost({
         headers: { "x-project-id": currentProjectStore.projectId as string },
         body: {
+          // @ts-ignore: TS2322
           query: nql.value[0],
           scope_ids: setup.value.source_scopes as string[],
           incl: setup.value.incl_rule as string,
@@ -178,9 +179,9 @@ async function loadImage(event: MouseEvent, filename: string) {
         "x-project-id": currentProjectStore.projectId as string,
         "x-priority-id": route.query.priority_id as string,
       },
-      filename,
+      query: { filename },
     },
-    { responseType: "blob" },
+    //{ responseType: "blob" },
   );
   const url = URL.createObjectURL(res.data as Blob);
   const img = new Image();

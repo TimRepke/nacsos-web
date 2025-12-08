@@ -124,22 +124,20 @@ function upload(abstracts: any[]) {
   return new Promise((resolve, reject) => {
     progress.value.upload = "UPLOADING";
     API.pipes
-      .uploadFileApiPipesArtefactsFilesUploadPost(
-        {
-          headers: { "x-project-id": currentProjectStore.projectId as string },
-          folder,
-          formData: { file },
-        },
-        {
-          onUploadProgress: (event: { loaded: number; total?: number }) => {
-            progress.value.uploadPercentage = Math.round(100 * (event.loaded / (event.total || 1)));
-          },
-        },
-      )
+      .uploadFileApiPipesArtefactsFilesUploadPost({
+        headers: { "x-project-id": currentProjectStore.projectId as string },
+        query: { folder },
+        body: { file },
+        // FIXME
+        // onUploadProgress: (event: { loaded: number; total?: number }) => {
+        //   progress.value.uploadPercentage = Math.round(100 * (event.loaded / (event.total || 1)));
+        // },
+      })
       .then((response) => {
         if (config.value) {
           progress.value.upload = "SUCCESS";
           config.value.file = response.data;
+          progress.value.uploadPercentage = 100;
           config.value.file_date = pyDTNow();
           resolve(response.data);
         }

@@ -41,12 +41,11 @@ import { defineComponent } from "vue";
 import type { AnyItem } from "@/types/items";
 import { API } from "@/plugins/api";
 import { currentProjectStore } from "@/stores";
-import type { CancelablePromise } from "@/plugins/api/spec/core/CancelablePromise";
 import AnyItemComponent from "@/components/items/AnyItem.vue";
 
 type ItemModalData = {
   itemInfo: AnyItem | undefined;
-  requestPromise: CancelablePromise<AnyItem> | undefined;
+  requestPromise: Promise<AnyItem> | undefined;
 };
 
 export default defineComponent({
