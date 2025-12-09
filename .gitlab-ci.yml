@@ -48,20 +48,24 @@ test-typing:
     - npm run type-check
 
 build:
+  extends: .npm
   stage: build
-  tags:
-    - se164-bare
   script:
-    - nvm use stable
-    - npm install
     - npm run build
+  artifacts:
+    paths:
+      - dist/
+    expire_in: 1 week
 
 deploy-to-production:
   tags:
     - se164-bare
   stage: deploy
+  dependencies:
+    - build
   script:
     - echo "Deploying to production"
+    - apk add lftp
     - ls -lisah
     - ls -lisah dist
     - /bin/chown -R gitlab-runner "${NACSOS_WWW_DIR}"
