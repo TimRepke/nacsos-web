@@ -22,6 +22,7 @@ import { ToastEvent } from "@/plugins/events/events/toast";
 import { ClearUserStoreEvent } from "@/plugins/events/events/auth";
 import { useRequestsStore } from "@/stores/RequestsStore";
 import { client } from "./spec/client.gen";
+import { isSuccess } from "@/plugins/api.orig/spec/core/request.ts";
 
 export function ignore() {}
 
@@ -120,6 +121,18 @@ client.interceptors.error.use((reason: unknown | RejectReason) => {
   if (reason && typeof reason === "object" && (reason as RejectReason).detail?.type === "NotAuthenticated") {
     EventBus.emit(new ClearUserStoreEvent());
   }
+  return reason;
+});
+
+client.interceptors.error.use((reason: unknown | RejectReason, response: Response) => {
+  if (reason)
+    return {
+      ...reason,
+      ok: false,
+      status: response.status,
+      response: response,
+      error: reason,
+    };
   return reason;
 });
 export const OpenAPI = {
