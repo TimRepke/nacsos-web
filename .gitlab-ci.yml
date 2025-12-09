@@ -54,9 +54,10 @@ build:
     - export NODE_ENV=production
     - npm run build
   artifacts:
+    untracked: true
+    expire_in: 1 day
     paths:
       - dist/
-    expire_in: 1 week
 
 deploy-to-production:
   tags:
@@ -66,7 +67,6 @@ deploy-to-production:
     - build
   script:
     - echo "Deploying to production"
-    - apk add lftp
     - ls -lisah
     - ls -lisah dist
     - /bin/chown -R gitlab-runner "${NACSOS_WWW_DIR}"
@@ -75,5 +75,5 @@ deploy-to-production:
     - ls -lisah
     - /bin/chown -R nacsos "${NACSOS_WWW_DIR}"
   when: manual
-  only:
-    - production
+  #only:
+  #  - production
