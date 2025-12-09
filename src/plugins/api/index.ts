@@ -22,7 +22,6 @@ import { ToastEvent } from "@/plugins/events/events/toast";
 import { ClearUserStoreEvent } from "@/plugins/events/events/auth";
 import { useRequestsStore } from "@/stores/RequestsStore";
 import { client } from "./spec/client.gen";
-import { isSuccess } from "@/plugins/api.orig/spec/core/request.ts";
 
 export function ignore() {}
 
