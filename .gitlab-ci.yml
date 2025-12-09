@@ -33,8 +33,7 @@ prepare:
   stage: setup
   script:
     - echo "Building the static sources"
-    - which npm-check-updates
-    - npm-check-updates
+    - npx npm-check-updates
 
 test-lint:
   stage: test

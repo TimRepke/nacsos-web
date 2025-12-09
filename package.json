@@ -15,11 +15,10 @@
     "serve": "vite --host 127.0.0.1 --port 8080",
     "preview": "vite preview --host 127.0.0.1 --port 8080",
     "build": "vite build --outDir dist",
-    "type-check": "vue-tsc --noEmit -p tsconfig.vitest.json --composite false",
+    "type-check": "npx vue-tsc --noEmit -p tsconfig.vitest.json --composite false",
     "lint": "eslint .",
-    "test:unit": "vitest --environment jsdom --root src/",
+    "test:unit": "npx vitest --environment jsdom --root src/",
     "nql": "nearleyc src/util/nql/grammar.ne --out src/util/nql/grammar.ts",
-    "api-deprecated": "npx tsx tools/openapi-ts/generate.ts",
     "api": "npx @hey-api/openapi-ts"
   },
   "dependencies": {
