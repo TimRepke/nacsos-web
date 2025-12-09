@@ -57,8 +57,8 @@ build:
     expire_in: 1 day
     paths:
       - dist/
-  only:
-    - production
+#  only:
+#    - production
 
 
 deploy-to-production:
@@ -77,5 +77,5 @@ deploy-to-production:
     - ls -lisah
     - sudo /usr/bin/chown -R nacsos "${NACSOS_WWW_DIR}"
   when: manual
-  only:
-    - production
+#  only:
+#    - production
