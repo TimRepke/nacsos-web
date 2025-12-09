@@ -34,24 +34,18 @@ prepare:
   script:
     - echo "Building the static sources"
     - npx npm-check-updates
-  only:
-    - production
 
 test-lint:
   stage: test
   extends: .npm
   script:
     - npm run lint
-  only:
-    - production
 
 test-typing:
   stage: test
   extends: .npm
   script:
     - npm run type-check
-  only:
-    - production
 
 build:
   extends: .npm
@@ -63,6 +57,9 @@ build:
     expire_in: 1 day
     paths:
       - dist/
+  only:
+    - production
+
 
 deploy-to-production:
   tags:
@@ -80,5 +77,5 @@ deploy-to-production:
     - ls -lisah
     - sudo /usr/bin/chown -R nacsos "${NACSOS_WWW_DIR}"
   when: manual
-  #only:
-  #  - production
+  only:
+    - production
