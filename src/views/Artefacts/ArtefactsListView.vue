@@ -95,7 +95,7 @@ import type { TaskModel, FileOnDisk } from "@/plugins/api/types";
 import { EventBus } from "@/plugins/events";
 import { ToastEvent } from "@/plugins/events/events/toast";
 import { API } from "@/plugins/api";
-import type { PipesService } from "@/plugins/api/spec/services.gen";
+import type { Pipes } from "@/plugins/api/spec/sdk.gen";
 import { currentProjectStore, currentUserStore } from "@/stores";
 import { ArgumentTypes } from "@/util";
 
@@ -115,7 +115,7 @@ type ArtefactListData = {
   searchByTags?: string;
 };
 
-type SearchParams = ArgumentTypes<typeof PipesService.searchTasksApiPipesTasksGet>[0];
+type SearchParams = ArgumentTypes<typeof Pipes.searchTasksApiPipesTasksGet>[0];
 
 export default defineComponent({
   name: "ArtefactsListView",
@@ -160,8 +160,10 @@ export default defineComponent({
     async toggleEntry(entry: Entry) {
       const artefacts = (
         await API.pipes.getArtefactsApiPipesArtefactsListGet({
-          xTaskId: entry.task.task_id as string,
-          xProjectId: currentProjectStore.projectId as string,
+          headers: {
+            "x-project-id": currentProjectStore.projectId as string,
+            "x-task-id": entry.task.task_id as string,
+          },
         })
       ).data;
       if (!artefacts) {
@@ -181,11 +183,11 @@ export default defineComponent({
   computed: {
     searchObject(): SearchParams {
       const searchObj: SearchParams = {
-        xProjectId: currentProjectStore.projectId as string,
+        headers: { "x-project-id": currentProjectStore.projectId as string },
       };
       if (this.searchByUser) {
         const userId = currentUserStore.user?.user_id;
-        searchObj.userId = userId === null || userId === undefined ? undefined : userId;
+        searchObj.query = { user_id: userId === null || userId === undefined ? undefined : userId };
       }
       // TODO add the other search params
       return searchObj;

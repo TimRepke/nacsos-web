@@ -149,7 +149,7 @@ export default defineComponent({
   async mounted() {
     API.project
       .countProjectItemsApiProjectItemsCountGet({
-        xProjectId: currentProjectStore.projectId as string,
+        headers: { "x-project-id": currentProjectStore.projectId as string },
       })
       .then((response) => {
         this.totalNumItems = response.data;
@@ -174,10 +174,12 @@ export default defineComponent({
       if (this.queryParsed.length > 0) {
         API.search
           .nqlQueryApiSearchNqlQueryPost({
-            xProjectId: currentProjectStore.projectId as string,
-            requestBody: this.queryParsed[0],
-            limit: this.$route.query.pageSize || 20,
-            page: this.$route.query.page || 1,
+            headers: { "x-project-id": currentProjectStore.projectId as string },
+            body: this.queryParsed[0],
+            query: {
+              limit: this.$route.query.pageSize || 20,
+              page: this.$route.query.page || 1,
+            },
           })
           .then((response) => {
             const { data } = response;
@@ -189,10 +191,12 @@ export default defineComponent({
       } else {
         API.project
           .listProjectDataPagedApiProjectItemsItemTypeListPagePageSizeGet({
-            xProjectId: currentProjectStore.projectId as string,
-            page: this.pagination.currentPage,
-            pageSize: this.pagination.currentPageSize,
-            itemType: currentProjectStore.project!.type,
+            headers: { "x-project-id": currentProjectStore.projectId as string },
+            path: {
+              page: this.pagination.currentPage,
+              page_size: this.pagination.currentPageSize,
+              item_type: currentProjectStore.project!.type,
+            },
           })
           .then((response) => {
             this.itemList = response.data;

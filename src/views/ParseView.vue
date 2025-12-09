@@ -104,8 +104,8 @@ export default defineComponent({
       this.count = -1;
       API.search
         .nqlQueryApiSearchNqlQueryPost({
-          xProjectId: currentProjectStore.projectId as string,
-          requestBody: query[0],
+          headers: {'x-project-id': currentProjectStore.projectId as string},
+          body: query[0],
         })
         .then((response) => {
           this.count = response.data.n_docs;

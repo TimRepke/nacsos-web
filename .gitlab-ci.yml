@@ -1,56 +1,79 @@
-# This file is a template, and might need editing before it works on your project.
-# To contribute improvements to CI/CD templates, please follow the Development guide at:
-# https://docs.gitlab.com/ee/development/cicd/templates.html
-# This specific template is located at:
-# https://gitlab.com/gitlab-org/gitlab/-/blob/master/lib/gitlab/ci/templates/Python.gitlab-ci.yml
+variables:
+  NACSOS_WWW_DIR:
+    description: "Absolute path on server to public_html for nacsos frontend"
+    value: "/var/www/nacsos"
+  VITE_NACSOS_BASE_URL:
+    description: "Complete URL to nacsos-web"
+    value: "http://127.0.0.1:8080"
+  VITE_NACSOS_CORE_URL:
+    description: "Complete URL to nacsos-core backend"
+    value: "http://127.0.0.1:8081"
+  NODE_ENV: "development"
 
-# Official language image. Look for the different tagged releases at:
-# https://hub.docker.com/r/library/python/tags/
-image: node:22-alpine
-
-before_script:
-  - apk add lftp
+.npm:
+  image: node:24-alpine
+  tags:
+    - se164-docker
+  before_script:
+    - npm ci --cache .npm
+    - npm ls
+  cache:
+    key: ${CI_COMMIT_REF_SLUG}
+    paths:
+      - .npm/
 
 stages:
-  - build
+  - setup
   - test
+  - build
   - deploy
 
-cache:
-  paths:
-    - node_modules/
-
-build-job:
-  stage: build
+prepare:
+  extends: .npm
+  stage: setup
   script:
     - echo "Building the static sources"
-    - npm install
-    - npm run build-only
-  artifacts:
-    paths:
-      - dist/
-    expire_in: 24 hours
+    - npx npm-check-updates
 
-test-job1:
+test-lint:
   stage: test
+  extends: .npm
   script:
     - npm run lint
 
-test-job2:
+test-typing:
   stage: test
+  extends: .npm
   script:
     - npm run type-check
 
+build:
+  extends: .npm
+  stage: build
+  script:
+    - export NODE_ENV=production
+    - npm run build
+  artifacts:
+    paths:
+      - dist/
+    expire_in: 1 week
+
 deploy-to-production:
+  tags:
+    - se164-bare
   stage: deploy
+  dependencies:
+    - build
   script:
     - echo "Deploying to production"
-    - lftp --version
+    - apk add lftp
     - ls -lisah
     - ls -lisah dist
-    - echo "$NACSOS_WEB_WWW"
-    - echo "$FTP_HOSTNAME"
-    - lftp -c "open -u $FTP_USERNAME,$FTP_PASSWORD $FTP_HOSTNAME; mirror -Renv dist/ $NACSOS_WEB_WWW"
+    - /bin/chown -R gitlab-runner "${NACSOS_WWW_DIR}"
+    - ls -lisah
+    - rsync -av dist/ "${NACSOS_WWW_DIR}"
+    - ls -lisah
+    - /bin/chown -R nacsos "${NACSOS_WWW_DIR}"
   when: manual
   only:
     - production

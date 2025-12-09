@@ -19,12 +19,12 @@ export function useScopesStore(): ScopesStore {
     return {
       bot: (
         await API.annotations.getBotScopesApiAnnotationsBotScopesGet({
-          xProjectId: currentProjectStore.projectId as string,
+          headers: { "x-project-id": currentProjectStore.projectId as string },
         })
       ).data,
       human: (
         await API.annotations.getAssignmentScopesForProjectApiAnnotationsAssignmentsScopesGet({
-          xProjectId: currentProjectStore.projectId as string,
+          headers: { "x-project-id": currentProjectStore.projectId as string },
         })
       ).data,
     };

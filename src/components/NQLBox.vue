@@ -51,8 +51,8 @@ async function getCount() {
   try {
     count.value = (
       await API.search.nqlQueryCountApiSearchNqlCountPost({
-        xProjectId: currentProjectStore.projectId as string,
-        requestBody: queryParsed.value[0],
+        headers: { "x-project-id": currentProjectStore.projectId as string },
+        body: queryParsed.value[0],
       })
     ).data;
   } catch {

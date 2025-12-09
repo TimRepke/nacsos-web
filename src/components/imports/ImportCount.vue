@@ -14,8 +14,8 @@ async function refreshCount() {
   try {
     numItems.value = (
       await API.imports.getImportCountsApiImportsImportImportIdCountGet({
-        importId: props.importId,
-        xProjectId: currentProjectStore.projectId as string,
+        path: { import_id: props.importId },
+        headers: { "x-project-id": currentProjectStore.projectId as string },
       })
     ).data;
   } catch {

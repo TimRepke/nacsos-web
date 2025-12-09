@@ -17,6 +17,10 @@ coverage
 /cypress/videos/
 /cypress/screenshots/
 
+tools/openapi-ts/
+src/util/query/
+
+src/plugins/api.orig/
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
@@ -26,5 +30,7 @@ coverage
 *.njsproj
 *.sln
 *.sw?
+
+.npm/
 
 python.ts

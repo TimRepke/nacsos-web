@@ -287,7 +287,7 @@ export default defineComponent({
     runSearch() {
       API.search
         .searchOpenalexApiSearchOpenalexSelectPost({
-          requestBody: {
+          body: {
             query: this.query,
             limit: this.limit,
             offset: this.offset,
@@ -297,7 +297,7 @@ export default defineComponent({
             histogram_from: this.histStart,
             histogram_to: this.histEnd,
           },
-          xProjectId: currentProjectStore.projectId as string,
+          headers: { "x-project-id": currentProjectStore.projectId as string },
         })
         .then((response) => {
           const { data } = response;
@@ -315,9 +315,8 @@ export default defineComponent({
     expandTokens() {
       API.search
         .termExpansionApiSearchOpenalexTermsGet({
-          xProjectId: currentProjectStore.projectId as string,
-          termPrefix: this.tokenSearchPrefix,
-          limit: this.tokenSearchLimit,
+          headers: { "x-project-id": currentProjectStore.projectId as string },
+          query: { term_prefix: this.tokenSearchPrefix, limit: this.tokenSearchLimit },
         })
         .then((response) => {
           const { data } = response;

@@ -264,7 +264,9 @@ export default defineComponent({
   },
   async mounted() {
     API.export
-      .getExportBaseinfoApiExportProjectBaseinfoGet({ xProjectId: currentProjectStore.projectId as string })
+      .getExportBaseinfoApiExportProjectBaseinfoGet({
+        headers: { "x-project-id": currentProjectStore.projectId as string },
+      })
       .then((response) => {
         this.projectScopes = response.data.scopes;
         this.projectUsers = response.data.users;
@@ -294,8 +296,8 @@ export default defineComponent({
 
       API.export
         .getAnnotationsCsvApiExportAnnotationsCsvPost({
-          xProjectId: currentProjectStore.projectId as string,
-          requestBody: {
+          headers: { "x-project-id": currentProjectStore.projectId as string },
+          body: {
             labels: labels,
             nql_filter: isEmpty(this.labelExportSettings.nqlFilter) ? null : this.labelExportSettings.nqlFilter[0],
             ignore_hierarchy: this.labelExportSettings.ignoreHierarchy,

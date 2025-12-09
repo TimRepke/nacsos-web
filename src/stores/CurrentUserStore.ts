@@ -43,7 +43,7 @@ export const useCurrentUserStore = defineStore("CurrentUserStore", {
   actions: {
     async login(username: string, password: string) {
       try {
-        const token = await API.oauth.loginForAccessTokenApiLoginTokenPost({ formData: { username, password } });
+        const token = await API.oauth.loginForAccessTokenApiLoginTokenPost({ body: { username, password } });
         this.setAuthToken(token.data);
         const me = await API.oauth.readUsersMeApiLoginMeGet();
         this.setUser(me.data);
@@ -56,7 +56,7 @@ export const useCurrentUserStore = defineStore("CurrentUserStore", {
       }
     },
     async loginWithAuthToken(token: string) {
-      OpenAPI.TOKEN = token;
+      OpenAPI.setToken(token);
       try {
         const userTokens = (await API.oauth.readTokensMeApiLoginMyTokensGet()).data;
         if (userTokens[0].token_id === token) {
@@ -88,11 +88,11 @@ export const useCurrentUserStore = defineStore("CurrentUserStore", {
     clear() {
       this.authToken = undefined;
       this.user = undefined;
-      OpenAPI.TOKEN = undefined;
+      OpenAPI.unsetToken();
     },
     setAuthToken(authToken: AuthTokenModel) {
       this.authToken = authToken;
-      OpenAPI.TOKEN = authToken.token_id;
+      OpenAPI.setToken(authToken.token_id);
     },
     setUser(user: UserModel) {
       this.user = user;
@@ -101,7 +101,7 @@ export const useCurrentUserStore = defineStore("CurrentUserStore", {
       try {
         if (this.authToken) {
           const newToken = await API.oauth.refreshTokenApiLoginTokenTokenIdPut({
-            tokenId: this.authToken.token_id,
+            path: { token_id: this.authToken.token_id },
           });
           this.authToken = newToken.data;
         }

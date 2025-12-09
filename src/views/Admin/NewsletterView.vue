@@ -90,9 +90,11 @@ export default defineComponent({
         this.sending = true;
         API.mailing
           .newsMailApiMailNewsPost({
-            isActive: this.isActive,
-            isSubscribed: this.isSubscribed,
-            requestBody: {
+            query: {
+              is_active: this.isActive,
+              is_subscribed: this.isSubscribed,
+            },
+            body: {
               subject: this.title,
               body: this.message,
             },

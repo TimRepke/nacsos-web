@@ -19,6 +19,7 @@ export default [
   },
   {
     ignores: [
+      "src/plugins/api.orig/*",
       "src/util/filesaver.js",
       "src/util/nql/*",
       "src/views/ParseView.vue",

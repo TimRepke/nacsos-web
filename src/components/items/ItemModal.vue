@@ -41,12 +41,11 @@ import { defineComponent } from "vue";
 import type { AnyItem } from "@/types/items";
 import { API } from "@/plugins/api";
 import { currentProjectStore } from "@/stores";
-import type { CancelablePromise } from "@/plugins/api/spec/core/CancelablePromise";
 import AnyItemComponent from "@/components/items/AnyItem.vue";
 
 type ItemModalData = {
   itemInfo: AnyItem | undefined;
-  requestPromise: CancelablePromise<AnyItem> | undefined;
+  requestPromise: Promise<AnyItem> | undefined;
 };
 
 export default defineComponent({
@@ -73,8 +72,8 @@ export default defineComponent({
       this.itemInfo = null;
       this.requestPromise = API.project
         .getDetailForItemApiProjectItemsDetailItemIdGet({
-          itemId,
-          xProjectId: currentProjectStore.projectId as string,
+          path: { item_id: itemId },
+          headers: { "x-project-id": currentProjectStore.projectId as string },
         })
         .then((result) => {
           this.itemInfo = result.data;

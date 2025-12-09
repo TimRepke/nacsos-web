@@ -157,8 +157,8 @@ export default defineComponent({
             if (confirmationResponse === "ACCEPT") {
               API.annotations
                 .clearEmptyAssignmentsApiAnnotationsConfigScopesClearSchemeIdPost({
-                  scopeId: this.assignmentScopeId,
-                  xProjectId: currentProjectStore.projectId as string,
+                  query: { scope_id: this.assignmentScopeId },
+                  headers: { "x-project-id": currentProjectStore.projectId as string },
                 })
                 .then(() => {
                   EventBus.emit(new ToastEvent("SUCCESS", "All open assignments cleared; reload page to see result!"));
@@ -177,9 +177,8 @@ export default defineComponent({
     clearUser(username: string) {
       API.annotations
         .clearEmptyAssignmentsApiAnnotationsConfigScopesClearSchemeIdPost({
-          scopeId: this.assignmentScopeId,
-          userId: currentProjectStore.users.name2id[username],
-          xProjectId: currentProjectStore.projectId as string,
+          query: { scope_id: this.assignmentScopeId, user_id: currentProjectStore.users.name2id[username] },
+          headers: { "x-project-id": currentProjectStore.projectId as string },
         })
         .then(toastSuccess(`All open assignments for ${username} cleared; reload page (F5) to see result!`))
         .catch(toastReject);
@@ -188,13 +187,13 @@ export default defineComponent({
       if (this.assiEditMode) {
         API.annotations
           .bulkAddAssignmentApiAnnotationsConfigScopesBulkAddPut({
-            requestBody: {
+            body: {
               item_ids: this.itemIds,
               scheme_id: this.annotationSchemeId,
               scope_id: this.assignmentScopeId,
               user_id: currentProjectStore.users.name2id[username],
             },
-            xProjectId: currentProjectStore.projectId as string,
+            headers: { "x-project-id": currentProjectStore.projectId as string },
           })
           .then(toastSuccess(`Bulk-created assignments for ${username}; reload page (F5) to see result!`))
           .catch(toastReject);
@@ -207,14 +206,14 @@ export default defineComponent({
         if (!assignment || assignment.status === "OPEN") {
           API.annotations
             .editAssignmentApiAnnotationsConfigAssignmentsEditPut({
-              requestBody: {
+              body: {
                 item_id: itemId,
                 user_id: currentProjectStore.users.name2id[username],
                 order,
                 scheme_id: this.annotationSchemeId,
                 scope_id: this.assignmentScopeId,
               },
-              xProjectId: currentProjectStore.projectId as string,
+              headers: { "x-project-id": currentProjectStore.projectId as string },
             })
             .then((res) => {
               if (assignment) {

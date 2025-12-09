@@ -122,7 +122,7 @@ export default defineComponent({
   async mounted() {
     API.imports
       .getAllImportsForProjectApiImportsListGet({
-        xProjectId: currentProjectStore.projectId as string,
+        headers: { "x-project-id": currentProjectStore.projectId as string },
       })
       .then((response) => {
         this.imports = Object.fromEntries(response.data.map((i) => [i.import_id, i]));
@@ -157,7 +157,7 @@ export default defineComponent({
                 .deleteImportDetailsApiImportsImportDeleteImportIdDelete({
                   // @ts-ignore
                   importId: importDetails.import_id,
-                  xProjectId: currentProjectStore.projectId as string,
+                  headers: { "x-project-id": currentProjectStore.projectId as string },
                 })
                 .then(() => {
                   // drop from the list of import objects

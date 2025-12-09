@@ -1,4 +1,4 @@
-import { type AssignmentStatus, AssignmentStatusEnum } from "@/plugins/api/types";
+import { AssignmentStatus } from "@/plugins/api/types";
 import type { AnnotationSchemeLabelChoice } from "@/plugins/api/spec/types.gen";
 
 export const cmap = [
@@ -62,10 +62,10 @@ export type Extractor<T, R> = (v: T) => R | undefined | null;
 export function lookupMakerStatus<T>(extract: Extractor<T, AssignmentStatus>): (v: T) => string {
   const mapper = lookupMaker<AssignmentStatus>(
     {
-      [AssignmentStatusEnum.OPEN]: "white",
-      [AssignmentStatusEnum.PARTIAL]: "yellow",
-      [AssignmentStatusEnum.FULL]: "#42b983",
-      [AssignmentStatusEnum.INVALID]: "red",
+      [AssignmentStatus.OPEN]: "white",
+      [AssignmentStatus.PARTIAL]: "yellow",
+      [AssignmentStatus.FULL]: "#42b983",
+      [AssignmentStatus.INVALID]: "red",
     },
     "white",
     "white",

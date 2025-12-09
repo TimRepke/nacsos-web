@@ -13,7 +13,7 @@ export function useProjectAnnotationSchemesStore(): ProjectAnnotationSchemesStor
     if (!currentProjectStore.projectId) return [];
     return (
       await API.annotations.getSchemeDefinitionsForProjectApiAnnotationsSchemesListGet({
-        xProjectId: currentProjectStore.projectId as string,
+        headers: { "x-project-id": currentProjectStore.projectId as string },
       })
     ).data;
   }

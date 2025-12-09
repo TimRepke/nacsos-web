@@ -196,7 +196,7 @@ export default defineComponent({
     saveUser(user: UserBaseModel) {
       API.users
         .saveUserApiUsersDetailsPut({
-          requestBody: user,
+          body: user,
         })
         .then((response) => {
           EventBus.emit(new ToastEvent("SUCCESS", `Successfully saved user with id: ${response.data}!`));
@@ -214,7 +214,9 @@ export default defineComponent({
     resetPasswordMail(user: UserModel) {
       API.mailing
         .resetPasswordApiMailResetPasswordUsernamePost({
-          username: user.username as string,
+          path: {
+            username: user.username as string,
+          },
         })
         .then(() => {
           EventBus.emit(new ToastEvent("SUCCESS", "Sent password reset mail to user."));
@@ -224,8 +226,10 @@ export default defineComponent({
     sendWelcome(user: UserModel) {
       API.mailing
         .welcomeMailApiMailWelcomePost({
-          username: user.username as string,
-          password: user.password as string,
+          query: {
+            username: user.username as string,
+            password: user.password as string,
+          },
         })
         .then(() => {
           EventBus.emit(new ToastEvent("SUCCESS", "Sent onboarding mail to user."));

@@ -104,20 +104,18 @@ export default defineComponent({
 
       return new Promise((resolve, reject) => {
         API.pipes
-          .uploadFileApiPipesArtefactsFilesUploadPost(
-            {
-              xProjectId: currentProjectStore.projectId as string,
-              folder,
-              formData: { file: uploadFile.file },
-            },
-            {
-              onUploadProgress: (event: { loaded: number; total?: number }) => {
-                uploadFile.percentage = Math.round(100 * (event.loaded / (event.total || 1)));
-              },
-            },
-          )
+          .uploadFileApiPipesArtefactsFilesUploadPost({
+            headers: { "x-project-id": currentProjectStore.projectId as string },
+            query: { folder },
+            body: { file: uploadFile.file },
+            // FIXME
+            // onUploadProgress: (event: { loaded: number; total?: number }) => {
+            //   uploadFile.percentage = Math.round(100 * (event.loaded / (event.total || 1)));
+            // },
+          })
           .then((response) => {
             uploadFile.status = "SUCCESS";
+            uploadFile.percentage = 100;
             uploadFile.serverPath = response.data;
             resolve(response.data);
           })

@@ -44,7 +44,7 @@ function saveItem() {
 
   API.item
     .updateItemInfoApiItemInfoPut({
-      requestBody: {
+      body: {
         item_id: props.item.item_id,
         text: clearString(props.item.text),
         doi: clearString(props.item.doi),
@@ -63,7 +63,7 @@ function saveItem() {
         authors: props.item.authors,
         meta: props.item.meta,
       },
-      xProjectId: currentProjectStore.projectId as string,
+      headers: { "x-project-id": currentProjectStore.projectId as string },
     })
     .then(() => {
       EventBus.emit(new ToastEvent("SUCCESS", "Saved item!"));
@@ -76,8 +76,8 @@ function saveItem() {
 onMounted(async () => {
   variants.value = (
     await API.item.getItemVariantsApiItemVariantsItemIdGet({
-      itemId: props.item?.item_id as string,
-      xProjectId: currentProjectStore.projectId as string,
+      path: { item_id: props.item?.item_id as string },
+      headers: { "x-project-id": currentProjectStore.projectId as string },
     })
   ).data;
 });

@@ -18,8 +18,8 @@ export function useProjectUsers(): Users {
     if (!currentProjectStore.projectId) return [];
     return (
       await API.users.getProjectUsersApiUsersListProjectProjectIdGet({
-        projectId: currentProjectStore.projectId as string,
-        xProjectId: currentProjectStore.projectId as string,
+        path: { project_id: currentProjectStore.projectId as string },
+        headers: { "x-project-id": currentProjectStore.projectId as string },
       })
     ).data;
   }

@@ -268,15 +268,15 @@ export default defineComponent({
       if (currentAssignmentId) {
         response = (
           await API.annotations.getAssignmentApiAnnotationsAnnotateAssignmentAssignmentIdGet({
-            xProjectId: currentProjectStore.projectId as string,
-            assignmentId: currentAssignmentId,
+            headers: { "x-project-id": currentProjectStore.projectId as string },
+            path: { assignment_id: currentAssignmentId },
           })
         ).data;
       } else {
         response = (
           await API.annotations.getNextOpenAssignmentForScopeForUserApiAnnotationsAnnotateNextAssignmentScopeIdGet({
-            xProjectId: currentProjectStore.projectId as string,
-            assignmentScopeId,
+            headers: { "x-project-id": currentProjectStore.projectId as string },
+            path: { assignment_scope_id: assignmentScopeId },
           })
         ).data;
       }
@@ -405,8 +405,8 @@ export default defineComponent({
         // Send data to the server
         API.annotations
           .saveAnnotationApiAnnotationsAnnotateSavePost({
-            xProjectId: currentProjectStore.projectId as string,
-            requestBody: {
+            headers: { "x-project-id": currentProjectStore.projectId as string },
+            body: {
               scheme,
               assignment: this.assignment as AssignmentModel,
             },
@@ -446,8 +446,8 @@ export default defineComponent({
       // update the assignments progress bar
       API.annotations
         .getAssignmentIndicatorsForScopeApiAnnotationsAnnotateAssignmentProgressAssignmentScopeIdGet({
-          xProjectId: currentProjectStore.projectId as string,
-          assignmentScopeId: annotationItem.scope.assignment_scope_id as string,
+          headers: { "x-project-id": currentProjectStore.projectId as string },
+          path: { assignment_scope_id: annotationItem.scope.assignment_scope_id as string },
         })
         .then(async (response) => {
           this.assignments = response.data;
@@ -468,8 +468,8 @@ export default defineComponent({
 
       API.annotations
         .getAssignmentApiAnnotationsAnnotateAssignmentAssignmentIdGet({
-          xProjectId: currentProjectStore.projectId as string,
-          assignmentId: targetAssignmentId,
+          headers: { "x-project-id": currentProjectStore.projectId as string },
+          path: { assignment_id: targetAssignmentId },
         })
         .then((response) => {
           this.setCurrentAssignment(response.data);

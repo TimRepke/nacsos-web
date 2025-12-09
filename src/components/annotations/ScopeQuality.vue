@@ -179,8 +179,8 @@ export default defineComponent({
   async mounted() {
     API.annotations
       .getNumAssignmentsForScopeApiAnnotationsAnnotateScopeCountsAssignmentScopeIdGet({
-        xProjectId: currentProjectStore.projectId as string,
-        assignmentScopeId: this.scope.assignment_scope_id as string,
+        headers: { "x-project-id": currentProjectStore.projectId as string },
+        path: { assignment_scope_id: this.scope.assignment_scope_id as string },
       })
       .then((response) => {
         this.counts = response.data;
@@ -218,8 +218,8 @@ export default defineComponent({
         if (this.resolutions.length === 0) {
           API.evaluation
             .getResolutionsForScopeApiEvalResolutionsGet({
-              assignmentScopeId: this.scope.assignment_scope_id as string,
-              xProjectId: currentProjectStore.projectId as string,
+              query: { assignment_scope_id: this.scope.assignment_scope_id as string },
+              headers: { "x-project-id": currentProjectStore.projectId as string },
             })
             .then((response) => {
               this.resolutions = response.data;
@@ -232,8 +232,8 @@ export default defineComponent({
     loadMetric() {
       API.evaluation
         .getIrrApiEvalQualityLoadAssignmentScopeIdGet({
-          assignmentScopeId: this.scope.assignment_scope_id as string,
-          xProjectId: currentProjectStore.projectId as string,
+          path: { assignment_scope_id: this.scope.assignment_scope_id as string },
+          headers: { "x-project-id": currentProjectStore.projectId as string },
         })
         .then((response) => {
           this.Metric = response.data;
@@ -248,9 +248,11 @@ export default defineComponent({
     recomputeMetric() {
       API.evaluation
         .recomputeIrrApiEvalQualityComputeGet({
-          assignmentScopeId: this.scope.assignment_scope_id as string,
-          botAnnotationMetadataId: this.selected_resolution,
-          xProjectId: currentProjectStore.projectId as string,
+          query: {
+            assignment_scope_id: this.scope.assignment_scope_id as string,
+            bot_annotation_metadata_id: this.selected_resolution,
+          },
+          headers: { "x-project-id": currentProjectStore.projectId as string },
         })
         .then((response) => {
           this.Metric = response.data;
@@ -262,8 +264,8 @@ export default defineComponent({
       if (!this.assignments) {
         API.annotations
           .getAssignmentIndicatorsForScopeApiAnnotationsAnnotateAssignmentProgressAssignmentScopeIdGet({
-            xProjectId: currentProjectStore.projectId as string,
-            assignmentScopeId: this.scope.assignment_scope_id as string,
+            headers: { "x-project-id": currentProjectStore.projectId as string },
+            path: { assignment_scope_id: this.scope.assignment_scope_id as string },
           })
           .then(async (response) => {
             this.assignments = response.data;

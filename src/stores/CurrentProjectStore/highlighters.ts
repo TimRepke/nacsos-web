@@ -15,7 +15,7 @@ export function useProjectHighlighters(): ProjectHighlighterStore {
     if (!currentProjectStore.projectId) return [];
     return (
       await API.highlighters.getProjectHighlightersApiHighlightersProjectGet({
-        xProjectId: currentProjectStore.projectId as string,
+        headers: { "x-project-id": currentProjectStore.projectId as string },
       })
     ).data;
   }

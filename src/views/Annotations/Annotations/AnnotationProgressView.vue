@@ -329,7 +329,7 @@ export default defineComponent({
   async mounted() {
     API.evaluation
       .getProjectTrackersApiEvalTrackingTrackersGet({
-        xProjectId: currentProjectStore.projectId as string,
+        headers: { "x-project-id": currentProjectStore.projectId as string },
       })
       .then((response) => {
         this.trackers = response.data;
@@ -338,7 +338,7 @@ export default defineComponent({
 
     API.evaluation
       .getProjectScopesApiEvalTrackingScopesGet({
-        xProjectId: currentProjectStore.projectId as string,
+        headers: { "x-project-id": currentProjectStore.projectId as string },
       })
       .then((response) => {
         this.scopes = response.data;
@@ -366,8 +366,8 @@ export default defineComponent({
       if (this.trackerDetails) {
         API.evaluation
           .saveTrackerApiEvalTrackingTrackerPut({
-            xProjectId: currentProjectStore.projectId as string,
-            requestBody: this.trackerDetails,
+            headers: { "x-project-id": currentProjectStore.projectId as string },
+            body: this.trackerDetails,
           })
           .then((response) => {
             if (this.trackerDetails) {
@@ -387,8 +387,8 @@ export default defineComponent({
       if (this.trackerDetails) {
         API.evaluation
           .updateTrackerApiEvalTrackingRefreshPost({
-            xProjectId: this.trackerDetails.project_id as string,
-            trackerId: this.trackerDetails.annotation_tracking_id as string,
+            headers: { "x-project-id": this.trackerDetails.project_id as string },
+            query: { tracker_id: this.trackerDetails.annotation_tracking_id as string },
           })
           .then((response) => {
             if (this.trackerDetails) {
@@ -429,8 +429,8 @@ export default defineComponent({
     focus(tracker: DehydratedAnnotationTracker) {
       API.evaluation
         .getTrackerApiEvalTrackingTrackerTrackerIdGet({
-          xProjectId: currentProjectStore.projectId as string,
-          trackerId: tracker.annotation_tracking_id as string,
+          headers: { "x-project-id": currentProjectStore.projectId as string },
+          path: { tracker_id: tracker.annotation_tracking_id as string },
         })
         .then((response) => {
           this.trackerDetails = response.data;
@@ -441,8 +441,8 @@ export default defineComponent({
       if (this.trackerDetails) {
         API.evaluation
           .getTrackerApiEvalTrackingTrackerTrackerIdGet({
-            xProjectId: currentProjectStore.projectId as string,
-            trackerId: this.trackerDetails.annotation_tracking_id as string,
+            headers: { "x-project-id": currentProjectStore.projectId as string },
+            path: { tracker_id: this.trackerDetails.annotation_tracking_id as string },
           })
           .then((response) => {
             this.trackerDetails = response.data;

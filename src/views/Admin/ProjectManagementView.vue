@@ -76,7 +76,7 @@ import { API } from "@/plugins/api";
 import { EventBus } from "@/plugins/events";
 import { ToastEvent } from "@/plugins/events/events/toast";
 import type { ProjectModel } from "@/plugins/api/spec/types.gen";
-import { ItemTypeEnum as ItemType } from "@/plugins/api/spec/enums.gen";
+import { ItemType } from "@/plugins/api/spec/types.gen";
 import ProjectTypeIcon from "@/components/ProjectTypeIcon.vue";
 import { CurrentProjectSelectedEvent, CurrentProjectSetEvent } from "@/plugins/events/events/projects";
 import { ConfirmationRequestEvent } from "@/plugins/events/events/confirmation";
@@ -128,7 +128,7 @@ export default defineComponent({
     saveProject(project: ProjectModelExt) {
       API.projects
         .createProjectApiProjectsCreatePut({
-          requestBody: project,
+          body: project,
         })
         .then((response) => {
           project.project_id = response.data;

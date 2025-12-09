@@ -84,7 +84,7 @@ export default defineComponent({
       this.error = null;
       API.mailing
         .resetPasswordApiMailResetPasswordUsernamePost({
-          username: this.username as string,
+          path: { username: this.username as string },
         })
         .then(() => {
           EventBus.emit(new ToastEvent("SUCCESS", "I sent you a password reset link. Please check your email inbox."));

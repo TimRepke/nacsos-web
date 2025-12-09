@@ -183,7 +183,7 @@ export default defineComponent({
       } else {
         API.users
           .saveUserSelfApiUsersMyDetailsPut({
-            requestBody: this.user,
+            body: this.user,
           })
           .then((response) => {
             EventBus.emit(new ToastEvent("SUCCESS", `Saved your data for user_id ${response.data}`));
@@ -207,7 +207,7 @@ export default defineComponent({
     revoke(token: AuthTokenModel) {
       API.oauth
         .revokeTokenApiLoginTokenTokenIdDelete({
-          tokenId: token.token_id,
+          path: { token_id: token.token_id },
         })
         .then(this.refreshAuthTokens)
         .catch(toastReject);
@@ -218,7 +218,7 @@ export default defineComponent({
       } else {
         API.oauth
           .refreshTokenApiLoginTokenTokenIdPut({
-            tokenId: token.token_id,
+            path: { token_id: token.token_id },
           })
           .then(this.refreshAuthTokens)
           .catch(toastReject);

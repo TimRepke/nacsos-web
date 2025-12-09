@@ -7,7 +7,7 @@ Steps to set up your local development environment are described below.
 
 If you are on an old machine with Ubuntu 18, you will need a lower version of node
 ```
-nvm install v16.18.1
+nvm install v24.11.1
 ```
 
 ```

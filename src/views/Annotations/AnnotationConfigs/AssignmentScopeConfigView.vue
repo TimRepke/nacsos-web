@@ -96,8 +96,8 @@ onMounted(async () => {
   if (route.params.scope_id) {
     config.value = (
       await API.annotations.getAssignmentScopeApiAnnotationsAssignmentsScopeAssignmentScopeIdGet({
-        xProjectId: currentProjectStore.projectId as string,
-        assignmentScopeId: route.params.scope_id as string,
+        headers: { "x-project-id": currentProjectStore.projectId as string },
+        path: { assignment_scope_id: route.params.scope_id as string },
       })
     ).data;
   }
@@ -131,7 +131,7 @@ onMounted(async () => {
   };
   priorities.value = (
     await API.prio.readProjectSetupsApiPrioSetupsGet({
-      xProjectId: currentProjectStore.projectId as string,
+      headers: { "x-project-id": currentProjectStore.projectId as string },
     })
   ).data;
 });
@@ -139,8 +139,8 @@ onMounted(async () => {
 async function loadCounts() {
   counts.value = (
     await API.annotations.getNumAssignmentsForScopeApiAnnotationsAnnotateScopeCountsAssignmentScopeIdGet({
-      xProjectId: currentProjectStore.projectId as string,
-      assignmentScopeId: route.params.scope_id as string,
+      headers: { "x-project-id": currentProjectStore.projectId as string },
+      path: { assignment_scope_id: route.params.scope_id as string },
     })
   ).data;
 }
@@ -149,8 +149,8 @@ async function sendReminders() {
   EventBus.emit(new ToastEvent("INFO", "Please only click the button once. Sending emails may take a while."));
   API.mailing
     .remindUsersAssigmentApiMailAssignmentReminderPost({
-      assignmentScopeId: config.value?.assignment_scope_id as string,
-      xProjectId: currentProjectStore.projectId as string,
+      query: { assignment_scope_id: config.value?.assignment_scope_id as string },
+      headers: { "x-project-id": currentProjectStore.projectId as string },
     })
     .then((response) => {
       EventBus.emit(new ToastEvent("SUCCESS", `Sent emails to ${response.data}`));
@@ -161,8 +161,8 @@ async function sendReminders() {
 function save() {
   API.annotations
     .putAssignmentScopeApiAnnotationsAssignmentsScopePut({
-      xProjectId: currentProjectStore.projectId as string,
-      requestBody: config.value as AssignmentScopeModel,
+      headers: { "x-project-id": currentProjectStore.projectId as string },
+      body: config.value as AssignmentScopeModel,
     })
     .then(() => {
       toastSuccess("Saved assignment scope details!")();
@@ -182,8 +182,8 @@ function makeAssignments() {
           counts.value = { num_full: 0, num_open: 1, num_partial: 0, num_total: 1 };
           API.annotations
             .makeAssignmentsApiAnnotationsConfigAssignmentsAssignmentScopeIdPut({
-              xProjectId: currentProjectStore.projectId as string,
-              assignmentScopeId: config.value?.assignment_scope_id as string,
+              headers: { "x-project-id": currentProjectStore.projectId as string },
+              path: { assignment_scope_id: config.value?.assignment_scope_id as string },
             })
             .then(() => {
               toastSuccess(`Successfully created assignments.`)();

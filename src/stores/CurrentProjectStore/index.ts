@@ -59,7 +59,7 @@ export const useCurrentProjectStore = defineStore("CurrentProjectStore", () => {
 
   async function refreshInfo(): Promise<ProjectModel | undefined> {
     if (projectId.value) {
-      const { data } = await API.project.getProjectApiProjectInfoGet({ xProjectId: projectId.value });
+      const { data } = await API.project.getProjectApiProjectInfoGet({ headers: { "x-project-id": projectId.value } });
       project.value = data;
       return data;
     }
@@ -69,7 +69,7 @@ export const useCurrentProjectStore = defineStore("CurrentProjectStore", () => {
   async function refreshPermissions(): Promise<ProjectPermissionsModel | undefined> {
     if (projectId.value) {
       const { data } = await API.project.getProjectPermissionsCurrentUserApiProjectPermissionsMeGet({
-        xProjectId: projectId.value,
+        headers: { "x-project-id": projectId.value },
       });
       permissions.value = data;
       return data;
@@ -79,7 +79,7 @@ export const useCurrentProjectStore = defineStore("CurrentProjectStore", () => {
 
   async function unsetImportMutex() {
     if (projectId.value) {
-      await API.project.resetImportMutexApiProjectImportMutexPut({ xProjectId: projectId.value });
+      await API.project.resetImportMutexApiProjectImportMutexPut({ headers: { "x-project-id": projectId.value } });
       await refreshInfo();
     }
   }
