@@ -11,6 +11,9 @@ variables:
 
 image: node:24-alpine
 
+before_script:
+  - apk add rsync
+
 stages:
   - build
   - test
@@ -19,11 +22,14 @@ stages:
 cache:
   paths:
     - node_modules/
+    - dist/
 
 build-job:
+  stage: build
   tags:
     - se164-docker
-  stage: build
+  variables:
+    NODE_ENV: development
   script:
     - echo "Building the static sources"
     - npm install
@@ -31,19 +37,23 @@ build-job:
   artifacts:
     paths:
       - dist/
-    expire_in: 24 hours
+    expire_in: 1 hours
 
 test-job1:
+  stage: test
   tags:
     - se164-docker
-  stage: test
+  variables:
+    NODE_ENV: development
   script:
     - npm run lint
 
 test-job2:
+  stage: test
   tags:
     - se164-docker
-  stage: test
+  variables:
+    NODE_ENV: development
   script:
     - npm run type-check
 
@@ -57,8 +67,7 @@ deploy-to-production:
     - ls -lisah dist
     - /bin/chown -R gitlab-runner "${NACSOS_WWW_DIR}"
     - ls -lisah
-    - rm -rf "${NACSOS_WWW_DIR}/*"
-    - cp -r dist/ "${NACSOS_WWW_DIR}"
+    - rsync -av dist/ "${NACSOS_WWW_DIR}"
     - ls -lisah
     - /bin/chown -R nacsos "${NACSOS_WWW_DIR}"
   when: manual
