@@ -15,7 +15,6 @@ variables:
   tags:
     - se164-docker
   before_script:
-    - apk add rsync
     - npm ci --cache .npm
     - npm ls
   cache:
