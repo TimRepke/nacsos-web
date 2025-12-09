@@ -8,51 +8,55 @@ variables:
   VITE_NACSOS_CORE_URL:
     description: "Complete URL to nacsos-core backend"
     value: "http://127.0.0.1:8081"
+  NODE_ENV: "development"
 
-image: node:24-alpine
-
-before_script:
-  - apk add rsync
-
-stages:
-  - build
-  - test
-  - deploy
-
-cache:
-  paths:
-    - node_modules/
-    - dist/
-
-build-job:
-  stage: build
+.npm:
+  image: node:24-alpine
   tags:
     - se164-docker
+  before_script:
+    - apk add rsync
+    - npm ci --cache .npm
+    - npm ls
+  cache:
+    key: ${CI_COMMIT_REF_SLUG}
+    paths:
+      - .npm/
+
+stages:
+  - setup
+  - test
+  - build
+  - deploy
+
+prepare:
+  extends: .npm
+  stage: setup
   script:
     - echo "Building the static sources"
-    - export NODE_ENV=development
-    - npm install
-    - npm ls
-    - ncu
-    - npm run build-only
-  artifacts:
-    paths:
-      - dist/
-    expire_in: 1 hours
+    - which npm-check-updates
+    - npm-check-updates
 
 test-lint:
   stage: test
-  tags:
-    - se164-docker
+  extends: .npm
   script:
     - npm run lint
 
 test-typing:
   stage: test
-  tags:
-    - se164-docker
+  extends: .npm
   script:
     - npm run type-check
+
+build:
+  stage: build
+  tags:
+    - se164-bare
+  script:
+    - nvm use stable
+    - npm install
+    - npm run build
 
 deploy-to-production:
   tags:

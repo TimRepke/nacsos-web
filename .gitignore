@@ -31,4 +31,6 @@ src/plugins/api.orig/
 *.sln
 *.sw?
 
+.npm/
+
 python.ts
