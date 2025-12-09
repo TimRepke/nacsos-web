@@ -28,32 +28,29 @@ build-job:
   stage: build
   tags:
     - se164-docker
-  variables:
-    NODE_ENV: development
   script:
     - echo "Building the static sources"
+    - export NODE_ENV=development
     - npm install
+    - npm ls
+    - ncu
     - npm run build-only
   artifacts:
     paths:
       - dist/
     expire_in: 1 hours
 
-test-job1:
+test-lint:
   stage: test
   tags:
     - se164-docker
-  variables:
-    NODE_ENV: development
   script:
     - npm run lint
 
-test-job2:
+test-typing:
   stage: test
   tags:
     - se164-docker
-  variables:
-    NODE_ENV: development
   script:
     - npm run type-check
 
