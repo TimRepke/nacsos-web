@@ -74,11 +74,11 @@ deploy-to-production:
     - echo "Deploying to production"
     - ls -lisah
     - ls -lisah dist
-    - /bin/chown -R gitlab-runner "${NACSOS_WWW_DIR}"
+    - sudo /usr/bin/chown -R gitlab-runner "${NACSOS_WWW_DIR}"
     - ls -lisah
     - rsync -av dist/ "${NACSOS_WWW_DIR}"
     - ls -lisah
-    - /bin/chown -R nacsos "${NACSOS_WWW_DIR}"
+    - sudo /usr/bin/chown -R nacsos "${NACSOS_WWW_DIR}"
   when: manual
   #only:
   #  - production
