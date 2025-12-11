@@ -460,7 +460,7 @@ function makeAssignments() {
           <div class="text-end">
             <button type="button" class="btn btn-outline-warning" @click="sendReminders">
               <font-awesome-icon :icon="['fas', 'paper-plane']" />
-              Remind users per email
+              Remind users by email
             </button>
           </div>
           <ScopeQuality :users="currentProjectStore.users.id2user" :scope="config" :edit-mode="true" />
