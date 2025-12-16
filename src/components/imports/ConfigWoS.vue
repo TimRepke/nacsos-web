@@ -5,7 +5,7 @@
       <p class="text-muted">
         Import method for Web of Science text files. These can be obtained by querying web of science, clicking "export"
         and selecting "Plain text file". Please consult
-        <a href="https://apsis.mcc-berlin.net/nacsos-docs/user/import/" target="_blank" rel="noopener noreferrer">
+        <a href="https://nacsos.pik-potsdam.de/documentation/user/import/" target="_blank" rel="noopener noreferrer">
           the documentation
         </a>
         for additional details. For multi-file upload, press and hold <kbd>Shift</kbd> or <kbd>Ctrl</kbd> in file

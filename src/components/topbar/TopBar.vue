@@ -34,7 +34,7 @@ import NacsosLogo from "@/components/NacsosLogo.vue";
             </router-link>
           </li>
           <li class="nav-item">
-            <a href="https://apsis.mcc-berlin.net/nacsos-docs/" class="nav-link fw-bold" target="_blank">
+            <a href="https://nacsos.pik-potsdam.de/documentation/" class="nav-link fw-bold" target="_blank">
               <font-awesome-icon :icon="['far', 'circle-question']" class="me-1" />
               Help
             </a>

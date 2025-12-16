@@ -81,7 +81,7 @@ onMounted(() => {
       </div>
       <div class="col text-end">
         <a
-          href="https://apsis.mcc-berlin.net/nacsos-docs/user/data-queries/"
+          href="https://nacsos.pik-potsdam.de/documentation/user/data-queries/"
           target="_blank"
           class="link-secondary me-2"
           style="text-decoration: none"

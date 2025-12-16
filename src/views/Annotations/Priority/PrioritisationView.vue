@@ -299,7 +299,7 @@ async function loadDF(event: MouseEvent, filename: string) {
             <div class="col">
               <h5>Inclusion rule</h5>
               <a
-                href="https://apsis.mcc-berlin.net/nacsos-docs/user/annotation/priority/"
+                href="https://nacsos.pik-potsdam.de/documentation/user/annotation/priority/"
                 target="_blank"
                 class="link-secondary me-2"
                 style="text-decoration: none"

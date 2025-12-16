@@ -26,7 +26,7 @@
                     <font-awesome-icon :icon="['fas', 'arrow-down-a-z']" />Tokens
                   </span>
                   <a
-                    href="https://apsis.mcc-berlin.net/nacsos-docs/user/import/openalex/"
+                    href="https://nacsos.pik-potsdam.de/documentation/user/import/openalex/"
                     target="_blank"
                     class="link-secondary"
                     style="text-decoration: none"

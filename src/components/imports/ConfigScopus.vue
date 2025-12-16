@@ -4,7 +4,7 @@
       <h5>Scopus CSV import</h5>
       <p class="text-muted">
         Upload a Scopus CSV file, where you selected (almost) all fields to export. Please consult
-        <a href="https://apsis.mcc-berlin.net/nacsos-docs/user/import/" target="_blank" rel="noopener noreferrer">
+        <a href="https://nacsos.pik-potsdam.de/documentation/user/import/" target="_blank" rel="noopener noreferrer">
           the documentation
         </a>
         for additional details. For multi-file upload, press and hold <kbd>Shift</kbd> or <kbd>Ctrl</kbd> in file
