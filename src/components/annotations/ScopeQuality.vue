@@ -239,7 +239,7 @@ export default defineComponent({
           this.Metric = response.data;
 
           // select the last used resolution
-          if (this.Metric) {
+          if (this.Metric && this.Metric.length > 0) {
             this.selected_resolution = this.Metric[0].bot_annotation_metadata_id;
           }
         })

@@ -5,7 +5,6 @@ import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import { API } from "@/plugins/api";
 import { currentProjectStore } from "@/stores";
 import { pyDTNow } from "@/util";
-import { InvalidArgumentError } from "commander";
 
 type ScopusResponse = {
   "search-results": {
@@ -91,7 +90,7 @@ async function fetchData() {
 async function scopusAPI(): Promise<Record<string, any>[]> {
   const query = config.value?.query;
   const date = config.value?.date;
-  if (!query || !date) throw new InvalidArgumentError("Query or date missing; this should have never happened!");
+  if (!query || !date) throw new Error("Query or date missing; this should have never happened!");
 
   progress.value.running = true;
   progress.value.currentPage = 0;
