@@ -298,7 +298,7 @@ export default defineComponent({
       histStart: 2000,
       histEnd: 2026,
       includeXPAC: false,
-      params: null,
+      params: '{ "fq": "is_xpac: false" }',
       advanced: false,
       histogram: null as Record<string, number> | null | undefined,
       qTime: null as number | null,
@@ -315,7 +315,7 @@ export default defineComponent({
   },
   watch: {
     includeXPAC(newValue: boolean) {
-      this.params = newValue ? '{ "fq": "is_xpac: false" }' : null;
+      this.params = !newValue ? '{ "fq": "is_xpac: false" }' : null;
     },
   },
   methods: {
