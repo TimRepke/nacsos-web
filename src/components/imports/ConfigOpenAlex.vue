@@ -61,9 +61,12 @@ import { defineComponent } from "vue";
 import { type OpenAlexSolrImport, DefTypeEnum, OpEnum, SearchFieldEnum, ImportConfigEnum } from "@/plugins/api/types";
 import useVuelidate, { type ValidationRule } from "@vuelidate/core";
 import { errorsToString } from "@/util/validators";
+import { Overwrite } from "@/util";
+
+type StringifiedOpenAlexSolrImport = Overwrite<OpenAlexSolrImport, { params: string }>;
 
 const isJSON: ValidationRule = {
-  $validator(value: OpenAlexSolrImport) {
+  $validator(value: StringifiedOpenAlexSolrImport) {
     if (!value.params) return true;
     try {
       JSON.parse(value.params);
@@ -102,29 +105,28 @@ export default defineComponent({
     return { v$: useVuelidate() };
   },
   data() {
-    const emptyConfig: OpenAlexSolrImport = {
+    const emptyConfig: StringifiedOpenAlexSolrImport = {
       kind: ImportConfigEnum.OA_SOLR,
       query: "",
       def_type: DefTypeEnum.LUCENE,
       field: SearchFieldEnum.TITLE_ABSTRACT,
       op: OpEnum.AND,
       params: '{ "fq": "is_xpac: false" }',
-      debounceWatch: false,
     };
     if (!this.existingConfig || this.existingConfig.kind !== ImportConfigEnum.OA_SOLR) {
       this.$emit("configChanged", this.parse(emptyConfig));
-      return { config: emptyConfig };
+      return { config: emptyConfig, debounceWatch: false };
     }
-    return { config: this.stringify(this.existingConfig) };
+    return { config: this.stringify(this.existingConfig), debounceWatch: false };
   },
   methods: {
     errorsToString,
-    parse(conf) {
+    parse(conf: StringifiedOpenAlexSolrImport): OpenAlexSolrImport {
       const copy = JSON.parse(JSON.stringify(conf));
       copy.params = JSON.parse(copy.params || "");
       return copy;
     },
-    stringify(conf) {
+    stringify(conf: OpenAlexSolrImport): StringifiedOpenAlexSolrImport {
       const copy = JSON.parse(JSON.stringify(conf));
       copy.params = copy.params ? JSON.stringify(copy.params) : null;
       return copy;
