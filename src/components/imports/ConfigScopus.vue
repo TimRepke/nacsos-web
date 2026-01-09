@@ -43,10 +43,11 @@ import type { PropType } from "vue";
 import { defineComponent } from "vue";
 import useVuelidate from "@vuelidate/core";
 import { required } from "@vuelidate/validators";
-import type { BaseValidation, ValidationRule } from "@vuelidate/core";
+import type { ValidationRule } from "@vuelidate/core";
 import { ImportConfigEnum, type ScopusImport } from "@/plugins/api/types";
 import FilesUploader from "@/components/FilesUploader.vue";
 import type { UploadFile } from "@/components/FilesUploader.vue";
+import { errorsToString } from "@/util/validators";
 
 const areFilesUploaded: ValidationRule = {
   $validator(value?: UploadFile[]) {
@@ -101,9 +102,7 @@ export default defineComponent({
     return { files: [] as UploadFile[], config: this.existingConfig };
   },
   methods: {
-    errorsToString(field: BaseValidation): string {
-      return field.$errors.map((error) => error.$message).join("; ");
-    },
+    errorsToString,
     onFilesChange(files: UploadFile[]) {
       this.files = files;
       const sources = files.map((file) => file.serverPath).filter((source) => !!source);

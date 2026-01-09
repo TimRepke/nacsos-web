@@ -21,7 +21,7 @@
             <div class="accordion-body">
               <div class="row">
                 <div class="col text-end">
-                  <textarea v-model="query" class="form-control" aria-label="Query" rows="3" />
+                  <textarea v-model="query" class="form-control" aria-label="Query" rows="3" placeholder="Query" />
                   <span role="button" tabindex="-1" class="link-secondary me-2" @click="showTokenExpandModal = true">
                     <font-awesome-icon :icon="['fas', 'arrow-down-a-z']" />Tokens
                   </span>
@@ -37,10 +37,65 @@
                   >
                 </div>
               </div>
+
+              <div class="row" v-if="advanced">
+                <div class="col">
+                  <textarea
+                    v-model="params"
+                    class="form-control"
+                    aria-label="Params"
+                    rows="3"
+                    placeholder="Params"
+                    :class="{ 'is-invalid': v$.params.$invalid }"
+                  />
+                  <div class="invalid-feedback d-block" v-if="v$.params.$invalid">
+                    {{ errorsToString(v$.params) }}
+                  </div>
+                </div>
+              </div>
+
               <div class="row mt-2">
                 <div class="col-12" :class="{ 'col-sm-8': histogramChart }">
                   <div class="row mt-2">
                     <div class="col-6 col-sm-auto">
+                      <label for="op" class="form-label">OP</label>
+                      <select class="form-select form-select form-select-sm" v-model="op" id="op">
+                        <option value="AND">AND</option>
+                        <option value="OR">OR</option>
+                      </select>
+                    </div>
+
+                    <div class="col-6 col-sm-auto">
+                      <label for="qfield" class="form-label">Field</label>
+                      <select class="form-select form-select form-select-sm" v-model="field" id="qfield">
+                        <option value="title">title</option>
+                        <option value="abstract">abstract</option>
+                        <option value="title_abstract">title_abstract</option>
+                      </select>
+                    </div>
+
+                    <div class="col-6 col-sm-auto">
+                      <label for="defType" class="form-label">Parser</label>
+                      <select class="form-select form-select form-select-sm" v-model="defType" id="defType">
+                        <option value="lucene">lucene</option>
+                        <option value="dismax">dismax</option>
+                        <option value="edismax">edismax</option>
+                      </select>
+                    </div>
+
+                    <div class="col-6 col-sm-auto">
+                      <label for="includeXPAC" class="form-label">Advanced</label>
+                      <div class="mb-2">
+                        <input id="includeXPAC" v-model="includeXPAC" class="form-check-input me-2" type="checkbox" />
+                        <label for="includeXPAC" class="form-check-label">Include XPAC</label>
+                      </div>
+                      <div class="mb-2">
+                        <input id="editParams" v-model="advanced" class="form-check-input me-2" type="checkbox" />
+                        <label for="editParams" class="form-check-label">Show override params</label>
+                      </div>
+                    </div>
+
+                    <div class="col-6 col-sm-auto ms-auto">
                       <label for="limit" class="form-label">Limit</label>
                       <input
                         type="number"
@@ -70,36 +125,9 @@
                         </div>
                       </div>
                     </div>
-
-                    <div class="col-6 col-sm-auto">
-                      <label for="op" class="form-label">OP</label>
-                      <select class="form-select form-select form-select-sm" v-model="op" id="op">
-                        <option value="AND">AND</option>
-                        <option value="OR">OR</option>
-                      </select>
-                    </div>
-
-                    <div class="col-6 col-sm-auto">
-                      <label for="qfield" class="form-label">Field</label>
-                      <select class="form-select form-select form-select-sm" v-model="field" id="qfield">
-                        <option value="title">title</option>
-                        <option value="abstract">abstract</option>
-                        <option value="title_abstract">title_abstract</option>
-                      </select>
-                    </div>
-
-                    <div class="col-6 col-sm-auto">
-                      <label for="defType" class="form-label">Parser</label>
-                      <select class="form-select form-select form-select-sm" v-model="defType" id="defType">
-                        <option value="lucene">lucene</option>
-                        <option value="dismax">dismax</option>
-                        <option value="edismax">edismax</option>
-                      </select>
-                    </div>
-
                     <div class="col-6 col-sm-auto">
                       <div class="mb-2">
-                        <input id="includeHistogram" v-model="hist" class="form-check-input me-1" type="checkbox" />
+                        <input id="includeHistogram" v-model="hist" class="form-check-input me-2" type="checkbox" />
                         <label for="includeHistogram" class="form-check-label"> Histogram </label>
                       </div>
                       <div class="d-flex">
@@ -193,6 +221,7 @@
                     class="form-control"
                     placeholder="Prefix without the *"
                     aria-label="Prefix without the *"
+                    @keyup.enter="expandTokens"
                   />
                   <button
                     class="btn btn-outline-secondary"
@@ -227,6 +256,7 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
+import useVuelidate from "@vuelidate/core";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import { Bar } from "vue-chartjs";
 import { BarElement, CategoryScale, Chart as ChartJS, Legend, LinearScale, Title, Tooltip } from "chart.js";
@@ -237,6 +267,7 @@ import { EventBus } from "@/plugins/events";
 import { ToastEvent } from "@/plugins/events/events/toast";
 import { API } from "@/plugins/api";
 import AcademicItemComponent from "@/components/items/AcademicItem.vue";
+import { isJSON, errorsToString } from "@/util/validators";
 
 ChartJS.register(Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale);
 
@@ -252,17 +283,23 @@ type OpType = "OR" | "AND";
 export default defineComponent({
   name: "OpenAlexSearchView",
   components: { Bar, FontAwesomeIcon, AcademicItemComponent },
+  setup() {
+    return { v$: useVuelidate() };
+  },
   data() {
     return {
-      query: "Query",
+      query: "",
       limit: 20,
       offset: 0,
       op: "AND" as OpType,
-      defType: "edismax" as DefType,
+      defType: "lucene" as DefType,
       field: "title_abstract" as SearchField,
       hist: false,
-      histStart: 1990,
-      histEnd: 2024,
+      histStart: 2000,
+      histEnd: 2026,
+      includeXPAC: false,
+      params: null,
+      advanced: false,
       histogram: null as Record<string, number> | null | undefined,
       qTime: null as number | null,
       nDocs: null as number | null,
@@ -276,7 +313,13 @@ export default defineComponent({
   async mounted() {
     // pass
   },
+  watch: {
+    includeXPAC(newValue: boolean) {
+      this.params = newValue ? '{ "fq": "is_xpac: false" }' : null;
+    },
+  },
   methods: {
+    errorsToString,
     paginate(step: number) {
       this.offset = Math.max(0, this.offset + step);
       // if we already ran the query, run it again with the updated offset
@@ -295,7 +338,8 @@ export default defineComponent({
             def_type: this.defType,
             histogram: this.hist,
             histogram_from: this.histStart,
-            histogram_to: this.histEnd,
+            histogram_to: this.histEnd + 1,
+            params: JSON.parse(this.params),
           },
           headers: { "x-project-id": currentProjectStore.projectId as string },
         })
@@ -351,6 +395,11 @@ export default defineComponent({
       }
       return undefined;
     },
+  },
+  validations() {
+    return {
+      params: { isJSON, $autoDirty: true },
+    };
   },
 });
 </script>
