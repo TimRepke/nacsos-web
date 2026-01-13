@@ -139,5 +139,5 @@ export const OpenAPI = {
   setToken: (token: string | undefined) => {
     client.setConfig({ headers: { Authorization: token ? `Bearer ${token}` : undefined } });
   },
-  unsetToken: () => client.setConfig({ headers: { Authorization: undefined } }),
+  unsetToken: () => client.setConfig({ headers: { Authorization: null } }),
 };
