@@ -131,7 +131,7 @@ export function pyDTNow() {
 
 export function timestampNow() {
   const now = new Date();
-  return `${now.getFullYear()}-${zPad(now.getMonth(), 2)}-${zPad(now.getDate(), 2)}`;
+  return `${now.getFullYear()}-${zPad(now.getMonth() + 1, 2)}-${zPad(now.getDate(), 2)}`;
 }
 
 export function clearString(s: string | null | undefined): string | null {
