@@ -35,18 +35,18 @@ const configs: { [key in ProjectModel["type"]]: Record<string, ConfigOption> } =
       component: ConfigScopus,
       name: "Upload Scopus CSV file(s)",
     },
-    scopusAPI: {
-      component: ConfigScopusAPI,
-      name: "Import from Scopus API",
-    },
+    // scopusAPI: {
+    //   component: ConfigScopusAPI,
+    //   name: "Import from Scopus API",
+    // },
     oa: {
       component: ConfigOpenAlex,
-      name: "Import from OpenAlex (Solr)",
+      name: "Import OpenAlex directly from solr",
     },
-    oaFile: {
-      component: ConfigJSONLOpenAlexWorks,
-      name: "Upload OpenAlex file",
-    },
+    // oaFile: {
+    //   component: ConfigJSONLOpenAlexWorks,
+    //   name: "Import OpenAlex directly from solr",
+    // },
     academicFile: {
       component: ConfigJSONLAcademicItem,
       name: "Upload JSONl file (AcademicItemModel)",
