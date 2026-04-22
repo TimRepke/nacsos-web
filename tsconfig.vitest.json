@@ -24,8 +24,8 @@
       "scripthost"
     ],
     "types": [
-      "node",
-      "jsdom",
+//      "node",
+//      "jsdom",
       "vite/client"
     ],
     "target": "esnext",

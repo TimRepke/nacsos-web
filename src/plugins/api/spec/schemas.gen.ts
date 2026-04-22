@@ -6898,6 +6898,18 @@ export const OpenAlexSolrImportSchema = {
             ],
             title: 'Op',
             default: 'AND'
+        },
+        params: {
+            anyOf: [
+                {
+                    additionalProperties: true,
+                    type: 'object'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Params'
         }
     },
     type: 'object',
@@ -8461,6 +8473,18 @@ export const SearchPayloadSchema = {
             type: 'integer',
             title: 'Histogram To',
             default: 2024
+        },
+        params: {
+            anyOf: [
+                {
+                    additionalProperties: true,
+                    type: 'object'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Params'
         }
     },
     type: 'object',

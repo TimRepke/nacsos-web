@@ -155,8 +155,7 @@ export default defineComponent({
             if (confirmationResponse === "ACCEPT") {
               API.imports
                 .deleteImportDetailsApiImportsImportDeleteImportIdDelete({
-                  // @ts-ignore
-                  importId: importDetails.import_id,
+                  path: { import_id: importDetails.import_id as string },
                   headers: { "x-project-id": currentProjectStore.projectId as string },
                 })
                 .then(() => {

@@ -2,6 +2,8 @@ import type { App } from "vue";
 import type { RouteLocationNormalized, RouteRecordNormalized } from "vue-router";
 import { marked } from "marked";
 
+export type Overwrite<T, U> = Pick<T, Exclude<keyof T, keyof U>> & U;
+
 // inspired by https://github.com/jashkenas/underscore/blob/master/modules/_shallowProperty.js
 // Internal helper to generate a function to obtain property `key` from `obj`.
 export function shallowProperty<T>(key: string) {
@@ -129,7 +131,7 @@ export function pyDTNow() {
 
 export function timestampNow() {
   const now = new Date();
-  return `${now.getFullYear()}-${zPad(now.getMonth(), 2)}-${zPad(now.getDate(), 2)}`;
+  return `${now.getFullYear()}-${zPad(now.getMonth() + 1, 2)}-${zPad(now.getDate(), 2)}`;
 }
 
 export function clearString(s: string | null | undefined): string | null {

@@ -3160,6 +3160,12 @@ export type OpenAlexSolrImport = {
      * Op
      */
     op?: 'OR' | 'AND';
+    /**
+     * Params
+     */
+    params?: {
+        [key: string]: unknown;
+    } | null;
 };
 
 /**
@@ -3968,6 +3974,12 @@ export type SearchPayload = {
      * Histogram To
      */
     histogram_to?: number;
+    /**
+     * Params
+     */
+    params?: {
+        [key: string]: unknown;
+    } | null;
 };
 
 /**

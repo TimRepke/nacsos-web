@@ -5,9 +5,7 @@ import type { Component } from "vue";
 import ConfigWoS from "@/components/imports/ConfigWoS.vue";
 import ConfigScopus from "@/components/imports/ConfigScopus.vue";
 import ConfigOpenAlex from "@/components/imports/ConfigOpenAlex.vue";
-import ConfigJSONLOpenAlexWorks from "@/components/imports/ConfigJSONLOpenAlexWorks.vue";
 import ConfigJSONLAcademicItem from "@/components/imports/ConfigJSONLAcademicItem.vue";
-import ConfigScopusAPI from "@/components/imports/ConfigScopusAPI.vue";
 import { currentProjectStore, currentUserStore } from "@/stores";
 import { useRoute, useRouter } from "vue-router";
 import { API, ignore, toastReject } from "@/plugins/api";
@@ -35,18 +33,18 @@ const configs: { [key in ProjectModel["type"]]: Record<string, ConfigOption> } =
       component: ConfigScopus,
       name: "Upload Scopus CSV file(s)",
     },
-    scopusAPI: {
-      component: ConfigScopusAPI,
-      name: "Import from Scopus API",
-    },
+    // scopusAPI: {
+    //   component: ConfigScopusAPI,
+    //   name: "Import from Scopus API",
+    // },
     oa: {
       component: ConfigOpenAlex,
-      name: "Import from OpenAlex (Solr)",
+      name: "Import OpenAlex directly from solr",
     },
-    oaFile: {
-      component: ConfigJSONLOpenAlexWorks,
-      name: "Upload OpenAlex file",
-    },
+    // oaFile: {
+    //   component: ConfigJSONLOpenAlexWorks,
+    //   name: "Import OpenAlex directly from solr",
+    // },
     academicFile: {
       component: ConfigJSONLAcademicItem,
       name: "Upload JSONl file (AcademicItemModel)",

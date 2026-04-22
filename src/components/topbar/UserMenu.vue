@@ -2,11 +2,13 @@
 import { EventBus } from "@/plugins/events";
 import { LoggedOutEvent, LogoutSuccessEvent } from "@/plugins/events/events/auth";
 import { currentUserStore } from "@/stores";
+import { useRouter } from "vue-router";
 
+const router = useRouter();
 function logout() {
   EventBus.emit(new LoggedOutEvent());
   EventBus.once(LogoutSuccessEvent, () => {
-    this.$router.push({ name: "user-login" });
+    router.push({ name: "user-login" });
   });
 }
 </script>

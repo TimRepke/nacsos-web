@@ -36,6 +36,22 @@
         </select>
       </div>
     </div>
+    <div class="row mt-2">
+      <div class="col">
+        <textarea
+          v-model="config.params"
+          :disabled="!editable"
+          aria-label="Parameter override"
+          placeholder="Parameter override"
+          class="form-control"
+          rows="5"
+          :class="{ 'is-invalid': v$.config.$invalid }"
+        />
+        <div class="invalid-feedback d-block" v-if="v$.config.$invalid">
+          {{ errorsToString(v$.config) }}
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -43,7 +59,24 @@
 import type { PropType } from "vue";
 import { defineComponent } from "vue";
 import { type OpenAlexSolrImport, DefTypeEnum, OpEnum, SearchFieldEnum, ImportConfigEnum } from "@/plugins/api/types";
+import useVuelidate, { type ValidationRule } from "@vuelidate/core";
+import { errorsToString } from "@/util/validators";
+import { Overwrite } from "@/util";
 
+type StringifiedOpenAlexSolrImport = Overwrite<OpenAlexSolrImport, { params: string }>;
+
+const isJSON: ValidationRule = {
+  $validator(value: StringifiedOpenAlexSolrImport) {
+    if (!value.params) return true;
+    try {
+      JSON.parse(value.params);
+      return true;
+    } catch {
+      return false;
+    }
+  },
+  $message: "Invalid JSON!",
+};
 export default defineComponent({
   name: "ConfigOpenAlex",
   emits: ["configChanged"],
@@ -68,30 +101,57 @@ export default defineComponent({
       default: true,
     },
   },
+  setup() {
+    return { v$: useVuelidate() };
+  },
   data() {
-    const emptyConfig: OpenAlexSolrImport = {
+    const emptyConfig: StringifiedOpenAlexSolrImport = {
       kind: ImportConfigEnum.OA_SOLR,
       query: "",
       def_type: DefTypeEnum.LUCENE,
       field: SearchFieldEnum.TITLE_ABSTRACT,
       op: OpEnum.AND,
+      params: '{ "fq": "is_xpac: false" }',
     };
     if (!this.existingConfig || this.existingConfig.kind !== ImportConfigEnum.OA_SOLR) {
-      this.$emit("configChanged", emptyConfig);
-      return { config: emptyConfig };
+      this.$emit("configChanged", this.parse(emptyConfig));
+      return { config: emptyConfig, debounceWatch: false };
     }
-    return { config: this.existingConfig };
+    return { config: this.stringify(this.existingConfig), debounceWatch: false };
+  },
+  methods: {
+    errorsToString,
+    parse(conf: StringifiedOpenAlexSolrImport): OpenAlexSolrImport {
+      const copy = JSON.parse(JSON.stringify(conf));
+      copy.params = JSON.parse(copy.params || "");
+      return copy;
+    },
+    stringify(conf: OpenAlexSolrImport): StringifiedOpenAlexSolrImport {
+      const copy = JSON.parse(JSON.stringify(conf));
+      copy.params = copy.params ? JSON.stringify(copy.params) : null;
+      return copy;
+    },
   },
   watch: {
     config: {
       handler(newValue: OpenAlexSolrImport) {
-        this.$emit("configChanged", newValue);
+        if (this.debounceWatch) {
+          // prevent endless recursion
+          this.debounceWatch = false;
+          return;
+        }
+        try {
+          this.$emit("configChanged", this.parse(newValue));
+        } catch {
+          console.warn("Not updating config due to invalid json");
+        }
       },
       deep: true,
     },
     existingConfig: {
       handler(newValue: OpenAlexSolrImport) {
-        this.config = newValue;
+        this.debounceWatch = true;
+        this.config = this.stringify(newValue);
       },
       deep: true,
     },
@@ -100,6 +160,11 @@ export default defineComponent({
         this.config.import_id = newValue;
       },
     },
+  },
+  validations() {
+    return {
+      config: { isJSON, $autoDirty: true },
+    };
   },
 });
 </script>

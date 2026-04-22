@@ -122,10 +122,22 @@ client.interceptors.error.use((reason: unknown | RejectReason) => {
   }
   return reason;
 });
+
+client.interceptors.error.use((reason: unknown | RejectReason, response: Response) => {
+  if (reason)
+    return {
+      ...reason,
+      ok: false,
+      status: response.status,
+      response: response,
+      error: reason,
+    };
+  return reason;
+});
 export const OpenAPI = {
   ...client,
   setToken: (token: string | undefined) => {
     client.setConfig({ headers: { Authorization: token ? `Bearer ${token}` : undefined } });
   },
-  unsetToken: () => client.setConfig({ headers: { Authorization: undefined } }),
+  unsetToken: () => client.setConfig({ headers: { Authorization: null, authorization: null } }),
 };

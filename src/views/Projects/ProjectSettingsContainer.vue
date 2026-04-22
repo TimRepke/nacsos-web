@@ -4,7 +4,7 @@ import { currentProjectStore } from "@/stores";
 
 <template>
   <div>
-    <div v-if="currentProjectStore.permissions.owner">
+    <div v-if="currentProjectStore.permissions?.owner">
       <router-view />
     </div>
     <div v-else>Unfortunately, you don't have permission to access this page.</div>
