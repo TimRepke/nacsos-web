@@ -27,6 +27,7 @@ assigned_clause ->
   | "IS ASSIGNED IN"i           __ uuids  {% (d) => ({ filter: "assignment", mode: 2, scopes: d[2] }) %}
   | "IS ASSIGNED BUT NOT IN"i   __ uuids  {% (d) => ({ filter: "assignment", mode: 3, scopes: d[2] }) %}
   | "IS NOT ASSIGNED"i                    {% (d) => ({ filter: "assignment", mode: 4               }) %}
+  | "IS NOT ASSIGNED WITH"i     __ UUID   {% (d) => ({ filter: "assignment", mode: 8, scheme: d[2] }) %}
   | "IS NOT ASSIGNED IGNORING"i __ uuids  {% (d) => ({ filter: "assignment", mode: 5, scopes: d[2] }) %}
   | "IS ASSIGNED WITH"i         __ UUID   {% (d) => ({ filter: "assignment", mode: 6, scheme: d[2] }) %}
   | "IS ASSIGNED BUT NOT WITH"i __ UUID   {% (d) => ({ filter: "assignment", mode: 7, scheme: d[2] }) %}
