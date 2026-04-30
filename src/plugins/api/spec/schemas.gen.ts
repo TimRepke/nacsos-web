@@ -3026,7 +3026,7 @@ export const Body_upload_file_api_pipes_artefacts_files_upload_postSchema = {
     properties: {
         file: {
             type: 'string',
-            format: 'binary',
+            contentMediaType: 'application/octet-stream',
             title: 'File'
         }
     },
@@ -3042,7 +3042,7 @@ export const Body_upload_files_api_pipes_artefacts_files_upload_many_postSchema 
         file: {
             items: {
                 type: 'string',
-                format: 'binary'
+                contentMediaType: 'application/octet-stream'
             },
             type: 'array',
             title: 'File'
@@ -4118,18 +4118,18 @@ export const EventSchema = {
         event: {
             type: 'string',
             enum: [
-                'ExampleEvent',
-                'ExampleSubEvent'
+                'ExampleSubEvent',
+                'ExampleEvent'
             ],
             title: 'Event'
         },
         payload: {
             anyOf: [
                 {
-                    $ref: '#/components/schemas/ExampleEvent'
+                    $ref: '#/components/schemas/ExampleSubEvent'
                 },
                 {
-                    $ref: '#/components/schemas/ExampleSubEvent'
+                    $ref: '#/components/schemas/ExampleEvent'
                 }
             ],
             title: 'Payload'
@@ -5969,6 +5969,18 @@ export const LabelSchema = {
 
 export const LabelCountSchema = {
     properties: {
+        scheme: {
+            anyOf: [
+                {
+                    type: 'string',
+                    format: 'uuid'
+                },
+                {
+                    type: 'string'
+                }
+            ],
+            title: 'Scheme'
+        },
         num_items: {
             type: 'integer',
             title: 'Num Items'
@@ -6035,6 +6047,7 @@ export const LabelCountSchema = {
     },
     type: 'object',
     required: [
+        'scheme',
         'num_items',
         'key'
     ],
@@ -10056,6 +10069,13 @@ export const ValidationErrorSchema = {
         type: {
             type: 'string',
             title: 'Error Type'
+        },
+        input: {
+            title: 'Input'
+        },
+        ctx: {
+            type: 'object',
+            title: 'Context'
         }
     },
     type: 'object',
