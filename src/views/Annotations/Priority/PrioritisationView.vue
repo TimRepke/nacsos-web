@@ -376,7 +376,7 @@ async function loadDF(event: MouseEvent, filename: string) {
         <template v-slot:body>
           <template v-if="!setup.time_started">
             <a
-              href="https://gitlab.pik-potsdam.de/mcc-apsis/nacsos/nacsos-ml/-/pipelines/new"
+              :href="`https://gitlab.pik-potsdam.de/mcc-apsis/nacsos/nacsos-ml/-/pipelines/new?var%5BPRIORITY_ID%5D=${setup.priority_id}`"
               target="_blank"
               class="btn btn-outline-secondary"
               v-if="currentUserStore.isSudo"
