@@ -1242,6 +1242,42 @@ export type AuthTokenModel = {
 };
 
 /**
+ * BaseInfo
+ */
+export type BaseInfo = {
+  /**
+   * Id
+   */
+  id: string | string;
+  /**
+   * Name
+   */
+  name: string;
+};
+
+/**
+ * BaseInfoWithScheme
+ */
+export type BaseInfoWithScheme = {
+  /**
+   * Id
+   */
+  id: string | string;
+  /**
+   * Name
+   */
+  name: string;
+  /**
+   * Scheme Id
+   */
+  scheme_id: string | string;
+  /**
+   * Scheme Name
+   */
+  scheme_name: string;
+};
+
+/**
  * BasicProjectStats
  */
 export type BasicProjectStats = {
@@ -3339,57 +3375,15 @@ export type ProjectBaseInfo = {
   /**
    * Users
    */
-  users: Array<ProjectBaseInfoEntry>;
+  users: Array<BaseInfo>;
   /**
    * Scopes
    */
-  scopes: Array<ProjectBaseInfoScopeEntry>;
+  scopes: Array<BaseInfoWithScheme>;
   /**
    * Bot Scopes
    */
-  bot_scopes: Array<ProjectBaseInfoEntry>;
-  /**
-   * Labels
-   */
-  labels: {
-    [key: string]: LabelOptions;
-  };
-};
-
-/**
- * ProjectBaseInfoEntry
- */
-export type ProjectBaseInfoEntry = {
-  /**
-   * Id
-   */
-  id: string | string;
-  /**
-   * Name
-   */
-  name: string;
-};
-
-/**
- * ProjectBaseInfoScopeEntry
- */
-export type ProjectBaseInfoScopeEntry = {
-  /**
-   * Id
-   */
-  id: string | string;
-  /**
-   * Name
-   */
-  name: string;
-  /**
-   * Scheme Id
-   */
-  scheme_id: string | string;
-  /**
-   * Scheme Name
-   */
-  scheme_name: string;
+  bot_scopes: Array<BaseInfoWithScheme>;
 };
 
 /**
@@ -7774,6 +7768,46 @@ export type GetExportBaseinfoApiExportProjectBaseinfoGetResponses = {
 };
 
 export type GetExportBaseinfoApiExportProjectBaseinfoGetResponse = GetExportBaseinfoApiExportProjectBaseinfoGetResponses[keyof GetExportBaseinfoApiExportProjectBaseinfoGetResponses];
+
+export type GetExportLabelOptionsApiExportProjectLabelOptionsSchemeIdGetData = {
+  body?: never;
+  headers: {
+    /**
+     * X-Project-Id
+     */
+    'x-project-id': string;
+  };
+  path: {
+    /**
+     * Scheme Id
+     */
+    scheme_id: string;
+  };
+  query?: never;
+  url: '/api/export/project/label_options/{scheme_id}';
+};
+
+export type GetExportLabelOptionsApiExportProjectLabelOptionsSchemeIdGetErrors = {
+  /**
+   * Validation Error
+   */
+  422: HttpValidationError;
+};
+
+export type GetExportLabelOptionsApiExportProjectLabelOptionsSchemeIdGetError = GetExportLabelOptionsApiExportProjectLabelOptionsSchemeIdGetErrors[keyof GetExportLabelOptionsApiExportProjectLabelOptionsSchemeIdGetErrors];
+
+export type GetExportLabelOptionsApiExportProjectLabelOptionsSchemeIdGetResponses = {
+  /**
+   * Response Get Export Label Options Api Export Project Label Options  Scheme Id  Get
+   *
+   * Successful Response
+   */
+  200: {
+    [key: string]: LabelOptions;
+  };
+};
+
+export type GetExportLabelOptionsApiExportProjectLabelOptionsSchemeIdGetResponse = GetExportLabelOptionsApiExportProjectLabelOptionsSchemeIdGetResponses[keyof GetExportLabelOptionsApiExportProjectLabelOptionsSchemeIdGetResponses];
 
 export type SearchOpenalexApiSearchOpenalexSelectPostData = {
   body: SearchPayload;

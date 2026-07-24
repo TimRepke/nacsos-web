@@ -2880,6 +2880,78 @@ export const AuthTokenModelSchema = {
   title: 'AuthTokenModel'
 } as const;
 
+export const BaseInfoSchema = {
+  properties: {
+    id: {
+      anyOf: [
+        {
+          type: 'string'
+        },
+        {
+          type: 'string',
+          format: 'uuid'
+        }
+      ],
+      title: 'Id'
+    },
+    name: {
+      type: 'string',
+      title: 'Name'
+    }
+  },
+  type: 'object',
+  required: [
+    'id',
+    'name'
+  ],
+  title: 'BaseInfo'
+} as const;
+
+export const BaseInfoWithSchemeSchema = {
+  properties: {
+    id: {
+      anyOf: [
+        {
+          type: 'string'
+        },
+        {
+          type: 'string',
+          format: 'uuid'
+        }
+      ],
+      title: 'Id'
+    },
+    name: {
+      type: 'string',
+      title: 'Name'
+    },
+    scheme_id: {
+      anyOf: [
+        {
+          type: 'string'
+        },
+        {
+          type: 'string',
+          format: 'uuid'
+        }
+      ],
+      title: 'Scheme Id'
+    },
+    scheme_name: {
+      type: 'string',
+      title: 'Scheme Name'
+    }
+  },
+  type: 'object',
+  required: [
+    'id',
+    'name',
+    'scheme_id',
+    'scheme_name'
+  ],
+  title: 'BaseInfoWithScheme'
+} as const;
+
 export const BasicProjectStatsSchema = {
   properties: {
     num_items: {
@@ -7353,113 +7425,33 @@ export const ProjectBaseInfoSchema = {
   properties: {
     users: {
       items: {
-        $ref: '#/components/schemas/ProjectBaseInfoEntry'
+        $ref: '#/components/schemas/BaseInfo'
       },
       type: 'array',
       title: 'Users'
     },
     scopes: {
       items: {
-        $ref: '#/components/schemas/ProjectBaseInfoScopeEntry'
+        $ref: '#/components/schemas/BaseInfoWithScheme'
       },
       type: 'array',
       title: 'Scopes'
     },
     bot_scopes: {
       items: {
-        $ref: '#/components/schemas/ProjectBaseInfoEntry'
+        $ref: '#/components/schemas/BaseInfoWithScheme'
       },
       type: 'array',
       title: 'Bot Scopes'
-    },
-    labels: {
-      additionalProperties: {
-        $ref: '#/components/schemas/LabelOptions'
-      },
-      type: 'object',
-      title: 'Labels'
     }
   },
   type: 'object',
   required: [
     'users',
     'scopes',
-    'bot_scopes',
-    'labels'
+    'bot_scopes'
   ],
   title: 'ProjectBaseInfo'
-} as const;
-
-export const ProjectBaseInfoEntrySchema = {
-  properties: {
-    id: {
-      anyOf: [
-        {
-          type: 'string'
-        },
-        {
-          type: 'string',
-          format: 'uuid'
-        }
-      ],
-      title: 'Id'
-    },
-    name: {
-      type: 'string',
-      title: 'Name'
-    }
-  },
-  type: 'object',
-  required: [
-    'id',
-    'name'
-  ],
-  title: 'ProjectBaseInfoEntry'
-} as const;
-
-export const ProjectBaseInfoScopeEntrySchema = {
-  properties: {
-    id: {
-      anyOf: [
-        {
-          type: 'string'
-        },
-        {
-          type: 'string',
-          format: 'uuid'
-        }
-      ],
-      title: 'Id'
-    },
-    name: {
-      type: 'string',
-      title: 'Name'
-    },
-    scheme_id: {
-      anyOf: [
-        {
-          type: 'string'
-        },
-        {
-          type: 'string',
-          format: 'uuid'
-        }
-      ],
-      title: 'Scheme Id'
-    },
-    scheme_name: {
-      type: 'string',
-      title: 'Scheme Name'
-    }
-  },
-  type: 'object',
-  required: [
-    'id',
-    'name',
-    'scheme_id',
-    'scheme_name'
-  ],
-  title: 'ProjectBaseInfoScopeEntry'
 } as const;
 
 export const ProjectInfoSchema = {

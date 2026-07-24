@@ -3,6 +3,14 @@
     <h1>Download/Export Data</h1>
 
     <div class="row gy-4 gx-5">
+      <div class="col-lg-7">
+        <h4>NQL item filter</h4>
+        <n-q-l-box
+          :query="nqlQuery"
+          @update:query-parsed="(newFilter: NQLFilter) => (labelExportSettings.nqlFilter = newFilter)"
+        />
+      </div>
+
       <div class="col-lg-3">
         <h4>Options</h4>
         <div class="card">
@@ -30,333 +38,266 @@
               />
               <label class="form-check-label" for="settingsIgnoreOrder"> Ignore annotation order </label>
             </div>
+            <div class="mt-3">
+              <label for="export-format" class="form-label">
+                Export format
+                <select class="form-select form-select" id="export-format" v-model="selectedFormat">
+                  <option v-for="(info, key) in FORMATS" :key="key" :value="key">{{ info.name }}</option>
+                </select>
+              </label>
+            </div>
           </div>
         </div>
       </div>
 
-      <div class="col-lg-5">
-        <h4>NQL item filter</h4>
-        <n-q-l-box
-          :query="nqlQuery"
-          @update:query-parsed="(newFilter: NQLFilter) => (labelExportSettings.nqlFilter = newFilter)"
-        />
+      <div class="col-2 ms-auto text-end d-flex flex-column justify-content-end">
+        <DebounceButton class="btn btn-outline-secondary" :onClick="downloadAnnotations" :timeout="30000">
+          <font-awesome-icon :icon="['fas', 'file-export']" />
+          Download
+        </DebounceButton>
       </div>
 
-      <div class="col-lg-4">
-        <h4>Users</h4>
-        <p>
-          <button type="button" class="btn btn-sm btn-outline-secondary me-2" @click="checkAllUsers">
-            <font-awesome-icon :icon="['fas', 'list-check']" class="me-2" />
-            Select all
-          </button>
-          <button type="button" class="btn btn-sm btn-outline-secondary" @click="labelExportSettings.userIds = []">
-            <font-awesome-icon :icon="['fas', 'list-ul']" class="me-2" />
-            Unselect all
-          </button>
-        </p>
-        <ul class="list-group">
-          <li v-for="user in projectUsers" :key="user.id" class="list-group-item">
-            <input
-              :id="`pu-${user.id}`"
-              :value="user.id"
-              v-model="labelExportSettings.userIds"
-              class="form-check-input me-1"
-              type="checkbox"
-            />
-            <label :for="`pu-${user.id}`" class="form-check-label stretched-link">
-              {{ user.name }}
+      <div class="col-lg-12">
+        <div class="row">
+          <div class="col">
+            <h4>Annotations</h4>
+            <label for="export-format" class="form-label">
+              Annotation scheme
+              <select
+                class="form-select form-select"
+                id="export-format"
+                v-model="selectedScheme"
+                @change="schemeChanged"
+              >
+                <option v-for="(scheme, schemeId) in schemes" :key="schemeId" :value="scheme.id">
+                  {{ scheme.name }}
+                </option>
+              </select>
             </label>
-          </li>
-        </ul>
-      </div>
-
-      <div class="col-lg-4">
-        <h4>Assignment Scopes</h4>
-        <p>
-          <button type="button" class="btn btn-sm btn-outline-secondary me-2" @click="checkAllScopes">
-            <font-awesome-icon :icon="['fas', 'list-check']" class="me-2" />
-            Select all
-          </button>
-          <button
-            type="button"
-            class="btn btn-sm btn-outline-secondary"
-            @click="labelExportSettings.assignmentScopeIds = []"
-          >
-            <font-awesome-icon :icon="['fas', 'list-ul']" class="me-2" />
-            Unselect all
-          </button>
-        </p>
-        <ul class="list-group">
-          <li v-for="scope in projectScopes" :key="scope.id" class="list-group-item">
-            <input
-              :id="`pas-${scope.id}`"
-              :value="scope.id"
-              v-model="labelExportSettings.assignmentScopeIds"
-              class="form-check-input me-1"
-              type="checkbox"
-            />
-            <label :for="`pas-${scope.id}`" class="form-check-label stretched-link">
-              {{ scope.name }}<br />
-              <span class="text-muted small">{{ scope.scheme_name }}</span>
-            </label>
-          </li>
-        </ul>
-      </div>
-
-      <div class="col-lg-4">
-        <h4>Resolved annotations / BotAnnotations</h4>
-        <p>
-          <button type="button" class="btn btn-sm btn-outline-secondary me-2" @click="checkAllBotScopes">
-            <font-awesome-icon :icon="['fas', 'list-check']" class="me-2" />
-            Select all
-          </button>
-          <button
-            type="button"
-            class="btn btn-sm btn-outline-secondary"
-            @click="labelExportSettings.botAnnotationMetadataIds = []"
-          >
-            <font-awesome-icon :icon="['fas', 'list-ul']" class="me-2" />
-            Unselect all
-          </button>
-        </p>
-        <ul class="list-group">
-          <li v-for="scope in projectBotScopes" :key="scope.id" class="list-group-item">
-            <input
-              :id="`pbamd-${scope.id}`"
-              :value="scope.id"
-              v-model="labelExportSettings.botAnnotationMetadataIds"
-              class="form-check-input me-1"
-              type="checkbox"
-            />
-            <label :for="`pbamd-${scope.id}`" class="form-check-label stretched-link">
-              {{ scope.name }}
-            </label>
-          </li>
-        </ul>
-      </div>
-
-      <div class="col-lg-4">
-        <h4>Labels</h4>
-        <p>
-          <button type="button" class="btn btn-sm btn-outline-secondary me-2" @click="checkAllLabels">
-            <font-awesome-icon :icon="['fas', 'list-check']" class="me-2" />
-            Select all
-          </button>
-          <button type="button" class="btn btn-sm btn-outline-secondary" @click="checkNoLabels">
-            <font-awesome-icon :icon="['fas', 'list-ul']" class="me-2" />
-            Unselect all
-          </button>
-        </p>
-        <ul class="list-group">
-          <li v-for="label in projectLabels" :key="label.key" class="list-group-item">
-            <div class="d-flex">
-              <div class="flex-grow-1">{{ label.key }}</div>
-              <div v-if="!label.strings">
-                <button
-                  type="button"
-                  class="btn btn-tiny btn-outline-secondary me-2"
-                  @click="checkAllOptions(label.key)"
-                >
-                  <font-awesome-icon :icon="['fas', 'list-check']" class="me-1" />
-                  all
-                </button>
-                <button type="button" class="btn btn-tiny btn-outline-secondary" @click="checkNoOptions(label.key)">
-                  <font-awesome-icon :icon="['fas', 'list-ul']" class="me-1" />
-                  none
-                </button>
-              </div>
-              <div v-else>
+          </div>
+        </div>
+        <div class="row" v-if="selectedScheme in schemes">
+          <div class="col-6">
+            <p>
+              <button
+                type="button"
+                class="btn btn-sm btn-outline-secondary me-2"
+                @click="
+                  labelExportSettings.assignmentScopeIds = schemes[selectedScheme].scopes.map((scope) => scope.id)
+                "
+              >
+                <font-awesome-icon :icon="['fas', 'list-check']" class="me-2" />
+                Select all
+              </button>
+              <button
+                type="button"
+                class="btn btn-sm btn-outline-secondary"
+                @click="labelExportSettings.assignmentScopeIds = []"
+              >
+                <font-awesome-icon :icon="['fas', 'list-ul']" class="me-2" />
+                Unselect all
+              </button>
+            </p>
+            <ul class="list-group">
+              <li v-for="scope in schemes[selectedScheme].scopes" :key="scope.id" class="list-group-item">
                 <input
-                  :id="`lab-${label.key}_str`"
-                  v-model="labelExportSettings.labels[label.key].strings"
+                  :id="`pu-${scope.id}`"
+                  :value="scope.id"
+                  v-model="labelExportSettings.assignmentScopeIds"
                   class="form-check-input me-1"
                   type="checkbox"
                 />
-                <label :for="`lab-${label.key}_str`" class="form-check-label text-muted"> Include strings </label>
-              </div>
-            </div>
-            <div class="row" v-if="!label.strings">
-              <div class="col">
-                <span
-                  v-for="val in label.options_bool ?? label.options_int ?? label.options_multi"
-                  :key="val"
-                  class="me-2"
-                >
-                  <template v-if="label.options_bool">
-                    <input
-                      :id="`lab-${label.key}-${val}`"
-                      :value="val"
-                      v-model="labelExportSettings.labels[label.key].options_bool"
-                      class="form-check-input me-1"
-                      type="checkbox"
-                    />
-                  </template>
-                  <template v-else-if="label.options_int">
-                    <input
-                      :id="`lab-${label.key}-${val}`"
-                      :value="val"
-                      v-model="labelExportSettings.labels[label.key].options_int"
-                      class="form-check-input me-1"
-                      type="checkbox"
-                    />
-                  </template>
-                  <template v-else-if="label.options_multi">
-                    <input
-                      :id="`lab-${label.key}-${val}`"
-                      :value="val"
-                      v-model="labelExportSettings.labels[label.key].options_multi"
-                      class="form-check-input me-1"
-                      type="checkbox"
-                    />
-                  </template>
-                  <label :for="`lab-${label.key}-${val}`" class="form-check-label text-muted">
-                    {{ val }}
-                  </label>
-                </span>
-              </div>
-            </div>
-          </li>
-        </ul>
-      </div>
-    </div>
+                <label :for="`pu-${scope.id}`" class="form-check-label stretched-link ms-2">
+                  {{ scope.name }}
+                </label>
+              </li>
+            </ul>
+          </div>
 
-    <div class="row mt-5 mb-5">
-      <div class="col-2 ms-auto text-end">
-        <button type="button" class="btn btn-outline-secondary" @click="downloadAnnotations">
-          <font-awesome-icon :icon="['fas', 'file-export']" />
-          Download
-        </button>
+          <div class="col-6">
+            <p>
+              <button
+                type="button"
+                class="btn btn-sm btn-outline-secondary me-2"
+                @click="
+                  labelExportSettings.botAnnotationMetadataIds = schemes[selectedScheme].resolutions.map(
+                    (scope) => scope.id,
+                  )
+                "
+              >
+                <font-awesome-icon :icon="['fas', 'list-check']" class="me-2" />
+                Select all
+              </button>
+              <button
+                type="button"
+                class="btn btn-sm btn-outline-secondary"
+                @click="labelExportSettings.botAnnotationMetadataIds = []"
+              >
+                <font-awesome-icon :icon="['fas', 'list-ul']" class="me-2" />
+                Unselect all
+              </button>
+            </p>
+            <ul class="list-group">
+              <li v-for="scope in schemes[selectedScheme].resolutions" :key="scope.id" class="list-group-item">
+                <input
+                  :id="`pu-${scope.id}`"
+                  :value="scope.id"
+                  v-model="labelExportSettings.botAnnotationMetadataIds"
+                  class="form-check-input me-1"
+                  type="checkbox"
+                />
+                <label :for="`pu-${scope.id}`" class="form-check-label stretched-link ms-2">
+                  {{ scope.name }}
+                </label>
+              </li>
+            </ul>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from "vue";
-import { API, toastReject } from "@/plugins/api";
+<script setup lang="ts">
+import { ref, reactive, onMounted, computed } from "vue";
+import { API, ApiResponseReject, toastReject } from "@/plugins/api";
 import { currentProjectStore } from "@/stores";
-import type { LabelOptions, ProjectBaseInfoEntry, ProjectBaseInfoScopeEntry } from "@/plugins/api/types";
+import type { LabelOptions, BaseInfoWithScheme, BaseInfo } from "@/plugins/api/types";
 import NQLBox from "@/components/NQLBox.vue";
-import { type Filter as NQLFilter } from "@/util/nql";
+import { type Filter, type Filter as NQLFilter } from "@/util/nql";
 import { isEmpty } from "@/util";
+import DebounceButton from "@/components/DebounceButton.vue";
 
-export default defineComponent({
-  name: "DatasetExportView",
-  components: { NQLBox },
-  data() {
-    return {
-      projectUsers: [] as Array<ProjectBaseInfoEntry>,
-      projectScopes: [] as Array<ProjectBaseInfoScopeEntry>,
-      projectBotScopes: [] as Array<ProjectBaseInfoEntry>,
-      projectLabels: {} as Record<string, LabelOptions>,
-      nqlQuery: "HAS ANNOTATION",
-      labelExportSettings: {
-        assignmentScopeIds: [] as Array<string>,
-        botAnnotationMetadataIds: [] as Array<string>,
-        userIds: [] as Array<string>,
-        itemFields: [] as Array<string>,
-        nqlFilter: null as null | NQLFilter,
-        labels: {} as Record<string, LabelOptions>,
-        ignoreHierarchy: true,
-        ignoreOrder: true,
-      },
-    };
-  },
-  async mounted() {
-    API.export
-      .getExportBaseinfoApiExportProjectBaseinfoGet({
-        headers: { "x-project-id": currentProjectStore.projectId as string },
-      })
-      .then((response) => {
-        this.projectScopes = response.data.scopes;
-        this.projectUsers = response.data.users;
-        this.projectBotScopes = response.data.bot_scopes;
-        this.projectLabels = response.data.labels;
+const FORMATS: Record<string, { type: string; name: string }> = {
+  csv: { type: "application/csv", name: "CSV (recommended)" },
+  jsonl: { type: "text/plain", name: "JSONl" },
+  ris: { type: "application/x-research-info-systems", name: "RIS (zotero compatible)" },
+  excel: { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", name: "Excel" },
+};
 
-        // pre-populate settings and deselect all
-        this.labelExportSettings.labels = JSON.parse(JSON.stringify(response.data.labels));
-        Object.keys(this.labelExportSettings.labels).forEach((key) => {
-          this.checkNoOptions(key);
-        });
-      })
-      .catch(toastReject);
-  },
-  methods: {
-    downloadAnnotations() {
-      const lValues: Array<LabelOptions> = Object.values(this.labelExportSettings.labels);
-      const labels = lValues.map(
-        (label: LabelOptions) =>
-          ({
-            key: label.key,
-            options_int: !label.options_int || label.options_int.length === 0 ? undefined : label.options_int,
-            options_bool: !label.options_bool || label.options_bool.length === 0 ? undefined : label.options_bool,
-            options_multi: !label.options_multi || label.options_multi.length === 0 ? undefined : label.options_multi,
-          }) as LabelOptions,
-      );
+interface Scheme {
+  id: string;
+  name: string;
+  scopes: Array<BaseInfoWithScheme>;
+  resolutions: Array<BaseInfoWithScheme>;
+}
+const projectUsers = ref<Array<BaseInfo>>([]);
+const projectScopes = ref<Array<BaseInfoWithScheme>>([]);
+const projectBotScopes = ref<Array<BaseInfoWithScheme>>([]);
+const projectLabels = ref<Record<string, LabelOptions>>({});
 
-      API.export
-        .exportAnnotationsApiExportAnnotationsExportFormatPost({
-          headers: { "x-project-id": currentProjectStore.projectId as string },
-          path: {
-            export_format: "",
-          },
-          body: {
-            labels: labels,
-            nql_filter: isEmpty(this.labelExportSettings.nqlFilter) ? null : this.labelExportSettings.nqlFilter[0],
-            ignore_hierarchy: this.labelExportSettings.ignoreHierarchy,
-            ignore_repeat: this.labelExportSettings.ignoreOrder,
-            bot_annotation_metadata_ids: this.labelExportSettings.botAnnotationMetadataIds,
-            assignment_scope_ids: this.labelExportSettings.assignmentScopeIds,
-            user_ids: this.labelExportSettings.userIds,
-          },
-        })
-        .then((response) => {
-          const blob = new Blob([response.data], { type: "application/csv" });
-          const link = document.createElement("a");
-          link.href = window.URL.createObjectURL(blob);
-          link.download = "export.csv";
-          link.click();
-        })
-        .catch(toastReject);
-    },
-    checkAllScopes() {
-      this.labelExportSettings.assignmentScopeIds = this.projectScopes.map(
-        (scope: ProjectBaseInfoScopeEntry) => scope.id,
-      );
-    },
-    checkAllBotScopes() {
-      this.labelExportSettings.botAnnotationMetadataIds = this.projectBotScopes.map(
-        (scope: ProjectBaseInfoEntry) => scope.id,
-      );
-    },
-    checkAllUsers() {
-      this.labelExportSettings.userIds = this.projectUsers.map((user: ProjectBaseInfoEntry) => user.id);
-    },
-    checkAllLabels() {
-      Object.keys(this.labelExportSettings.labels).forEach((key: string) => {
-        this.checkAllOptions(key);
-      });
-    },
-    checkNoLabels() {
-      Object.keys(this.labelExportSettings.labels).forEach((key: string) => {
-        this.checkNoOptions(key);
-      });
-    },
-    checkAllOptions(key: string) {
-      this.labelExportSettings.labels[key].options_multi = this.projectLabels[key].options_multi;
-      this.labelExportSettings.labels[key].options_bool = this.projectLabels[key].options_bool;
-      this.labelExportSettings.labels[key].options_int = this.projectLabels[key].options_int;
-    },
-    checkNoOptions(key: string) {
-      this.labelExportSettings.labels[key].options_multi = [];
-      this.labelExportSettings.labels[key].options_bool = [];
-      this.labelExportSettings.labels[key].options_int = [];
-    },
-  },
-  computed: {
-    // pass
-  },
+const nqlQuery = ref("HAS ANNOTATION");
+
+const selectedFormat = ref<string>("csv");
+const selectedScheme = ref<string>("");
+
+const projectUserIds = computed(() => projectUsers.value.map((user) => user.id));
+const schemes = computed(() => {
+  const ret: Record<string, Scheme> = {};
+  projectScopes.value.forEach((scope) => {
+    if (!(scope.scheme_id in ret)) {
+      ret[scope.scheme_id] = {
+        id: scope.scheme_id,
+        name: scope.scheme_name,
+        scopes: [],
+        resolutions: [],
+      };
+    }
+    ret[scope.scheme_id].scopes.push(scope);
+  });
+  projectBotScopes.value.forEach((scope) => {
+    if (!(scope.scheme_id in ret)) {
+      ret[scope.scheme_id] = {
+        id: scope.scheme_id,
+        name: scope.scheme_name,
+        scopes: [],
+        resolutions: [],
+      };
+    }
+    ret[scope.scheme_id].resolutions.push(scope);
+  });
+  return ret;
 });
+
+const labelExportSettings = reactive({
+  assignmentScopeIds: [] as Array<string>,
+  botAnnotationMetadataIds: [] as Array<string>,
+  userIds: [] as Array<string>,
+  itemFields: [] as Array<string>,
+  nqlFilter: [] as Filter[],
+  labels: {} as Record<string, LabelOptions>,
+  ignoreHierarchy: true,
+  ignoreOrder: true,
+});
+
+onMounted(async () => {
+  try {
+    const response = await API.export.getExportBaseinfoApiExportProjectBaseinfoGet({
+      headers: { "x-project-id": currentProjectStore.projectId as string },
+    });
+    projectScopes.value = response.data.scopes;
+    projectUsers.value = response.data.users;
+    projectBotScopes.value = response.data.bot_scopes;
+  } catch (e) {
+    toastReject(e as ApiResponseReject);
+  }
+});
+
+const schemeChanged = () => {
+  labelExportSettings.assignmentScopeIds = schemes.value[selectedScheme.value].scopes.map((scope) => scope.id);
+  labelExportSettings.botAnnotationMetadataIds = schemes.value[selectedScheme.value].resolutions.map(
+    (scope) => scope.id,
+  );
+  API.export
+    .getExportLabelOptionsApiExportProjectLabelOptionsSchemeIdGet({
+      headers: { "x-project-id": currentProjectStore.projectId as string },
+      path: { scheme_id: selectedScheme.value },
+    })
+    .then((response) => {
+      projectLabels.value = response.data;
+      labelExportSettings.labels = response.data;
+    })
+    .catch(toastReject);
+};
+
+const downloadAnnotations = () => {
+  const lValues: Array<LabelOptions> = Object.values(labelExportSettings.labels);
+  const labels = lValues.map(
+    (label: LabelOptions) =>
+      ({
+        key: label.key,
+        options_int: !label.options_int || label.options_int.length === 0 ? undefined : label.options_int,
+        options_bool: !label.options_bool || label.options_bool.length === 0 ? undefined : label.options_bool,
+        options_multi: !label.options_multi || label.options_multi.length === 0 ? undefined : label.options_multi,
+      }) as LabelOptions,
+  );
+  const dateStr = new Date().toISOString().slice(0, 10).replace(/-/g, "");
+
+  API.export
+    .exportAnnotationsApiExportAnnotationsExportFormatPost({
+      headers: { "x-project-id": currentProjectStore.projectId as string },
+      path: {
+        export_format: selectedFormat.value,
+      },
+      body: {
+        labels: labels,
+        nql_filter: isEmpty(labelExportSettings.nqlFilter) ? null : labelExportSettings.nqlFilter[0],
+        ignore_hierarchy: labelExportSettings.ignoreHierarchy,
+        ignore_repeat: labelExportSettings.ignoreOrder,
+        bot_annotation_metadata_ids: labelExportSettings.botAnnotationMetadataIds,
+        assignment_scope_ids: labelExportSettings.assignmentScopeIds,
+        user_ids: projectUserIds.value,
+      },
+    })
+    .then((response) => {
+      const blob = new Blob([response.data], { type: FORMATS[selectedFormat.value].type });
+      const link = document.createElement("a");
+      link.href = window.URL.createObjectURL(blob);
+      link.download = `export_${dateStr}.${selectedFormat.value}`;
+      link.click();
+    })
+    .catch(toastReject);
+};
 </script>
 
 <style scoped></style>
