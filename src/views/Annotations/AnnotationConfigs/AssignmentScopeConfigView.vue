@@ -387,7 +387,12 @@ function makeAssignments() {
                 <div class="row mb-3">
                   <div class="col">
                     <label for="prioritySetup">Prioritised items</label>
-                    <select v-model="config.config.priority_id" class="form-control" :disabled="!isEditable">
+                    <select
+                      id="prioritySetup"
+                      v-model="config.config.priority_id"
+                      class="form-control"
+                      :disabled="!isEditable"
+                    >
                       <template v-for="prio in priorities" :key="prio.priority_id">
                         <option :value="prio.priority_id" v-if="(prio.num_prioritised ?? 0) >= numAssignedItems">
                           {{ prio.name }}

@@ -46,7 +46,7 @@ const schemes = computed(() => new Set(Object.keys(groupedResolutions.value).con
 
 function refresh() {
   API.stats
-    .labelStatsApiStatsLabelsHumanPost({
+    .labelStatsRawApiStatsLabelsHumanPost({
       headers: { "x-project-id": currentProjectStore.projectId as string },
       body: query.value[0],
     })
@@ -56,7 +56,7 @@ function refresh() {
     .catch(ignore);
 
   API.stats
-    .labelStatsApiStatsLabelsResolvedPost({
+    .labelStatsResApiStatsLabelsResolvedPost({
       headers: { "x-project-id": currentProjectStore.projectId as string },
       body: query.value[0],
     })

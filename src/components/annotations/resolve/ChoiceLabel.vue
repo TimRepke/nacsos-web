@@ -148,7 +148,7 @@ export default defineComponent({
       this.editMode = false;
     },
     getPrettyIntLabelInfo(userEntry: ResolutionUserEntry): string {
-      let username: string | null | undefined = "";
+      let username: string | null | undefined;
       let valueInt: number | null | undefined = null;
       if (!userEntry.annotation) {
         if (!userEntry.assignment) {

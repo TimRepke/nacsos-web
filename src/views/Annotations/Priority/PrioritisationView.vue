@@ -297,7 +297,7 @@ async function loadDF(event: MouseEvent, filename: string) {
           </div>
           <div class="row mb-3">
             <div class="col">
-              <h5>Inclusion rule</h5>
+              <label class="h5 d-block" for="incl-definition">Inclusion rule</label>
               <a
                 href="https://nacsos.pik-potsdam.de/documentation/user/annotation/priority/"
                 target="_blank"
@@ -311,6 +311,7 @@ async function loadDF(event: MouseEvent, filename: string) {
               <textarea
                 class="form-control text-muted"
                 style="font-family: monospace"
+                id="incl-definition"
                 v-model="setup.incl_rule"
                 rows="2"
               />

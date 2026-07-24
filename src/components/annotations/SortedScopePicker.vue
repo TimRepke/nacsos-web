@@ -72,7 +72,11 @@ function scopeDown(scopeId: string, idx: number) {
             v-for="scope in sortedFilteredScopes"
             :key="`opt-${scope.scopeKey}`"
             class="list-group-item list-group-item-action d-flex text-muted"
+            role="button"
+            tabindex="0"
             @click="scopePick(scope.scopeKey)"
+            @keyup.enter="scopePick(scope.scopeKey)"
+            @keyup.space="scopePick(scope.scopeKey)"
           >
             <font-awesome-icon icon="arrow-left" class="me-2" />
             <font-awesome-icon :icon="['fas', scope.human ? 'user' : 'user-check']" class="me-auto" />

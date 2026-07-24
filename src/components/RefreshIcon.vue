@@ -37,7 +37,15 @@ async function reload() {
       <span class="visually-hidden">Loading...</span>
     </span>
 
-    <span v-else-if="state == IconState.Ready" class="clickable-icon" @click="reload">
+    <span
+      v-else-if="state == IconState.Ready"
+      class="clickable-icon"
+      role="button"
+      tabindex="0"
+      @click="reload"
+      @keyup.enter="reload"
+      @keyup.space="reload"
+    >
       <font-awesome-icon :icon="icon" />
     </span>
 

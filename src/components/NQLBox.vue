@@ -77,7 +77,7 @@ onMounted(() => {
     <div class="row">
       <div class="col">
         <RefreshIcon :refresh="getCount" icon="calculator" class="ms-1" />
-        <span v-if="notNone(count)" class="small text-muted ms-2">{{ count.toLocaleString() }}</span>
+        <span v-if="notNone(count)" class="small text-muted ms-2">{{ (count ?? 0).toLocaleString() }}</span>
       </div>
       <div class="col text-end">
         <a

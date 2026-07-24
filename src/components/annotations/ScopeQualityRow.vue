@@ -6,8 +6,11 @@
         class="text-muted ms-2 p-1"
         :class="{ 'bg-success': showAnnotations }"
         role="button"
+        tabindex="0"
         v-if="hasLabels"
         @click="showAnnotations = !showAnnotations"
+        @keyup.enter="showAnnotations = !showAnnotations"
+        @keyup.space="showAnnotations = !showAnnotations"
       >
         <font-awesome-icon :icon="['fas', 'tags']" />
       </span>

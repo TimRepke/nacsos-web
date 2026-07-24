@@ -87,8 +87,13 @@
               </select>
             </div>
             <div class="col-auto">
-              <label for="autoSizingSelect">Max. Repeat</label>
-              <input type="number" class="form-control" v-model="schemeLabel.max_repeat" />
+              <label :for="`max-repeat-${schemeLabel.tmpKey}`">Max. Repeat</label>
+              <input
+                type="number"
+                class="form-control"
+                :id="`max-repeat-${schemeLabel.tmpKey}`"
+                v-model="schemeLabel.max_repeat"
+              />
             </div>
             <div class="col-auto">
               <div class="form-check form-switch">

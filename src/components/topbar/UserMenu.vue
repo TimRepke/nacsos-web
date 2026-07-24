@@ -61,7 +61,7 @@ function logout() {
           Edit Profile
         </router-link>
       </li>
-      <li class="dropdown-item" role="button" @click="logout">
+      <li class="dropdown-item" role="button" tabindex="0" @click="logout" @keyup.enter="logout" @keyup.space="logout">
         <font-awesome-icon :icon="['fas', 'arrow-right-from-bracket']" class="me-2" />
         Log out
       </li>

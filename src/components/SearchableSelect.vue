@@ -22,7 +22,15 @@
     <div v-show="dropdownVisible">
       <ul class="list-group rounded-0 rounded-bottom border-top-0 overflow-auto" style="max-height: 10rem">
         <template v-for="option in dropdownOptions" :key="`opt-${option.name}-${option.value}`">
-          <li v-if="option.visible" class="list-group-item list-group-item-action" @click="pickOption(option)">
+          <li
+            v-if="option.visible"
+            class="list-group-item list-group-item-action"
+            role="button"
+            tabindex="0"
+            @click="pickOption(option)"
+            @keyup.enter="pickOption(option)"
+            @keyup.space="pickOption(option)"
+          >
             <InlineToolTip :info="option.hint"> {{ option.name }} ({{ option.value }})</InlineToolTip>
           </li>
         </template>

@@ -60,8 +60,11 @@
       <div
         id="sidebar-toggle"
         class="border border-start-0 rounded-end mt-5"
+        role="button"
+        tabindex="0"
         @click="toggleVisibility()"
-        @keypress="toggleVisibility()"
+        @keypress.enter="toggleVisibility()"
+        @keypress.space="toggleVisibility()"
       >
         <a aria-label="test">
           <font-awesome-icon :icon="iconButton" />

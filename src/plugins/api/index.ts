@@ -123,12 +123,12 @@ client.interceptors.error.use((reason: unknown | RejectReason) => {
   return reason;
 });
 
-client.interceptors.error.use((reason: unknown | RejectReason, response: Response) => {
+client.interceptors.error.use((reason: unknown | RejectReason, response: Response | undefined) => {
   if (reason)
     return {
       ...reason,
       ok: false,
-      status: response.status,
+      status: (response ?? {}).status,
       response: response,
       error: reason,
     };

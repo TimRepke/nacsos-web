@@ -39,7 +39,7 @@ watch(dummyModel, (newValue: string) => {
         <label :for="`variants-${field}`" class="form-label">{{ title }}</label>
       </div>
       <div class="text-end input-group-sm">
-        <label v-if="variations.length === 0" class="input-group-text">No variants</label>
+        <span v-if="variations.length === 0" class="input-group-text">No variants</span>
         <button v-else class="btn btn-sm btn-outline-secondary" type="button" @click="showVariants = !showVariants">
           {{ showVariants ? "Hide" : "Show" }} {{ variations.length }} variants
         </button>

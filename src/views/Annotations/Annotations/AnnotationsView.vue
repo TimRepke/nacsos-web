@@ -22,7 +22,8 @@
                 :key="assignmentLI.assignmentId"
                 class="assignments-birdseye-step"
                 :class="[assignmentLI.inHighlight ? 'assignments-birdseye-step-inview' : '', assignmentLI.status]"
-                type="button"
+                role="button"
+                tabindex="-1"
                 @click="saveAndGoto(assignmentLI.assignmentId)"
               />
             </div>
@@ -32,7 +33,8 @@
                 :key="assignmentLI.assignmentId"
                 class="assignments-step"
                 :class="{ current: assignmentLI.assignmentId === assignment?.assignment_id }"
-                type="button"
+                role="button"
+                tabindex="-1"
                 :style="{ 'background-color': assignmentLI.colour }"
                 @click="saveAndGoto(assignmentLI.assignmentId)"
               >
@@ -56,6 +58,8 @@
           class="position-fixed bottom-0 border border-end-0 rounded-start text-muted text-center"
           style="margin-left: -1.325rem; width: 0.75rem; font-size: 0.75rem"
           @click="widenSidebar"
+          role="button"
+          tabindex="-1"
         >
           <font-awesome-icon :icon="['fas', 'caret-left']" />
         </div>
@@ -63,6 +67,8 @@
           class="position-fixed bottom-0 border border-start-0 rounded-end text-muted text-center"
           style="margin-left: -0.5rem; width: 0.75rem; font-size: 0.75rem"
           @click="shrinkSidebar"
+          role="button"
+          tabindex="-1"
         >
           <font-awesome-icon :icon="['fas', 'caret-right']" />
         </div>
@@ -534,17 +540,15 @@ export default defineComponent({
           (assignment: UserAssignmentInfo) => assignment.assignment_id === assignmentId,
         );
         focus = Math.min(Math.max(WINDOW, focus), this.userAssignments.length - WINDOW);
-        return this.userAssignments.map(
-          (assignment: UserAssignmentInfo, index: number): AssignmentIndicator => ({
-            assignmentId: assignment.assignment_id as string,
-            inHighlight: index - WINDOW <= focus && focus <= index + WINDOW,
-            itemId: assignment.item_id,
-            status: assignment.status,
-            colour: this.indicatorLabelColourMapper(assignment),
-            order: assignment.order,
-            identifier: assignment.identifier,
-          }),
-        );
+        return this.userAssignments.map((assignment: UserAssignmentInfo, index: number): AssignmentIndicator => ({
+          assignmentId: assignment.assignment_id as string,
+          inHighlight: index - WINDOW <= focus && focus <= index + WINDOW,
+          itemId: assignment.item_id,
+          status: assignment.status,
+          colour: this.indicatorLabelColourMapper(assignment),
+          order: assignment.order,
+          identifier: assignment.identifier,
+        }));
       }
       return null;
     },

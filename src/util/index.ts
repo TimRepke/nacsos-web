@@ -55,12 +55,12 @@ export const nativeIsArray = Array.isArray;
 export const isArray = (obj: unknown) => nativeIsArray(obj) || tagTester("Array")(obj);
 
 // From https://github.com/jashkenas/underscore/blob/master/modules/isEmpty.js
-export const isEmpty = (obj: unknown | null | undefined) => {
+export function isEmpty(obj: unknown | null | undefined): obj is object {
   if (obj === null || obj === undefined) return true;
   const length = getLength(obj);
   if (typeof length === "number" && (isArray(obj) || isString(obj) || isArguments(obj))) return length === 0;
   return getLength(keys(obj)) === 0;
-};
+}
 
 // get a list/generator of numbers from `start` to `end` (inclusive)
 export function* range(start: number, end: number) {

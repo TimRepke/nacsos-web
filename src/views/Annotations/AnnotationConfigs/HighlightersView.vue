@@ -150,12 +150,10 @@ export default defineComponent({
         headers: { "x-project-id": currentProjectStore.projectId as string },
       })
       .then((result) => {
-        this.highlighters = result.data.map(
-          (highlighter: HighlighterModel): Highlighter => ({
-            ...highlighter,
-            keywordsStr: highlighter.keywords.join("|"),
-          }),
-        );
+        this.highlighters = result.data.map((highlighter: HighlighterModel): Highlighter => ({
+          ...highlighter,
+          keywordsStr: highlighter.keywords.join("|"),
+        }));
       })
       .catch(toastReject);
   },
