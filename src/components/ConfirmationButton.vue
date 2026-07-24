@@ -4,8 +4,12 @@
       <slot />
     </button>
     <template v-if="confirming">
-      <span class="ms-2 me-2" role="button" @click="accept">Yes</span>
-      <span class="me-2" role="button" @click="reject">No</span>
+      <span class="ms-2 me-2" role="button" tabindex="0" @click="accept" @keyup.enter="accept" @keyup.space="accept"
+        >Yes</span
+      >
+      <span class="me-2" role="button" tabindex="0" @click="reject" @keyup.enter="reject" @keyup.space="reject"
+        >No</span
+      >
     </template>
   </div>
 </template>

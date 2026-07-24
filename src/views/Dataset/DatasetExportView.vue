@@ -295,8 +295,11 @@ export default defineComponent({
       );
 
       API.export
-        .getAnnotationsCsvApiExportAnnotationsCsvPost({
+        .exportAnnotationsApiExportAnnotationsExportFormatPost({
           headers: { "x-project-id": currentProjectStore.projectId as string },
+          path: {
+            export_format: "",
+          },
           body: {
             labels: labels,
             nql_filter: isEmpty(this.labelExportSettings.nqlFilter) ? null : this.labelExportSettings.nqlFilter[0],

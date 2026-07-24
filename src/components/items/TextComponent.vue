@@ -7,7 +7,13 @@
       </p>
     </template>
     <template v-else>
-      <div class="text-muted small position-absolute" role="button" style="top: 0; right: 0" @click="iterateColumns">
+      <div
+        class="text-muted small position-absolute"
+        role="button"
+        style="top: 0; right: 0"
+        @click="iterateColumns"
+        tabindex="-1"
+      >
         <font-awesome-icon :icon="['fas', 'table-columns']" class="me-2" />
       </div>
 

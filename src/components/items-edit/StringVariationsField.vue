@@ -42,14 +42,27 @@ const variations = computed<(AcademicItemVariantModel & { diff: Change[] })[]>((
       <textarea v-if="field === 'text'" class="form-control" rows="6" :id="`variants-${field}`" v-model="model" />
       <input v-else :id="`variants-${field}`" class="form-control form-control-sm" type="text" v-model="model" />
 
-      <label v-if="variations.length === 0" class="input-group-text">No variants</label>
-      <button v-else class="btn btn-sm btn-outline-secondary" type="button" @click="showVariants = !showVariants">
+      <label v-if="variations.length === 0" class="input-group-text" for="show-variants-button">No variants</label>
+      <button
+        v-else
+        class="btn btn-sm btn-outline-secondary"
+        type="button"
+        @click="showVariants = !showVariants"
+        id="show-variants-button"
+      >
         {{ showVariants ? "Hide" : "Show" }} {{ variations.length }} variants
       </button>
     </div>
 
     <div class="form-text" v-if="showVariants">
-      <div class="clickable-icon text-end" @click="showDiff = !showDiff">
+      <div
+        class="clickable-icon text-end"
+        role="button"
+        tabindex="0"
+        @click="showDiff = !showDiff"
+        @keyup.enter="showDiff = !showDiff"
+        @keyup.space="showDiff = !showDiff"
+      >
         <font-awesome-icon icon="timeline" class="me-1" />
         Show/hide diff
       </div>

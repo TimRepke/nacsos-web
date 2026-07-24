@@ -11,7 +11,11 @@
 
     <span
       v-if="userQualities"
+      role="button"
+      tabindex="0"
       @click="toggleUsers"
+      @keyup.enter="toggleUsers"
+      @keyup.space="toggleUsers"
       class="ms-2 p-1 text-muted small"
       :class="{ 'bg-success': showUsers }"
     >
@@ -20,7 +24,11 @@
 
     <span
       v-if="choiceQualities"
+      role="button"
+      tabindex="0"
       @click="toggleChoices"
+      @keyup.enter="toggleChoices"
+      @keyup.space="toggleChoices"
       class="ms-2 p-1 text-muted small"
       :class="{ 'bg-success': showChoices }"
     >

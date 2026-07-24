@@ -101,7 +101,7 @@ onMounted(async () => {
             </ul>
           </div>
           <div>
-            <button @click="saveItem" role="button" class="btn btn-success">Save</button>
+            <button @click="saveItem" class="btn btn-success">Save</button>
           </div>
         </div>
 

@@ -22,7 +22,14 @@ const info = computed(
 
 <template>
   <div class="card">
-    <div class="card-header clickable-icon small" @click="visible = !visible">
+    <div
+      class="card-header clickable-icon small"
+      role="button"
+      tabindex="0"
+      @click="visible = !visible"
+      @keyup.enter="visible = !visible"
+      @keyup.space="visible = !visible"
+    >
       <font-awesome-icon :icon="visible ? 'minus' : 'plus'" />
       {{ info.i.name }} (rev. {{ info.r.import_revision_counter }} / {{ info.r.time_created }})
     </div>

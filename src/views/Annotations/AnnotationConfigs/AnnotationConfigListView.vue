@@ -151,10 +151,10 @@
                       custom
                       v-slot="{ navigate }"
                     >
-                      <span @click.stop="navigate" role="button" class="me-3 ms-2">
+                      <span @click.stop="navigate" role="button" class="me-3 ms-2" tabindex="-1">
                         {{ resolution.name }}
                       </span>
-                      <span class="text-muted small me-3 ms-auto" @click.stop="navigate" role="button">
+                      <span class="text-muted small me-3 ms-auto" @click.stop="navigate" role="button" tabindex="-1">
                         {{ $util.dt2str(resolution.time_created) }}
                       </span>
                     </router-link>

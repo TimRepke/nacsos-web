@@ -5,6 +5,9 @@
       class="text-muted"
       @mouseover="visible = true"
       @mouseleave="visible = false"
+      @focusin="visible = true"
+      @focusout="visible = false"
+      tabindex="0"
     />
     <div
       v-show="visible"

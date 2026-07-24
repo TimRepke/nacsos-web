@@ -1,21 +1,17 @@
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import js from "@eslint/js";
-import { FlatCompat } from "@eslint/eslintrc";
+import pluginVue from "eslint-plugin-vue";
+import pluginVuejsAccessibility from "eslint-plugin-vuejs-accessibility";
 import vueTsEslintConfig from "@vue/eslint-config-typescript";
 import prettierConfig from "@vue/eslint-config-prettier";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const compat = new FlatCompat({
-  baseDirectory: __dirname,
-  recommendedConfig: js.configs.recommended,
-  allConfig: js.configs.all,
-});
 
 export default [
   {
-    files: ["**/.vue", "**/.js", "**/.jsx", "**/.cjs", "**/.mjs", "**/.ts", "**/.tsx", "**/.cts", "**/.mts"],
+    files: ["**/*.vue", "**/*.js", "**/*.jsx", "**/*.cjs", "**/*.mjs", "**/*.ts", "**/*.tsx", "**/*.cts", "**/*.mts"],
   },
   {
     ignores: [
@@ -48,11 +44,28 @@ export default [
       "python.ts",
     ],
   },
-  ...compat.extends("plugin:vue/vue3-essential"),
+  js.configs.recommended,
+  ...pluginVue.configs["flat/essential"],
   ...vueTsEslintConfig({
     extends: ["recommended"],
-    rootDir: import.meta.dirname,
+    rootDir: __dirname,
   }),
+  {
+    plugins: {
+      "vuejs-accessibility": pluginVuejsAccessibility,
+    },
+    rules: {
+      ...pluginVuejsAccessibility.configs.recommended.rules,
+      "vuejs-accessibility/label-has-for": [
+        "error",
+        {
+          required: {
+            some: ["nesting", "id"],
+          },
+        },
+      ],
+    },
+  },
   prettierConfig,
   {
     languageOptions: {

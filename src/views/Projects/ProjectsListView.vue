@@ -40,7 +40,15 @@
             <tr>
               <td>
                 <div class="d-flex">
-                  <div v-if="project.description" @click="project.showDesc = !project.showDesc" class="text-muted me-2">
+                  <div
+                    v-if="project.description"
+                    @click="project.showDesc = !project.showDesc"
+                    class="text-muted me-2"
+                    role="button"
+                    tabindex="0"
+                    @keyup.enter="project.showDesc = !project.showDesc"
+                    @keyup.space="project.showDesc = !project.showDesc"
+                  >
                     <font-awesome-icon :icon="['fas', 'info-circle']" />
                   </div>
                   <div @click="selectProject(project.project_id)" class="flex-grow-1" role="button" tabindex="0">

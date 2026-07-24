@@ -15,7 +15,10 @@
           class="text-muted me-2 p-2"
           :class="{ 'bg-success': assignmentsVisible }"
           role="button"
+          tabindex="0"
           @click="toggleAssignments"
+          @keyup.enter="toggleAssignments"
+          @keyup.space="toggleAssignments"
         >
           <font-awesome-icon :icon="['fas', 'list-check']" />
         </span>
@@ -66,7 +69,8 @@
           </div>
         </div>
 
-        <select class="form-select form-select-sm w-auto me-2" v-model="selected_resolution">
+        <label class="visually-hidden" for="scope-res-select">Resolution</label>
+        <select id="scope-res-select" class="form-select form-select-sm w-auto me-2" v-model="selected_resolution">
           <option :value="null">Include no resolution</option>
           <option
             v-for="resolution in resolutions"

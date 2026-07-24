@@ -205,7 +205,7 @@ export default defineComponent({
       return this.labelKeys.length === new Set(this.labelKeys).size;
     },
     keysValid(): boolean {
-      const reg = new RegExp("^[a-zA-Z_\-]+$");
+      const reg = new RegExp("^[a-zA-Z_-]+$");
       return this.labelKeys.every((key: string) => {
         return reg.test(key);
       });

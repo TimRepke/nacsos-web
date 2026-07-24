@@ -11,7 +11,7 @@ variables:
   NODE_ENV: "development"
 
 .npm:
-  image: node:24-alpine
+  image: node:26-alpine
   tags:
     - se164-docker
   before_script:
