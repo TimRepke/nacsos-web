@@ -46,6 +46,27 @@
                 </select>
               </label>
             </div>
+            <div class="mt-3">
+              <h6>Columns to drop</h6>
+              <input id="cte-me" type="checkbox" value="meta" v-model="labelExportSettings.columnsToDrop" />
+              <label for="cte-me" class="ms-1">meta</label>
+              <input
+                id="cte-ar"
+                class="ms-2"
+                type="checkbox"
+                value="authors_raw"
+                v-model="labelExportSettings.columnsToDrop"
+              />
+              <label for="cte-ar" class="ms-1">authors_raw</label>
+              <input
+                id="cte-kw"
+                class="ms-2"
+                type="checkbox"
+                value="keywords"
+                v-model="labelExportSettings.columnsToDrop"
+              />
+              <label for="cte-kw" class="ms-1">keywords</label>
+            </div>
           </div>
         </div>
       </div>
@@ -228,6 +249,7 @@ const labelExportSettings = reactive({
   labels: {} as Record<string, LabelOptions>,
   ignoreHierarchy: true,
   ignoreOrder: true,
+  columnsToDrop: ["type", "time_edited", "project_id", "title_slug", "keywords", "meta", "authors_raw"],
 });
 
 onMounted(async () => {
@@ -287,6 +309,7 @@ const downloadAnnotations = () => {
         bot_annotation_metadata_ids: labelExportSettings.botAnnotationMetadataIds,
         assignment_scope_ids: labelExportSettings.assignmentScopeIds,
         user_ids: projectUserIds.value,
+        columns_to_drop: labelExportSettings.columnsToDrop,
       },
     })
     .then((response) => {
