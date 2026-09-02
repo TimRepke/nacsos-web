@@ -232,6 +232,7 @@ type AnnotationsViewData = {
   scope?: AssignmentScopeModel;
   labels?: AnnotationSchemeLabel[];
   dirty: number;
+  saveInFlight: boolean;
   rerenderCounter: number; // this is a hack to force-update the AnnotationLabels-component
   showStatusBarModal: boolean;
 };
@@ -258,6 +259,7 @@ export default defineComponent({
       scope: undefined as AssignmentScopeModel | undefined,
       labels: undefined as AnnotationSchemeLabel[] | undefined,
       dirty: 0,
+      saveInFlight: false,
       rerenderCounter: 0,
       showStatusBarModal: false,
     };
@@ -380,7 +382,13 @@ export default defineComponent({
       });
     },
     async save() {
-      if (this.dirty > 0) {
+      if (this.dirty <= 0 || this.saveInFlight) {
+        return;
+      }
+
+      this.saveInFlight = true;
+
+      try {
         // copy relevant data to break references
         const labels = JSON.parse(JSON.stringify(this.labels));
         const scheme = JSON.parse(JSON.stringify(this.scheme));
@@ -409,35 +417,33 @@ export default defineComponent({
         scheme.labels = removeEmptyAnnotations(labels);
 
         // Send data to the server
-        API.annotations
-          .saveAnnotationApiAnnotationsAnnotateSavePost({
-            headers: { "x-project-id": currentProjectStore.projectId as string },
-            body: {
-              scheme,
-              assignment: this.assignment as AssignmentModel,
-            },
-          })
-          .then((response) => {
-            const reason = response.data;
-            if (reason === "PARTIAL") {
-              EventBus.emit(new ToastEvent("WARN", "This annotation wasn't quite done yet..."));
-            }
-            EventBus.emit(new ToastEvent("SUCCESS", "Successfully saved your annotation!"));
-          })
-          .catch(() => {
-            EventBus.emit(
-              new ToastEvent(
-                "ERROR",
-                "Failed to save your annotation. Sorry. " + "Please try reloading the page and saving again.",
-              ),
-            );
-          })
-          .finally(() => {
-            if (currentProjectStore.project?.setting_motivational_quotes && Math.random() < 0.2) {
-              const quoteIndex = Math.floor(Math.random() * (motivationalQuotes.length + 1));
-              EventBus.emit(new ToastEvent("INFO", motivationalQuotes[quoteIndex]));
-            }
-          });
+        const response = await API.annotations.saveAnnotationApiAnnotationsAnnotateSavePost({
+          headers: { "x-project-id": currentProjectStore.projectId as string },
+          body: {
+            scheme,
+            assignment: this.assignment as AssignmentModel,
+          },
+        });
+
+        const reason = response.data;
+        if (reason === "PARTIAL") {
+          EventBus.emit(new ToastEvent("WARN", "This annotation wasn't quite done yet..."));
+        }
+        EventBus.emit(new ToastEvent("SUCCESS", "Successfully saved your annotation!"));
+        this.dirty = 0;
+      } catch {
+        EventBus.emit(
+          new ToastEvent(
+            "ERROR",
+            "Failed to save your annotation. Sorry. " + "Please try reloading the page and saving again.",
+          ),
+        );
+      } finally {
+        this.saveInFlight = false;
+        if (currentProjectStore.project?.setting_motivational_quotes && Math.random() < 0.2) {
+          const quoteIndex = Math.floor(Math.random() * (motivationalQuotes.length + 1));
+          EventBus.emit(new ToastEvent("INFO", motivationalQuotes[quoteIndex]));
+        }
       }
     },
     async setCurrentAssignment(annotationItem: AnnotationItem) {
