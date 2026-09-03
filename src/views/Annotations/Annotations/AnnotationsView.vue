@@ -172,7 +172,7 @@ import { API, ignore } from "@/plugins/api";
 import type { AnyItem } from "@/types/items.d";
 import { currentProjectStore, currentUserStore, interfaceSettingsStore } from "@/stores";
 import { lookupMakerBool, lookupMakerChoice, lookupMakerStatus } from "@/types/colours";
-import { useDelay } from "@/util";
+import { useDebounce, useDelay } from "@/util";
 
 const motivationalQuotes = [
   "The chase is better than the catch. – Scooter",
@@ -268,7 +268,7 @@ function markdown(md: string) {
   return marked(md);
 }
 
-const { delayedCall: onKeyPress } = useDelay((e: KeyboardEvent) => {
+const { debouncedCall: onKeyPress } = useDebounce((e: KeyboardEvent) => {
   if (e !== null && e.target !== null) {
     const target = e.target as Element;
     if (!target.matches("input, textarea") && !e.repeat) {
@@ -318,7 +318,7 @@ const { delayedCall: onKeyPress } = useDelay((e: KeyboardEvent) => {
       }
     }
   }
-}, 200);
+}, 250);
 
 function populateEmptyAnnotations(labelsToFill: AnnotationSchemeLabel[]): AnnotationSchemeLabel[] {
   return labelsToFill.map((label: AnnotationSchemeLabel) => {
