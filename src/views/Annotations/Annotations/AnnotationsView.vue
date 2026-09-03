@@ -127,7 +127,7 @@
                   </label>
                   <select
                     :value="progressBarLabelKey"
-                    @input="updateProgressBarLabelKey($event.target.value)"
+                    @input="updateProgressBarLabelKey($event.target?.value)"
                     id="progressBarLabelKey"
                     class="form-select"
                   >
