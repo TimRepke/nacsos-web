@@ -25,7 +25,7 @@ export default defineConfig({
     },
     {
       name: "@hey-api/sdk",
-      asClass: true,
+      operations: { strategy: "byTags" },
       throwOnError: true,
       paramStructure: "flat",
       responseStyle: "fields",

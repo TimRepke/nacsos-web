@@ -1469,6 +1469,10 @@ export const AnnotationSchemeInfoSchema = {
       ],
       title: 'Annotation Scheme Id'
     },
+    name: {
+      type: 'string',
+      title: 'Name'
+    },
     project_id: {
       anyOf: [
         {
@@ -1483,10 +1487,6 @@ export const AnnotationSchemeInfoSchema = {
         }
       ],
       title: 'Project Id'
-    },
-    name: {
-      type: 'string',
-      title: 'Name'
     },
     description: {
       anyOf: [
@@ -1716,6 +1716,10 @@ export const AnnotationSchemeModelSchema = {
       ],
       title: 'Annotation Scheme Id'
     },
+    name: {
+      type: 'string',
+      title: 'Name'
+    },
     project_id: {
       anyOf: [
         {
@@ -1730,10 +1734,6 @@ export const AnnotationSchemeModelSchema = {
         }
       ],
       title: 'Project Id'
-    },
-    name: {
-      type: 'string',
-      title: 'Name'
     },
     description: {
       anyOf: [
@@ -1815,6 +1815,10 @@ export const AnnotationSchemeModelFlatSchema = {
       ],
       title: 'Annotation Scheme Id'
     },
+    name: {
+      type: 'string',
+      title: 'Name'
+    },
     project_id: {
       anyOf: [
         {
@@ -1829,10 +1833,6 @@ export const AnnotationSchemeModelFlatSchema = {
         }
       ],
       title: 'Project Id'
-    },
-    name: {
-      type: 'string',
-      title: 'Name'
     },
     description: {
       anyOf: [
@@ -2802,8 +2802,7 @@ export const AssignmentScopeModelSchema = {
     'annotation_scheme_id',
     'name'
   ],
-  title: 'AssignmentScopeModel',
-  description: 'AssignmentScope can be used to logically group a set of Assignments.\nFor example, one may wish to re-use the same AnnotationScheme several times within a project\nwithout copying it each time. It may also be used to logically group different scopes of\nthe annotation process, for example to make it clear that different subsets of a dataset\nare to be annotated.\nLogically, this should be viewed as a hierarchical organisation\nAnnotationScheme -> [AssignmentScope] -> Assignment -> Annotation'
+  title: 'AssignmentScopeModel'
 } as const;
 
 export const AssignmentStatusSchema = {
@@ -2878,78 +2877,6 @@ export const AuthTokenModelSchema = {
     'username'
   ],
   title: 'AuthTokenModel'
-} as const;
-
-export const BaseInfoSchema = {
-  properties: {
-    id: {
-      anyOf: [
-        {
-          type: 'string'
-        },
-        {
-          type: 'string',
-          format: 'uuid'
-        }
-      ],
-      title: 'Id'
-    },
-    name: {
-      type: 'string',
-      title: 'Name'
-    }
-  },
-  type: 'object',
-  required: [
-    'id',
-    'name'
-  ],
-  title: 'BaseInfo'
-} as const;
-
-export const BaseInfoWithSchemeSchema = {
-  properties: {
-    id: {
-      anyOf: [
-        {
-          type: 'string'
-        },
-        {
-          type: 'string',
-          format: 'uuid'
-        }
-      ],
-      title: 'Id'
-    },
-    name: {
-      type: 'string',
-      title: 'Name'
-    },
-    scheme_id: {
-      anyOf: [
-        {
-          type: 'string'
-        },
-        {
-          type: 'string',
-          format: 'uuid'
-        }
-      ],
-      title: 'Scheme Id'
-    },
-    scheme_name: {
-      type: 'string',
-      title: 'Scheme Name'
-    }
-  },
-  type: 'object',
-  required: [
-    'id',
-    'name',
-    'scheme_id',
-    'scheme_name'
-  ],
-  title: 'BaseInfoWithScheme'
 } as const;
 
 export const BasicProjectStatsSchema = {
@@ -4387,6 +4314,10 @@ export const ExportRequestSchema = {
         'keywords',
         'meta'
       ]
+    },
+    ris_label_format: {
+      $ref: '#/components/schemas/RISLabelFormat',
+      default: 'RAW_TAGS'
     }
   },
   type: 'object',
@@ -4394,6 +4325,17 @@ export const ExportRequestSchema = {
     'labels'
   ],
   title: 'ExportRequest'
+} as const;
+
+export const ExportTypeEnumSchema = {
+  type: 'string',
+  enum: [
+    'csv',
+    'excel',
+    'ris',
+    'jsonl'
+  ],
+  title: 'ExportTypeEnum'
 } as const;
 
 export const FieldFilterSchema = {
@@ -7425,21 +7367,21 @@ export const ProjectBaseInfoSchema = {
   properties: {
     users: {
       items: {
-        $ref: '#/components/schemas/BaseInfo'
+        $ref: '#/components/schemas/DehydratedUser'
       },
       type: 'array',
       title: 'Users'
     },
     scopes: {
       items: {
-        $ref: '#/components/schemas/BaseInfoWithScheme'
+        $ref: '#/components/schemas/ScopeInfo'
       },
       type: 'array',
       title: 'Scopes'
     },
     bot_scopes: {
       items: {
-        $ref: '#/components/schemas/BaseInfoWithScheme'
+        $ref: '#/components/schemas/ScopeInfo'
       },
       type: 'array',
       title: 'Bot Scopes'
@@ -7799,6 +7741,16 @@ export const QueryResultSchema = {
     'docs'
   ],
   title: 'QueryResult'
+} as const;
+
+export const RISLabelFormatSchema = {
+  type: 'string',
+  enum: [
+    'RAW_TAGS',
+    'CHOICE_NAMES',
+    'LABEL_AND_CHOICE_NAMES'
+  ],
+  title: 'RISLabelFormat'
 } as const;
 
 export const RankEntrySchema = {
@@ -8373,6 +8325,35 @@ export const SciBERTModelSchema = {
   },
   type: 'object',
   title: 'SciBERTModel'
+} as const;
+
+export const ScopeInfoSchema = {
+  properties: {
+    scope_id: {
+      type: 'string',
+      title: 'Scope Id'
+    },
+    scope_name: {
+      type: 'string',
+      title: 'Scope Name'
+    },
+    scheme_id: {
+      type: 'string',
+      title: 'Scheme Id'
+    },
+    scheme_name: {
+      type: 'string',
+      title: 'Scheme Name'
+    }
+  },
+  type: 'object',
+  required: [
+    'scope_id',
+    'scope_name',
+    'scheme_id',
+    'scheme_name'
+  ],
+  title: 'ScopeInfo'
 } as const;
 
 export const ScopusAPIImportSchema = {

@@ -127,7 +127,7 @@
                   </label>
                   <select
                     :value="progressBarLabelKey"
-                    @input="updateProgressBarLabelKey($event.target.value)"
+                    @input="updateProgressBarLabelKey($event.target?.value)"
                     id="progressBarLabelKey"
                     class="form-select"
                   >
@@ -148,9 +148,9 @@
     </template>
   </div>
 </template>
-
-<script lang="ts">
-import { defineComponent } from "vue";
+<script setup lang="ts">
+import { computed, onMounted, onUnmounted, ref, watch } from "vue";
+import { useRoute, useRouter } from "vue-router";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import { marked } from "marked";
 import AnyItemComponent from "@/components/items/AnyItem.vue";
@@ -172,6 +172,7 @@ import { API, ignore } from "@/plugins/api";
 import type { AnyItem } from "@/types/items.d";
 import { currentProjectStore, currentUserStore, interfaceSettingsStore } from "@/stores";
 import { lookupMakerBool, lookupMakerChoice, lookupMakerStatus } from "@/types/colours";
+import { useDebounce } from "@/util";
 
 const motivationalQuotes = [
   "The chase is better than the catch. – Scooter",
@@ -221,20 +222,10 @@ const motivationalQuotes = [
   "Всюди добре де нас нема", // The grass is always greener on the other side of the hill. (Ukrainian proverb)
   "أشد الفاقة عدم العقل", // (Arabic proverb)
   "千 里 之 行 始 于 足 下。--- 老 子", // A journey of a thousand miles must begin with a single step. – Lao Tzu
+  "Don't. stop. me. now, 'cause I'm havin' a good time screening. — Tim Repke",
 ];
-type UserAssignmentInfo = AssignmentInfo & { identifier: number; item_id: string };
 
-type AnnotationsViewData = {
-  item?: AnyItem;
-  assignment?: AssignmentModel;
-  assignments?: AssignmentScopeEntry[];
-  scheme?: AnnotationSchemeModel;
-  scope?: AssignmentScopeModel;
-  labels?: AnnotationSchemeLabel[];
-  dirty: number;
-  rerenderCounter: number; // this is a hack to force-update the AnnotationLabels-component
-  showStatusBarModal: boolean;
-};
+type UserAssignmentInfo = AssignmentInfo & { identifier: number; item_id: string };
 
 type AssignmentIndicator = {
   assignmentId: string;
@@ -246,392 +237,434 @@ type AssignmentIndicator = {
   identifier: number;
 };
 
-export default defineComponent({
-  name: "AnnotationsView",
-  components: { FontAwesomeIcon, AnnotationLabels, AnyItemComponent },
-  data(): AnnotationsViewData {
-    return {
-      item: undefined as AnyItem | undefined,
-      assignment: undefined as AssignmentModel | undefined,
-      assignments: undefined as AssignmentScopeEntry[] | undefined,
-      scheme: undefined as AnnotationSchemeModel | undefined,
-      scope: undefined as AssignmentScopeModel | undefined,
-      labels: undefined as AnnotationSchemeLabel[] | undefined,
-      dirty: 0,
-      rerenderCounter: 0,
-      showStatusBarModal: false,
-    };
-  },
-  unmounted() {
-    document.removeEventListener("keydown", this.onKeyPress, false);
-  },
-  async mounted() {
-    const assignmentScopeId = this.$route.params.scope_id as string;
-    const currentAssignmentId = this.$route.params.assignment_id as string;
-    document.addEventListener("keydown", this.onKeyPress, false);
-    try {
-      let response: AnnotationItem;
-      if (currentAssignmentId) {
-        response = (
-          await API.annotations.getAssignmentApiAnnotationsAnnotateAssignmentAssignmentIdGet({
-            headers: { "x-project-id": currentProjectStore.projectId as string },
-            path: { assignment_id: currentAssignmentId },
-          })
-        ).data;
-      } else {
-        response = (
-          await API.annotations.getNextOpenAssignmentForScopeForUserApiAnnotationsAnnotateNextAssignmentScopeIdGet({
-            headers: { "x-project-id": currentProjectStore.projectId as string },
-            path: { assignment_scope_id: assignmentScopeId },
-          })
-        ).data;
-      }
+const route = useRoute();
+const router = useRouter();
 
-      await this.setCurrentAssignment(response);
-    } catch (e) {
-      console.error(e);
-    }
-  },
-  methods: {
-    widenSidebar() {
-      if (interfaceSettingsStore.annotation.sidebarWidth < 12) interfaceSettingsStore.annotation.sidebarWidth++;
-    },
-    shrinkSidebar() {
-      if (interfaceSettingsStore.annotation.sidebarWidth > 0) interfaceSettingsStore.annotation.sidebarWidth--;
-    },
-    updateProgressBarLabelKey(newValue: string) {
-      interfaceSettingsStore.annotation.progressBarLabelKey = newValue;
-    },
-    markdown(md: string) {
-      return marked(md);
-    },
-    onKeyPress(e: KeyboardEvent) {
-      if (e !== null && e.target !== null) {
-        const target = e.target as Element;
-        if (!target.matches("input, textarea") && !e.repeat) {
-          switch (e.key) {
-            case "ArrowUp":
-            case "k":
-            case "w":
-              // UP => previous label
-              this.$refs.labelsComponents?.selectPrevious();
-              break;
-            case "ArrowDown":
-            case "j":
-            case "s":
-              // DOWN => next label
-              this.$refs.labelsComponents?.selectNext();
-              break;
-            case "0":
-            case "1":
-            case "2":
-            case "3":
-            case "4":
-            case "5":
-            case "6":
-            case "7":
-            case "8":
-            case "9":
-            case "+":
-            case "-":
-            case "Enter":
-            case "Backspace":
-              this.$refs.labelsComponents?.setValue(e.key);
-              break;
-            case "ArrowLeft":
-            case "h":
-            case "a":
-              // LEFT => previous assignment
-              this.saveAndPrevious();
-              break;
-            case "ArrowRight":
-            case "l":
-            case "d":
-              // RIGHT => next assignment
-              this.saveAndNext();
-              break;
-            default:
-            // pass
-          }
-        }
+// refs for the template's `$refs.labelsComponents`
+const labelsComponents = ref<InstanceType<typeof AnnotationLabels> | null>(null);
+
+const item = ref<AnyItem | undefined>(undefined);
+const assignment = ref<AssignmentModel | undefined>(undefined);
+const assignments = ref<AssignmentScopeEntry[] | undefined>(undefined);
+const scheme = ref<AnnotationSchemeModel | undefined>(undefined);
+const scope = ref<AssignmentScopeModel | undefined>(undefined);
+const labels = ref<AnnotationSchemeLabel[] | undefined>(undefined);
+const dirty = ref(0);
+const rerenderCounter = ref(0);
+const showStatusBarModal = ref(false);
+
+function widenSidebar() {
+  if (interfaceSettingsStore.annotation.sidebarWidth < 12) interfaceSettingsStore.annotation.sidebarWidth++;
+}
+
+function shrinkSidebar() {
+  if (interfaceSettingsStore.annotation.sidebarWidth > 0) interfaceSettingsStore.annotation.sidebarWidth--;
+}
+
+function updateProgressBarLabelKey(newValue: string) {
+  interfaceSettingsStore.annotation.progressBarLabelKey = newValue;
+}
+
+function markdown(md: string) {
+  return marked(md);
+}
+
+const { debouncedCall: onKeyPress } = useDebounce((e: KeyboardEvent) => {
+  if (e !== null && e.target !== null) {
+    const target = e.target as Element;
+    if (!target.matches("input, textarea") && !e.repeat) {
+      switch (e.key) {
+        case "ArrowUp":
+        case "k":
+        case "w":
+          // UP => previous label
+          labelsComponents.value?.selectPrevious();
+          break;
+        case "ArrowDown":
+        case "j":
+        case "s":
+          // DOWN => next label
+          labelsComponents.value?.selectNext();
+          break;
+        case "0":
+        case "1":
+        case "2":
+        case "3":
+        case "4":
+        case "5":
+        case "6":
+        case "7":
+        case "8":
+        case "9":
+        case "+":
+        case "-":
+        case "Enter":
+        case "Backspace":
+          labelsComponents.value?.setValue(e.key);
+          break;
+        case "ArrowLeft":
+        case "h":
+        case "a":
+          // LEFT => previous assignment
+          saveAndPrevious();
+          break;
+        case "ArrowRight":
+        case "l":
+        case "d":
+          // RIGHT => next assignment
+          saveAndNext();
+          break;
+        default:
+        // pass
       }
-    },
-    populateEmptyAnnotations(labels: AnnotationSchemeLabel[]) {
-      return labels.map((label: AnnotationSchemeLabel) => {
-        if (!label.annotation && !!this.assignment) {
-          label.annotation = {
-            assignment_id: this.assignment.assignment_id as string,
-            user_id: this.assignment.user_id,
-            item_id: this.assignment.item_id,
-            annotation_scheme_id: this.assignment.annotation_scheme_id,
-            key: label.key,
-            repeat: 1,
-            parent: undefined,
-          };
+    }
+  }
+}, 250);
+
+function populateEmptyAnnotations(labelsToFill: AnnotationSchemeLabel[]): AnnotationSchemeLabel[] {
+  return labelsToFill.map((label: AnnotationSchemeLabel) => {
+    if (!label.annotation && !!assignment.value) {
+      label.annotation = {
+        assignment_id: assignment.value.assignment_id as string,
+        user_id: assignment.value.user_id,
+        item_id: assignment.value.item_id,
+        annotation_scheme_id: assignment.value.annotation_scheme_id,
+        key: label.key,
+        repeat: 1,
+        parent: undefined,
+      };
+    }
+    if (label.choices) {
+      label.choices.forEach((choice) => {
+        if (choice.children) {
+          choice.children = populateEmptyAnnotations(choice.children);
+        }
+      });
+    }
+    return label;
+  });
+}
+
+async function save() {
+  if (dirty.value > 0) {
+    // copy relevant data to break references
+    const labelsCopy = JSON.parse(JSON.stringify(labels.value));
+    const schemeCopy = JSON.parse(JSON.stringify(scheme.value));
+
+    // first, remove all empty annotations again
+    const removeEmptyAnnotations = (subLabels: AnnotationSchemeLabel[]) =>
+      subLabels.map((label: AnnotationSchemeLabel) => {
+        if (
+          label.annotation?.value_int === undefined &&
+          label.annotation?.value_str === undefined &&
+          label.annotation?.value_bool === undefined &&
+          label.annotation?.value_float === undefined &&
+          label.annotation?.multi_int === undefined
+        ) {
+          delete label.annotation;
         }
         if (label.choices) {
           label.choices.forEach((choice) => {
             if (choice.children) {
-              choice.children = this.populateEmptyAnnotations(choice.children);
+              choice.children = removeEmptyAnnotations(choice.children);
             }
           });
         }
         return label;
       });
-    },
-    async save() {
-      if (this.dirty > 0) {
-        // copy relevant data to break references
-        const labels = JSON.parse(JSON.stringify(this.labels));
-        const scheme = JSON.parse(JSON.stringify(this.scheme));
+    schemeCopy.labels = removeEmptyAnnotations(labelsCopy);
 
-        // first, remove all empty annotations again
-        const removeEmptyAnnotations = (subLabels: AnnotationSchemeLabel[]) =>
-          subLabels.map((label: AnnotationSchemeLabel) => {
-            if (
-              label.annotation?.value_int === undefined &&
-              label.annotation?.value_str === undefined &&
-              label.annotation?.value_bool === undefined &&
-              label.annotation?.value_float === undefined &&
-              label.annotation?.multi_int === undefined
-            ) {
-              delete label.annotation;
-            }
-            if (label.choices) {
-              label.choices.forEach((choice) => {
-                if (choice.children) {
-                  choice.children = removeEmptyAnnotations(choice.children);
-                }
-              });
-            }
-            return label;
-          });
-        scheme.labels = removeEmptyAnnotations(labels);
-
-        // Send data to the server
-        API.annotations
-          .saveAnnotationApiAnnotationsAnnotateSavePost({
-            headers: { "x-project-id": currentProjectStore.projectId as string },
-            body: {
-              scheme,
-              assignment: this.assignment as AssignmentModel,
-            },
-          })
-          .then((response) => {
-            const reason = response.data;
-            if (reason === "PARTIAL") {
-              EventBus.emit(new ToastEvent("WARN", "This annotation wasn't quite done yet..."));
-            }
-            EventBus.emit(new ToastEvent("SUCCESS", "Successfully saved your annotation!"));
-          })
-          .catch(() => {
-            EventBus.emit(
-              new ToastEvent(
-                "ERROR",
-                "Failed to save your annotation. Sorry. " + "Please try reloading the page and saving again.",
-              ),
-            );
-          })
-          .finally(() => {
-            if (currentProjectStore.project?.setting_motivational_quotes && Math.random() < 0.2) {
-              const quoteIndex = Math.floor(Math.random() * (motivationalQuotes.length + 1));
-              EventBus.emit(new ToastEvent("INFO", motivationalQuotes[quoteIndex]));
-            }
-          });
-      }
-    },
-    async setCurrentAssignment(annotationItem: AnnotationItem) {
-      // update all the data
-      this.assignment = annotationItem.assignment;
-      this.scheme = annotationItem.scheme;
-      this.scope = annotationItem.scope;
-      this.item = annotationItem.item;
-      this.labels = this.populateEmptyAnnotations(this.scheme.labels);
-      this.rerenderCounter += 1;
-
-      // update the assignments progress bar
-      API.annotations
-        .getAssignmentIndicatorsForScopeApiAnnotationsAnnotateAssignmentProgressAssignmentScopeIdGet({
-          headers: { "x-project-id": currentProjectStore.projectId as string },
-          path: { assignment_scope_id: annotationItem.scope.assignment_scope_id as string },
-        })
-        .then(async (response) => {
-          this.assignments = response.data;
-          // update the URL
-          await this.$router.push({
-            name: "project-annotate-item",
-            params: {
-              scope_id: this.scope!.assignment_scope_id,
-              assignment_id: this.assignment!.assignment_id,
-            },
-          });
-          this.dirty = 0;
-        })
-        .catch(ignore);
-    },
-    async saveAndGoto(targetAssignmentId: string) {
-      await this.save();
-
-      API.annotations
-        .getAssignmentApiAnnotationsAnnotateAssignmentAssignmentIdGet({
-          headers: { "x-project-id": currentProjectStore.projectId as string },
-          path: { assignment_id: targetAssignmentId },
-        })
-        .then((response) => {
-          this.setCurrentAssignment(response.data);
-        })
-        .catch(ignore);
-    },
-    async saveAndPrevious() {
-      if (this.currentAssignmentIndex !== undefined && this.userAssignments) {
-        if (this.currentAssignmentIndex > 0) {
-          await this.saveAndGoto(this.userAssignments[this.currentAssignmentIndex - 1].assignment_id);
-        } else {
-          await this.saveAndGoto(this.userAssignments[this.userAssignments.length - 1].assignment_id);
+    // Send data to the server
+    API.annotations
+      .saveAnnotationApiAnnotationsAnnotateSavePost({
+        headers: { "x-project-id": currentProjectStore.projectId as string },
+        body: {
+          scheme: schemeCopy,
+          assignment: assignment.value as AssignmentModel,
+        },
+      })
+      .then((response) => {
+        const reason = response.data;
+        if (reason === "PARTIAL") {
+          EventBus.emit(new ToastEvent("WARN", "This annotation wasn't quite done yet..."));
         }
-      }
-    },
-    async saveAndNext() {
-      if (this.currentAssignmentIndex !== undefined && this.userAssignments) {
-        await this.saveAndGoto(
-          this.userAssignments[(this.currentAssignmentIndex + 1) % this.userAssignments.length].assignment_id,
-        );
-      }
-    },
-  },
-  computed: {
-    currentAssignmentIndex(): number | undefined {
-      if (this.userAssignments) {
-        return this.userAssignments?.findIndex(
-          (assi: UserAssignmentInfo) => assi.assignment_id === this.assignment?.assignment_id,
-        );
-      }
-      return undefined;
-    },
-    sidebarWidthClass() {
-      return `col-md-${interfaceSettingsStore.annotation.sidebarWidth}`;
-    },
-    userAssignments(): UserAssignmentInfo[] | null {
-      if (this.assignments) {
-        return this.assignments
-          .map((entry: AssignmentScopeEntry): UserAssignmentInfo | null => {
-            const userAssignments = entry.assignments.filter(
-              (assignment: AssignmentInfo) => assignment.user_id === currentUserStore.user?.user_id,
-            );
-            if (userAssignments.length > 0) {
-              return {
-                ...userAssignments[0],
-                identifier: entry.identifier,
-                item_id: entry.item_id,
-              } as unknown as UserAssignmentInfo;
-            }
-            return null;
-          })
-          .filter((entry: UserAssignmentInfo | null): entry is UserAssignmentInfo => entry !== null)
-          .sort((a: UserAssignmentInfo, b: UserAssignmentInfo) => a.order - b.order);
-      }
-      return null;
-    },
-    assignmentIndicators(): AssignmentIndicator[] | null {
-      const WINDOW = 50; // 100/2
-      const assignmentId = this.assignment?.assignment_id;
-      if (this.userAssignments && assignmentId) {
-        let focus = this.userAssignments.findIndex(
-          (assignment: UserAssignmentInfo) => assignment.assignment_id === assignmentId,
-        );
-        focus = Math.min(Math.max(WINDOW, focus), this.userAssignments.length - WINDOW);
-        return this.userAssignments.map((assignment: UserAssignmentInfo, index: number): AssignmentIndicator => ({
-          assignmentId: assignment.assignment_id as string,
-          inHighlight: index - WINDOW <= focus && focus <= index + WINDOW,
-          itemId: assignment.item_id,
-          status: assignment.status,
-          colour: this.indicatorLabelColourMapper(assignment),
-          order: assignment.order,
-          identifier: assignment.identifier,
-        }));
-      }
-      return null;
-    },
-    assignmentIndicatorsHighlighted(): AssignmentIndicator[] | null {
-      if (this.assignmentIndicators) {
-        return this.assignmentIndicators.filter((assignment: AssignmentIndicator) => assignment.inHighlight);
-      }
-      return null;
-    },
-    assignmentIndicatorsNeedBirdseye(): boolean {
-      return !!this.userAssignments && this.userAssignments.length > 100;
-    },
-    availableIndicatorLabels(): AnnotationSchemeLabel[] {
-      let list = [
-        {
-          name: "Assignment status (always fallback)",
-        } as AnnotationSchemeLabel,
-      ];
-      if (this.labels !== undefined) {
-        list = list.concat(
-          this.labels.filter(
-            (label: AnnotationSchemeLabel) =>
-              (label.kind === "bool" || label.kind === "single") && (label.annotation?.repeat || 1) === 1,
+        EventBus.emit(new ToastEvent("SUCCESS", "Successfully saved your annotation!"));
+      })
+      .catch(() => {
+        EventBus.emit(
+          new ToastEvent(
+            "ERROR",
+            "Failed to save your annotation. Sorry. " + "Please try reloading the page and saving again.",
           ),
         );
-      }
-      return list;
-    },
-    indicatorLabelColourMapper(): (indicator: UserAssignmentInfo) => string {
-      // Colour by assignment status is always the fallback, set up respective map and mapper function
-      const indicateStatusMapper = lookupMakerStatus<UserAssignmentInfo>(
-        (indicator: UserAssignmentInfo): AssignmentStatus => indicator.status,
-      );
+      })
+      .finally(() => {
+        if (currentProjectStore.project?.setting_motivational_quotes && Math.random() < 0.2) {
+          const quoteIndex = Math.floor(Math.random() * (motivationalQuotes.length + 1));
+          EventBus.emit(new ToastEvent("INFO", motivationalQuotes[quoteIndex]));
+        }
+      });
+  }
+}
 
-      // User selected to colour by assignment status
-      if (interfaceSettingsStore.annotationProgressBarUseStatus) {
-        return indicateStatusMapper;
-      }
+async function setCurrentAssignment(annotationItem: AnnotationItem) {
+  // update all the data
+  assignment.value = annotationItem.assignment;
+  scheme.value = annotationItem.scheme;
+  scope.value = annotationItem.scope;
+  item.value = annotationItem.item;
+  labels.value = populateEmptyAnnotations(scheme.value.labels);
+  rerenderCounter.value += 1;
 
-      const labelKey = this.progressBarLabelKey;
-      if (!labelKey) {
-        return indicateStatusMapper;
-      }
+  // update the assignments progress bar
+  API.annotations
+    .getAssignmentIndicatorsForScopeApiAnnotationsAnnotateAssignmentProgressAssignmentScopeIdGet({
+      headers: { "x-project-id": currentProjectStore.projectId as string },
+      path: { assignment_scope_id: annotationItem.scope.assignment_scope_id as string },
+    })
+    .then(async (response) => {
+      assignments.value = response.data;
+      // update the URL
+      await router.push({
+        name: "project-annotate-item",
+        params: {
+          scope_id: scope.value!.assignment_scope_id,
+          assignment_id: assignment.value!.assignment_id,
+        },
+      });
+      dirty.value = 0;
+    })
+    .catch(ignore);
+}
 
-      // User selected a specific label for colouring, try to find it
-      const label: AnnotationSchemeLabel | undefined = (this.labels ?? []).find(
-        (lab: AnnotationSchemeLabel) => lab.key === labelKey,
-      );
+async function saveAndGoto(targetAssignmentId: string) {
+  await save();
 
-      // No corresponding label found in the scheme, return fallback mapper
-      if (!label) {
-        return indicateStatusMapper;
-      }
+  API.annotations
+    .getAssignmentApiAnnotationsAnnotateAssignmentAssignmentIdGet({
+      headers: { "x-project-id": currentProjectStore.projectId as string },
+      path: { assignment_id: targetAssignmentId },
+    })
+    .then((response) => {
+      setCurrentAssignment(response.data);
+    })
+    .catch(ignore);
+}
 
-      if (label.kind === KindEnum.SINGLE && label.choices) {
-        return lookupMakerChoice<UserAssignmentInfo>(
-          label.choices,
-          false,
-          (indicator: UserAssignmentInfo): number | null | undefined => indicator.labels?.[labelKey]?.[0]?.value_int,
+async function saveAndPrevious() {
+  if (currentAssignmentIndex.value !== undefined && userAssignments.value) {
+    if (currentAssignmentIndex.value > 0) {
+      await saveAndGoto(userAssignments.value[currentAssignmentIndex.value - 1].assignment_id);
+    } else {
+      await saveAndGoto(userAssignments.value[userAssignments.value.length - 1].assignment_id);
+    }
+  }
+}
+
+async function saveAndNext() {
+  if (currentAssignmentIndex.value !== undefined && userAssignments.value) {
+    await saveAndGoto(
+      userAssignments.value[(currentAssignmentIndex.value + 1) % userAssignments.value.length].assignment_id,
+    );
+  }
+}
+
+const currentAssignmentIndex = computed<number | undefined>(() => {
+  if (userAssignments.value) {
+    return userAssignments.value?.findIndex(
+      (assi: UserAssignmentInfo) => assi.assignment_id === assignment.value?.assignment_id,
+    );
+  }
+  return undefined;
+});
+
+const sidebarWidthClass = computed(() => `col-md-${interfaceSettingsStore.annotation.sidebarWidth}`);
+
+const userAssignments = computed<UserAssignmentInfo[] | null>(() => {
+  if (assignments.value) {
+    return assignments.value
+      .map((entry: AssignmentScopeEntry): UserAssignmentInfo | null => {
+        const filteredAssignments = entry.assignments.filter(
+          (a: AssignmentInfo) => a.user_id === currentUserStore.user?.user_id,
         );
-      }
+        if (filteredAssignments.length > 0) {
+          return {
+            ...filteredAssignments[0],
+            identifier: entry.identifier,
+            item_id: entry.item_id,
+          } as unknown as UserAssignmentInfo;
+        }
+        return null;
+      })
+      .filter((entry: UserAssignmentInfo | null): entry is UserAssignmentInfo => entry !== null)
+      .sort((a: UserAssignmentInfo, b: UserAssignmentInfo) => a.order - b.order);
+  }
+  return null;
+});
 
-      if (label.kind === KindEnum.BOOL) {
-        return lookupMakerBool<UserAssignmentInfo>(
-          (indicator: UserAssignmentInfo): boolean | null | undefined => indicator.labels?.[labelKey]?.[0]?.value_bool,
-        );
-      }
+const assignmentIndicators = computed<AssignmentIndicator[] | null>(() => {
+  const WINDOW = 50; // 100/2
+  const assignmentId = assignment.value?.assignment_id;
+  if (userAssignments.value && assignmentId) {
+    let focus = userAssignments.value.findIndex((a: UserAssignmentInfo) => a.assignment_id === assignmentId);
+    focus = Math.min(Math.max(WINDOW, focus), userAssignments.value.length - WINDOW);
+    return userAssignments.value.map((a: UserAssignmentInfo, index: number): AssignmentIndicator => ({
+      assignmentId: a.assignment_id as string,
+      inHighlight: index - WINDOW <= focus && focus <= index + WINDOW,
+      itemId: a.item_id,
+      status: a.status,
+      colour: indicatorLabelColourMapper.value(a),
+      order: a.order,
+      identifier: a.identifier,
+    }));
+  }
+  return null;
+});
 
-      // fallback to status mapper
-      return indicateStatusMapper;
-    },
-    progressBarLabelKey(): string | undefined | null {
-      return interfaceSettingsStore.annotation.progressBarLabelKey;
-    },
+const assignmentIndicatorsHighlighted = computed<AssignmentIndicator[] | null>(() => {
+  if (assignmentIndicators.value) {
+    return assignmentIndicators.value.filter((a: AssignmentIndicator) => a.inHighlight);
+  }
+  return null;
+});
+
+const assignmentIndicatorsNeedBirdseye = computed<boolean>(
+  () => !!userAssignments.value && userAssignments.value.length > 100,
+);
+
+const availableIndicatorLabels = computed<AnnotationSchemeLabel[]>(() => {
+  let list = [
+    {
+      name: "Assignment status (always fallback)",
+    } as AnnotationSchemeLabel,
+  ];
+  if (labels.value !== undefined) {
+    list = list.concat(
+      labels.value.filter(
+        (label: AnnotationSchemeLabel) =>
+          (label.kind === "bool" || label.kind === "single") && (label.annotation?.repeat || 1) === 1,
+      ),
+    );
+  }
+  return list;
+});
+
+const progressBarLabelKey = computed<string | undefined | null>(
+  () => interfaceSettingsStore.annotation.progressBarLabelKey,
+);
+
+const indicatorLabelColourMapper = computed<(indicator: UserAssignmentInfo) => string>(() => {
+  // Colour by assignment status is always the fallback, set up respective map and mapper function
+  const indicateStatusMapper = lookupMakerStatus<UserAssignmentInfo>(
+    (indicator: UserAssignmentInfo): AssignmentStatus => indicator.status,
+  );
+
+  // User selected to colour by assignment status
+  if (interfaceSettingsStore.annotationProgressBarUseStatus) {
+    return indicateStatusMapper;
+  }
+
+  const labelKey = progressBarLabelKey.value;
+  if (!labelKey) {
+    return indicateStatusMapper;
+  }
+
+  // User selected a specific label for colouring, try to find it
+  const label: AnnotationSchemeLabel | undefined = (labels.value ?? []).find(
+    (lab: AnnotationSchemeLabel) => lab.key === labelKey,
+  );
+
+  // No corresponding label found in the scheme, return fallback mapper
+  if (!label) {
+    return indicateStatusMapper;
+  }
+
+  if (label.kind === KindEnum.SINGLE && label.choices) {
+    return lookupMakerChoice<UserAssignmentInfo>(
+      label.choices,
+      false,
+      (indicator: UserAssignmentInfo): number | null | undefined => indicator.labels?.[labelKey]?.[0]?.value_int,
+    );
+  }
+
+  if (label.kind === KindEnum.BOOL) {
+    return lookupMakerBool<UserAssignmentInfo>(
+      (indicator: UserAssignmentInfo): boolean | null | undefined => indicator.labels?.[labelKey]?.[0]?.value_bool,
+    );
+  }
+
+  // fallback to status mapper
+  return indicateStatusMapper;
+});
+
+// equivalent of the `watch: { labels: { deep: true, handler() {...} } }` option
+
+watch(
+  labels,
+  () => {
+    dirty.value += 1;
   },
-  watch: {
-    labels: {
-      deep: true,
-      handler() {
-        this.dirty += 1;
-      },
-    },
-  },
+  { deep: true },
+);
+
+onMounted(async () => {
+  const assignmentScopeId = route.params.scope_id as string;
+  const currentAssignmentId = route.params.assignment_id as string;
+  document.addEventListener("keydown", onKeyPress, false);
+  try {
+    let response: AnnotationItem;
+    if (currentAssignmentId) {
+      response = (
+        await API.annotations.getAssignmentApiAnnotationsAnnotateAssignmentAssignmentIdGet({
+          headers: { "x-project-id": currentProjectStore.projectId as string },
+          path: { assignment_id: currentAssignmentId },
+        })
+      ).data;
+    } else {
+      response = (
+        await API.annotations.getNextOpenAssignmentForScopeForUserApiAnnotationsAnnotateNextAssignmentScopeIdGet({
+          headers: { "x-project-id": currentProjectStore.projectId as string },
+          path: { assignment_scope_id: assignmentScopeId },
+        })
+      ).data;
+    }
+
+    await setCurrentAssignment(response);
+  } catch (e) {
+    console.error(e);
+  }
+});
+
+onUnmounted(() => {
+  document.removeEventListener("keydown", onKeyPress, false);
+});
+
+defineExpose({
+  item,
+  assignment,
+  assignments,
+  scheme,
+  scope,
+  labels,
+  dirty,
+  rerenderCounter,
+  showStatusBarModal,
+  widenSidebar,
+  shrinkSidebar,
+  updateProgressBarLabelKey,
+  markdown,
+  save,
+  saveAndPrevious,
+  saveAndNext,
+  currentAssignmentIndex,
+  sidebarWidthClass,
+  userAssignments,
+  assignmentIndicators,
+  assignmentIndicatorsHighlighted,
+  assignmentIndicatorsNeedBirdseye,
+  availableIndicatorLabels,
+  progressBarLabelKey,
+  indicatorLabelColourMapper,
 });
 </script>
 
