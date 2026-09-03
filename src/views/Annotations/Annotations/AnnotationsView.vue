@@ -172,7 +172,7 @@ import { API, ignore } from "@/plugins/api";
 import type { AnyItem } from "@/types/items.d";
 import { currentProjectStore, currentUserStore, interfaceSettingsStore } from "@/stores";
 import { lookupMakerBool, lookupMakerChoice, lookupMakerStatus } from "@/types/colours";
-import { useDebounce, useDelay } from "@/util";
+import { useDebounce } from "@/util";
 
 const motivationalQuotes = [
   "The chase is better than the catch. – Scooter",
@@ -222,6 +222,7 @@ const motivationalQuotes = [
   "Всюди добре де нас нема", // The grass is always greener on the other side of the hill. (Ukrainian proverb)
   "أشد الفاقة عدم العقل", // (Arabic proverb)
   "千 里 之 行 始 于 足 下。--- 老 子", // A journey of a thousand miles must begin with a single step. – Lao Tzu
+  "Don't. stop. me. now, 'cause I'm havin' a good time screening. — Tim Repke",
 ];
 
 type UserAssignmentInfo = AssignmentInfo & { identifier: number; item_id: string };
