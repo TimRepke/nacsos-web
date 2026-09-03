@@ -7,7 +7,7 @@
         <h4>NQL item filter</h4>
         <n-q-l-box
           :query="nqlQuery"
-          @update:query-parsed="(newFilter: NQLFilter) => (labelExportSettings.nqlFilter = newFilter)"
+          @update:query-parsed="(newFilter: Filter[]) => (labelExportSettings.nqlFilter = newFilter)"
         />
       </div>
 
@@ -41,7 +41,7 @@
             <div class="mt-3">
               <label for="export-format" class="form-label">
                 Export format
-                <select class="form-select form-select" id="export-format" v-model="selectedFormat">
+                <select class="form-select form-select" id="export-format" v-model="selectedFormatKey">
                   <option v-for="(info, key) in FORMATS" :key="key" :value="key">{{ info.name }}</option>
                 </select>
               </label>
@@ -84,28 +84,21 @@
             <h4>Annotations</h4>
             <label for="export-format" class="form-label">
               Annotation scheme
-              <select
-                class="form-select form-select"
-                id="export-format"
-                v-model="selectedScheme"
-                @change="schemeChanged"
-              >
-                <option v-for="(scheme, schemeId) in schemes" :key="schemeId" :value="scheme.id">
+              <select class="form-select form-select" id="export-format" v-model="selectedSchemeId">
+                <option v-for="(scheme, schemeId) in schemes" :key="schemeId" :value="scheme.scheme_id">
                   {{ scheme.name }}
                 </option>
               </select>
             </label>
           </div>
         </div>
-        <div class="row" v-if="selectedScheme in schemes">
+        <div class="row" v-if="selectedScheme">
           <div class="col-6">
             <p>
               <button
                 type="button"
                 class="btn btn-sm btn-outline-secondary me-2"
-                @click="
-                  labelExportSettings.assignmentScopeIds = schemes[selectedScheme].scopes.map((scope) => scope.id)
-                "
+                @click="labelExportSettings.assignmentScopeIds = selectedScheme.scopes.map((scope) => scope.scope_id)"
               >
                 <font-awesome-icon :icon="['fas', 'list-check']" class="me-2" />
                 Select all
@@ -120,16 +113,16 @@
               </button>
             </p>
             <ul class="list-group">
-              <li v-for="scope in schemes[selectedScheme].scopes" :key="scope.id" class="list-group-item">
+              <li v-for="scope in selectedScheme.scopes" :key="scope.scope_id" class="list-group-item">
                 <input
-                  :id="`pu-${scope.id}`"
-                  :value="scope.id"
+                  :id="`pu-${scope.scope_id}`"
+                  :value="scope.scope_id"
                   v-model="labelExportSettings.assignmentScopeIds"
                   class="form-check-input me-1"
                   type="checkbox"
                 />
-                <label :for="`pu-${scope.id}`" class="form-check-label stretched-link ms-2">
-                  {{ scope.name }}
+                <label :for="`pu-${scope.scope_id}`" class="form-check-label stretched-link ms-2">
+                  {{ scope.scope_name }}
                 </label>
               </li>
             </ul>
@@ -141,8 +134,8 @@
                 type="button"
                 class="btn btn-sm btn-outline-secondary me-2"
                 @click="
-                  labelExportSettings.botAnnotationMetadataIds = schemes[selectedScheme].resolutions.map(
-                    (scope) => scope.id,
+                  labelExportSettings.botAnnotationMetadataIds = selectedScheme.resolutions.map(
+                    (scope) => scope.scope_id,
                   )
                 "
               >
@@ -159,16 +152,16 @@
               </button>
             </p>
             <ul class="list-group">
-              <li v-for="scope in schemes[selectedScheme].resolutions" :key="scope.id" class="list-group-item">
+              <li v-for="scope in selectedScheme.resolutions" :key="scope.scope_id" class="list-group-item">
                 <input
-                  :id="`pu-${scope.id}`"
-                  :value="scope.id"
+                  :id="`pu-${scope.scope_id}`"
+                  :value="scope.scope_id"
                   v-model="labelExportSettings.botAnnotationMetadataIds"
                   class="form-check-input me-1"
                   type="checkbox"
                 />
-                <label :for="`pu-${scope.id}`" class="form-check-label stretched-link ms-2">
-                  {{ scope.name }}
+                <label :for="`pu-${scope.scope_id}`" class="form-check-label stretched-link ms-2">
+                  {{ scope.scope_name }}
                 </label>
               </li>
             </ul>
@@ -180,66 +173,60 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted, computed } from "vue";
+import { ref, reactive, onMounted, computed, watch } from "vue";
 import { API, ApiResponseReject, toastReject } from "@/plugins/api";
 import { currentProjectStore } from "@/stores";
-import type { LabelOptions, BaseInfoWithScheme, BaseInfo } from "@/plugins/api/types";
+import { LabelOptions, ExportTypeEnum, ScopeInfo, RisLabelFormat, ProjectBaseInfo } from "@/plugins/api/types";
 import NQLBox from "@/components/NQLBox.vue";
-import { type Filter, type Filter as NQLFilter } from "@/util/nql";
+import { type Filter } from "@/util/nql";
 import { isEmpty } from "@/util";
 import DebounceButton from "@/components/DebounceButton.vue";
-
-const FORMATS: Record<string, { type: string; name: string }> = {
-  csv: { type: "application/csv", name: "CSV (recommended)" },
-  jsonl: { type: "text/plain", name: "JSONl" },
-  ris: { type: "application/x-research-info-systems", name: "RIS (zotero compatible)" },
-  excel: { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", name: "Excel" },
-};
-
 interface Scheme {
-  id: string;
+  scheme_id: string;
   name: string;
-  scopes: Array<BaseInfoWithScheme>;
-  resolutions: Array<BaseInfoWithScheme>;
+  scopes: Array<ScopeInfo>;
+  resolutions: Array<ScopeInfo>;
 }
-const projectUsers = ref<Array<BaseInfo>>([]);
-const projectScopes = ref<Array<BaseInfoWithScheme>>([]);
-const projectBotScopes = ref<Array<BaseInfoWithScheme>>([]);
-const projectLabels = ref<Record<string, LabelOptions>>({});
+const FORMATS: Record<
+  string,
+  { type: ExportTypeEnum; responseType: string; name: string; extension: string; flavour?: RisLabelFormat }
+> = {
+  csv: { type: ExportTypeEnum.CSV, responseType: "application/csv", name: "CSV (recommended)", extension: "csv" },
+  jsonl: { type: ExportTypeEnum.JSONL, responseType: "text/plain", name: "JSONl", extension: "jsonl" },
+  ris1: {
+    type: ExportTypeEnum.RIS,
+    responseType: "application/x-research-info-systems",
+    name: "RIS (zotero compatible; tags)",
+    extension: "ris",
+  },
+  ris2: {
+    type: ExportTypeEnum.RIS,
+    responseType: "application/x-research-info-systems",
+    name: "RIS (zotero compatible; named)",
+    extension: "ris",
+  },
+  ris3: {
+    type: ExportTypeEnum.RIS,
+    responseType: "application/x-research-info-systems",
+    name: "RIS (zotero compatible; nested named)",
+    extension: "ris",
+  },
+  excel: {
+    type: ExportTypeEnum.EXCEL,
+    responseType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    name: "Excel",
+    extension: "xlsx",
+  },
+};
 
 const nqlQuery = ref("HAS ANNOTATION");
 
-const selectedFormat = ref<string>("csv");
-const selectedScheme = ref<string>("");
+const baseInfo = ref<ProjectBaseInfo>({ users: [], bot_scopes: [], scopes: [] });
 
-const projectUserIds = computed(() => projectUsers.value.map((user) => user.id));
-const schemes = computed(() => {
-  const ret: Record<string, Scheme> = {};
-  projectScopes.value.forEach((scope) => {
-    if (!(scope.scheme_id in ret)) {
-      ret[scope.scheme_id] = {
-        id: scope.scheme_id,
-        name: scope.scheme_name,
-        scopes: [],
-        resolutions: [],
-      };
-    }
-    ret[scope.scheme_id].scopes.push(scope);
-  });
-  projectBotScopes.value.forEach((scope) => {
-    if (!(scope.scheme_id in ret)) {
-      ret[scope.scheme_id] = {
-        id: scope.scheme_id,
-        name: scope.scheme_name,
-        scopes: [],
-        resolutions: [],
-      };
-    }
-    ret[scope.scheme_id].resolutions.push(scope);
-  });
-  return ret;
-});
-
+const selectedFormatKey = ref<string>("csv");
+const selectedFormat = computed(() => FORMATS[selectedFormatKey.value]);
+const selectedSchemeId = ref<string>("");
+const selectedScheme = computed(() => schemes.value[selectedSchemeId.value]);
 const labelExportSettings = reactive({
   assignmentScopeIds: [] as Array<string>,
   botAnnotationMetadataIds: [] as Array<string>,
@@ -252,35 +239,58 @@ const labelExportSettings = reactive({
   columnsToDrop: ["type", "time_edited", "project_id", "title_slug", "keywords", "meta", "authors_raw"],
 });
 
+const schemes = computed(() => {
+  const ret: Record<string, Scheme> = {};
+  baseInfo.value.scopes.forEach((scope) => {
+    if (!(scope.scheme_id in ret)) {
+      ret[scope.scheme_id] = {
+        scheme_id: scope.scheme_id,
+        name: scope.scheme_name,
+        scopes: [],
+        resolutions: [],
+      };
+    }
+    ret[scope.scheme_id].scopes.push(scope);
+  });
+  baseInfo.value.bot_scopes.forEach((scope) => {
+    if (!(scope.scheme_id in ret)) {
+      ret[scope.scheme_id] = {
+        scheme_id: scope.scheme_id,
+        name: scope.scheme_name,
+        scopes: [],
+        resolutions: [],
+      };
+    }
+    ret[scope.scheme_id].resolutions.push(scope);
+  });
+  console.log(Object.values(ret).forEach((s) => console.log(s)));
+  return ret;
+});
+
 onMounted(async () => {
   try {
     const response = await API.export.getExportBaseinfoApiExportProjectBaseinfoGet({
       headers: { "x-project-id": currentProjectStore.projectId as string },
     });
-    projectScopes.value = response.data.scopes;
-    projectUsers.value = response.data.users;
-    projectBotScopes.value = response.data.bot_scopes;
+    baseInfo.value = response.data;
   } catch (e) {
     toastReject(e as ApiResponseReject);
   }
 });
-
-const schemeChanged = () => {
-  labelExportSettings.assignmentScopeIds = schemes.value[selectedScheme.value].scopes.map((scope) => scope.id);
-  labelExportSettings.botAnnotationMetadataIds = schemes.value[selectedScheme.value].resolutions.map(
-    (scope) => scope.id,
-  );
+watch(selectedScheme, () => {
+  if (!selectedScheme.value) return;
+  labelExportSettings.assignmentScopeIds = selectedScheme.value.scopes.map((scope) => scope.scope_id);
+  labelExportSettings.botAnnotationMetadataIds = selectedScheme.value.resolutions.map((scope) => scope.scheme_id);
   API.export
     .getExportLabelOptionsApiExportProjectLabelOptionsSchemeIdGet({
       headers: { "x-project-id": currentProjectStore.projectId as string },
-      path: { scheme_id: selectedScheme.value },
+      path: { scheme_id: selectedSchemeId.value },
     })
     .then((response) => {
-      projectLabels.value = response.data;
       labelExportSettings.labels = response.data;
     })
     .catch(toastReject);
-};
+});
 
 const downloadAnnotations = () => {
   const lValues: Array<LabelOptions> = Object.values(labelExportSettings.labels);
@@ -299,7 +309,7 @@ const downloadAnnotations = () => {
     .exportAnnotationsApiExportAnnotationsExportFormatPost({
       headers: { "x-project-id": currentProjectStore.projectId as string },
       path: {
-        export_format: selectedFormat.value,
+        export_format: selectedFormat.value.type,
       },
       body: {
         labels: labels,
@@ -308,15 +318,16 @@ const downloadAnnotations = () => {
         ignore_repeat: labelExportSettings.ignoreOrder,
         bot_annotation_metadata_ids: labelExportSettings.botAnnotationMetadataIds,
         assignment_scope_ids: labelExportSettings.assignmentScopeIds,
-        user_ids: projectUserIds.value,
+        user_ids: baseInfo.value.users.map((user) => user.user_id as string),
         columns_to_drop: labelExportSettings.columnsToDrop,
+        ris_label_format: selectedFormat.value.flavour,
       },
     })
     .then((response) => {
-      const blob = new Blob([response.data], { type: FORMATS[selectedFormat.value].type });
+      const blob = new Blob([response.data as Blob], { type: selectedFormat.value.type });
       const link = document.createElement("a");
       link.href = window.URL.createObjectURL(blob);
-      link.download = `export_${dateStr}.${selectedFormat.value}`;
+      link.download = `export_${dateStr}.${selectedFormat.value.extension}`;
       link.click();
     })
     .catch(toastReject);

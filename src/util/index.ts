@@ -196,6 +196,24 @@ export function delay(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+export function useDebounce<T extends Array<any>, U>(fn: (...args: T) => U, delay: number) {
+  let _isBlocked = false;
+
+  function call(...args: T): U {
+    return fn(...args);
+  }
+
+  function debouncedCall(...args: T): U | null {
+    if (_isBlocked) return null;
+    _isBlocked = true;
+    const result = call(...args);
+    setTimeout(() => (_isBlocked = false), delay);
+    return result;
+  }
+
+  return { call, debouncedCall };
+}
+
 export function isElem(obj: unknown): obj is HTMLElement | Node {
   return !!obj && (obj instanceof Node || obj instanceof HTMLElement);
 }
