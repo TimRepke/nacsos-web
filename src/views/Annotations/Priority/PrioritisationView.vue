@@ -161,7 +161,7 @@ onMounted(async () => {
       // scopes to use labels from
       source_scopes: [],
       // Filter for which items to use for prediction AND training (labels are not an outer join!)
-      nql: "IS ASSIGNED",
+      nql: "HAS ANNOTATION OR (IS NOT ASSIGNED AND HAS ABSTRACT > 50)",
       incl_rule: "res|rel:1", //"OR [mult:0 mult:2 mult:5]",
       incl_field: "incl",
       incl_pred_field: "pred|incl",

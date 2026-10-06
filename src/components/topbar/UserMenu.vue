@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { EventBus } from "@/plugins/events";
 import { LoggedOutEvent, LogoutSuccessEvent } from "@/plugins/events/events/auth";
-import { currentUserStore } from "@/stores";
+import { currentUserStore, interfaceSettingsStore } from "@/stores";
 import { useRouter } from "vue-router";
+import { ref } from "vue";
 
 const router = useRouter();
 function logout() {
@@ -11,11 +12,21 @@ function logout() {
     router.push({ name: "user-login" });
   });
 }
+const isMenuOpenUI = ref(false);
+
+const checkboxOffset = ref(0);
 </script>
 
 <template>
   <li class="dropdown">
-    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    <a
+      class="nav-link dropdown-toggle"
+      href="#"
+      role="button"
+      data-bs-toggle="dropdown"
+      aria-expanded="false"
+      data-bs-auto-close="outside"
+    >
       <font-awesome-icon class="me-1 mb-1" style="vertical-align: middle" :icon="['fas', 'circle-user']" />
       {{ currentUserStore.user?.username || "Username" }}
     </a>
@@ -49,6 +60,81 @@ function logout() {
           <hr class="dropdown-divider" />
         </li>
       </template>
+
+      <li>
+        <span
+          class="dropdown-item d-flex flex-row"
+          @click.prevent.stop="isMenuOpenUI = !isMenuOpenUI"
+          role="button"
+          tabindex="-1"
+          :class="{ 'fw-bold': isMenuOpenUI }"
+        >
+          <font-awesome-icon :icon="['fas', 'message']" class="me-2 d-block" />
+          <span class="d-block me-3">Toast Settings</span>
+          <font-awesome-icon :icon="['fas', isMenuOpenUI ? 'caret-down' : 'caret-right']" class="ms-auto d-block" />
+        </span>
+        <ul class="dropdown-menu px-3 py-2 position-relative mb-2" :class="{ show: isMenuOpenUI }" @click.stop>
+          <li>
+            <div class="form-check my-1 d-flex">
+              <!-- eslint-disable-next-line vuejs-accessibility/mouse-events-have-key-events -->
+              <input
+                id="settingQuotes"
+                v-model="interfaceSettingsStore.toasts.showQuotes"
+                class="form-check-input"
+                type="checkbox"
+                :style="{ marginRight: `${checkboxOffset * 5}em` }"
+                @mouseenter="checkboxOffset = Math.min(checkboxOffset + 1, 10)"
+              />
+              <label class="form-check-label text-nowrap ms-1" for="settingQuotes">Show quotes</label>
+            </div>
+          </li>
+          <li>
+            <div class="form-check my-1">
+              <input
+                id="settingInfo"
+                v-model="interfaceSettingsStore.toasts.showInfo"
+                class="form-check-input"
+                type="checkbox"
+              />
+              <label class="form-check-label text-nowrap ms-1" for="settingInfo">Show infos</label>
+            </div>
+          </li>
+          <li>
+            <div class="form-check my-1">
+              <input
+                id="settingError"
+                v-model="interfaceSettingsStore.toasts.showError"
+                class="form-check-input"
+                type="checkbox"
+              />
+              <label class="form-check-label text-nowrap ms-1" for="settingError">Show errors</label>
+            </div>
+          </li>
+          <li>
+            <div class="form-check my-1">
+              <input
+                id="settingWarn"
+                v-model="interfaceSettingsStore.toasts.showWarn"
+                class="form-check-input"
+                type="checkbox"
+              />
+              <label class="form-check-label text-nowrap ms-1" for="settingWarn">Show warnings</label>
+            </div>
+          </li>
+          <li>
+            <div class="form-check my-1">
+              <input
+                id="settingSuccess"
+                v-model="interfaceSettingsStore.toasts.showSuccess"
+                class="form-check-input"
+                type="checkbox"
+              />
+              <label class="form-check-label text-nowrap ms-1" for="settingSuccess">Show success</label>
+            </div>
+          </li>
+        </ul>
+      </li>
+
       <li>
         <router-link to="/nql" class="dropdown-item">
           <font-awesome-icon :icon="['fas', 'feather']" class="me-2" />
