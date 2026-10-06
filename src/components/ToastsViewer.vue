@@ -34,6 +34,7 @@ import { defineComponent } from "vue";
 import { ToastEvent } from "@/plugins/events/events/toast";
 import type { ToastType } from "@/plugins/events/events/toast";
 import { md2html } from "@/util";
+import { interfaceSettingsStore } from "@/stores";
 
 interface Toast {
   key: number;
@@ -68,6 +69,16 @@ export default defineComponent({
         bg: backgroundClass[event.level],
         col: textColorClass[event.level],
       };
+
+      // Skip toasts if they are turned off in the UI settings
+      if (
+        (!interfaceSettingsStore.toasts.showSuccess && toast.level === "SUCCESS") ||
+        (!interfaceSettingsStore.toasts.showError && toast.level === "ERROR") ||
+        (!interfaceSettingsStore.toasts.showInfo && toast.level === "INFO") ||
+        (!interfaceSettingsStore.toasts.showWarn && toast.level === "WARN")
+      )
+        return;
+
       // add toast to list
       this.toasts.push(toast);
       // set up timer to automatically remove toast after hangtime
