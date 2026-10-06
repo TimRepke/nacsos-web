@@ -17,6 +17,14 @@ export interface ItemDisplaySettings {
   columns?: number;
 }
 
+export interface ToastSettings {
+  showQuotes?: boolean;
+  showSuccess?: boolean;
+  showError?: boolean;
+  showInfo?: boolean;
+  showWarn?: boolean;
+}
+
 // Columns to show in the quality monitor
 export interface QualityColumnsSettings {
   cohen: boolean;
@@ -47,6 +55,7 @@ export type InterfaceSettingsState = {
   itemDisplay: RemovableRef<ItemDisplaySettings>;
   qualityColumns: RemovableRef<QualityColumnsSettings>;
   highlighters: RemovableRef<ProjectHighlighters>;
+  toasts: RemovableRef<ToastSettings>;
 };
 export type InterfaceSettingsActions = Record<string, never>;
 export type InterfaceSettingsGetters = Record<string, never>;
@@ -88,6 +97,18 @@ export const useInterfaceSettingsStore = defineStore("InterfaceSettingsStore", {
         {
           mergeDefaults: true,
         },
+      ),
+      toasts: useStorage<ToastSettings>(
+        "nacsos:ui-settings:toasts",
+        {
+          showQuotes: true,
+          showSuccess: true,
+          showError: true,
+          showInfo: true,
+          showWarn: true,
+        },
+        undefined,
+        { mergeDefaults: true },
       ),
       qualityColumns: useStorage<QualityColumnsSettings>(
         "nacsos:ui-settings:quality-columns",
