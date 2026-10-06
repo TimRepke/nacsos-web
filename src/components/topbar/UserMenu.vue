@@ -13,6 +13,8 @@ function logout() {
   });
 }
 const isMenuOpenUI = ref(false);
+
+const checkboxOffset = ref(0);
 </script>
 
 <template>
@@ -73,12 +75,15 @@ const isMenuOpenUI = ref(false);
         </span>
         <ul class="dropdown-menu px-3 py-2 position-relative mb-2" :class="{ show: isMenuOpenUI }" @click.stop>
           <li>
-            <div class="form-check my-1">
+            <div class="form-check my-1 d-flex">
+              <!-- eslint-disable-next-line vuejs-accessibility/mouse-events-have-key-events -->
               <input
                 id="settingQuotes"
                 v-model="interfaceSettingsStore.toasts.showQuotes"
                 class="form-check-input"
                 type="checkbox"
+                :style="{ marginRight: `${checkboxOffset * 5}em` }"
+                @mouseenter="checkboxOffset = Math.min(checkboxOffset + 1, 10)"
               />
               <label class="form-check-label text-nowrap ms-1" for="settingQuotes">Show quotes</label>
             </div>
