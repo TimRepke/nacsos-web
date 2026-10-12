@@ -4117,18 +4117,18 @@ export const EventSchema = {
     event: {
       type: 'string',
       enum: [
-        'ExampleSubEvent',
-        'ExampleEvent'
+        'ExampleEvent',
+        'ExampleSubEvent'
       ],
       title: 'Event'
     },
     payload: {
       anyOf: [
         {
-          $ref: '#/components/schemas/ExampleSubEvent'
+          $ref: '#/components/schemas/ExampleEvent'
         },
         {
-          $ref: '#/components/schemas/ExampleEvent'
+          $ref: '#/components/schemas/ExampleSubEvent'
         }
       ],
       title: 'Payload'
