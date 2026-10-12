@@ -198,18 +198,21 @@ const FORMATS: Record<
     responseType: "application/x-research-info-systems",
     name: "RIS (zotero compatible; tags)",
     extension: "ris",
+    flavour: RisLabelFormat.RAW_TAGS,
   },
   ris2: {
     type: ExportTypeEnum.RIS,
     responseType: "application/x-research-info-systems",
     name: "RIS (zotero compatible; named)",
     extension: "ris",
+    flavour: RisLabelFormat.CHOICE_NAMES,
   },
   ris3: {
     type: ExportTypeEnum.RIS,
     responseType: "application/x-research-info-systems",
     name: "RIS (zotero compatible; nested named)",
     extension: "ris",
+    flavour: RisLabelFormat.LABEL_AND_CHOICE_NAMES,
   },
   excel: {
     type: ExportTypeEnum.EXCEL,
@@ -263,7 +266,6 @@ const schemes = computed(() => {
     }
     ret[scope.scheme_id].resolutions.push(scope);
   });
-  console.log(Object.values(ret).forEach((s) => console.log(s)));
   return ret;
 });
 
