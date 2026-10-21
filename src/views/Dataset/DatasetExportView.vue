@@ -5,10 +5,14 @@
     <div class="row gy-4 gx-5">
       <div class="col-lg-7">
         <h4>NQL item filter</h4>
-        <n-q-l-box
-          :query="nqlQuery"
+        <NQLBox
+          v-model:query="nqlQuery"
           @update:query-parsed="(newFilter: Filter[]) => (labelExportSettings.nqlFilter = newFilter)"
         />
+        <button type="button" class="btn btn-sm btn-outline-secondary me-2" @click="addScopeFilter">
+          <font-awesome-icon :icon="['fas', 'arrow-turn-up']" class="me-2" />
+          Add scope filters
+        </button>
       </div>
 
       <div class="col-lg-3">
@@ -334,6 +338,11 @@ const downloadAnnotations = () => {
     })
     .catch(toastReject);
 };
+
+function addScopeFilter() {
+  const scopes = [...labelExportSettings.botAnnotationMetadataIds, ...labelExportSettings.assignmentScopeIds];
+  nqlQuery.value = `${nqlQuery.value}\nAND\nHAS ANNOTATION IN ${scopes.join(",")}`;
+}
 </script>
 
 <style scoped></style>
