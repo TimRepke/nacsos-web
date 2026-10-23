@@ -65,6 +65,18 @@ watch(queryStr, (newQuery) => {
   return parseQuery(newQuery);
 });
 
+// Propagate query changes made by the parent into the local state.
+// Assigning the same value does not re-trigger the queryStr watch, so no
+// update loop occurs when the parent syncs back via v-model / update:query.
+watch(
+  () => props.query,
+  (newQuery) => {
+    if (newQuery !== queryStr.value) {
+      queryStr.value = newQuery;
+    }
+  },
+);
+
 onMounted(() => {
   if (!isNone(queryStr.value) && queryStr.value.length > 0) {
     parseQuery(queryStr.value);
