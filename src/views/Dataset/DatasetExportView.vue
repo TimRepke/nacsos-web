@@ -158,13 +158,13 @@
             <ul class="list-group">
               <li v-for="scope in selectedScheme.resolutions" :key="scope.scope_id" class="list-group-item">
                 <input
-                  :id="`pu-${scope.scope_id}`"
+                  :id="`bm-${scope.scope_id}`"
                   :value="scope.scope_id"
                   v-model="labelExportSettings.botAnnotationMetadataIds"
                   class="form-check-input me-1"
                   type="checkbox"
                 />
-                <label :for="`pu-${scope.scope_id}`" class="form-check-label stretched-link ms-2">
+                <label :for="`bm-${scope.scope_id}`" class="form-check-label stretched-link ms-2">
                   {{ scope.scope_name }}
                 </label>
               </li>
@@ -286,7 +286,7 @@ onMounted(async () => {
 watch(selectedScheme, () => {
   if (!selectedScheme.value) return;
   labelExportSettings.assignmentScopeIds = selectedScheme.value.scopes.map((scope) => scope.scope_id);
-  labelExportSettings.botAnnotationMetadataIds = selectedScheme.value.resolutions.map((scope) => scope.scheme_id);
+  labelExportSettings.botAnnotationMetadataIds = selectedScheme.value.resolutions.map((scope) => scope.scope_id);
   API.export
     .getExportLabelOptionsApiExportProjectLabelOptionsSchemeIdGet({
       headers: { "x-project-id": currentProjectStore.projectId as string },
