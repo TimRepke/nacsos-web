@@ -85,8 +85,9 @@
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent, ref } from "vue";
+<script lang="ts" setup>
+import { computed, onMounted, ref } from "vue";
+import { useRoute, useRouter } from "vue-router";
 import { marked } from "marked";
 import { EventBus } from "@/plugins/events";
 import { ToastEvent } from "@/plugins/events/events/toast";
@@ -101,116 +102,110 @@ import type {
 import { API } from "@/plugins/api";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 
-export default defineComponent({
-  name: "AnnotationConfigEditView",
-  components: { FontAwesomeIcon, AnnotationSchemeLabelsEditor },
-  data() {
-    const { projectId } = currentProjectStore;
-    const annotationSchemeId = this.$route.params.annotation_scheme_id as string | undefined;
+defineOptions({ name: "AnnotationConfigEditView" });
 
-    return {
-      annotationSchemeId,
-      isNewScheme: !annotationSchemeId,
-      nameEditMode: false,
-      descriptionEditMode: false,
-      scheme: ref({
-        project_id: projectId,
-        name: "New annotation scheme",
-        description: "Description for new scheme.",
-        inclusion_rule: "",
-        labels: [],
-      } as AnnotationSchemeModel),
-    };
-  },
-  async mounted() {
-    if (!this.isNewScheme) {
-      API.annotations
-        .getSchemeDefinitionApiAnnotationsSchemesDefinitionAnnotationSchemeIdGet({
-          query: { flat: false },
-          path: { annotation_scheme_id: this.annotationSchemeId as string },
-          headers: { "x-project-id": currentProjectStore.projectId as string },
-        })
-        .then((response) => {
-          this.scheme = ref(response.data as AnnotationSchemeModel);
-        })
-        .catch(() => {
-          EventBus.emit(new ToastEvent("ERROR", "Failed to load assignment scope info. Please try reloading."));
-          throw Error("Something went wrong. Please tell the admin how you got here.");
-        });
-    }
-  },
-  methods: {
-    save() {
-      EventBus.emit(
-        new ConfirmationRequestEvent(
-          "Editing the annotation scheme after assignment scopes, assignments, or annotations already exist for it " +
-            "can lead to very unexpected behaviour. Are you sure you want to proceed?",
-          (response) => {
-            if (response === "ACCEPT") {
-              API.annotations
-                .putAnnotationSchemeApiAnnotationsSchemesDefinitionPut({
-                  headers: { "x-project-id": currentProjectStore.projectId as string },
-                  body: this.scheme,
-                })
-                .then((res) => {
-                  EventBus.emit(new ToastEvent("SUCCESS", `Saved annotation scheme.  \n**ID:** ${res.data}`));
-                  if (this.isNewScheme) {
-                    this.isNewScheme = false;
-                    this.$router.replace({
-                      name: "config-annotation-scheme-edit",
-                      params: { annotation_scheme_id: res.data },
-                    });
-                  }
-                })
-                .catch((res) => {
-                  EventBus.emit(new ToastEvent("ERROR", `Failed to save the annotation scheme. (${res.reason})`));
-                });
-            } else {
-              EventBus.emit(new ToastEvent("WARN", "Did not save the annotation scheme."));
-            }
-          },
-          "Save annotation scheme",
-          "Yes, save!",
-          "Nope!",
-        ),
-      );
-    },
-  },
-  computed: {
-    htmlDescription() {
-      if (!this.scheme.description) return "";
-      return marked(this.scheme.description);
-    },
-    labelKeys(): string[] {
-      function recurse(labels: AnnotationSchemeLabel[]) {
-        return labels.flatMap((label) => {
-          if (label.choices) {
-            return [label.key].concat(
-              label.choices.flatMap((choice: AnnotationSchemeLabelChoice): string[] => {
-                if (choice.children) {
-                  return recurse(choice.children);
-                }
-                return [];
-              }),
-            );
-          }
-          return [label.key];
-        });
-      }
+const route = useRoute();
+const router = useRouter();
 
-      return recurse(this.scheme.labels);
-    },
-    keysUnique(): boolean {
-      // console.debug(this.labelKeys);
-      return this.labelKeys.length === new Set(this.labelKeys).size;
-    },
-    keysValid(): boolean {
-      const reg = new RegExp("^[a-zA-Z_-]+$");
-      return this.labelKeys.every((key: string) => {
-        return reg.test(key);
+const { projectId } = currentProjectStore;
+const annotationSchemeId = route.params.annotation_scheme_id as string | undefined;
+
+const isNewScheme = ref(!annotationSchemeId);
+const descriptionEditMode = ref(false);
+const scheme = ref({
+  project_id: projectId,
+  name: "New annotation scheme",
+  description: "Description for new scheme.",
+  inclusion_rule: "",
+  labels: [],
+} as AnnotationSchemeModel);
+
+onMounted(() => {
+  if (!isNewScheme.value) {
+    API.annotations
+      .getSchemeDefinitionApiAnnotationsSchemesDefinitionAnnotationSchemeIdGet({
+        query: { flat: false },
+        path: { annotation_scheme_id: annotationSchemeId as string },
+        headers: { "x-project-id": currentProjectStore.projectId as string },
+      })
+      .then((response) => {
+        scheme.value = response.data as AnnotationSchemeModel;
+      })
+      .catch(() => {
+        EventBus.emit(new ToastEvent("ERROR", "Failed to load assignment scope info. Please try reloading."));
+        throw Error("Something went wrong. Please tell the admin how you got here.");
       });
-    },
-  },
+  }
+});
+
+function save() {
+  EventBus.emit(
+    new ConfirmationRequestEvent(
+      "Editing the annotation scheme after assignment scopes, assignments, or annotations already exist for it " +
+        "can lead to very unexpected behaviour. Are you sure you want to proceed?",
+      (response) => {
+        if (response === "ACCEPT") {
+          API.annotations
+            .putAnnotationSchemeApiAnnotationsSchemesDefinitionPut({
+              headers: { "x-project-id": currentProjectStore.projectId as string },
+              body: scheme.value,
+            })
+            .then((res) => {
+              EventBus.emit(new ToastEvent("SUCCESS", `Saved annotation scheme.  \n**ID:** ${res.data}`));
+              if (isNewScheme.value) {
+                isNewScheme.value = false;
+                router.replace({
+                  name: "config-annotation-scheme-edit",
+                  params: { annotation_scheme_id: res.data },
+                });
+              }
+            })
+            .catch((res) => {
+              EventBus.emit(new ToastEvent("ERROR", `Failed to save the annotation scheme. (${res.reason})`));
+            });
+        } else {
+          EventBus.emit(new ToastEvent("WARN", "Did not save the annotation scheme."));
+        }
+      },
+      "Save annotation scheme",
+      "Yes, save!",
+      "Nope!",
+    ),
+  );
+}
+
+const htmlDescription = computed(() => {
+  if (!scheme.value.description) return "";
+  return marked(scheme.value.description);
+});
+const labelKeys = computed<string[]>(() => {
+  function recurse(labels: AnnotationSchemeLabel[]) {
+    return labels.flatMap((label) => {
+      if (label.choices) {
+        return [label.key].concat(
+          label.choices.flatMap((choice: AnnotationSchemeLabelChoice): string[] => {
+            if (choice.children) {
+              return recurse(choice.children);
+            }
+            return [];
+          }),
+        );
+      }
+      return [label.key];
+    });
+  }
+
+  return recurse(scheme.value.labels);
+});
+const keysUnique = computed<boolean>(() => {
+  // console.debug(labelKeys.value);
+  return labelKeys.value.length === new Set(labelKeys.value).size;
+});
+const keysValid = computed<boolean>(() => {
+  const reg = new RegExp("^[a-zA-Z_-]+$");
+  return labelKeys.value.every((key: string) => {
+    return reg.test(key);
+  });
 });
 </script>
 

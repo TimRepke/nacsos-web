@@ -133,110 +133,95 @@
   </template>
 </template>
 
-<script lang="ts">
-import { defineComponent } from "vue";
+<script lang="ts" setup>
+import { ref, computed, onMounted } from "vue";
 import { currentProjectStore, currentUserStore } from "@/stores";
-import type { AuthTokenModel, UserModel } from "@/plugins/api/types";
+import type { AuthTokenModel, UserInDbModel } from "@/plugins/api/types";
 import { API, toastReject } from "@/plugins/api";
 import ToolTip from "@/components/ToolTip.vue";
 import { EventBus } from "@/plugins/events";
 import { ToastEvent } from "@/plugins/events/events/toast";
 
-type UserManagementViewData = {
-  editPassword: boolean;
-  passwordRepeat: string;
-  user: UserModel | null;
-  tokens: AuthTokenModel[];
-};
+defineOptions({ name: "UserProfileView" });
 
-export default defineComponent({
-  name: "UserProfileView",
-  components: { ToolTip },
-  data(): UserManagementViewData {
-    return {
-      editPassword: false,
-      passwordRepeat: "",
-      user: null,
-      tokens: [],
-    };
-  },
-  mounted() {
-    // clear current project when user enters this page
-    // among other things, this makes the sidebar go away
-    currentProjectStore.clear();
+const editPassword = ref(false);
+const passwordRepeat = ref("");
+const user = ref<UserInDbModel | null>(null);
+const tokens = ref<AuthTokenModel[]>([]);
 
-    // load user data
-    API.oauth
-      .readUsersMeApiLoginMeGet()
+const matching = computed<boolean>(() => passwordRepeat.value === user.value?.password);
+const secure = computed<boolean>(() =>
+  /(?=.*[$@!%*#?&^])(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z]).{11,}/.test(user.value!.password || ""),
+);
+const invalidPassword = computed<boolean>(() => editPassword.value && (!matching.value || !secure.value));
+
+onMounted(() => {
+  // clear current project when user enters this page
+  // among other things, this makes the sidebar go away
+  currentProjectStore.clear();
+
+  // load user data
+  API.oauth
+    .readUsersMeApiLoginMeGet()
+    .then((response) => {
+      user.value = response.data;
+    })
+    .catch(toastReject);
+
+  // load auth tokens
+  refreshAuthTokens();
+});
+
+function save() {
+  if (invalidPassword.value) {
+    EventBus.emit(new ToastEvent("WARN", "Something is not right with your password!"));
+  } else {
+    API.users
+      .saveUserSelfApiUsersMyDetailsPut({
+        body: user.value!,
+      })
       .then((response) => {
-        this.user = response.data;
+        EventBus.emit(new ToastEvent("SUCCESS", `Saved your data for user_id ${response.data}`));
+
+        // reset password edit settings
+        editPassword.value = false;
+        passwordRepeat.value = "";
+        user.value!.password = undefined;
       })
       .catch(toastReject);
+  }
+}
 
-    // load auth tokens
-    this.refreshAuthTokens();
-  },
-  methods: {
-    save() {
-      if (this.invalidPassword) {
-        EventBus.emit(new ToastEvent("WARN", "Something is not right with your password!"));
-      } else {
-        API.users
-          .saveUserSelfApiUsersMyDetailsPut({
-            body: this.user,
-          })
-          .then((response) => {
-            EventBus.emit(new ToastEvent("SUCCESS", `Saved your data for user_id ${response.data}`));
+function refreshAuthTokens() {
+  API.oauth
+    .readTokensMeApiLoginMyTokensGet()
+    .then((response) => {
+      tokens.value = response.data;
+    })
+    .catch(toastReject);
+}
 
-            // reset password edit settings
-            this.editPassword = false;
-            this.passwordRepeat = "";
-            this.user.password = undefined;
-          })
-          .catch(toastReject);
-      }
-    },
-    refreshAuthTokens() {
-      API.oauth
-        .readTokensMeApiLoginMyTokensGet()
-        .then((response) => {
-          this.tokens = response.data;
-        })
-        .catch(toastReject);
-    },
-    revoke(token: AuthTokenModel) {
-      API.oauth
-        .revokeTokenApiLoginTokenTokenIdDelete({
-          path: { token_id: token.token_id },
-        })
-        .then(this.refreshAuthTokens)
-        .catch(toastReject);
-    },
-    refresh(token: AuthTokenModel) {
-      if (token.token_id === currentUserStore.authToken?.token_id) {
-        currentUserStore.extendAuthTokenValidity();
-      } else {
-        API.oauth
-          .refreshTokenApiLoginTokenTokenIdPut({
-            path: { token_id: token.token_id },
-          })
-          .then(this.refreshAuthTokens)
-          .catch(toastReject);
-      }
-    },
-  },
-  computed: {
-    matching(): boolean {
-      return this.passwordRepeat === this.user?.password;
-    },
-    secure(): boolean {
-      return /(?=.*[$@!%*#?&^])(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z]).{11,}/.test(this.user.password || "");
-    },
-    invalidPassword(): boolean {
-      return this.editPassword && (!this.matching || !this.secure);
-    },
-  },
-});
+function revoke(token: AuthTokenModel) {
+  API.oauth
+    .revokeTokenApiLoginTokenTokenIdDelete({
+      path: { token_id: token.token_id },
+    })
+    .then(refreshAuthTokens)
+    .catch(toastReject);
+}
+
+function refresh(token: AuthTokenModel) {
+  if (token.token_id === currentUserStore.authToken?.token_id) {
+    currentUserStore.extendAuthTokenValidity();
+  } else {
+    API.oauth
+      .refreshTokenApiLoginTokenTokenIdPut({
+        path: { token_id: token.token_id },
+      })
+      .then(refreshAuthTokens)
+      .catch(toastReject);
+  }
+}
 </script>
 
 <style scoped></style>

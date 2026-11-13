@@ -7,22 +7,14 @@
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from "vue";
+<script lang="ts" setup>
+import { ref } from "vue";
 import { currentUserStore } from "@/stores";
 import type { UserModel } from "@/plugins/api/spec/types.gen";
 
-type AdminContainerData = {
-  user: UserModel;
-};
-export default defineComponent({
-  name: "AdminContainer",
-  data(): AdminContainerData {
-    return {
-      user: currentUserStore.user as UserModel,
-    };
-  },
-});
+defineOptions({ name: "AdminContainer" });
+
+const user = ref<UserModel>(currentUserStore.user as UserModel);
 </script>
 
 <style scoped></style>

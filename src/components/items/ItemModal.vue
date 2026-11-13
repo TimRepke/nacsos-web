@@ -36,74 +36,66 @@
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from "vue";
+<script lang="ts" setup>
+import { computed, ref, watch } from "vue";
 import type { AnyItem } from "@/types/items";
 import { API } from "@/plugins/api";
 import { currentProjectStore } from "@/stores";
 import AnyItemComponent from "@/components/items/AnyItem.vue";
 
-type ItemModalData = {
-  itemInfo: AnyItem | undefined;
-  requestPromise: Promise<AnyItem> | undefined;
-};
+const props = defineProps(["itemId"]);
+const emit = defineEmits(["dismissed"]);
 
-export default defineComponent({
-  components: { AnyItemComponent },
-  props: ["itemId"],
-  emits: ["dismissed"],
-  data(): ItemModalData {
-    return {
-      itemInfo: undefined,
-      requestPromise: undefined,
-    };
+const itemInfo = ref<AnyItem | undefined>(undefined);
+const requestPromise = ref<Promise<AnyItem> | undefined>(undefined);
+
+// latent quirk carried over from the Options API version: the template binds `stop`
+// as a click handler, but no component member `stop` ever existed and it resolved
+// to undefined at runtime; keep that exact (undefined) value.
+const stop: (() => void) | undefined = undefined;
+
+// show modal if data is present or request is running
+const showItemModal = computed(() => itemInfo.value !== undefined || requestPromise.value !== undefined);
+const isLoading = computed(() => requestPromise.value !== undefined);
+
+function getItemInfo(itemId: string) {
+  itemInfo.value = null;
+  requestPromise.value = API.project
+    .getDetailForItemApiProjectItemsDetailItemIdGet({
+      path: { item_id: itemId },
+      headers: { "x-project-id": currentProjectStore.projectId as string },
+    })
+    .then((result) => {
+      itemInfo.value = result.data;
+      requestPromise.value = undefined;
+    })
+    .catch(() => {
+      dismissModal();
+    });
+}
+function dismissModal() {
+  resetRequest();
+  itemInfo.value = undefined;
+  emit("dismissed");
+}
+function resetRequest() {
+  if (requestPromise.value !== undefined) {
+    // the request promise is cancelable at runtime (fetch-client request), but the
+    // chained promise type does not expose `cancel`; latent quirk from the original
+    (requestPromise.value as Promise<AnyItem> & { cancel: () => void }).cancel();
+    requestPromise.value = undefined;
+  }
+}
+
+watch(
+  () => props.itemId,
+  (newId: string | null | undefined) => {
+    // reset any prior request (if present)
+    resetRequest();
+    // fetch the data
+    if (newId !== null && newId !== undefined) {
+      getItemInfo(newId);
+    }
   },
-  computed: {
-    showItemModal() {
-      // show modal if data is present or request is running
-      return this.itemInfo !== undefined || this.requestPromise !== undefined;
-    },
-    isLoading() {
-      return this.requestPromise !== undefined;
-    },
-  },
-  methods: {
-    getItemInfo(itemId: string) {
-      this.itemInfo = null;
-      this.requestPromise = API.project
-        .getDetailForItemApiProjectItemsDetailItemIdGet({
-          path: { item_id: itemId },
-          headers: { "x-project-id": currentProjectStore.projectId as string },
-        })
-        .then((result) => {
-          this.itemInfo = result.data;
-          this.requestPromise = undefined;
-        })
-        .catch(() => {
-          this.dismissModal();
-        });
-    },
-    dismissModal() {
-      this.resetRequest();
-      this.itemInfo = undefined;
-      this.$emit("dismissed");
-    },
-    resetRequest() {
-      if (this.requestPromise !== undefined) {
-        this.requestPromise.cancel();
-        this.requestPromise = undefined;
-      }
-    },
-  },
-  watch: {
-    itemId(newId: string | null | undefined) {
-      // reset any prior request (if present)
-      this.resetRequest();
-      // fetch the data
-      if (newId !== null && newId !== undefined) {
-        this.getItemInfo(newId);
-      }
-    },
-  },
-});
+);
 </script>

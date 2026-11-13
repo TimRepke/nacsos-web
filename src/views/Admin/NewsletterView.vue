@@ -66,47 +66,40 @@
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from "vue";
+<script lang="ts" setup>
+import { ref } from "vue";
 import { API, toastReject } from "@/plugins/api";
 import ConfirmationButton from "@/components/ConfirmationButton.vue";
 
-export default defineComponent({
-  name: "NewsletterView",
-  components: { ConfirmationButton },
-  data() {
-    return {
-      isSubscribed: true,
-      isActive: true,
-      message: "",
-      title: "",
-      recipients: [],
-      sending: false,
-    };
-  },
-  methods: {
-    send() {
-      if (!this.sending) {
-        this.sending = true;
-        API.mailing
-          .newsMailApiMailNewsPost({
-            query: {
-              is_active: this.isActive,
-              is_subscribed: this.isSubscribed,
-            },
-            body: {
-              subject: this.title,
-              body: this.message,
-            },
-          })
-          .then((res) => {
-            this.recipients = res.data;
-          })
-          .catch(toastReject);
-      }
-    },
-  },
-});
+defineOptions({ name: "NewsletterView" });
+
+const isSubscribed = ref(true);
+const isActive = ref(true);
+const message = ref("");
+const title = ref("");
+const recipients = ref<string[]>([]);
+const sending = ref(false);
+
+function send() {
+  if (!sending.value) {
+    sending.value = true;
+    API.mailing
+      .newsMailApiMailNewsPost({
+        query: {
+          is_active: isActive.value,
+          is_subscribed: isSubscribed.value,
+        },
+        body: {
+          subject: title.value,
+          body: message.value,
+        },
+      })
+      .then((res) => {
+        recipients.value = res.data;
+      })
+      .catch(toastReject);
+  }
+}
 </script>
 
 <style scoped></style>

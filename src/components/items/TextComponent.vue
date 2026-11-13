@@ -22,64 +22,58 @@
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from "vue";
+<script lang="ts" setup>
+import { computed } from "vue";
 import { currentProjectStore, interfaceSettingsStore } from "@/stores";
 import { marked } from "marked";
 
-export default defineComponent({
-  name: "TextComponent",
-  props: {
-    text: {
-      type: String,
-      required: false,
-      default: null,
-    },
-    html: {
-      type: String,
-      required: false,
-      default: null,
-    },
-    missingText: {
-      type: String,
-      required: false,
-      default: "[Text missing]",
-    },
-  },
-  data() {
-    return {
-      showRaw: false,
-    };
-  },
-  computed: {
-    htmlText() {
-      // Provided html trumps internal parsing
-      if (this.html) return this.html;
-      // Return placeholder for missing texts
-      if (!this.text) return this.missingText;
-      let txt = this.text;
-      txt = txt.replaceAll("`", "'");
-      txt = marked.parse(txt);
-      txt = currentProjectStore.highlighters.applyActiveHighlighters(txt);
-      return txt.replaceAll("\n", "<br />");
-    },
-    columnStyle(): Record<string, string> {
-      return interfaceSettingsStore.itemColumnStyle;
-    },
-  },
-  methods: {
-    iterateColumns() {
-      if (!interfaceSettingsStore.itemDisplay.columns) {
-        interfaceSettingsStore.itemDisplay.columns = 0;
-      }
-      interfaceSettingsStore.itemDisplay.columns += 1;
+defineOptions({ name: "TextComponent" });
 
-      if (interfaceSettingsStore.itemDisplay.columns > 4) {
-        interfaceSettingsStore.itemDisplay.columns = 1;
-      }
-    },
+const props = defineProps({
+  text: {
+    type: String,
+    required: false,
+    default: null,
+  },
+  html: {
+    type: String,
+    required: false,
+    default: null,
+  },
+  missingText: {
+    type: String,
+    required: false,
+    default: "[Text missing]",
   },
 });
+
+const htmlText = computed(() => {
+  // Provided html trumps internal parsing
+  if (props.html) return props.html;
+  // Return placeholder for missing texts
+  if (!props.text) return props.missingText;
+  let txt = props.text;
+  txt = txt.replaceAll("`", "'");
+  // the parser runs synchronously here (marked's async mode is never enabled) and the
+  // highlighters return a string; same unchecked assumptions as the original
+  txt = marked.parse(txt) as string;
+  txt = currentProjectStore.highlighters.applyActiveHighlighters(txt) as string;
+  return txt.replaceAll("\n", "<br />");
+});
+const columnStyle = computed((): Record<string, string> => {
+  return interfaceSettingsStore.itemColumnStyle;
+});
+
+function iterateColumns() {
+  if (!interfaceSettingsStore.itemDisplay.columns) {
+    interfaceSettingsStore.itemDisplay.columns = 0;
+  }
+  interfaceSettingsStore.itemDisplay.columns += 1;
+
+  if (interfaceSettingsStore.itemDisplay.columns > 4) {
+    interfaceSettingsStore.itemDisplay.columns = 1;
+  }
+}
 </script>
 
 <style scoped />

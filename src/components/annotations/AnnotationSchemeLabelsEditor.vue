@@ -221,138 +221,146 @@
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from "vue";
+<script lang="ts" setup>
+import { computed, ref, watch } from "vue";
 import type { PropType } from "vue";
 import ToolTip from "@/components/ToolTip.vue";
-import { type AnnotationSchemeLabel, AnnotationSchemeLabelKindEnum } from "@/plugins/api/types";
+import {
+  type AnnotationSchemeLabel,
+  type AnnotationSchemeLabelChoice,
+  AnnotationSchemeLabelKindEnum,
+} from "@/plugins/api/types";
 
-type KeyedAnnotationSchemeLabel = AnnotationSchemeLabel & { tmpKey?: string };
+// editor-local view over the API types: labels/choices get a transient `tmpKey` for
+// v-for keys and `children` is always present (null, never undefined) as the original
+// component assumed
+interface KeyedAnnotationSchemeLabelChoice extends Omit<AnnotationSchemeLabelChoice, "children"> {
+  tmpKey?: string;
+  children: KeyedAnnotationSchemeLabel[] | null;
+}
+
+interface KeyedAnnotationSchemeLabel extends Omit<AnnotationSchemeLabel, "choices"> {
+  tmpKey?: string;
+  choices?: KeyedAnnotationSchemeLabelChoice[] | null;
+}
 
 // TODO flatten list of all keys and make sure they are all unique (probably in AnnotationConfigEditView)
 // TODO general input validation
 
-export default defineComponent({
-  name: "AnnotationSchemeLabelsEditor",
-  components: { ToolTip },
-  props: {
-    labels: {
-      type: Object as PropType<AnnotationSchemeLabel[]>,
-      required: true,
-      default: null,
-    },
-  },
-  data() {
-    return {
-      annotationSchemeLabelKinds: AnnotationSchemeLabelKindEnum,
-      schemeLabels: this.labels,
-    };
-  },
-  methods: {
-    addLabel() {
-      this.schemeLabels.push({
-        tmpKey: crypto.randomUUID(),
-        name: "",
-        key: "newKey",
-        hint: "",
-        required: false,
-        max_repeat: 1,
-        kind: "bool",
-        choices: [],
-      } as AnnotationSchemeLabel);
-    },
-    removeLabel(index: number) {
-      this.schemeLabels.splice(index, 1);
-    },
-    addChild(labelIndex: number, choiceIndex: number) {
-      // TODO
-      this.schemeLabels[labelIndex].choices[choiceIndex].children = [
-        {
-          tmpKey: crypto.randomUUID(),
-          name: "",
-          key: "newKey",
-          hint: "",
-          required: false,
-          max_repeat: 1,
-          kind: "bool",
-          choices: [],
-        } as AnnotationSchemeLabel,
-      ];
-    },
-    addChoice(schemeLabelIndex: number) {
-      this.schemeLabels[schemeLabelIndex].choices.push({
-        tmpKey: crypto.randomUUID(),
-        children: null,
-        hint: null,
-        name: "",
-        value: this.schemeLabels[schemeLabelIndex].choices.length,
-      });
-    },
-    removeChoice(schemeLabelIndex: number, choiceIndex: number) {
-      this.schemeLabels[schemeLabelIndex].choices.splice(choiceIndex, 1);
-    },
-    moveChoiceUp(schemeLabelIndex: number, currentChoiceIndex: number) {
-      if (currentChoiceIndex > 0) {
-        // This looks like sorcery, but it essentially just swaps two elements in an array.
-        [
-          this.schemeLabels[schemeLabelIndex].choices[currentChoiceIndex],
-          this.schemeLabels[schemeLabelIndex].choices[currentChoiceIndex - 1],
-        ] = [
-          this.schemeLabels[schemeLabelIndex].choices[currentChoiceIndex - 1],
-          this.schemeLabels[schemeLabelIndex].choices[currentChoiceIndex],
-        ];
-      }
-    },
-    moveChoiceDown(schemeLabelIndex: number, currentChoiceIndex: number) {
-      if (currentChoiceIndex < this.schemeLabels[schemeLabelIndex].choices.length - 1) {
-        // This looks like sorcery, but it essentially just swaps two elements in an array.
-        [
-          this.schemeLabels[schemeLabelIndex].choices[currentChoiceIndex],
-          this.schemeLabels[schemeLabelIndex].choices[currentChoiceIndex + 1],
-        ] = [
-          this.schemeLabels[schemeLabelIndex].choices[currentChoiceIndex + 1],
-          this.schemeLabels[schemeLabelIndex].choices[currentChoiceIndex],
-        ];
-      }
-    },
-    moveLabelUp(currentSchemeLabelIndex: number) {
-      if (currentSchemeLabelIndex > 0) {
-        // This looks like sorcery, but it essentially just swaps two elements in an array.
-        [this.schemeLabels[currentSchemeLabelIndex], this.schemeLabels[currentSchemeLabelIndex - 1]] = [
-          this.schemeLabels[currentSchemeLabelIndex - 1],
-          this.schemeLabels[currentSchemeLabelIndex],
-        ];
-      }
-    },
-    moveLabelDown(currentSchemeLabelIndex: number) {
-      if (currentSchemeLabelIndex < this.schemeLabels.length - 1) {
-        // This looks like sorcery, but it essentially just swaps two elements in an array.
-        [this.schemeLabels[currentSchemeLabelIndex], this.schemeLabels[currentSchemeLabelIndex + 1]] = [
-          this.schemeLabels[currentSchemeLabelIndex + 1],
-          this.schemeLabels[currentSchemeLabelIndex],
-        ];
-      }
-    },
-  },
-  computed: {
-    schemeLabelsWithKey() {
-      return this.schemeLabels.map((schemeLabel: KeyedAnnotationSchemeLabel) => {
-        schemeLabel.tmpKey = crypto.randomUUID();
-        return schemeLabel;
-      });
-    },
-  },
-  watch: {
-    labels: {
-      // FIXME: somehow the props reference between schemeLabels and props.labels broke
-      //        this should be fixed, since this watch hack makes the config very slow!
-      handler(labels: AnnotationSchemeLabel[]) {
-        this.schemeLabels = labels;
-      },
-      // deep: true,
-    },
+defineOptions({ name: "AnnotationSchemeLabelsEditor" });
+
+const props = defineProps({
+  labels: {
+    type: Object as PropType<AnnotationSchemeLabel[]>,
+    required: true,
+    default: null,
   },
 });
+
+const annotationSchemeLabelKinds = ref(AnnotationSchemeLabelKindEnum);
+const schemeLabels = ref(props.labels);
+
+function addLabel() {
+  schemeLabels.value.push({
+    tmpKey: crypto.randomUUID(),
+    name: "",
+    key: "newKey",
+    hint: "",
+    required: false,
+    max_repeat: 1,
+    kind: "bool",
+    choices: [],
+  } as AnnotationSchemeLabel);
+}
+function removeLabel(index: number) {
+  schemeLabels.value.splice(index, 1);
+}
+function addChild(labelIndex: number, choiceIndex: number) {
+  // TODO
+  schemeLabels.value[labelIndex].choices![choiceIndex].children = [
+    {
+      tmpKey: crypto.randomUUID(),
+      name: "",
+      key: "newKey",
+      hint: "",
+      required: false,
+      max_repeat: 1,
+      kind: "bool",
+      choices: [],
+    } as AnnotationSchemeLabel,
+  ];
+}
+function addChoice(schemeLabelIndex: number) {
+  schemeLabels.value[schemeLabelIndex].choices!.push({
+    tmpKey: crypto.randomUUID(),
+    children: null,
+    hint: null,
+    name: "",
+    value: schemeLabels.value[schemeLabelIndex].choices!.length,
+  } as AnnotationSchemeLabelChoice);
+}
+function removeChoice(schemeLabelIndex: number, choiceIndex: number) {
+  schemeLabels.value[schemeLabelIndex].choices!.splice(choiceIndex, 1);
+}
+function moveChoiceUp(schemeLabelIndex: number, currentChoiceIndex: number) {
+  if (currentChoiceIndex > 0) {
+    // This looks like sorcery, but it essentially just swaps two elements in an array.
+    [
+      schemeLabels.value[schemeLabelIndex].choices![currentChoiceIndex],
+      schemeLabels.value[schemeLabelIndex].choices![currentChoiceIndex - 1],
+    ] = [
+      schemeLabels.value[schemeLabelIndex].choices![currentChoiceIndex - 1],
+      schemeLabels.value[schemeLabelIndex].choices![currentChoiceIndex],
+    ];
+  }
+}
+function moveChoiceDown(schemeLabelIndex: number, currentChoiceIndex: number) {
+  if (currentChoiceIndex < schemeLabels.value[schemeLabelIndex].choices!.length - 1) {
+    // This looks like sorcery, but it essentially just swaps two elements in an array.
+    [
+      schemeLabels.value[schemeLabelIndex].choices![currentChoiceIndex],
+      schemeLabels.value[schemeLabelIndex].choices![currentChoiceIndex + 1],
+    ] = [
+      schemeLabels.value[schemeLabelIndex].choices![currentChoiceIndex + 1],
+      schemeLabels.value[schemeLabelIndex].choices![currentChoiceIndex],
+    ];
+  }
+}
+function moveLabelUp(currentSchemeLabelIndex: number) {
+  if (currentSchemeLabelIndex > 0) {
+    // This looks like sorcery, but it essentially just swaps two elements in an array.
+    [schemeLabels.value[currentSchemeLabelIndex], schemeLabels.value[currentSchemeLabelIndex - 1]] = [
+      schemeLabels.value[currentSchemeLabelIndex - 1],
+      schemeLabels.value[currentSchemeLabelIndex],
+    ];
+  }
+}
+function moveLabelDown(currentSchemeLabelIndex: number) {
+  if (currentSchemeLabelIndex < schemeLabels.value.length - 1) {
+    // This looks like sorcery, but it essentially just swaps two elements in an array.
+    [schemeLabels.value[currentSchemeLabelIndex], schemeLabels.value[currentSchemeLabelIndex + 1]] = [
+      schemeLabels.value[currentSchemeLabelIndex + 1],
+      schemeLabels.value[currentSchemeLabelIndex],
+    ];
+  }
+}
+
+const schemeLabelsWithKey = computed(() => {
+  return (schemeLabels.value as KeyedAnnotationSchemeLabel[]).map((schemeLabel: KeyedAnnotationSchemeLabel) => {
+    schemeLabel.tmpKey = crypto.randomUUID();
+    return schemeLabel;
+  });
+});
+
+watch(
+  () => props.labels,
+  // FIXME: somehow the props reference between schemeLabels and props.labels broke
+  //        this should be fixed, since this watch hack makes the config very slow!
+  (labels: AnnotationSchemeLabel[]) => {
+    schemeLabels.value = labels;
+  },
+  // { deep: true },
+);
 </script>
 
 <style scoped></style>

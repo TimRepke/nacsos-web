@@ -88,9 +88,8 @@
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from "vue";
-import { marked } from "marked";
+<script lang="ts" setup>
+import { computed, onMounted, ref } from "vue";
 import type { TaskModel, FileOnDisk } from "@/plugins/api/types";
 import { EventBus } from "@/plugins/events";
 import { ToastEvent } from "@/plugins/events/events/toast";
@@ -105,94 +104,78 @@ interface Entry {
   showLog: boolean;
   log: boolean;
   artefacts?: FileOnDisk[];
+  info?: { name?: string | null };
 }
-
-type ArtefactListData = {
-  entries: Entry[];
-  searchByUser: boolean;
-  searchByProject: boolean;
-  searchByFunctions?: string;
-  searchByTags?: string;
-};
 
 type SearchParams = ArgumentTypes<typeof Pipes.searchTasksApiPipesTasksGet>[0];
 
-export default defineComponent({
-  name: "ArtefactsListView",
-  data(): ArtefactListData {
-    return {
-      entries: [],
-      searchByUser: false,
-      searchByProject: true,
-      searchByFunctions: undefined,
-      searchByTags: undefined,
-    };
-  },
-  async mounted() {
-    await this.loadEntries();
-  },
-  methods: {
-    async loadEntries() {
-      try {
-        const tasks = (await API.pipes.searchTasksApiPipesTasksGet(this.searchObject)).data;
+defineOptions({ name: "ArtefactsListView" });
 
-        if (!tasks || tasks.length === 0) {
-          EventBus.emit(
-            new ToastEvent("WARN", "Failed to load tasks (or none found yet). Please try reloading the page later."),
-          );
-          return;
-        }
+const entries = ref<Entry[]>([]);
+const searchByUser = ref(false);
 
-        this.entries = tasks.map((task: TaskModel) => ({
-          task,
-          showArtefacts: false,
-          showLog: false,
-          log: false,
-        }));
-      } catch (e) {
-        console.error(e);
-        EventBus.emit(new ToastEvent("ERROR", "Loading data failed, please try reloading."));
-      }
-    },
-    md2html(s: string): string {
-      return marked.parse(s, { async: false }) as string;
-    },
-    async toggleEntry(entry: Entry) {
-      const artefacts = (
-        await API.pipes.getArtefactsApiPipesArtefactsListGet({
-          headers: {
-            "x-project-id": currentProjectStore.projectId as string,
-            "x-task-id": entry.task.task_id as string,
-          },
-        })
-      ).data;
-      if (!artefacts) {
-        EventBus.emit(new ToastEvent("WARN", `Failed to load additional info for task ${entry.task.task_id}`));
-      } else {
-        entry.artefacts = artefacts;
-        entry.showArtefacts = !entry.showArtefacts;
-      }
-    },
-    isOpen(entry: Entry): boolean {
-      return entry.showArtefacts || entry.showLog;
-    },
-    noBorderIfOpen(entry: Entry): string[] {
-      return this.isOpen(entry) ? ["border-bottom-0"] : [];
-    },
-  },
-  computed: {
-    searchObject(): SearchParams {
-      const searchObj: SearchParams = {
-        headers: { "x-project-id": currentProjectStore.projectId as string },
-      };
-      if (this.searchByUser) {
-        const userId = currentUserStore.user?.user_id;
-        searchObj.query = { user_id: userId === null || userId === undefined ? undefined : userId };
-      }
-      // TODO add the other search params
-      return searchObj;
-    },
-  },
+const searchObject = computed<SearchParams>(() => {
+  const searchObj: SearchParams = {
+    headers: { "x-project-id": currentProjectStore.projectId as string },
+  };
+  if (searchByUser.value) {
+    const userId = currentUserStore.user?.user_id;
+    searchObj.query = { user_id: userId === null || userId === undefined ? undefined : userId };
+  }
+  // TODO add the other search params
+  return searchObj;
+});
+
+async function loadEntries() {
+  try {
+    const tasks = (await API.pipes.searchTasksApiPipesTasksGet(searchObject.value)).data;
+
+    if (!tasks || tasks.length === 0) {
+      EventBus.emit(
+        new ToastEvent("WARN", "Failed to load tasks (or none found yet). Please try reloading the page later."),
+      );
+      return;
+    }
+
+    entries.value = tasks.map((task: TaskModel) => ({
+      task,
+      showArtefacts: false,
+      showLog: false,
+      log: false,
+    }));
+  } catch (e) {
+    console.error(e);
+    EventBus.emit(new ToastEvent("ERROR", "Loading data failed, please try reloading."));
+  }
+}
+
+async function toggleEntry(entry: Entry) {
+  const artefacts = (
+    await API.pipes.getArtefactsApiPipesArtefactsListGet({
+      headers: {
+        "x-project-id": currentProjectStore.projectId as string,
+        "x-task-id": entry.task.task_id as string,
+      },
+    })
+  ).data;
+  if (!artefacts) {
+    EventBus.emit(new ToastEvent("WARN", `Failed to load additional info for task ${entry.task.task_id}`));
+  } else {
+    entry.artefacts = artefacts;
+    entry.showArtefacts = !entry.showArtefacts;
+  }
+}
+
+function isOpen(entry: Entry): boolean {
+  return entry.showArtefacts || entry.showLog;
+}
+
+function noBorderIfOpen(entry: Entry): string[] {
+  return isOpen(entry) ? ["border-bottom-0"] : [];
+}
+
+onMounted(async () => {
+  await loadEntries();
 });
 </script>
 

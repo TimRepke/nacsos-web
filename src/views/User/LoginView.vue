@@ -49,50 +49,48 @@
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from "vue";
+<script lang="ts" setup>
+import { ref, onMounted } from "vue";
+import { useRouter } from "vue-router";
 import NacsosLogo from "@/components/NacsosLogo.vue";
 import { EventBus } from "@/plugins/events";
 import { AuthFailedEvent, UserLoginEvent, LoginSuccessEvent } from "@/plugins/events/events/auth";
 import { API, ErrorDetails, toastReject } from "@/plugins/api";
 import { ToastEvent } from "@/plugins/events/events/toast";
 
-export default defineComponent({
-  name: "LoginView",
-  components: { NacsosLogo },
-  data() {
-    return {
-      username: "",
-      password: "",
-      error: null,
-    };
-  },
-  mounted() {
-    EventBus.on(AuthFailedEvent, (reason: { reason: ErrorDetails }) => {
-      this.error = reason?.reason.type === "KeyError" ? "Username not in the system." : (this.error = "Login failed.");
-    });
-  },
-  methods: {
-    async login() {
-      this.error = null;
-      EventBus.emit(new UserLoginEvent(this.username, this.password));
-      EventBus.once(LoginSuccessEvent, () => {
-        this.$router.push({ name: "project-list" });
-      });
-    },
-    async reset() {
-      this.error = null;
-      API.mailing
-        .resetPasswordApiMailResetPasswordUsernamePost({
-          path: { username: this.username as string },
-        })
-        .then(() => {
-          EventBus.emit(new ToastEvent("SUCCESS", "I sent you a password reset link. Please check your email inbox."));
-        })
-        .catch(toastReject);
-    },
-  },
+defineOptions({ name: "LoginView" });
+
+const router = useRouter();
+
+const username = ref("");
+const password = ref("");
+const error = ref<string | null>(null);
+
+onMounted(() => {
+  EventBus.on(AuthFailedEvent, (reason: { reason: ErrorDetails }) => {
+    error.value = reason?.reason.type === "KeyError" ? "Username not in the system." : (error.value = "Login failed.");
+  });
 });
+
+async function login() {
+  error.value = null;
+  EventBus.emit(new UserLoginEvent(username.value, password.value));
+  EventBus.once(LoginSuccessEvent, () => {
+    router.push({ name: "project-list" });
+  });
+}
+
+async function reset() {
+  error.value = null;
+  API.mailing
+    .resetPasswordApiMailResetPasswordUsernamePost({
+      path: { username: username.value as string },
+    })
+    .then(() => {
+      EventBus.emit(new ToastEvent("SUCCESS", "I sent you a password reset link. Please check your email inbox."));
+    })
+    .catch(toastReject);
+}
 </script>
 
 <style scoped>

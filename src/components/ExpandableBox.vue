@@ -16,23 +16,19 @@
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from "vue";
+<script lang="ts" setup>
+import { ref } from "vue";
 
-export default defineComponent({
-  name: "ExpandableBox",
-  props: {
-    initiallyOpen: {
-      type: Boolean,
-      default: true,
-    },
-  },
-  data() {
-    return {
-      expanded: this.initiallyOpen,
-    };
+defineOptions({ name: "ExpandableBox" });
+
+const props = defineProps({
+  initiallyOpen: {
+    type: Boolean,
+    default: true,
   },
 });
+
+const expanded = ref(props.initiallyOpen);
 </script>
 
 <style scoped></style>

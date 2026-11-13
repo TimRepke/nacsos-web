@@ -74,9 +74,9 @@
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from "vue";
-import type { RouteLocationMatched } from "vue-router";
+<script lang="ts" setup>
+import { computed, onMounted, ref } from "vue";
+import { useRouter } from "vue-router";
 import { currentProjectStore } from "@/stores";
 import type { ProjectPermissionsModel } from "@/plugins/api/types";
 
@@ -96,220 +96,210 @@ interface SideMenuEntry extends MenuEntry {
   sub?: Array<SideMenuEntry>;
 }
 
-export default defineComponent({
-  name: "SideBar",
-  data() {
-    const perm: ProjectPermissionsModel | Record<string, never> = currentProjectStore.permissions || {};
-    return {
-      menu: [
-        { name: "Overview", permission: true, target: "/project/overview", routes: ["project-overview"] },
-        {
-          name: "Import",
-          permission: perm.imports_read,
-          target: "/project/imports",
-          routes: ["project-imports"],
-          sub: [
-            {
-              name: "Imports",
-              icon: "file-import",
-              permission: perm.imports_read,
-              target: "/project/imports/list",
-              routes: ["project-imports-list", "project-imports-details"],
-            },
-            {
-              name: "OpenAlex Solr",
-              icon: "magnifying-glass",
-              permission: perm.imports_read,
-              target: "/project/imports/search",
-              routes: ["project-imports-search"],
-            },
-          ],
-        },
-        {
-          name: "Dataset",
-          target: "/project/dataset",
-          permission: perm.dataset_read,
-          routes: ["project-dataset"],
-          sub: [
-            {
-              name: "Explore",
-              icon: "map-location-dot",
-              target: "/project/dataset/list",
-              permission: perm.dataset_read,
-              routes: ["project-dataset-list", "project-dataset-item"],
-            },
-            // {
-            //   name: "Item details",
-            //   icon: "file-lines",
-            //   target: "/project/dataset/item",
-            //   permission: perm.dataset_read,
-            //   routes: ["project-dataset-item"],
-            // },
-            {
-              name: "Statistics",
-              icon: "chart-pie",
-              target: "/project/dataset/stats",
-              permission: perm.dataset_read,
-              routes: ["project-dataset-statistics"],
-            },
-            {
-              name: "Export",
-              icon: "file-export",
-              target: "/project/dataset/export",
-              permission: perm.dataset_read,
-              routes: ["project-dataset-export"],
-            },
-          ],
-        },
-        {
-          name: "Data Annotation",
-          target: "/project/annotate/scopes",
-          permission: perm.annotations_read,
-          routes: ["project-annotate"],
-          sub: [
-            {
-              name: "My Assignments",
-              icon: "user-tag",
-              target: "/project/annotate/scopes",
-              permission: perm.annotations_read,
-              routes: ["project-annotate-assignments", "project-annotate-item"],
-            },
-            {
-              name: "Quality Monitor",
-              target: "/project/annotate/quality",
-              icon: "swatchbook",
-              permission: perm.annotations_read,
-              routes: ["project-annotate-quality"],
-            },
-            {
-              name: "Progress Monitor",
-              icon: "bars-progress",
-              target: "/project/annotate/progress",
-              permission: perm.annotations_read,
-              routes: ["project-annotate-progress"],
-            },
-            {
-              name: "Prioritisation",
-              icon: "wand-magic-sparkles",
-              target: "/project/config/priority/list",
-              permission: perm.annotations_prio,
-              routes: ["config-priority", "config-priority-setup", "config-priority-list"],
-            },
-            {
-              name: "Label Manager",
-              icon: "tags",
-              target: "/project/config/annotations",
-              permission: perm.annotations_edit,
-              routes: [
-                "config-annotation-schemes",
-                "config-annotation-scheme-list",
-                "config-annotation-scheme-edit",
-                "config-annotation-scheme-scope",
-                "config-annotation-resolve",
-              ],
-            },
-            {
-              name: "Highlighters",
-              icon: "highlighter",
-              target: "/project/config/annotations/highlighters",
-              permission: perm.annotations_edit,
-              routes: ["config-annotation-highlighters"],
-            },
-          ],
-        },
-        {
-          name: "Supplemental data",
-          target: null,
-          permission: perm.pipelines_read || perm.annotations_read,
-          routes: ["project-pipelines"],
-          sub: [
-            {
-              name: "Pipeline artefacts",
-              icon: "folder-tree",
-              target: "/project/artefacts",
-              permission: perm.artefacts_read || perm.pipelines_read,
-              routes: ["project-artefacts", "project-artefacts-list", "project-artefacts-details"],
-            },
-            {
-              name: "Bot Annotations",
-              icon: "robot",
-              target: "/project/bot-annotations",
-              permission: perm.annotations_read,
-              routes: ["project-bot-annotations", "project-bot-annotations-list"],
-            },
-          ],
-        },
-        {
-          name: "Project",
-          icon: "gear",
-          permission: perm.owner,
-          target: "/project/settings",
-          routes: ["project-settings", "project-settings-settings"],
-        },
-      ] as Array<MenuEntry>,
+defineOptions({ name: "SideBar" });
 
-      visible: null as boolean | null,
-      windowWidth: window.innerWidth,
-      opened: {
-        import: false,
+const router = useRouter();
+
+const perm: ProjectPermissionsModel | Record<string, never> = currentProjectStore.permissions || {};
+const menu = ref([
+  { name: "Overview", permission: true, target: "/project/overview", routes: ["project-overview"] },
+  {
+    name: "Import",
+    permission: perm.imports_read,
+    target: "/project/imports",
+    routes: ["project-imports"],
+    sub: [
+      {
+        name: "Imports",
+        icon: "file-import",
+        permission: perm.imports_read,
+        target: "/project/imports/list",
+        routes: ["project-imports-list", "project-imports-details"],
       },
-    };
+      {
+        name: "OpenAlex Solr",
+        icon: "magnifying-glass",
+        permission: perm.imports_read,
+        target: "/project/imports/search",
+        routes: ["project-imports-search"],
+      },
+    ],
   },
-  computed: {
-    isOpen(): boolean {
-      // bootstrap "md" breakpoint is >=768
-      if (this.visible !== null) {
-        return this.visible;
-      }
-      return this.windowWidth >= 768;
-    },
-    iconButton(): string[] {
-      return ["fas", this.isOpen ? "caret-left" : "caret-right"];
-    },
-    sideMenu(): Array<SideMenuEntry> {
-      return this.menu.map((entry: MenuEntry) => {
-        let routes: Array<string> = entry.routes;
-        let subEntries: Array<SideMenuEntry> = [];
-        let isActive: boolean;
-        if (entry.sub && entry.sub.length > 0) {
-          routes = entry.sub.reduce((prev: Array<string>, curr: MenuEntry) => prev.concat(curr.routes), routes);
-          isActive = this.anyOf(routes);
-          subEntries = entry.sub.map((sub: MenuEntry) => {
-            return {
-              ...sub,
-              isActive: this.anyOf(sub.routes),
-              isVisible: sub.permission && (isActive || entry.toggleOpen),
-            } as SideMenuEntry;
-          });
-        } else {
-          isActive = this.anyOf(routes);
-        }
-        return { ...entry, isActive: isActive, isVisible: entry.permission, sub: subEntries };
+  {
+    name: "Dataset",
+    target: "/project/dataset",
+    permission: perm.dataset_read,
+    routes: ["project-dataset"],
+    sub: [
+      {
+        name: "Explore",
+        icon: "map-location-dot",
+        target: "/project/dataset/list",
+        permission: perm.dataset_read,
+        routes: ["project-dataset-list", "project-dataset-item"],
+      },
+      // {
+      //   name: "Item details",
+      //   icon: "file-lines",
+      //   target: "/project/dataset/item",
+      //   permission: perm.dataset_read,
+      //   routes: ["project-dataset-item"],
+      // },
+      {
+        name: "Statistics",
+        icon: "chart-pie",
+        target: "/project/dataset/stats",
+        permission: perm.dataset_read,
+        routes: ["project-dataset-statistics"],
+      },
+      {
+        name: "Export",
+        icon: "file-export",
+        target: "/project/dataset/export",
+        permission: perm.dataset_read,
+        routes: ["project-dataset-export"],
+      },
+    ],
+  },
+  {
+    name: "Data Annotation",
+    target: "/project/annotate/scopes",
+    permission: perm.annotations_read,
+    routes: ["project-annotate"],
+    sub: [
+      {
+        name: "My Assignments",
+        icon: "user-tag",
+        target: "/project/annotate/scopes",
+        permission: perm.annotations_read,
+        routes: ["project-annotate-assignments", "project-annotate-item"],
+      },
+      {
+        name: "Quality Monitor",
+        target: "/project/annotate/quality",
+        icon: "swatchbook",
+        permission: perm.annotations_read,
+        routes: ["project-annotate-quality"],
+      },
+      {
+        name: "Progress Monitor",
+        icon: "bars-progress",
+        target: "/project/annotate/progress",
+        permission: perm.annotations_read,
+        routes: ["project-annotate-progress"],
+      },
+      {
+        name: "Prioritisation",
+        icon: "wand-magic-sparkles",
+        target: "/project/config/priority/list",
+        permission: perm.annotations_prio,
+        routes: ["config-priority", "config-priority-setup", "config-priority-list"],
+      },
+      {
+        name: "Label Manager",
+        icon: "tags",
+        target: "/project/config/annotations",
+        permission: perm.annotations_edit,
+        routes: [
+          "config-annotation-schemes",
+          "config-annotation-scheme-list",
+          "config-annotation-scheme-edit",
+          "config-annotation-scheme-scope",
+          "config-annotation-resolve",
+        ],
+      },
+      {
+        name: "Highlighters",
+        icon: "highlighter",
+        target: "/project/config/annotations/highlighters",
+        permission: perm.annotations_edit,
+        routes: ["config-annotation-highlighters"],
+      },
+    ],
+  },
+  {
+    name: "Supplemental data",
+    target: null,
+    permission: perm.pipelines_read || perm.annotations_read,
+    routes: ["project-pipelines"],
+    sub: [
+      {
+        name: "Pipeline artefacts",
+        icon: "folder-tree",
+        target: "/project/artefacts",
+        permission: perm.artefacts_read || perm.pipelines_read,
+        routes: ["project-artefacts", "project-artefacts-list", "project-artefacts-details"],
+      },
+      {
+        name: "Bot Annotations",
+        icon: "robot",
+        target: "/project/bot-annotations",
+        permission: perm.annotations_read,
+        routes: ["project-bot-annotations", "project-bot-annotations-list"],
+      },
+    ],
+  },
+  {
+    name: "Project",
+    icon: "gear",
+    permission: perm.owner,
+    target: "/project/settings",
+    routes: ["project-settings", "project-settings-settings"],
+  },
+] as Array<MenuEntry>);
+
+const visible = ref<boolean | null>(null);
+const windowWidth = ref(window.innerWidth);
+
+const isOpen = computed<boolean>(() => {
+  // bootstrap "md" breakpoint is >=768
+  if (visible.value !== null) {
+    return visible.value;
+  }
+  return windowWidth.value >= 768;
+});
+const iconButton = computed<string[]>(() => {
+  return ["fas", isOpen.value ? "caret-left" : "caret-right"];
+});
+const sideMenu = computed<Array<SideMenuEntry>>(() => {
+  return menu.value.map((entry: MenuEntry) => {
+    let routes: Array<string> = entry.routes;
+    let subEntries: Array<SideMenuEntry> = [];
+    let isActive: boolean;
+    if (entry.sub && entry.sub.length > 0) {
+      routes = entry.sub.reduce((prev: Array<string>, curr: MenuEntry) => prev.concat(curr.routes), routes);
+      isActive = anyOf(routes);
+      subEntries = entry.sub.map((sub: MenuEntry) => {
+        return {
+          ...sub,
+          isActive: anyOf(sub.routes),
+          isVisible: sub.permission && (isActive || entry.toggleOpen),
+        } as SideMenuEntry;
       });
-    },
-    projectPermissions(): ProjectPermissionsModel | Record<string, never> {
-      return currentProjectStore.permissions || {};
-    },
-  },
-  methods: {
-    toggle(i: number) {
-      this.menu[i].toggleOpen = !this.menu[i].toggleOpen;
-    },
-    isActive(parentName: string): boolean {
-      return this.$router.currentRoute.value.matched.some((route: RouteLocationMatched) => route.name === parentName);
-    },
-    anyOf(routeNames: string[]): boolean {
-      return routeNames.indexOf(this.$router.currentRoute.value.name) >= 0;
-    },
-    toggleVisibility(): void {
-      this.visible = this.visible === null ? false : !this.visible;
-    },
-  },
-  mounted() {
-    window.onresize = () => {
-      this.windowWidth = window.innerWidth;
-    };
-  },
+    } else {
+      isActive = anyOf(routes);
+    }
+    return { ...entry, isActive: isActive, isVisible: entry.permission, sub: subEntries };
+  });
+});
+const projectPermissions = computed<ProjectPermissionsModel | Record<string, never>>(() => {
+  return currentProjectStore.permissions || {};
+});
+
+function toggle(i: number) {
+  menu.value[i].toggleOpen = !menu.value[i].toggleOpen;
+}
+function anyOf(routeNames: string[]): boolean {
+  return routeNames.indexOf(router.currentRoute.value.name as string) >= 0;
+}
+function toggleVisibility(): void {
+  visible.value = visible.value === null ? false : !visible.value;
+}
+
+onMounted(() => {
+  window.onresize = () => {
+    windowWidth.value = window.innerWidth;
+  };
 });
 </script>
 

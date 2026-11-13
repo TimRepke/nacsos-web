@@ -58,37 +58,31 @@
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from "vue";
+<script lang="ts" setup>
+import { computed, ref } from "vue";
 import type { PropType } from "vue";
 import InlineToolTip from "@/components/InlineToolTip.vue";
 import type { FullLexisNexisItemModel } from "@/plugins/api/types";
 import TextComponent from "@/components/items/TextComponent.vue";
 import { currentProjectStore } from "@/stores";
 
-export default defineComponent({
-  name: "LexisNexisItem",
-  components: { TextComponent, InlineToolTip },
-  props: {
-    item: {
-      type: Object as PropType<FullLexisNexisItemModel>,
-      required: true,
-      default: null,
-    },
+defineOptions({ name: "LexisNexisItem" });
+
+const props = defineProps({
+  item: {
+    type: Object as PropType<FullLexisNexisItemModel>,
+    required: true,
+    default: null,
   },
-  data() {
-    return {
-      showRaw: false,
-    };
-  },
-  computed: {
-    htmlTitle() {
-      return currentProjectStore.highlighters.applyActiveHighlighters(this.item.sources?.[0]?.title) ?? "[MISSING]";
-    },
-    htmlTeaser(): string | null {
-      return currentProjectStore.highlighters.applyActiveHighlighters(this.item.teaser);
-    },
-  },
+});
+
+const showRaw = ref(false);
+
+const htmlTitle = computed(() => {
+  return currentProjectStore.highlighters.applyActiveHighlighters(props.item.sources?.[0]?.title) ?? "[MISSING]";
+});
+const htmlTeaser = computed((): string | null => {
+  return currentProjectStore.highlighters.applyActiveHighlighters(props.item.teaser);
 });
 </script>
 

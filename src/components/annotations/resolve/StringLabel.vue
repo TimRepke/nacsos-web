@@ -12,58 +12,44 @@
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from "vue";
+<script lang="ts" setup>
+import { computed, ref } from "vue";
 import type { PropType } from "vue";
 import type { FlatLabel, ResolutionCell, BotAnnotationModel } from "@/plugins/api/types";
 import { is, isNone, notNone } from "@/util";
 
-export default defineComponent({
-  name: "StringLabel",
-  data() {
-    return {
-      // set to true when bot annotation was manipulated
-      changed: false,
-    };
+defineOptions({ name: "StringLabel" });
+
+const emit = defineEmits(["botAnnotationChanged"]);
+
+const props = defineProps({
+  itemId: { type: String, required: true },
+  label: {
+    type: Object as PropType<FlatLabel>,
+    required: true,
   },
-  emits: ["botAnnotationChanged"],
-  props: {
-    itemId: { type: String, required: true },
-    label: {
-      type: Object as PropType<FlatLabel>,
-      required: true,
-    },
-    proposalRow: {
-      type: Object as PropType<Record<string, ResolutionCell>>,
-      required: true,
-    },
-  },
-  methods: {
-    notNone,
-    annotation2icon(val: boolean | undefined): string {
-      if (val === undefined) return "question";
-      return val ? "check" : "xmark";
-    },
-    annotation2classes(val: boolean | undefined): string[] {
-      if (val === undefined) return ["bg-light", "text-dark"];
-      return val ? ["bg-success", "text-light"] : ["bg-danger", "text-light"];
-    },
-    setBotAnnotation(value: string | undefined | null) {
-      const { resolution } = this.proposalRow[this.label.path_key];
-      if (is<BotAnnotationModel>(resolution)) {
-        // Do not store empty/whitespace-only text: that would create an annotation without content.
-        resolution.value_str = value && value.trim().length > 0 ? value : undefined;
-        this.$emit("botAnnotationChanged", resolution);
-        this.changed = true;
-      }
-    },
-  },
-  computed: {
-    val(): string | undefined {
-      const { resolution } = this.proposalRow[this.label.path_key];
-      if (isNone(resolution) || isNone(resolution.value_str)) return undefined;
-      return resolution.value_str;
-    },
+  proposalRow: {
+    type: Object as PropType<Record<string, ResolutionCell>>,
+    required: true,
   },
 });
+
+// set to true when bot annotation was manipulated
+const changed = ref(false);
+
+const val = computed<string | undefined>(() => {
+  const { resolution } = props.proposalRow[props.label.path_key];
+  if (isNone(resolution) || isNone(resolution.value_str)) return undefined;
+  return resolution.value_str;
+});
+
+function setBotAnnotation(value: string | undefined | null) {
+  const { resolution } = props.proposalRow[props.label.path_key];
+  if (is<BotAnnotationModel>(resolution)) {
+    // Do not store empty/whitespace-only text: that would create an annotation without content.
+    resolution.value_str = value && value.trim().length > 0 ? value : undefined;
+    emit("botAnnotationChanged", resolution);
+    changed.value = true;
+  }
+}
 </script>

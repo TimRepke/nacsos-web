@@ -88,8 +88,8 @@
   </ExpandableBox>
 </template>
 
-<script lang="ts">
-import { defineComponent } from "vue";
+<script lang="ts" setup>
+import { ref } from "vue";
 import type { PropType } from "vue";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import ExpandableBox from "@/components/ExpandableBox.vue";
@@ -102,79 +102,64 @@ import { EventBus } from "@/plugins/events";
 import { ToastEvent } from "@/plugins/events/events/toast";
 import { ConfirmationRequestEvent } from "@/plugins/events/events/confirmation";
 
-type PermissionSettingsData = {
-  permission: UserPermission;
-  presets: Record<string, Permissions>;
-  hints: Record<PermissionKeys, string>;
-};
+defineOptions({ name: "PermissionSettingsCard" });
 
-export default defineComponent({
-  name: "PermissionSettingsCard",
-  components: { FontAwesomeIcon, ExpandableBox },
-  emits: ["userDeleted", "userSaved"],
-  props: {
-    userPermission: {
-      type: Object as PropType<UserPermission>,
-      required: true,
-    },
-  },
-  data(): PermissionSettingsData {
-    return {
-      presets: PermissionPresets,
-      hints: ProjectPermissionHints,
-      permission: this.userPermission,
-    };
-  },
-  methods: {
-    applyPreset(preset: Permissions) {
-      Object.entries(preset).forEach(([key, value]) => {
-        this.permission[key as PermissionKeys] = value;
-      });
-    },
-    saveUser() {
-      API.project
-        .saveProjectPermissionApiProjectPermissionsPermissionPut({
-          body: this.permission,
-          headers: { "x-project-id": currentProjectStore.projectId as string },
-        })
-        .then(() => {
-          this.$emit("userSaved", this.permission);
-          EventBus.emit(new ToastEvent("SUCCESS", "Saved!"));
-        })
-        .catch(() => {
-          EventBus.emit(new ToastEvent("ERROR", "Failed to save."));
-        });
-    },
-    removeUser() {
-      EventBus.emit(
-        new ConfirmationRequestEvent(
-          "Do you really want to remove access for this user?",
-          (confirmationResponse) => {
-            if (confirmationResponse === "ACCEPT") {
-              API.project
-                .removeProjectPermissionApiProjectPermissionsPermissionDelete({
-                  query: { project_permission_id: this.permission.project_permission_id as string },
-                  headers: { "x-project-id": currentProjectStore.projectId as string },
-                })
-                .then(() => {
-                  this.$emit("userDeleted", this.permission);
-                  EventBus.emit(new ToastEvent("SUCCESS", "Removed permission!"));
-                })
-                .catch(() => {
-                  // Deletion may not only fail on server error but also when the user removes a new permission that wasn't saved yet.
-                  EventBus.emit(
-                    new ToastEvent(
-                      "WARN",
-                      "May have failed to remove permission, please reload page if you are unsure.",
-                    ),
-                  );
-                });
-            }
-          },
-          "Remove user permission",
-        ),
-      );
-    },
+const props = defineProps({
+  userPermission: {
+    type: Object as PropType<UserPermission>,
+    required: true,
   },
 });
+const emit = defineEmits(["userDeleted", "userSaved"]);
+
+const presets = ref<Record<string, Permissions>>(PermissionPresets);
+const hints = ref<Record<PermissionKeys, string>>(ProjectPermissionHints);
+const permission = ref<UserPermission>(props.userPermission);
+
+function applyPreset(preset: Permissions) {
+  Object.entries(preset).forEach(([key, value]) => {
+    (permission.value as unknown as Record<string, number | boolean>)[key] = value;
+  });
+}
+function saveUser() {
+  API.project
+    .saveProjectPermissionApiProjectPermissionsPermissionPut({
+      body: permission.value,
+      headers: { "x-project-id": currentProjectStore.projectId as string },
+    })
+    .then(() => {
+      emit("userSaved", permission.value);
+      EventBus.emit(new ToastEvent("SUCCESS", "Saved!"));
+    })
+    .catch(() => {
+      EventBus.emit(new ToastEvent("ERROR", "Failed to save."));
+    });
+}
+function removeUser() {
+  EventBus.emit(
+    new ConfirmationRequestEvent(
+      "Do you really want to remove access for this user?",
+      (confirmationResponse) => {
+        if (confirmationResponse === "ACCEPT") {
+          API.project
+            .removeProjectPermissionApiProjectPermissionsPermissionDelete({
+              query: { project_permission_id: permission.value.project_permission_id as string },
+              headers: { "x-project-id": currentProjectStore.projectId as string },
+            })
+            .then(() => {
+              emit("userDeleted", permission.value);
+              EventBus.emit(new ToastEvent("SUCCESS", "Removed permission!"));
+            })
+            .catch(() => {
+              // Deletion may not only fail on server error but also when the user removes a new permission that wasn't saved yet.
+              EventBus.emit(
+                new ToastEvent("WARN", "May have failed to remove permission, please reload page if you are unsure."),
+              );
+            });
+        }
+      },
+      "Remove user permission",
+    ),
+  );
+}
 </script>

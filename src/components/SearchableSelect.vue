@@ -39,8 +39,8 @@
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from "vue";
+<script lang="ts" setup>
+import { ref, watch } from "vue";
 import type { PropType } from "vue";
 import InlineToolTip from "@/components/InlineToolTip.vue";
 
@@ -51,106 +51,98 @@ interface Option {
   visible?: boolean;
 }
 
-export default defineComponent({
-  name: "SearchableSelect",
-  components: { InlineToolTip },
-  emits: ["update:current-option"],
-  props: {
-    options: {
-      type: Object as PropType<Option[]>,
-      required: true,
-      default: () => [] as Option[],
-    },
-    hiddenOptions: {
-      type: Object as PropType<number[]>,
-      required: false,
-      default: () => [] as number[],
-    },
-    currentOptionValue: {
-      type: Number,
-      required: false,
-      default: undefined,
-    },
-    resetText: {
-      type: Boolean,
-      required: false,
-      default: false,
-    },
+defineOptions({ name: "SearchableSelect" });
+
+const emit = defineEmits(["update:current-option"]);
+
+const props = defineProps({
+  options: {
+    type: Object as PropType<Option[]>,
+    required: true,
+    default: () => [] as Option[],
   },
-  data() {
-    const mappedOptions = Object.fromEntries(
-      this.options.map((option) => {
-        option.visible = !this.isHidden(option);
-        return [option.value, option];
-      }),
-    );
-    return {
-      searchText:
-        this.currentOptionValue !== undefined && this.currentOptionValue in mappedOptions
-          ? mappedOptions[this.currentOptionValue].name
-          : "",
-      dropdownOptions: mappedOptions,
-      dropdownVisible: false,
-    };
+  hiddenOptions: {
+    type: Object as PropType<number[]>,
+    required: false,
+    default: () => [] as number[],
   },
-  computed: {
-    // pass
+  currentOptionValue: {
+    type: Number,
+    required: false,
+    default: undefined,
   },
-  methods: {
-    isHidden(option: Option): boolean {
-      return (this.hiddenOptions ?? []).indexOf(option.value) >= 0;
-    },
-    unfocusSearchField() {
-      setTimeout(() => {
-        // create a small delay, because otherwise the list entry someone clicked on is gone before the
-        // event propagates and to JS it looks like the user clicked into thin air
-        this.dropdownVisible = false;
-      }, 200);
-    },
-    resetDropdownOptions() {
-      Object.entries<Option>(this.dropdownOptions).forEach((entry: [string, Option]) => {
-        entry[1].visible = !this.isHidden(entry[1]);
-      });
-    },
-    filterDropdownOptions() {
-      Object.entries<Option>(this.dropdownOptions).forEach((entry: [string, Option]) => {
-        entry[1].visible =
-          !this.isHidden(entry[1]) && entry[1].name.toLowerCase().indexOf(this.searchText.toLowerCase()) >= 0;
-      });
-    },
-    clear() {
-      this.searchText = "";
-      this.$emit("update:current-option", undefined);
-    },
-    pickOption(option: Option) {
-      if (!this.resetText) {
-        this.searchText = option.name;
-      }
-      this.$emit("update:current-option", option.value);
-      this.dropdownVisible = false;
-    },
-  },
-  watch: {
-    searchText(newValue: string) {
-      setTimeout(() => {
-        if (
-          newValue.length === 0 ||
-          (this.currentOptionValue !== undefined && newValue === this.dropdownOptions[this.currentOptionValue].name)
-        ) {
-          this.resetDropdownOptions();
-        } else {
-          this.filterDropdownOptions();
-        }
-      }, 200);
-    },
-    hiddenOptions: {
-      handler() {
-        this.filterDropdownOptions();
-      },
-      deep: true,
-    },
+  resetText: {
+    type: Boolean,
+    required: false,
+    default: false,
   },
 });
+
+const mappedOptions = Object.fromEntries(
+  props.options.map((option) => {
+    option.visible = !isHidden(option);
+    return [option.value, option];
+  }),
+);
+const searchText = ref(
+  props.currentOptionValue !== undefined && props.currentOptionValue in mappedOptions
+    ? mappedOptions[props.currentOptionValue].name
+    : "",
+);
+const dropdownOptions = ref(mappedOptions);
+const dropdownVisible = ref(false);
+
+function isHidden(option: Option): boolean {
+  return (props.hiddenOptions ?? []).indexOf(option.value) >= 0;
+}
+function unfocusSearchField() {
+  setTimeout(() => {
+    // create a small delay, because otherwise the list entry someone clicked on is gone before the
+    // event propagates and to JS it looks like the user clicked into thin air
+    dropdownVisible.value = false;
+  }, 200);
+}
+function resetDropdownOptions() {
+  Object.entries<Option>(dropdownOptions.value).forEach((entry: [string, Option]) => {
+    entry[1].visible = !isHidden(entry[1]);
+  });
+}
+function filterDropdownOptions() {
+  Object.entries<Option>(dropdownOptions.value).forEach((entry: [string, Option]) => {
+    entry[1].visible = !isHidden(entry[1]) && entry[1].name.toLowerCase().indexOf(searchText.value.toLowerCase()) >= 0;
+  });
+}
+function clear() {
+  searchText.value = "";
+  emit("update:current-option", undefined);
+}
+function pickOption(option: Option) {
+  if (!props.resetText) {
+    searchText.value = option.name;
+  }
+  emit("update:current-option", option.value);
+  dropdownVisible.value = false;
+}
+
+watch(searchText, (newValue: string) => {
+  setTimeout(() => {
+    if (
+      newValue.length === 0 ||
+      (props.currentOptionValue !== undefined && newValue === dropdownOptions.value[props.currentOptionValue].name)
+    ) {
+      resetDropdownOptions();
+    } else {
+      filterDropdownOptions();
+    }
+  }, 200);
+});
+watch(
+  () => props.hiddenOptions,
+  () => {
+    filterDropdownOptions();
+  },
+  { deep: true },
+);
 </script>
 
 <style scoped></style>

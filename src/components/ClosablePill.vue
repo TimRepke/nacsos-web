@@ -9,36 +9,35 @@
   </span>
 </template>
 
-<script lang="ts">
-import { defineComponent } from "vue";
+<script lang="ts" setup>
+import { computed } from "vue";
 import type { PropType } from "vue";
 
 type BackgroundColour = "primary" | "secondary" | "success" | "danger" | "warning" | "info" | "dark" | "light";
 
-export default defineComponent({
-  name: "ClosablePill",
-  emits: ["clicked-x"],
-  props: {
-    colour: {
-      type: String as PropType<BackgroundColour>,
-      default: "primary",
-    },
-    rounded: {
-      type: Boolean,
-      default: true,
-    },
-    bgOverride: {
-      type: Boolean,
-      default: false,
-      required: false,
-    },
+defineOptions({ name: "ClosablePill" });
+
+defineEmits(["clicked-x"]);
+
+const props = defineProps({
+  colour: {
+    type: String as PropType<BackgroundColour>,
+    default: "primary",
   },
-  computed: {
-    background(): string | undefined {
-      if (this.bgOverride !== undefined) return `text-bg-${this.colour}`;
-      return undefined;
-    },
+  rounded: {
+    type: Boolean,
+    default: true,
   },
+  bgOverride: {
+    type: Boolean,
+    default: false,
+    required: false,
+  },
+});
+
+const background = computed<string | undefined>(() => {
+  if (props.bgOverride !== undefined) return `text-bg-${props.colour}`;
+  return undefined;
 });
 </script>
 

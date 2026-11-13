@@ -99,7 +99,7 @@
                   </router-link>
                 </div>
               </td>
-              <td class="col text-muted text-start small">{{ $util.dt2str(scope.time_created) }}</td>
+              <td class="col text-muted text-start small">{{ dt2str(scope.time_created) }}</td>
               <td>
                 <router-link
                   :to="{
@@ -155,7 +155,7 @@
                         {{ resolution.name }}
                       </span>
                       <span class="text-muted small me-3 ms-auto" @click.stop="navigate" role="button" tabindex="-1">
-                        {{ $util.dt2str(resolution.time_created) }}
+                        {{ dt2str(resolution.time_created) }}
                       </span>
                     </router-link>
                     <div>
@@ -191,8 +191,9 @@
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from "vue";
+<script lang="ts" setup>
+import { dt2str } from "@/util";
+import { computed, onMounted, ref } from "vue";
 import { currentProjectStore } from "@/stores";
 import { EventBus } from "@/plugins/events";
 import { ConfirmationRequestEvent } from "@/plugins/events/events/confirmation";
@@ -206,177 +207,167 @@ import type {
 import { type ApiResponseReject, API } from "@/plugins/api";
 import PopOver from "@/components/PopOver.vue";
 
-export default defineComponent({
-  name: "AnnotationConfigListView",
-  components: { PopOver, InlineToolTip },
-  data() {
-    return {
-      projectSchemes: [] as AnnotationSchemeModel[],
-      projectScopes: [] as AssignmentScopeModel[],
-      projectResolutions: [] as BotAnnotationMetaDataBaseModel[],
-    };
-  },
-  async mounted() {
-    await this.refreshData();
-  },
-  methods: {
-    async refreshData() {
-      try {
-        this.projectSchemes = (
-          await API.annotations.getSchemeDefinitionsForProjectApiAnnotationsSchemesListGet({
-            headers: { "x-project-id": currentProjectStore.projectId as string },
-          })
-        ).data;
+defineOptions({ name: "AnnotationConfigListView" });
 
-        this.projectScopes = (
-          await API.annotations.getAssignmentScopesForProjectApiAnnotationsAssignmentsScopesGet({
-            headers: { "x-project-id": currentProjectStore.projectId as string },
-          })
-        ).data;
+const projectSchemes = ref<AnnotationSchemeModel[]>([]);
+const projectScopes = ref<AssignmentScopeModel[]>([]);
+const projectResolutions = ref<BotAnnotationMetaDataBaseModel[]>([]);
 
-        this.projectResolutions = (
-          await API.annotations.listSavedResolvedAnnotationsApiAnnotationsConfigResolvedListGet({
-            headers: { "x-project-id": currentProjectStore.projectId as string },
-          })
-        ).data;
-      } catch (e) {
-        console.error(e);
-        const err = e as ApiResponseReject;
-        EventBus.emit(
-          new ToastEvent("ERROR", `Failed to load data (${err.error.detail?.type}: ${err.error.detail?.message})`),
-        );
+onMounted(async () => {
+  await refreshData();
+});
+
+async function refreshData() {
+  try {
+    projectSchemes.value = (
+      await API.annotations.getSchemeDefinitionsForProjectApiAnnotationsSchemesListGet({
+        headers: { "x-project-id": currentProjectStore.projectId as string },
+      })
+    ).data;
+
+    projectScopes.value = (
+      await API.annotations.getAssignmentScopesForProjectApiAnnotationsAssignmentsScopesGet({
+        headers: { "x-project-id": currentProjectStore.projectId as string },
+      })
+    ).data;
+
+    projectResolutions.value = (
+      await API.annotations.listSavedResolvedAnnotationsApiAnnotationsConfigResolvedListGet({
+        headers: { "x-project-id": currentProjectStore.projectId as string },
+      })
+    ).data;
+  } catch (e) {
+    console.error(e);
+    const err = e as ApiResponseReject;
+    EventBus.emit(
+      new ToastEvent("ERROR", `Failed to load data (${err.error.detail?.type}: ${err.error.detail?.message})`),
+    );
+  }
+}
+
+async function copyScheme(scheme: AnnotationSchemeModel) {
+  const copy: AnnotationSchemeModel = JSON.parse(JSON.stringify(scheme));
+  copy.annotation_scheme_id = undefined;
+  copy.name = `[COPY] ${scheme.name}`;
+
+  try {
+    const copyId = await API.annotations.putAnnotationSchemeApiAnnotationsSchemesDefinitionPut({
+      headers: { "x-project-id": currentProjectStore.projectId as string },
+      body: copy,
+    });
+    EventBus.emit(
+      new ToastEvent("SUCCESS", `Created copy of the annotation scheme "${scheme.name}" with ID ${copyId.data}.`),
+    );
+
+    const schemes = await API.annotations.getSchemeDefinitionsForProjectApiAnnotationsSchemesListGet({
+      headers: { "x-project-id": currentProjectStore.projectId as string },
+    });
+    projectSchemes.value = schemes.data;
+  } catch {
+    EventBus.emit(new ToastEvent("ERROR", "Failed to copy or refresh data, try reloading the page."));
+  }
+}
+function removeScheme(scheme: AnnotationSchemeModel) {
+  EventBus.emit(
+    new ConfirmationRequestEvent(
+      "Do you really want to **permanently delete**  the following annotation scheme?\n" +
+        `- "${scheme.name}"\n` +
+        `- ID: ${scheme.annotation_scheme_id}\n\n` +
+        "This may result in deletion of all associated assignments and annotations or at least make them meaningless!",
+      (confirmationResponse) => {
+        if (confirmationResponse === "ACCEPT") {
+          API.annotations
+            .removeAnnotationSchemeApiAnnotationsSchemesDefinitionSchemeIdDelete({
+              headers: { "x-project-id": currentProjectStore.projectId as string },
+              query: { annotation_scheme_id: scheme.annotation_scheme_id as string },
+            })
+            .then(() => {
+              EventBus.emit(new ToastEvent("SUCCESS", "Annotation scheme deleted!"));
+              refreshData();
+            })
+            .catch(() => {
+              EventBus.emit(new ToastEvent("ERROR", "Failed to delete annotation scheme!"));
+            });
+        }
+      },
+      "Delete annotation scheme",
+    ),
+  );
+}
+function removeScope(scope: AssignmentScopeModel) {
+  EventBus.emit(
+    new ConfirmationRequestEvent(
+      "Do you really want to **permanently delete**  the following assignment scope?\n" +
+        `- "${scope.name}"\n` +
+        `- ID: ${scope.assignment_scope_id}\n\n` +
+        "This may result in deletion of all associated assignments and annotations or at least make them meaningless!",
+      (confirmationResponse) => {
+        if (confirmationResponse === "ACCEPT") {
+          API.annotations
+            .removeAssignmentScopeApiAnnotationsAnnotateScopeAssignmentScopeIdDelete({
+              headers: { "x-project-id": currentProjectStore.projectId as string },
+              path: { assignment_scope_id: scope.assignment_scope_id as string },
+            })
+            .then(() => {
+              EventBus.emit(new ToastEvent("SUCCESS", "Assignment scope deleted!"));
+              refreshData();
+            })
+            .catch(() => {
+              EventBus.emit(new ToastEvent("ERROR", "Failed to delete assignment scope!"));
+            });
+        }
+      },
+      "Delete assignment scope",
+    ),
+  );
+}
+function removeResolution(meta: BotAnnotationMetaDataBaseModel) {
+  EventBus.emit(
+    new ConfirmationRequestEvent(
+      "Do you really want to **permanently delete** all resolved annotations associated to the scope shown below?\n" +
+        `- "${meta.name}"\n` +
+        `- ID: ${meta.bot_annotation_metadata_id}`,
+      (confirmationResponse) => {
+        if (confirmationResponse === "ACCEPT") {
+          API.annotations
+            .deleteSavedResolvedAnnotationsApiAnnotationsConfigResolvedBotAnnotationMetaIdDelete({
+              query: { bot_annotation_metadata_id: meta.bot_annotation_metadata_id! },
+              headers: { "x-project-id": currentProjectStore.projectId as string },
+            })
+            .then(() => {
+              EventBus.emit(new ToastEvent("SUCCESS", `Deleted ${meta.bot_annotation_metadata_id}`));
+              refreshData();
+            })
+            .catch(() => {
+              EventBus.emit(new ToastEvent("ERROR", `Failed to delete ${meta.bot_annotation_metadata_id}.`));
+            });
+        }
+      },
+      "Delete resolved annotations",
+    ),
+  );
+}
+
+const scopesLookup = computed<{ [key: string]: AssignmentScopeModel[] }>(() => {
+  return projectScopes.value.reduce((ret: { [key: string]: AssignmentScopeModel[] }, scope: AssignmentScopeModel) => {
+    if (!(scope.annotation_scheme_id in ret)) {
+      ret[scope.annotation_scheme_id] = [];
+    }
+    ret[scope.annotation_scheme_id].push(scope);
+    return ret;
+  }, {});
+});
+const resolutionLookup = computed<{ [key: string]: BotAnnotationMetaDataBaseModel[] }>(() => {
+  return projectResolutions.value.reduce(
+    (ret: { [key: string]: BotAnnotationMetaDataBaseModel[] }, bam: BotAnnotationMetaDataBaseModel) => {
+      if (!((bam.assignment_scope_id as string) in ret)) {
+        ret[bam.assignment_scope_id as string] = [];
       }
+      ret[bam.assignment_scope_id as string].push(bam);
+      return ret;
     },
-
-    async copyScheme(scheme: AnnotationSchemeModel) {
-      const copy: AnnotationSchemeModel = JSON.parse(JSON.stringify(scheme));
-      copy.annotation_scheme_id = undefined;
-      copy.name = `[COPY] ${scheme.name}`;
-
-      try {
-        const copyId = await API.annotations.putAnnotationSchemeApiAnnotationsSchemesDefinitionPut({
-          headers: { "x-project-id": currentProjectStore.projectId as string },
-          body: copy,
-        });
-        EventBus.emit(
-          new ToastEvent("SUCCESS", `Created copy of the annotation scheme "${scheme.name}" with ID ${copyId.data}.`),
-        );
-
-        const schemes = await API.annotations.getSchemeDefinitionsForProjectApiAnnotationsSchemesListGet({
-          headers: { "x-project-id": currentProjectStore.projectId as string },
-        });
-        this.projectSchemes = schemes.data;
-      } catch {
-        EventBus.emit(new ToastEvent("ERROR", "Failed to copy or refresh data, try reloading the page."));
-      }
-    },
-    removeScheme(scheme: AnnotationSchemeModel) {
-      EventBus.emit(
-        new ConfirmationRequestEvent(
-          "Do you really want to **permanently delete**  the following annotation scheme?\n" +
-            `- "${scheme.name}"\n` +
-            `- ID: ${scheme.annotation_scheme_id}\n\n` +
-            "This may result in deletion of all associated assignments and annotations or at least make them meaningless!",
-          (confirmationResponse) => {
-            if (confirmationResponse === "ACCEPT") {
-              API.annotations
-                .removeAnnotationSchemeApiAnnotationsSchemesDefinitionSchemeIdDelete({
-                  headers: { "x-project-id": currentProjectStore.projectId as string },
-                  query: { annotation_scheme_id: scheme.annotation_scheme_id as string },
-                })
-                .then(() => {
-                  EventBus.emit(new ToastEvent("SUCCESS", "Annotation scheme deleted!"));
-                  this.refreshData();
-                })
-                .catch(() => {
-                  EventBus.emit(new ToastEvent("ERROR", "Failed to delete annotation scheme!"));
-                });
-            }
-          },
-          "Delete annotation scheme",
-        ),
-      );
-    },
-    removeScope(scope: AssignmentScopeModel) {
-      EventBus.emit(
-        new ConfirmationRequestEvent(
-          "Do you really want to **permanently delete**  the following assignment scope?\n" +
-            `- "${scope.name}"\n` +
-            `- ID: ${scope.assignment_scope_id}\n\n` +
-            "This may result in deletion of all associated assignments and annotations or at least make them meaningless!",
-          (confirmationResponse) => {
-            if (confirmationResponse === "ACCEPT") {
-              API.annotations
-                .removeAssignmentScopeApiAnnotationsAnnotateScopeAssignmentScopeIdDelete({
-                  headers: { "x-project-id": currentProjectStore.projectId as string },
-                  path: { assignment_scope_id: scope.assignment_scope_id as string },
-                })
-                .then(() => {
-                  EventBus.emit(new ToastEvent("SUCCESS", "Assignment scope deleted!"));
-                  this.refreshData();
-                })
-                .catch(() => {
-                  EventBus.emit(new ToastEvent("ERROR", "Failed to delete assignment scope!"));
-                });
-            }
-          },
-          "Delete assignment scope",
-        ),
-      );
-    },
-    removeResolution(meta: BotAnnotationMetaDataBaseModel) {
-      EventBus.emit(
-        new ConfirmationRequestEvent(
-          "Do you really want to **permanently delete** all resolved annotations associated to the scope shown below?\n" +
-            `- "${meta.name}"\n` +
-            `- ID: ${meta.bot_annotation_metadata_id}`,
-          (confirmationResponse) => {
-            if (confirmationResponse === "ACCEPT") {
-              API.annotations
-                .deleteSavedResolvedAnnotationsApiAnnotationsConfigResolvedBotAnnotationMetaIdDelete({
-                  query: { bot_annotation_metadata_id: meta.bot_annotation_metadata_id! },
-                  headers: { "x-project-id": currentProjectStore.projectId as string },
-                })
-                .then(() => {
-                  EventBus.emit(new ToastEvent("SUCCESS", `Deleted ${meta.bot_annotation_metadata_id}`));
-                  this.refreshData();
-                })
-                .catch(() => {
-                  EventBus.emit(new ToastEvent("ERROR", `Failed to delete ${meta.bot_annotation_metadata_id}.`));
-                });
-            }
-          },
-          "Delete resolved annotations",
-        ),
-      );
-    },
-  },
-  computed: {
-    scopesLookup(): { [key: string]: AssignmentScopeModel[] } {
-      return this.projectScopes.reduce(
-        (ret: { [key: string]: AssignmentScopeModel[] }, scope: AssignmentScopeModel) => {
-          if (!(scope.annotation_scheme_id in ret)) {
-            ret[scope.annotation_scheme_id] = [];
-          }
-          ret[scope.annotation_scheme_id].push(scope);
-          return ret;
-        },
-        {},
-      );
-    },
-    resolutionLookup(): { [key: string]: BotAnnotationMetaDataBaseModel[] } {
-      return this.projectResolutions.reduce(
-        (ret: { [key: string]: BotAnnotationMetaDataBaseModel[] }, bam: BotAnnotationMetaDataBaseModel) => {
-          if (!((bam.assignment_scope_id as string) in ret)) {
-            ret[bam.assignment_scope_id as string] = [];
-          }
-          ret[bam.assignment_scope_id as string].push(bam);
-          return ret;
-        },
-        {},
-      );
-    },
-  },
+    {},
+  );
 });
 </script>
 

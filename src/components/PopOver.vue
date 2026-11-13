@@ -27,31 +27,27 @@
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from "vue";
+<script lang="ts" setup>
+import { ref } from "vue";
 import { marked } from "marked";
 
-export default defineComponent({
-  name: "PopOver",
-  props: {
-    title: {
-      type: String,
-      required: false,
-      default: undefined,
-    },
-    bodyMD: {
-      type: String,
-      required: false,
-      default: undefined,
-    },
+defineOptions({ name: "PopOver" });
+
+const props = defineProps({
+  title: {
+    type: String,
+    required: false,
+    default: undefined,
   },
-  data() {
-    return {
-      body: this.bodyMD ? marked(this.bodyMD) : null,
-      visible: false,
-    };
+  bodyMD: {
+    type: String,
+    required: false,
+    default: undefined,
   },
 });
+
+const body = ref(props.bodyMD ? marked(props.bodyMD) : null);
+const visible = ref(false);
 </script>
 
 <style scoped>

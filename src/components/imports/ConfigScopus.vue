@@ -38,9 +38,9 @@
   </div>
 </template>
 
-<script lang="ts">
+<script lang="ts" setup>
 import type { PropType } from "vue";
-import { defineComponent } from "vue";
+import { computed, ref, watch } from "vue";
 import useVuelidate from "@vuelidate/core";
 import { required } from "@vuelidate/validators";
 import type { ValidationRule } from "@vuelidate/core";
@@ -48,6 +48,8 @@ import { ImportConfigEnum, type ScopusImport } from "@/plugins/api/types";
 import FilesUploader from "@/components/FilesUploader.vue";
 import type { UploadFile } from "@/components/FilesUploader.vue";
 import { errorsToString } from "@/util/validators";
+
+defineOptions({ name: "ConfigScopus" });
 
 const areFilesUploaded: ValidationRule = {
   $validator(value?: UploadFile[]) {
@@ -60,85 +62,75 @@ const areFilesUploaded: ValidationRule = {
   $message: "Files not uploaded yet.",
 };
 
-export default defineComponent({
-  name: "ConfigScopus",
-  components: { FilesUploader },
-  emits: ["configChanged"],
-  props: {
-    existingConfig: {
-      type: Object as PropType<ScopusImport>,
-      required: false,
-      default: null,
-    },
-    projectId: {
-      type: String,
-      required: false,
-      default: null,
-    },
-    importId: {
-      type: String,
-      required: false,
-      default: null,
-    },
-    editable: {
-      type: Boolean,
-      default: true,
-    },
+const emit = defineEmits(["configChanged"]);
+const props = defineProps({
+  existingConfig: {
+    type: Object as PropType<ScopusImport>,
+    required: false,
+    default: null,
   },
-  setup() {
-    return {
-      v$: useVuelidate(),
-    };
+  projectId: {
+    type: String,
+    required: false,
+    default: null,
   },
-  data() {
-    const emptyConfig: ScopusImport = {
-      kind: ImportConfigEnum.SCOPUS,
-      sources: [] as string[],
-    };
-    if (!this.existingConfig || this.existingConfig.kind !== ImportConfigEnum.SCOPUS) {
-      this.$emit("configChanged", emptyConfig);
-      return { files: [] as UploadFile[], config: emptyConfig };
-    }
-    return { files: [] as UploadFile[], config: this.existingConfig };
+  importId: {
+    type: String,
+    required: false,
+    default: null,
   },
-  methods: {
-    errorsToString,
-    onFilesChange(files: UploadFile[]) {
-      this.files = files;
-      const sources = files.map((file) => file.serverPath).filter((source) => !!source);
-      this.config.sources = sources.length === 0 ? undefined : sources;
-    },
-  },
-  computed: {
-    uploadsEnabled(): boolean {
-      return this.editable && this.config;
-    },
-  },
-  watch: {
-    config: {
-      handler(newValue: ScopusImport) {
-        this.$emit("configChanged", newValue);
-      },
-      deep: true,
-    },
-    existingConfig: {
-      handler(newValue: ScopusImport) {
-        this.config = newValue;
-      },
-      deep: true,
-    },
-    importId: {
-      handler(newValue: string) {
-        this.config.import_id = newValue;
-      },
-    },
-  },
-  validations() {
-    return {
-      files: { required, areFilesUploaded, $autoDirty: true },
-    };
+  editable: {
+    type: Boolean,
+    default: true,
   },
 });
+
+const emptyConfig: ScopusImport = {
+  kind: ImportConfigEnum.SCOPUS,
+  sources: [] as string[],
+};
+
+const files = ref<UploadFile[]>([]);
+const config = ref<ScopusImport>(emptyConfig);
+if (!props.existingConfig || props.existingConfig.kind !== ImportConfigEnum.SCOPUS) {
+  emit("configChanged", emptyConfig);
+} else {
+  config.value = props.existingConfig;
+}
+
+const rules = {
+  files: { required, areFilesUploaded, $autoDirty: true },
+};
+const v$ = useVuelidate(rules, { files });
+
+const uploadsEnabled = computed<boolean>(() => (props.editable && config.value) as boolean);
+
+function onFilesChange(newFiles: UploadFile[]) {
+  files.value = newFiles;
+  const sources = newFiles.map((file) => file.serverPath).filter((source) => !!source);
+  config.value.sources = (sources.length === 0 ? undefined : sources) as string[];
+}
+
+watch(
+  () => config.value,
+  (newValue) => {
+    emit("configChanged", newValue);
+  },
+  { deep: true },
+);
+watch(
+  () => props.existingConfig,
+  (newValue) => {
+    config.value = newValue;
+  },
+  { deep: true },
+);
+watch(
+  () => props.importId,
+  (newValue) => {
+    (config.value as { import_id?: string | null }).import_id = newValue;
+  },
+);
 </script>
 
 <style scoped></style>

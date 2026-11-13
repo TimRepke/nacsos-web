@@ -299,8 +299,8 @@
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from "vue";
+<script lang="ts" setup>
+import { computed, onMounted, ref } from "vue";
 import type {
   AnnotationTrackerModel,
   DehydratedAnnotationTracker,
@@ -315,166 +315,159 @@ import { EventBus } from "@/plugins/events";
 import { ToastEvent } from "@/plugins/events/events/toast";
 import BuscarChart from "@/components/charts/BuscarChart.vue";
 
-export default defineComponent({
-  name: "AnnotationTrackingView",
-  components: { BuscarChart, ToolTip, ExpandableBox },
-  data() {
-    return {
-      permissions: currentProjectStore.permissions as ProjectPermissionsModel,
-      scopes: [] as LabelScope[],
-      trackers: [] as DehydratedAnnotationTracker[],
-      trackerDetails: null as AnnotationTrackerModel | null,
-    };
-  },
-  async mounted() {
-    API.evaluation
-      .getProjectTrackersApiEvalTrackingTrackersGet({
-        headers: { "x-project-id": currentProjectStore.projectId as string },
-      })
-      .then((response) => {
-        this.trackers = response.data;
-      })
-      .catch(ignore);
+defineOptions({ name: "AnnotationTrackingView" });
 
+const permissions = ref(currentProjectStore.permissions as ProjectPermissionsModel);
+const scopes = ref<LabelScope[]>([]);
+const trackers = ref<DehydratedAnnotationTracker[]>([]);
+const trackerDetails = ref<AnnotationTrackerModel | null>(null);
+
+onMounted(() => {
+  API.evaluation
+    .getProjectTrackersApiEvalTrackingTrackersGet({
+      headers: { "x-project-id": currentProjectStore.projectId as string },
+    })
+    .then((response) => {
+      trackers.value = response.data;
+    })
+    .catch(ignore);
+
+  API.evaluation
+    .getProjectScopesApiEvalTrackingScopesGet({
+      headers: { "x-project-id": currentProjectStore.projectId as string },
+    })
+    .then((response) => {
+      scopes.value = response.data;
+    })
+    .catch(ignore);
+});
+
+function addTracker() {
+  trackerDetails.value = {
+    annotation_tracking_id: null,
+    name: "New Tracker",
+    project_id: currentProjectStore.projectId as string,
+    inclusion_rule: "rel=1",
+    majority: true,
+    n_items_total: 0,
+    recall_target: 0.95,
+    batch_size: 100,
+    source_ids: [] as string[],
+    labels: null,
+    recall: null,
+    buscar: null,
+  };
+}
+function saveTracker() {
+  if (trackerDetails.value) {
     API.evaluation
-      .getProjectScopesApiEvalTrackingScopesGet({
+      .saveTrackerApiEvalTrackingTrackerPut({
         headers: { "x-project-id": currentProjectStore.projectId as string },
+        body: trackerDetails.value,
       })
       .then((response) => {
-        this.scopes = response.data;
+        if (trackerDetails.value) {
+          trackerDetails.value.annotation_tracking_id = response.data;
+        }
+        EventBus.emit(new ToastEvent("SUCCESS", `Saved with id ${response.data}.`));
       })
       .catch(ignore);
-  },
-  methods: {
-    addTracker() {
-      this.trackerDetails = {
-        annotation_tracking_id: null,
-        name: "New Tracker",
-        project_id: currentProjectStore.projectId as string,
-        inclusion_rule: "rel=1",
-        majority: true,
-        n_items_total: 0,
-        recall_target: 0.95,
-        batch_size: 100,
-        source_ids: [] as string[],
-        labels: null,
-        recall: null,
-        buscar: null,
-      };
-    },
-    saveTracker() {
-      if (this.trackerDetails) {
-        API.evaluation
-          .saveTrackerApiEvalTrackingTrackerPut({
-            headers: { "x-project-id": currentProjectStore.projectId as string },
-            body: this.trackerDetails,
-          })
-          .then((response) => {
-            if (this.trackerDetails) {
-              this.trackerDetails.annotation_tracking_id = response.data;
-            }
-            EventBus.emit(new ToastEvent("SUCCESS", `Saved with id ${response.data}.`));
-          })
-          .catch(ignore);
-      } else {
-        EventBus.emit(new ToastEvent("WARN", "Nothing to save."));
-      }
-    },
-    deleteTracker() {
-      // TODO
-    },
-    refreshTracker() {
-      if (this.trackerDetails) {
-        API.evaluation
-          .updateTrackerApiEvalTrackingRefreshPost({
-            headers: { "x-project-id": this.trackerDetails.project_id as string },
-            query: { tracker_id: this.trackerDetails.annotation_tracking_id as string },
-          })
-          .then((response) => {
-            if (this.trackerDetails) {
-              this.trackerDetails = response.data;
-              EventBus.emit(new ToastEvent("INFO", "Tracker will be updated and/or recomputed."));
-            }
-          })
-          .catch(ignore);
-      } else {
-        EventBus.emit(new ToastEvent("WARN", "No tracker loaded."));
-      }
-    },
-    addScope(scope: LabelScope) {
-      if (this.trackerDetails) {
-        this.trackerDetails.source_ids?.push(scope.scope_id);
-      }
-    },
-    dropScope(scope: LabelScope) {
-      if (this.trackerDetails && this.trackerDetails.source_ids) {
-        const scopeIndex = this.trackerDetails.source_ids.findIndex((sid: string) => sid === scope.scope_id);
-        this.trackerDetails.source_ids.splice(scopeIndex, 1);
-      }
-    },
-    moveScopeUp(si: number) {
-      if (this.trackerDetails && this.trackerDetails.source_ids && si > 0) {
-        const tmp = this.trackerDetails.source_ids[si];
-        this.trackerDetails.source_ids[si] = this.trackerDetails.source_ids[si - 1];
-        this.trackerDetails.source_ids[si - 1] = tmp;
-      }
-    },
-    moveScopeDown(si: number) {
-      if (this.trackerDetails && this.trackerDetails.source_ids && si < this.trackerDetails.source_ids.length - 1) {
-        const tmp = this.trackerDetails.source_ids[si];
-        this.trackerDetails.source_ids[si] = this.trackerDetails.source_ids[si + 1];
-        this.trackerDetails.source_ids[si + 1] = tmp;
-      }
-    },
-    focus(tracker: DehydratedAnnotationTracker) {
-      API.evaluation
-        .getTrackerApiEvalTrackingTrackerTrackerIdGet({
-          headers: { "x-project-id": currentProjectStore.projectId as string },
-          path: { tracker_id: tracker.annotation_tracking_id as string },
-        })
-        .then((response) => {
-          this.trackerDetails = response.data;
-        })
-        .catch(ignore);
-    },
-    refresh() {
-      if (this.trackerDetails) {
-        API.evaluation
-          .getTrackerApiEvalTrackingTrackerTrackerIdGet({
-            headers: { "x-project-id": currentProjectStore.projectId as string },
-            path: { tracker_id: this.trackerDetails.annotation_tracking_id as string },
-          })
-          .then((response) => {
-            this.trackerDetails = response.data;
-          })
-          .catch(ignore);
-      }
-    },
-  },
-  computed: {
-    availableScopes() {
-      const source_ids = this.trackerDetails?.source_ids;
-      if (!source_ids) return this.scopes;
-      return this.scopes.filter((scope: LabelScope) => source_ids.indexOf(scope.scope_id) < 0);
-    },
-    scopesLookup(): Record<string, LabelScope> {
-      return Object.fromEntries(this.scopes.map((scope: LabelScope) => [scope.scope_id, scope]));
-    },
-    lastBuscar(): [number, number | null] | undefined {
-      if (this.trackerDetails?.buscar && this.trackerDetails.buscar.length > 0) {
-        return this.trackerDetails.buscar[this.trackerDetails.buscar.length - 1] as [number, number | null];
-      }
-      return undefined;
-    },
-    numLabels(): number {
-      return (this.trackerDetails?.recall || []).length;
-    },
-    numLabelsPos(): number {
-      return (this.trackerDetails?.labels || []).reduce((countTotal: number, labels: number[]) => {
-        return countTotal + labels.reduce((count: number, label: number) => count + label, 0);
-      }, 0);
-    },
-  },
+  } else {
+    EventBus.emit(new ToastEvent("WARN", "Nothing to save."));
+  }
+}
+function deleteTracker() {
+  // TODO
+}
+function refreshTracker() {
+  if (trackerDetails.value) {
+    API.evaluation
+      .updateTrackerApiEvalTrackingRefreshPost({
+        headers: { "x-project-id": trackerDetails.value.project_id as string },
+        query: { tracker_id: trackerDetails.value.annotation_tracking_id as string },
+      })
+      .then((response) => {
+        if (trackerDetails.value) {
+          trackerDetails.value = response.data;
+          EventBus.emit(new ToastEvent("INFO", "Tracker will be updated and/or recomputed."));
+        }
+      })
+      .catch(ignore);
+  } else {
+    EventBus.emit(new ToastEvent("WARN", "No tracker loaded."));
+  }
+}
+function addScope(scope: LabelScope) {
+  if (trackerDetails.value) {
+    trackerDetails.value.source_ids?.push(scope.scope_id);
+  }
+}
+function dropScope(scope: LabelScope) {
+  if (trackerDetails.value && trackerDetails.value.source_ids) {
+    const scopeIndex = trackerDetails.value.source_ids.findIndex((sid: string) => sid === scope.scope_id);
+    trackerDetails.value.source_ids.splice(scopeIndex, 1);
+  }
+}
+function moveScopeUp(si: number) {
+  if (trackerDetails.value && trackerDetails.value.source_ids && si > 0) {
+    const tmp = trackerDetails.value.source_ids[si];
+    trackerDetails.value.source_ids[si] = trackerDetails.value.source_ids[si - 1];
+    trackerDetails.value.source_ids[si - 1] = tmp;
+  }
+}
+function moveScopeDown(si: number) {
+  if (trackerDetails.value && trackerDetails.value.source_ids && si < trackerDetails.value.source_ids.length - 1) {
+    const tmp = trackerDetails.value.source_ids[si];
+    trackerDetails.value.source_ids[si] = trackerDetails.value.source_ids[si + 1];
+    trackerDetails.value.source_ids[si + 1] = tmp;
+  }
+}
+function focus(tracker: DehydratedAnnotationTracker) {
+  API.evaluation
+    .getTrackerApiEvalTrackingTrackerTrackerIdGet({
+      headers: { "x-project-id": currentProjectStore.projectId as string },
+      path: { tracker_id: tracker.annotation_tracking_id as string },
+    })
+    .then((response) => {
+      trackerDetails.value = response.data;
+    })
+    .catch(ignore);
+}
+function refresh() {
+  if (trackerDetails.value) {
+    API.evaluation
+      .getTrackerApiEvalTrackingTrackerTrackerIdGet({
+        headers: { "x-project-id": currentProjectStore.projectId as string },
+        path: { tracker_id: trackerDetails.value.annotation_tracking_id as string },
+      })
+      .then((response) => {
+        trackerDetails.value = response.data;
+      })
+      .catch(ignore);
+  }
+}
+
+const availableScopes = computed(() => {
+  const source_ids = trackerDetails.value?.source_ids;
+  if (!source_ids) return scopes.value;
+  return scopes.value.filter((scope: LabelScope) => source_ids.indexOf(scope.scope_id) < 0);
+});
+const scopesLookup = computed<Record<string, LabelScope>>(() => {
+  return Object.fromEntries(scopes.value.map((scope: LabelScope) => [scope.scope_id, scope]));
+});
+const lastBuscar = computed<[number, number | null] | undefined>(() => {
+  if (trackerDetails.value?.buscar && trackerDetails.value.buscar.length > 0) {
+    return trackerDetails.value.buscar[trackerDetails.value.buscar.length - 1] as [number, number | null];
+  }
+  return undefined;
+});
+const numLabels = computed<number>(() => {
+  return (trackerDetails.value?.recall || []).length;
+});
+const numLabelsPos = computed<number>(() => {
+  return (trackerDetails.value?.labels || []).reduce((countTotal: number, labels: number[]) => {
+    return countTotal + labels.reduce((count: number, label: number) => count + label, 0);
+  }, 0);
 });
 </script>
 

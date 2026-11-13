@@ -36,44 +36,47 @@
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from "vue";
+<script lang="ts" setup>
+import { computed, ref } from "vue";
 import { marked } from "marked";
+import { EventBus } from "@/plugins/events";
 import { ConfirmationRequestEvent } from "@/plugins/events/events/confirmation";
-import type { ConfirmationResponse } from "@/plugins/events/events/confirmation";
+import type { ConfirmationCallback, ConfirmationResponse } from "@/plugins/events/events/confirmation";
 
-export default defineComponent({
-  name: "ConfirmationModal",
-  created() {
-    this.$eventBus.on(ConfirmationRequestEvent, (event: ConfirmationRequestEvent) => {
-      // pass
-      this.pendingConfirmationRequests.push({
-        title: event.title,
-        body: event.body,
-        htmlBody: marked(event.body),
-        accept: event.accept,
-        reject: event.reject,
-        callback: event.callback,
-      });
-    });
-  },
-  data() {
-    return {
-      pendingConfirmationRequests: [],
-    };
-  },
-  computed: {
-    latestConfirmationRequest(): ConfirmationRequestEvent {
-      return this.pendingConfirmationRequests[this.pendingConfirmationRequests.length - 1];
-    },
-  },
-  methods: {
-    resolveConfirmationRequest(response: ConfirmationResponse) {
-      const latestConfirmationRequest = this.pendingConfirmationRequests.pop();
-      latestConfirmationRequest.callback(response);
-    },
-  },
+defineOptions({ name: "ConfirmationModal" });
+
+type PendingConfirmationRequest = {
+  title: string;
+  body: string;
+  htmlBody: string;
+  accept: string;
+  reject: string;
+  callback: ConfirmationCallback;
+};
+
+const pendingConfirmationRequests = ref<PendingConfirmationRequest[]>([]);
+
+// same singleton instance that is exposed as the global $eventBus property
+EventBus.on(ConfirmationRequestEvent, (event: ConfirmationRequestEvent) => {
+  // pass
+  pendingConfirmationRequests.value.push({
+    title: event.title,
+    body: event.body,
+    htmlBody: marked(event.body) as string,
+    accept: event.accept,
+    reject: event.reject,
+    callback: event.callback,
+  });
 });
+
+const latestConfirmationRequest = computed<PendingConfirmationRequest>(() => {
+  return pendingConfirmationRequests.value[pendingConfirmationRequests.value.length - 1];
+});
+
+function resolveConfirmationRequest(response: ConfirmationResponse) {
+  const latestConfirmationRequest = pendingConfirmationRequests.value.pop();
+  latestConfirmationRequest!.callback(response);
+}
 </script>
 
 <style></style>

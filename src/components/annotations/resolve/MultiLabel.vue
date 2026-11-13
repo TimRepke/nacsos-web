@@ -44,12 +44,11 @@
   </div>
 </template>
 
-<script lang="ts">
+<script lang="ts" setup>
 import "core-js/modules/es.array.to-sorted";
-import { defineComponent } from "vue";
+import { computed, ref } from "vue";
 import type { PropType } from "vue";
 import type {
-  AnnotationModel,
   BotAnnotationModel,
   UserModel,
   FlatLabel,
@@ -60,13 +59,6 @@ import type {
 import ClosablePill from "@/components/ClosablePill.vue";
 import InlineToolTip from "@/components/InlineToolTip.vue";
 import { is, isNone, notNone } from "@/util";
-
-function hasValue(
-  model: AnnotationModel | BotAnnotationModel | undefined | null,
-): model is (AnnotationModel | BotAnnotationModel) & { multi_int: number } {
-  if (isNone(model)) return false;
-  return model.multi_int !== undefined && model.multi_int !== null;
-}
 
 enum Agreement {
   // All users from the pool picked this choice
@@ -79,178 +71,158 @@ enum Agreement {
   NOVEL = "novel",
 }
 
-export default defineComponent({
-  name: "MultiLabel",
-  components: { ClosablePill, InlineToolTip },
-  data() {
-    return {
-      changed: false,
-      editMode: false,
-      AgreementColour: {
-        full: "green",
-        partial: "#BB8E49",
-        single: "orange",
-        novel: "limegreen",
-      } as Record<Agreement, string>,
-    };
+defineOptions({ name: "MultiLabel" });
+
+const emit = defineEmits(["botAnnotationChanged", "botAnnotationConfirmed"]);
+
+const props = defineProps({
+  botAnnotationMetaDataId: { type: String, required: false, default: undefined },
+  itemId: { type: String, required: true },
+  label: {
+    type: Object as PropType<FlatLabel>,
+    required: true,
   },
-  emits: ["botAnnotationChanged", "botAnnotationConfirmed"],
-  props: {
-    botAnnotationMetaDataId: { type: String, required: false, default: undefined },
-    itemId: { type: String, required: true },
-    label: {
-      type: Object as PropType<FlatLabel>,
-      required: true,
-    },
-    usersLookup: {
-      type: Object as PropType<Record<string, UserModel>>,
-      required: true,
-    },
-    users: {
-      type: Array as PropType<Array<UserModel>>,
-      required: true,
-    },
-    proposal: {
-      type: Object as PropType<ResolutionCell>,
-      required: true,
-    },
-    proposalRow: {
-      type: Object as PropType<Record<string, ResolutionCell>>,
-      required: true,
-    },
+  usersLookup: {
+    type: Object as PropType<Record<string, UserModel>>,
+    required: true,
   },
-  methods: {
-    hasValue(
-      model: AnnotationModel | BotAnnotationModel | undefined | null,
-    ): model is (AnnotationModel | BotAnnotationModel) & { multi_int: number } {
-      return hasValue(model);
-    },
-    addLabel(value: number) {
-      const anno = this.proposal.resolution;
-      if (is<BotAnnotationModel>(anno)) {
-        const { multi_int } = anno;
-        if (is<number[]>(multi_int)) {
-          const pos: number = multi_int.indexOf(value);
-          if (pos < 0) {
-            this.changed = true;
-            multi_int.push(value);
-            this.$emit("botAnnotationChanged", anno);
-          }
-        } else {
-          this.changed = true;
-          anno.multi_int = [value];
-          this.$emit("botAnnotationChanged", anno);
-        }
-      }
-      this.editMode = false;
-    },
-    removeLabel(value: number) {
-      const anno = this.proposal.resolution;
-      if (is<BotAnnotationModel>(anno)) {
-        const { multi_int } = anno;
-        if (is<number[]>(multi_int)) {
-          const pos: number = multi_int.indexOf(value);
-          if (pos >= 0) {
-            this.changed = true;
-            multi_int.splice(pos, 1);
-            this.$emit("botAnnotationChanged", anno);
-          }
-        }
-      }
-      this.editMode = false;
-    },
-    getPrettyUsername(userId: string): string {
-      const user: UserModel | undefined = this.usersLookup[userId];
-      if (isNone(user)) return "??";
-      return `${user.username} (${user.full_name})`;
-    },
+  users: {
+    type: Array as PropType<Array<UserModel>>,
+    required: true,
   },
-  computed: {
-    tags(): Array<number> {
-      const { resolution } = this.proposalRow[this.label.path_key];
-      if (is<BotAnnotationModel>(resolution) && is<Array<number>>(resolution.multi_int)) {
-        return resolution.multi_int.toSorted();
-      }
-      return [];
-    },
-    choiceLookup(): Record<number, FlatLabelChoice> {
-      const { choices } = this.label;
-      if (!choices) return {};
-      return Object.fromEntries(choices.map((choice: FlatLabelChoice) => [choice.value, choice]));
-    },
-    choiceUsers(): Record<number, UserModel[]> {
-      const { labels } = this.proposalRow[this.label.path_key];
-      if (isNone(labels)) {
-        return {};
-      }
-      const entries = Object.entries<ResolutionUserEntry[]>(labels)
-        .flatMap((userEntry: [string, ResolutionUserEntry[]]) => {
-          const [userId, userLabels] = userEntry;
-          return userLabels.flatMap((entry: ResolutionUserEntry) => {
-            if (
-              isNone(entry.annotation) ||
-              isNone(entry.annotation.multi_int) ||
-              entry.annotation.multi_int.length === 0
-            )
-              return undefined;
-            return entry.annotation.multi_int.map((choice: number): [number, UserModel] => [
-              choice as number,
-              this.usersLookup[userId] as UserModel,
-            ]);
-          });
-        })
-        .filter((entry: [number, UserModel] | undefined) => notNone(entry)) as [number, UserModel][];
-
-      return entries.reduce((accu: Record<number, UserModel[]>, entry: [number, UserModel]) => {
-        const [choice, user] = entry;
-
-        if (!accu[choice]) accu[choice] = [];
-        accu[choice].push(user);
-        return accu;
-      }, {});
-    },
-    choiceInfo(): Record<number, string> {
-      const userEntries = Object.entries(this.choiceUsers) as unknown as Array<[number, UserModel[]]>;
-      return Object.fromEntries(
-        userEntries.map((entry: [number, UserModel[]]) => {
-          const [choice, entryUsers] = entry;
-          const usernames = entryUsers
-            .filter((user) => !!user)
-            .map((user) => user.username)
-            .join(", ");
-          const choiceName = this.choiceLookup[choice].name;
-          return [choice, `${usernames}: "${choiceName}"`];
-        }),
-      );
-    },
-    choiceAgreements(): Record<number, Agreement> {
-      const numUsers: number = Object.keys(this.users).length;
-      const { resolution } = this.proposalRow[this.label.path_key];
-
-      if (isNone(resolution) || isNone(resolution.multi_int)) return {};
-      return Object.fromEntries(
-        Object.entries<UserModel[]>(this.choiceUsers).map((entry: [string, UserModel[]]): [number, Agreement] => {
-          const [choice_str, users] = entry;
-          const choice = parseInt(choice_str);
-          const usernames = users.filter((user) => !!user).map((user) => user.username);
-          const count = new Set(usernames).size;
-          if (!count) return [choice, Agreement.NOVEL]; // undefined, 0, null
-          if (numUsers === 1) return [choice, Agreement.FULL];
-          if (count === numUsers) return [choice, Agreement.FULL];
-          if (count === 1) return [choice, Agreement.SINGLE];
-          return [choice, Agreement.PARTIAL];
-        }),
-      );
-    },
-    discardedChoices(): Array<number> {
-      const { resolution } = this.proposalRow[this.label.path_key];
-
-      const chosen = Object.keys(this.choiceUsers).map((value) => parseInt(value));
-      const resolved = isNone(resolution) || isNone(resolution.multi_int) ? [] : resolution.multi_int;
-
-      return chosen.filter((value) => resolved.indexOf(value) < 0);
-    },
+  proposal: {
+    type: Object as PropType<ResolutionCell>,
+    required: true,
   },
+  proposalRow: {
+    type: Object as PropType<Record<string, ResolutionCell>>,
+    required: true,
+  },
+});
+
+const changed = ref(false);
+const editMode = ref(false);
+const AgreementColour = ref({
+  full: "green",
+  partial: "#BB8E49",
+  single: "orange",
+  novel: "limegreen",
+} as Record<Agreement, string>);
+
+function addLabel(value: number) {
+  const anno = props.proposal.resolution;
+  if (is<BotAnnotationModel>(anno)) {
+    const { multi_int } = anno;
+    if (is<number[]>(multi_int)) {
+      const pos: number = multi_int.indexOf(value);
+      if (pos < 0) {
+        changed.value = true;
+        multi_int.push(value);
+        emit("botAnnotationChanged", anno);
+      }
+    } else {
+      changed.value = true;
+      anno.multi_int = [value];
+      emit("botAnnotationChanged", anno);
+    }
+  }
+  editMode.value = false;
+}
+function removeLabel(value: number) {
+  const anno = props.proposal.resolution;
+  if (is<BotAnnotationModel>(anno)) {
+    const { multi_int } = anno;
+    if (is<number[]>(multi_int)) {
+      const pos: number = multi_int.indexOf(value);
+      if (pos >= 0) {
+        changed.value = true;
+        multi_int.splice(pos, 1);
+        emit("botAnnotationChanged", anno);
+      }
+    }
+  }
+  editMode.value = false;
+}
+
+const tags = computed<Array<number>>(() => {
+  const { resolution } = props.proposalRow[props.label.path_key];
+  if (is<BotAnnotationModel>(resolution) && is<Array<number>>(resolution.multi_int)) {
+    return resolution.multi_int.toSorted();
+  }
+  return [];
+});
+const choiceLookup = computed<Record<number, FlatLabelChoice>>(() => {
+  const { choices } = props.label;
+  if (!choices) return {};
+  return Object.fromEntries(choices.map((choice: FlatLabelChoice) => [choice.value, choice]));
+});
+const choiceUsers = computed<Record<number, UserModel[]>>(() => {
+  const { labels } = props.proposalRow[props.label.path_key];
+  if (isNone(labels)) {
+    return {};
+  }
+  const entries = Object.entries<ResolutionUserEntry[]>(labels)
+    .flatMap((userEntry: [string, ResolutionUserEntry[]]) => {
+      const [userId, userLabels] = userEntry;
+      return userLabels.flatMap((entry: ResolutionUserEntry) => {
+        if (isNone(entry.annotation) || isNone(entry.annotation.multi_int) || entry.annotation.multi_int.length === 0)
+          return undefined;
+        return entry.annotation.multi_int.map((choice: number): [number, UserModel] => [
+          choice as number,
+          props.usersLookup[userId] as UserModel,
+        ]);
+      });
+    })
+    .filter((entry: [number, UserModel] | undefined) => notNone(entry)) as [number, UserModel][];
+
+  return entries.reduce((accu: Record<number, UserModel[]>, entry: [number, UserModel]) => {
+    const [choice, user] = entry;
+
+    if (!accu[choice]) accu[choice] = [];
+    accu[choice].push(user);
+    return accu;
+  }, {});
+});
+const choiceInfo = computed<Record<number, string>>(() => {
+  const userEntries = Object.entries(choiceUsers.value) as unknown as Array<[number, UserModel[]]>;
+  return Object.fromEntries(
+    userEntries.map((entry: [number, UserModel[]]) => {
+      const [choice, entryUsers] = entry;
+      const usernames = entryUsers
+        .filter((user) => !!user)
+        .map((user) => user.username)
+        .join(", ");
+      const choiceName = choiceLookup.value[choice].name;
+      return [choice, `${usernames}: "${choiceName}"`];
+    }),
+  );
+});
+const choiceAgreements = computed<Record<number, Agreement>>(() => {
+  const numUsers: number = Object.keys(props.users).length;
+  const { resolution } = props.proposalRow[props.label.path_key];
+
+  if (isNone(resolution) || isNone(resolution.multi_int)) return {};
+  return Object.fromEntries(
+    Object.entries<UserModel[]>(choiceUsers.value).map((entry: [string, UserModel[]]): [number, Agreement] => {
+      const [choice_str, users] = entry;
+      const choice = parseInt(choice_str);
+      const usernames = users.filter((user) => !!user).map((user) => user.username);
+      const count = new Set(usernames).size;
+      if (!count) return [choice, Agreement.NOVEL]; // undefined, 0, null
+      if (numUsers === 1) return [choice, Agreement.FULL];
+      if (count === numUsers) return [choice, Agreement.FULL];
+      if (count === 1) return [choice, Agreement.SINGLE];
+      return [choice, Agreement.PARTIAL];
+    }),
+  );
+});
+const discardedChoices = computed<Array<number>>(() => {
+  const { resolution } = props.proposalRow[props.label.path_key];
+
+  const chosen = Object.keys(choiceUsers.value).map((value) => parseInt(value));
+  const resolved = isNone(resolution) || isNone(resolution.multi_int) ? [] : resolution.multi_int;
+
+  return chosen.filter((value) => resolved.indexOf(value) < 0);
 });
 </script>
 

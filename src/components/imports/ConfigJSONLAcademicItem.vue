@@ -39,9 +39,9 @@
   </div>
 </template>
 
-<script lang="ts">
+<script lang="ts" setup>
+import { computed, reactive, toRefs, watch } from "vue";
 import type { PropType } from "vue";
-import { defineComponent } from "vue";
 import useVuelidate from "@vuelidate/core";
 import { required } from "@vuelidate/validators";
 import type { BaseValidation, ValidationRule } from "@vuelidate/core";
@@ -60,87 +60,86 @@ const areFilesUploaded: ValidationRule = {
   $message: "Files not uploaded yet.",
 };
 
-export default defineComponent({
-  name: "ConfigJSONLAcademicItem",
-  components: { FilesUploader },
-  emits: ["configChanged"],
-  props: {
-    existingConfig: {
-      type: Object as PropType<AcademicItemImport>,
-      required: false,
-      default: null,
-    },
-    projectId: {
-      type: String,
-      required: false,
-      default: null,
-    },
-    importId: {
-      type: String,
-      required: false,
-      default: null,
-    },
-    editable: {
-      type: Boolean,
-      default: true,
-    },
+defineOptions({ name: "ConfigJSONLAcademicItem" });
+
+const emit = defineEmits(["configChanged"]);
+
+const props = defineProps({
+  existingConfig: {
+    type: Object as PropType<AcademicItemImport>,
+    required: false,
+    default: null,
   },
-  setup() {
-    return {
-      v$: useVuelidate(),
-    };
+  projectId: {
+    type: String,
+    required: false,
+    default: null,
   },
-  data() {
-    const emptyConfig: AcademicItemImport = {
-      kind: ImportConfigEnum.ACADEMIC,
-      sources: [] as string[],
-    };
-    if (!this.existingConfig || this.existingConfig.kind !== ImportConfigEnum.ACADEMIC) {
-      this.$emit("configChanged", emptyConfig);
-      return { files: [] as UploadFile[], config: emptyConfig };
-    }
-    return { files: [] as UploadFile[], config: this.existingConfig };
+  importId: {
+    type: String,
+    required: false,
+    default: null,
   },
-  methods: {
-    errorsToString(field: BaseValidation): string {
-      return field.$errors.map((error) => error.$message).join("; ");
-    },
-    onFilesChange(files: UploadFile[]) {
-      this.files = files;
-      const sources = files.map((file) => file.serverPath).filter((filename) => !!filename);
-      this.config.sources = sources.length === 0 ? undefined : sources;
-    },
-  },
-  computed: {
-    uploadsEnabled(): boolean {
-      return this.editable && this.config;
-    },
-  },
-  watch: {
-    config: {
-      handler(newValue: AcademicItemImport) {
-        this.$emit("configChanged", newValue);
-      },
-      deep: true,
-    },
-    existingConfig: {
-      handler(newValue: AcademicItemImport) {
-        this.config = newValue;
-      },
-      deep: true,
-    },
-    importId: {
-      handler(newValue: string) {
-        this.config.import_id = newValue;
-      },
-    },
-  },
-  validations() {
-    return {
-      files: { required, areFilesUploaded, $autoDirty: true },
-    };
+  editable: {
+    type: Boolean,
+    default: true,
   },
 });
+
+const emptyConfig: AcademicItemImport = {
+  kind: ImportConfigEnum.ACADEMIC,
+  sources: [] as string[],
+};
+const state = reactive({
+  files: [] as UploadFile[],
+  config: emptyConfig,
+});
+if (!props.existingConfig || props.existingConfig.kind !== ImportConfigEnum.ACADEMIC) {
+  emit("configChanged", emptyConfig);
+} else {
+  state.config = props.existingConfig;
+}
+
+const rules = {
+  files: { required, areFilesUploaded, $autoDirty: true },
+};
+const v$ = useVuelidate(rules, state);
+
+const { config } = toRefs(state);
+
+function errorsToString(field: BaseValidation): string {
+  return field.$errors.map((error) => error.$message).join("; ");
+}
+function onFilesChange(files: UploadFile[]) {
+  state.files = files;
+  const sources = files.map((file) => file.serverPath).filter((filename) => !!filename);
+  config.value.sources = (sources.length === 0 ? undefined : sources) as string[];
+}
+
+const uploadsEnabled = computed((): boolean => {
+  return (props.editable && config.value) as boolean;
+});
+
+watch(
+  config,
+  (newValue: AcademicItemImport) => {
+    emit("configChanged", newValue);
+  },
+  { deep: true },
+);
+watch(
+  () => props.existingConfig,
+  (newValue) => {
+    state.config = newValue as AcademicItemImport;
+  },
+  { deep: true },
+);
+watch(
+  () => props.importId,
+  (newValue) => {
+    (config.value as { import_id?: string | null }).import_id = newValue;
+  },
+);
 </script>
 
 <style scoped></style>

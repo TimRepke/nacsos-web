@@ -31,28 +31,23 @@
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from "vue";
+<script lang="ts" setup>
+import { ref } from "vue";
 import type { PropType } from "vue";
 import type { BaseItem as BaseItemModel } from "@/types/items.d";
 import TextComponent from "@/components/items/TextComponent.vue";
 
-export default defineComponent({
-  name: "GenericItem",
-  components: { TextComponent },
-  props: {
-    item: {
-      type: Object as PropType<BaseItemModel>,
-      required: true,
-      default: null,
-    },
-  },
-  data() {
-    return {
-      showAll: false,
-    };
+defineOptions({ name: "GenericItem" });
+
+defineProps({
+  item: {
+    type: Object as PropType<BaseItemModel>,
+    required: true,
+    default: null,
   },
 });
+
+const showAll = ref(false);
 </script>
 
 <style scoped></style>

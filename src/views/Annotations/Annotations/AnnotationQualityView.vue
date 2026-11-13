@@ -21,65 +21,55 @@
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from "vue";
+<script lang="ts" setup>
+import { computed, onMounted, ref } from "vue";
 import { API, ignore } from "@/plugins/api";
-import type { AssignmentCounts, UserBaseModel, AnnotationSchemeModel, AssignmentScopeModel } from "@/plugins/api/types";
+import type { UserBaseModel, AnnotationSchemeModel, AssignmentScopeModel } from "@/plugins/api/types";
 import { currentProjectStore } from "@/stores";
 import ScopeQuality from "@/components/annotations/ScopeQuality.vue";
 
-export default defineComponent({
-  name: "AnnotationQualityView",
-  components: { ScopeQuality },
-  data() {
-    return {
-      schemes: [] as AnnotationSchemeModel[],
-      scopes: [] as AssignmentScopeModel[],
-      counts: {} as Record<string, AssignmentCounts>,
-      users: {} as Record<string, UserBaseModel>,
-    };
-  },
-  async mounted() {
-    API.annotations
-      .getSchemeDefinitionsForProjectApiAnnotationsSchemesListGet({
-        headers: { "x-project-id": currentProjectStore.projectId as string },
-      })
-      .then((response) => {
-        this.schemes = response.data;
-      })
-      .catch(ignore);
-    API.annotations
-      .getAssignmentScopesForProjectApiAnnotationsAssignmentsScopesGet({
-        headers: { "x-project-id": currentProjectStore.projectId as string },
-      })
-      .then((response) => {
-        this.scopes = response.data;
-      })
-      .catch(ignore);
-    API.users
-      .getProjectAnnotatorUsersApiUsersListProjectAnnotatorsProjectIdGet({
-        path: { project_id: currentProjectStore.projectId as string },
-        headers: { "x-project-id": currentProjectStore.projectId as string },
-      })
-      .then((response) => {
-        this.users = response.data;
-      })
-      .catch(ignore);
-  },
-  methods: {
-    // pass
-  },
-  computed: {
-    scopesLookup(): { [key: string]: AssignmentScopeModel[] } {
-      const ret: Record<string, AssignmentScopeModel[]> = {};
-      this.scopes.forEach((scope: AssignmentScopeModel) => {
-        if (!(scope.annotation_scheme_id in ret)) ret[scope.annotation_scheme_id] = [];
-        ret[scope.annotation_scheme_id].push(scope);
-      });
+defineOptions({ name: "AnnotationQualityView" });
 
-      return ret;
-    },
-  },
+const schemes = ref<AnnotationSchemeModel[]>([]);
+const scopes = ref<AssignmentScopeModel[]>([]);
+const users = ref<Record<string, UserBaseModel>>({});
+
+onMounted(() => {
+  API.annotations
+    .getSchemeDefinitionsForProjectApiAnnotationsSchemesListGet({
+      headers: { "x-project-id": currentProjectStore.projectId as string },
+    })
+    .then((response) => {
+      schemes.value = response.data;
+    })
+    .catch(ignore);
+  API.annotations
+    .getAssignmentScopesForProjectApiAnnotationsAssignmentsScopesGet({
+      headers: { "x-project-id": currentProjectStore.projectId as string },
+    })
+    .then((response) => {
+      scopes.value = response.data;
+    })
+    .catch(ignore);
+  API.users
+    .getProjectAnnotatorUsersApiUsersListProjectAnnotatorsProjectIdGet({
+      path: { project_id: currentProjectStore.projectId as string },
+      headers: { "x-project-id": currentProjectStore.projectId as string },
+    })
+    .then((response) => {
+      users.value = response.data;
+    })
+    .catch(ignore);
+});
+
+const scopesLookup = computed<{ [key: string]: AssignmentScopeModel[] }>(() => {
+  const ret: Record<string, AssignmentScopeModel[]> = {};
+  scopes.value.forEach((scope: AssignmentScopeModel) => {
+    if (!(scope.annotation_scheme_id in ret)) ret[scope.annotation_scheme_id] = [];
+    ret[scope.annotation_scheme_id].push(scope);
+  });
+
+  return ret;
 });
 </script>
 
