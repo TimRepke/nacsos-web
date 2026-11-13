@@ -67,14 +67,18 @@ if (!props.existingConfig || props.existingConfig.kind !== ImportConfigEnum.SCOP
 }
 
 watch(
-  config.value,
-  (newValue: ScopusApiImport) => {
+  () => config.value,
+  (newValue: ScopusApiImport | null) => {
     if (newValue) emits("configChanged", newValue);
   },
   { deep: true },
 );
 
-watch(props.existingConfig, (newValue: ScopusApiImport) => (config.value = newValue), { deep: true });
+watch(
+  () => props.existingConfig,
+  (newValue: ScopusApiImport | null) => (config.value = newValue),
+  { deep: true },
+);
 // watch(props, (newValue) => {
 //   if (config.value && config.value.import_id !== newValue.importId) config.value.import_id = newValue.importId;
 // });

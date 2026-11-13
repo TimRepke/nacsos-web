@@ -48,6 +48,8 @@ const emit = defineEmits(["dismissed"]);
 
 const itemInfo = ref<AnyItem | undefined>(undefined);
 const requestPromise = ref<Promise<AnyItem> | undefined>(undefined);
+// monotonic sequence to invalidate in-flight requests once the modal is dismissed/reset
+let requestSeq = 0;
 
 // latent quirk carried over from the Options API version: the template binds `stop`
 // as a click handler, but no component member `stop` ever existed and it resolved
@@ -60,17 +62,20 @@ const isLoading = computed(() => requestPromise.value !== undefined);
 
 function getItemInfo(itemId: string) {
   itemInfo.value = null;
+  const seq = ++requestSeq;
   requestPromise.value = API.project
     .getDetailForItemApiProjectItemsDetailItemIdGet({
       path: { item_id: itemId },
       headers: { "x-project-id": currentProjectStore.projectId as string },
     })
     .then((result) => {
+      // ignore the response if the modal was dismissed/reset in the meantime
+      if (seq !== requestSeq) return;
       itemInfo.value = result.data;
       requestPromise.value = undefined;
     })
     .catch(() => {
-      dismissModal();
+      if (seq === requestSeq) dismissModal();
     });
 }
 function dismissModal() {
@@ -80,9 +85,9 @@ function dismissModal() {
 }
 function resetRequest() {
   if (requestPromise.value !== undefined) {
-    // the request promise is cancelable at runtime (fetch-client request), but the
-    // chained promise type does not expose `cancel`; latent quirk from the original
-    (requestPromise.value as Promise<AnyItem> & { cancel: () => void }).cancel();
+    // the chained promise exposes no `cancel`; bump the sequence so a pending
+    // response is ignored and clear the loading state
+    requestSeq++;
     requestPromise.value = undefined;
   }
 }

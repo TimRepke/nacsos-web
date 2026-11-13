@@ -23,7 +23,7 @@
       <ul class="list-group rounded-0 rounded-bottom border-top-0 overflow-auto" style="max-height: 10rem">
         <template v-for="option in dropdownOptions" :key="`opt-${option.name}-${option.value}`">
           <li
-            v-if="option.visible"
+            v-if="visibleValues.has(option.value)"
             class="list-group-item list-group-item-action"
             role="button"
             tabindex="0"
@@ -40,7 +40,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, watch } from "vue";
+import { onUnmounted, ref, watch } from "vue";
 import type { PropType } from "vue";
 import InlineToolTip from "@/components/InlineToolTip.vue";
 
@@ -48,7 +48,6 @@ interface Option {
   name: string;
   value: number;
   hint?: string;
-  visible?: boolean;
 }
 
 defineOptions({ name: "SearchableSelect" });
@@ -78,39 +77,68 @@ const props = defineProps({
   },
 });
 
-const mappedOptions = Object.fromEntries(
-  props.options.map((option) => {
-    option.visible = !isHidden(option);
-    return [option.value, option];
-  }),
-);
-const searchText = ref(
-  props.currentOptionValue !== undefined && props.currentOptionValue in mappedOptions
-    ? mappedOptions[props.currentOptionValue].name
-    : "",
-);
-const dropdownOptions = ref(mappedOptions);
+const searchText = ref("");
+const dropdownOptions = ref<Record<number, Option>>({});
+const visibleValues = ref<Set<number>>(new Set());
 const dropdownVisible = ref(false);
+let searchTimer: ReturnType<typeof setTimeout> | undefined;
+let blurTimer: ReturnType<typeof setTimeout> | undefined;
 
 function isHidden(option: Option): boolean {
   return (props.hiddenOptions ?? []).indexOf(option.value) >= 0;
 }
+function rebuildOptions() {
+  const mapped: Record<number, Option> = {};
+  props.options.forEach((option: Option) => {
+    mapped[option.value] = option;
+  });
+  dropdownOptions.value = mapped;
+  syncSearchText();
+  applySearchFilter();
+}
+function syncSearchText() {
+  if (props.currentOptionValue === undefined) {
+    searchText.value = "";
+  } else if (props.currentOptionValue in dropdownOptions.value && !props.resetText) {
+    searchText.value = dropdownOptions.value[props.currentOptionValue].name;
+  }
+}
 function unfocusSearchField() {
-  setTimeout(() => {
+  if (blurTimer !== undefined) {
+    clearTimeout(blurTimer);
+  }
+  blurTimer = setTimeout(() => {
+    blurTimer = undefined;
     // create a small delay, because otherwise the list entry someone clicked on is gone before the
     // event propagates and to JS it looks like the user clicked into thin air
     dropdownVisible.value = false;
   }, 200);
 }
 function resetDropdownOptions() {
-  Object.entries<Option>(dropdownOptions.value).forEach((entry: [string, Option]) => {
-    entry[1].visible = !isHidden(entry[1]);
+  const visible = new Set<number>();
+  Object.values(dropdownOptions.value).forEach((option: Option) => {
+    if (!isHidden(option)) {
+      visible.add(option.value);
+    }
   });
+  visibleValues.value = visible;
 }
 function filterDropdownOptions() {
-  Object.entries<Option>(dropdownOptions.value).forEach((entry: [string, Option]) => {
-    entry[1].visible = !isHidden(entry[1]) && entry[1].name.toLowerCase().indexOf(searchText.value.toLowerCase()) >= 0;
+  const visible = new Set<number>();
+  const needle = searchText.value.toLowerCase();
+  Object.values(dropdownOptions.value).forEach((option: Option) => {
+    if (!isHidden(option) && option.name.toLowerCase().indexOf(needle) >= 0) {
+      visible.add(option.value);
+    }
   });
+  visibleValues.value = visible;
+}
+function applySearchFilter() {
+  if (searchText.value.length === 0) {
+    resetDropdownOptions();
+  } else {
+    filterDropdownOptions();
+  }
 }
 function clear() {
   searchText.value = "";
@@ -124,11 +152,17 @@ function pickOption(option: Option) {
   dropdownVisible.value = false;
 }
 
+rebuildOptions();
+
 watch(searchText, (newValue: string) => {
-  setTimeout(() => {
+  if (searchTimer !== undefined) {
+    clearTimeout(searchTimer);
+  }
+  searchTimer = setTimeout(() => {
+    searchTimer = undefined;
     if (
       newValue.length === 0 ||
-      (props.currentOptionValue !== undefined && newValue === dropdownOptions.value[props.currentOptionValue].name)
+      (props.currentOptionValue !== undefined && newValue === dropdownOptions.value[props.currentOptionValue]?.name)
     ) {
       resetDropdownOptions();
     } else {
@@ -137,12 +171,35 @@ watch(searchText, (newValue: string) => {
   }, 200);
 });
 watch(
+  () => props.options,
+  () => {
+    rebuildOptions();
+  },
+  { deep: true },
+);
+watch(
+  () => props.currentOptionValue,
+  () => {
+    syncSearchText();
+    applySearchFilter();
+  },
+);
+watch(
   () => props.hiddenOptions,
   () => {
     filterDropdownOptions();
   },
   { deep: true },
 );
+
+onUnmounted(() => {
+  if (searchTimer !== undefined) {
+    clearTimeout(searchTimer);
+  }
+  if (blurTimer !== undefined) {
+    clearTimeout(blurTimer);
+  }
+});
 </script>
 
 <style scoped></style>

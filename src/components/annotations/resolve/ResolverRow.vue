@@ -96,7 +96,7 @@ import StringLabel from "@/components/annotations/resolve/StringLabel.vue";
 import type { AnyItem } from "@/types/items";
 import { API } from "@/plugins/api";
 import { currentProjectStore } from "@/stores";
-import { is, isNone } from "@/util";
+import { is, isNone, sanitizeHtml } from "@/util";
 
 defineOptions({ name: "ResolverRow" });
 
@@ -231,7 +231,8 @@ const itemHtmlText = computed<string>(() => {
       ret += item.value.text.replaceAll("\n", "<br />");
     }
   }
-  return ret;
+  // item data is user-supplied, so the built html must be sanitized before v-html
+  return sanitizeHtml(ret);
 });
 const hasItemText = computed<boolean>(() => item.value && item.value.text);
 

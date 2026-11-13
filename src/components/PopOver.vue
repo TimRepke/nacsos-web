@@ -28,8 +28,8 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from "vue";
-import { marked } from "marked";
+import { computed, ref } from "vue";
+import { md2html } from "@/util";
 
 defineOptions({ name: "PopOver" });
 
@@ -46,7 +46,7 @@ const props = defineProps({
   },
 });
 
-const body = ref(props.bodyMD ? marked(props.bodyMD) : null);
+const body = computed<string | null>(() => (props.bodyMD ? md2html(props.bodyMD) : null));
 const visible = ref(false);
 </script>
 

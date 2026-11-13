@@ -60,6 +60,7 @@ async function clone(priority: DehydratedPriorityModel) {
     headers: { "x-project-id": currentProjectStore.projectId as string },
     body: cloned,
   });
+  reload();
 }
 
 function reload() {

@@ -85,7 +85,7 @@
 <script lang="ts" setup>
 import { ref, reactive, computed, onMounted } from "vue";
 import { useRouter } from "vue-router";
-import { marked } from "marked";
+import { md2html } from "@/util";
 import "core-js/modules/es.array.to-sorted";
 import { EventBus } from "@/plugins/events";
 import { CurrentProjectSelectedEvent, CurrentProjectSetEvent } from "@/plugins/events/events/projects";
@@ -161,7 +161,11 @@ function resort(field: keyof Sorting) {
 }
 
 function renderMD(txt: string): string {
-  return marked.parse(txt, { async: false }) as string;
+  return md2html(txt);
+}
+
+function ownerNames(p: ProjectInfoExt): string {
+  return (p.owners ?? []).map((owner) => owner.full_name ?? "").join(" ");
 }
 
 const filteredProjects = computed<ProjectInfoExt[]>(() => {
@@ -176,6 +180,15 @@ const sortedFilteredProjects = computed<ProjectInfoExt[]>(() => {
   if (sorting.name !== Sort.sort) {
     comparator = (p1: ProjectInfoExt, p2: ProjectInfoExt) => [p1.name as string, p2.name as string];
     dir = sorting.name;
+  } else if (sorting.assi !== Sort.sort) {
+    comparator = (p1: ProjectInfoExt, p2: ProjectInfoExt) => [
+      (p1.project_id ?? "") as string,
+      (p2.project_id ?? "") as string,
+    ];
+    dir = sorting.assi;
+  } else if (sorting.owner !== Sort.sort) {
+    comparator = (p1: ProjectInfoExt, p2: ProjectInfoExt) => [ownerNames(p1), ownerNames(p2)];
+    dir = sorting.owner;
   } else if (sorting.date !== Sort.sort) {
     comparator = (p1: ProjectInfoExt, p2: ProjectInfoExt) => [p1.time_created as string, p2.time_created as string];
     dir = sorting.date;

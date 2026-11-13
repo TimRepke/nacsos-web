@@ -1,11 +1,11 @@
 <template>
   <div>
     <span v-for="user in users" :key="user.user_id">
-      <span v-for="annotation in proposal.labels[user.user_id as string]" :key="annotation.annotation.annotation_id">
-        <InlineToolTip :info="getPrettyUsername(user)" placement="bottom">
+      <span v-for="(annotation, idx) in proposal.labels[user.user_id as string] ?? []" :key="`${user.user_id}-${idx}`">
+        <InlineToolTip :info="getPrettyLabelInfo(annotation)" placement="bottom">
           <font-awesome-icon
-            :icon="['fas', annotation2icon(annotation.annotation.value_bool)]"
-            :class="[val2classes(annotation.annotation.value_bool)]"
+            :icon="['fas', annotation2icon(annotation.annotation?.value_bool)]"
+            :class="[val2classes(annotation.annotation?.value_bool)]"
             class="border text-light p-1"
             style="height: 1rem; width: 1rem"
           />
@@ -36,7 +36,13 @@
 <script lang="ts" setup>
 import { ref } from "vue";
 import type { PropType } from "vue";
-import type { BotAnnotationModel, FlatLabel, ResolutionCell, UserModel } from "@/plugins/api/types";
+import type {
+  BotAnnotationModel,
+  FlatLabel,
+  ResolutionCell,
+  ResolutionUserEntry,
+  UserModel,
+} from "@/plugins/api/types";
 import InlineToolTip from "@/components/InlineToolTip.vue";
 import { is, isNone } from "@/util";
 
@@ -100,8 +106,16 @@ function setBotAnnotation(value: boolean | undefined | null) {
   }
   editMode.value = false;
 }
-function getPrettyUsername(user: UserModel | undefined | null): string {
-  if (!is<UserModel>(user)) return "??";
-  return `${user.username} (${user.full_name})`;
+function getPrettyLabelInfo(userEntry: ResolutionUserEntry): string {
+  // entries without annotation exist (the resolver fetches with include_empty: true)
+  if (isNone(userEntry.annotation)) {
+    return "No data";
+  }
+  const username = props.usersLookup[userEntry.annotation.user_id]?.username ?? "??";
+  const valueBool = userEntry.annotation.value_bool;
+  let value = "undetermined";
+  if (valueBool === true) value = "true";
+  else if (valueBool === false) value = "false";
+  return `${username}: ${value}`;
 }
 </script>

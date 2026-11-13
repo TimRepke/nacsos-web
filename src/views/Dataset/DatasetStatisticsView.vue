@@ -15,7 +15,7 @@
               {{ basic.num_schemes }} annotation schemes and {{ basic.num_scopes }} assignment scopes amounting to a
               total of {{ basic.num_labels }} labels for
               {{ basic.num_labeled_items }}
-              <span class="fst-italic">({{ ((basic.num_labeled_items / basic.num_items) * 100).toFixed(2) }}%)</span>
+              <span class="fst-italic">({{ labeledShare }})</span>
               unique documents.
             </p>
           </div>
@@ -73,7 +73,7 @@
 import { computed, onMounted, ref } from "vue";
 import { Bar } from "vue-chartjs";
 import { Chart as ChartJS, Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale } from "chart.js";
-import { API, ignore } from "@/plugins/api";
+import { API, toastReject } from "@/plugins/api";
 import { currentProjectStore } from "@/stores";
 import type { BasicProjectStats, HistogramEntry, RankEntry } from "@/plugins/api/types";
 import LabelStats from "@/components/annotations/LabelStats.vue";
@@ -83,6 +83,11 @@ ChartJS.register(Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale)
 const basic = ref<BasicProjectStats | null>(null);
 const leaderboard = ref<Array<RankEntry> | null>(null);
 const histogramYears = ref<Array<HistogramEntry> | null>(null);
+
+const labeledShare = computed<string>(() => {
+  if (!basic.value || basic.value.num_items === 0) return "—";
+  return ((basic.value.num_labeled_items / basic.value.num_items) * 100).toFixed(2) + "%";
+});
 
 const histogramChart = computed(() => {
   if (!histogramYears.value) return null;
@@ -102,13 +107,13 @@ onMounted(() => {
     .then((response) => {
       basic.value = response.data;
     })
-    .catch(ignore);
+    .catch(toastReject);
   API.stats
     .getAnnotatorRankingApiStatsRankGet({ headers: { "x-project-id": currentProjectStore.projectId as string } })
     .then((response) => {
       leaderboard.value = response.data;
     })
-    .catch(ignore);
+    .catch(toastReject);
   API.stats
     .getPublicationYearHistogramApiStatsHistogramYearsGet({
       headers: { "x-project-id": currentProjectStore.projectId as string },
@@ -116,7 +121,7 @@ onMounted(() => {
     .then((response) => {
       histogramYears.value = response.data;
     })
-    .catch(ignore);
+    .catch(toastReject);
 });
 </script>
 

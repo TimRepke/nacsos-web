@@ -24,8 +24,10 @@ export function useDeferredValue<T>(fallback: T, request: () => Promise<T>) {
   }) as Ref<LoadStatus>;
 
   let promise: Promise<T> | null = null;
+  let requestId = 0;
 
   function clear() {
+    requestId += 1; // invalidate in-flight requests so their responses are dropped
     promise = null;
     value.value = fallback;
     status.value.loaded = false;
@@ -33,37 +35,39 @@ export function useDeferredValue<T>(fallback: T, request: () => Promise<T>) {
   }
 
   async function reload(): Promise<T> {
-    promise = new Promise<T>((resolve) => {
-      if (!currentProjectStore.projectId) {
-        clear();
-        resolve(fallback);
-      }
-      status.value.loading = true;
-      request()
-        .then((res) => {
+    if (!currentProjectStore.projectId) {
+      clear();
+      return fallback;
+    }
+    const id = ++requestId;
+    status.value.loading = true;
+    promise = request()
+      .then((res) => {
+        if (id === requestId) {
           status.value.loaded = true;
           value.value = res;
-        })
-        .catch((e) => {
+          return res;
+        }
+        return value.value; // stale response -> drop it
+      })
+      .catch((e) => {
+        if (id === requestId) {
           status.value.loaded = false;
           value.value = fallback;
-          console.error(e);
-        })
-        .finally(() => {
-          status.value.loading = false;
-          resolve(value.value);
-        });
-    });
+        }
+        console.error(e);
+        return value.value;
+      })
+      .finally(() => {
+        if (id === requestId) status.value.loading = false;
+      });
     return promise;
   }
 
   async function awaitLoaded(): Promise<T> {
     if (promise) return promise;
-    return new Promise<T>((resolve, reject) => {
-      const { loading, loaded } = status.value;
-      if (!loading && !loaded) reload().then(resolve).catch(reject);
-      else resolve(fallback);
-    });
+    if (status.value.loaded) return value.value;
+    return reload();
   }
 
   function ensureLoaded() {

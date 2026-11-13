@@ -94,7 +94,7 @@ const userLookup = computed((): Record<string, UserBaseModel> => {
 const searchResults = computed((): Array<{ name: string; user_id: string }> => {
   if (search.value.length < 1) return [];
   return usernames.value.filter(
-    (user: { name: string; user_id: string }) => user.name.toLowerCase().indexOf(search.value) >= 0,
+    (user: { name: string; user_id: string }) => user.name.toLowerCase().indexOf(search.value.toLowerCase()) >= 0,
   );
 });
 </script>

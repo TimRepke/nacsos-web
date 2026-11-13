@@ -35,10 +35,6 @@
           <div class="row">
             <div class="col">
               <div class="text-end">
-                <button type="button" class="btn btn-danger btn-sm me-2" @click="deleteTracker()">
-                  <font-awesome-icon :icon="['fas', 'trash']" />
-                  Delete
-                </button>
                 <button type="button" class="btn btn-success btn-sm" @click="saveTracker()">
                   <font-awesome-icon :icon="['fas', 'floppy-disk']" />
                   Save
@@ -375,9 +371,6 @@ function saveTracker() {
   } else {
     EventBus.emit(new ToastEvent("WARN", "Nothing to save."));
   }
-}
-function deleteTracker() {
-  // TODO
 }
 function refreshTracker() {
   if (trackerDetails.value) {

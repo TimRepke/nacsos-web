@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { onUnmounted, ref } from "vue";
 import { currentUserStore } from "@/stores";
 
 const tokenNeedsExtension = ref<boolean>(false);
@@ -7,15 +7,17 @@ const tokenNeedsExtension = ref<boolean>(false);
 function checkTokenNeedsExtension() {
   // 24 * 60 * 60 * 1000 = 86400000 (1 day in ms)
   const valid = currentUserStore.authToken?.valid_till;
-  if (valid && new Date(valid).getTime() - Date.now() - 86400000 < 0) {
-    tokenNeedsExtension.value = true;
-  }
+  tokenNeedsExtension.value = !!valid && new Date(valid).getTime() - Date.now() - 86400000 < 0;
 }
 
 // Run initially on creation
 checkTokenNeedsExtension();
 // Once a minute, check if `tokenNeedsExtension` needs to be updated
-setInterval(checkTokenNeedsExtension, 60 * 1000);
+const checkInterval = setInterval(checkTokenNeedsExtension, 60 * 1000);
+
+onUnmounted(() => {
+  clearInterval(checkInterval);
+});
 </script>
 
 <template>

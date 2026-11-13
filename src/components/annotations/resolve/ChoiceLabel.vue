@@ -2,10 +2,7 @@
   <div>
     <!-- User Annotations -->
     <span v-for="user in users" :key="user.user_id as string">
-      <span
-        v-for="annotation in proposal.labels[user.user_id as string]"
-        :key="annotation.annotation!.annotation_id as string"
-      >
+      <span v-for="(annotation, idx) in proposal.labels[user.user_id as string] ?? []" :key="`${user.user_id}-${idx}`">
         <InlineToolTip :info="getPrettyIntLabelInfo(annotation)" placement="bottom">
           <span
             class="border text-light p-1 ps-2 pe-2"

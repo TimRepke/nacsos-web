@@ -2,7 +2,7 @@
   <ul class="list-unstyled">
     <li
       v-for="(label, labelIndex) in labels"
-      :key="`${label.key}-${label.annotation!.repeat}`"
+      :key="`${label.key}-${label.annotation?.repeat}`"
       class="mb-3"
       :class="{ selected: labelIndex === selectedIdx && selectedChildIdx < 0 }"
     >
@@ -476,9 +476,11 @@ function multiIntUpdate(label: AnnotationSchemeLabel, value: number | undefined)
       const index = annotation.multi_int.indexOf(value);
       if (index >= 0) {
         annotation.multi_int.splice(index, 1);
-        // propagate deletion to children
-        if (label.choices) {
-          label.choices[index].children?.forEach((lab: AnnotationSchemeLabel) => {
+        // propagate deletion to the children of the removed choice
+        // (index is the position within multi_int, so the choice must be found by value)
+        const choiceIndex = label.choices?.findIndex((c) => c.value === value);
+        if (choiceIndex !== undefined && choiceIndex >= 0) {
+          label.choices![choiceIndex].children?.forEach((lab: AnnotationSchemeLabel) => {
             clearAnnotation(lab);
           });
         }

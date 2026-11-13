@@ -34,7 +34,7 @@ export function toastReject(reason: ApiResponseReject) {
   EventBus.emit(
     new ToastEvent(
       "WARN",
-      `Request failed ${reason.error.detail.level}[${reason.status}] ${reason.error?.detail?.type}(${reason.error?.detail?.message})`,
+      `Request failed ${reason.error?.detail?.level}[${reason.status}] ${reason.error?.detail?.type}(${reason.error?.detail?.message})`,
     ),
   );
 }

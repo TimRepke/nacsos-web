@@ -1,6 +1,7 @@
 import type { App } from "vue";
 import type { RouteLocationNormalized, RouteRecordNormalized } from "vue-router";
 import { marked } from "marked";
+import DOMPurify from "dompurify";
 
 export type Overwrite<T, U> = Pick<T, Exclude<keyof T, keyof U>> & U;
 
@@ -92,21 +93,25 @@ export function padZero(num: number, padding: number): string {
 export const zPad = padZero;
 
 export function paddedDT(dt: Date) {
+  // UTC components. Shifting hours by getTimezoneOffset() was broken: it lost
+  // the minute part of half-hour offsets, never rolled the date over, and could
+  // emit negative hours (e.g. "T-2:30:00Z" for UTC+2:30 before midnight).
   return {
-    Y: dt.getFullYear(),
-    M: padZero(dt.getMonth() + 1, 2),
-    D: padZero(dt.getDate(), 2),
-    H: padZero(dt.getHours() + Math.floor(dt.getTimezoneOffset() / 60), 2),
-    min: padZero(dt.getMinutes(), 2),
-    s: padZero(dt.getSeconds(), 2),
+    Y: dt.getUTCFullYear(),
+    M: padZero(dt.getUTCMonth() + 1, 2),
+    D: padZero(dt.getUTCDate(), 2),
+    H: padZero(dt.getUTCHours(), 2),
+    min: padZero(dt.getUTCMinutes(), 2),
+    s: padZero(dt.getUTCSeconds(), 2),
   };
 }
 
 export function dt2str(datetime: string | number | null | undefined): string | null {
-  // 2024-10-28 18:30
+  // 2024-10-28 18:30 (local time)
   if (datetime !== null && datetime !== undefined) {
-    const dt = paddedDT(new Date(datetime));
-    return `${dt.Y}-${dt.M}-${dt.D} ${dt.H}:${dt.min}`;
+    const dt = new Date(datetime);
+    return `${dt.getFullYear()}-${padZero(dt.getMonth() + 1, 2)}-${padZero(dt.getDate(), 2)} 
+${padZero(dt.getHours(), 2)}:${padZero(dt.getMinutes(), 2)}`;
   }
   return null;
 }
@@ -144,7 +149,14 @@ export function clearString(s: string | null | undefined): string | null {
 }
 
 export function md2html(s: string): string {
-  return marked.parse(s, { async: false }) as string;
+  // Sanitize before it reaches v-html — marked passes raw HTML through, so
+  // without this every md2html consumer is a stored-XSS sink.
+  return DOMPurify.sanitize(marked.parse(s, { async: false }) as string);
+}
+
+export function sanitizeHtml(html: string): string {
+  // For pre-built HTML strings (e.g. highlighter spans) that must go through v-html.
+  return DOMPurify.sanitize(html);
 }
 
 export type StringValues<T> = {
@@ -197,21 +209,33 @@ export function delay(ms: number) {
 }
 
 export function useDebounce<T extends Array<any>, U>(fn: (...args: T) => U, delay: number) {
-  let _isBlocked = false;
+  // Trailing-edge debounce: the last call within the window wins, so a final
+  // keystroke is never dropped (the old leading-edge throttle discarded it).
+  let _timer: ReturnType<typeof setTimeout> | null = null;
+
+  function clear() {
+    if (_timer !== null) {
+      clearTimeout(_timer);
+      _timer = null;
+    }
+  }
 
   function call(...args: T): U {
+    clear();
     return fn(...args);
   }
 
-  function debouncedCall(...args: T): U | null {
-    if (_isBlocked) return null;
-    _isBlocked = true;
-    const result = call(...args);
-    setTimeout(() => (_isBlocked = false), delay);
-    return result;
+  function debouncedCall(...args: T): Promise<U> {
+    clear();
+    return new Promise((resolve) => {
+      _timer = setTimeout(() => {
+        _timer = null;
+        resolve(fn(...args));
+      }, delay);
+    });
   }
 
-  return { call, debouncedCall };
+  return { call, debouncedCall, clear };
 }
 
 export function isElem(obj: unknown): obj is HTMLElement | Node {

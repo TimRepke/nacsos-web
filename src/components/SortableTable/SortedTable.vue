@@ -15,10 +15,23 @@ const sortedData = computed(() =>
   !sortBy.value
     ? props.data
     : props.data.toSorted((a, b) => {
-        if (a[sortBy.value as string] >= b[sortBy.value as string]) {
-          return sortOrder.value;
+        const av = a[sortBy.value as string];
+        const bv = b[sortBy.value as string];
+        const aEmpty = av === undefined || av === null;
+        const bEmpty = bv === undefined || bv === null;
+        if (aEmpty && bEmpty) {
+          return 0;
         }
-        return -sortOrder.value;
+        if (aEmpty) {
+          return 1; // empty cells always sort to the end
+        }
+        if (bEmpty) {
+          return -1;
+        }
+        if (av === bv) {
+          return 0;
+        }
+        return (av > bv ? 1 : -1) * sortOrder.value;
       }),
 );
 
@@ -27,6 +40,7 @@ function sort(field: string) {
     sortOrder.value = ((sortOrder.value + 2) % 3) - 1;
   } else {
     sortBy.value = field;
+    sortOrder.value = props.defaultOrder ?? 1;
   }
 }
 

@@ -12,6 +12,7 @@ export default defineConfig(({ mode }) => {
 
   const coreUrl = new URL(env.VITE_NACSOS_CORE_URL || "http://127.0.0.1:8080/proxy-core");
   const proxyPath = coreUrl.pathname.replace(/\/$/, ""); // e.g. "/proxy-core"
+  const proxyPathRegex = new RegExp("^" + proxyPath.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
   const proxyTarget = env.VITE_PROXY_CORE_TARGET;
   const runProxy = env.VITE_NACSOS_CORE_URL && env.VITE_PROXY_CORE_TARGET;
 
@@ -48,7 +49,7 @@ export default defineConfig(({ mode }) => {
                     target: proxyTarget,
                     changeOrigin: true,
                     secure: true,
-                    rewrite: (path) => path.replace(new RegExp(`^${proxyPath}`), ""),
+                    rewrite: (path) => path.replace(proxyPathRegex, ""),
                     cookieDomainRewrite: coreUrl.hostname,
                   },
                 }

@@ -65,6 +65,7 @@ import InlineToolTip from "@/components/InlineToolTip.vue";
 import type { FullLexisNexisItemModel } from "@/plugins/api/types";
 import TextComponent from "@/components/items/TextComponent.vue";
 import { currentProjectStore } from "@/stores";
+import { sanitizeHtml } from "@/util";
 
 defineOptions({ name: "LexisNexisItem" });
 
@@ -79,10 +80,13 @@ const props = defineProps({
 const showRaw = ref(false);
 
 const htmlTitle = computed(() => {
-  return currentProjectStore.highlighters.applyActiveHighlighters(props.item.sources?.[0]?.title) ?? "[MISSING]";
+  const html = currentProjectStore.highlighters.applyActiveHighlighters(props.item.sources?.[0]?.title);
+  return sanitizeHtml(html ?? "[MISSING]");
 });
 const htmlTeaser = computed((): string | null => {
-  return currentProjectStore.highlighters.applyActiveHighlighters(props.item.teaser);
+  const html = currentProjectStore.highlighters.applyActiveHighlighters(props.item.teaser);
+  // item data is user-supplied, so the highlighter html must be sanitized before v-html
+  return html ? sanitizeHtml(html) : null;
 });
 </script>
 

@@ -34,19 +34,6 @@
                   <!--"file.status==='PENDING'"-->
                 </InlineToolTip>
               </span>
-              <div class="progress">
-                <div
-                  role="progressbar"
-                  :style="{ width: `${file.percentage}%` }"
-                  class="progress-bar"
-                  aria-label="File upload progress"
-                  :aria-valuenow="file.percentage"
-                  aria-valuemin="0"
-                  aria-valuemax="100"
-                >
-                  {{ file.percentage }}%
-                </div>
-              </div>
             </div>
           </li>
         </ul>
@@ -106,10 +93,6 @@ function upload(uploadFile: UploadFile, folder?: string) {
         headers: { "x-project-id": currentProjectStore.projectId as string },
         query: { folder },
         body: { file: uploadFile.file },
-        // FIXME
-        // onUploadProgress: (event: { loaded: number; total?: number }) => {
-        //   uploadFile.percentage = Math.round(100 * (event.loaded / (event.total || 1)));
-        // },
       })
       .then((response) => {
         uploadFile.status = "SUCCESS";
@@ -125,12 +108,28 @@ function upload(uploadFile: UploadFile, folder?: string) {
   });
 }
 
+// max number of files uploaded concurrently
+const MAX_CONCURRENT_UPLOADS = 3;
+
 function uploadFiles() {
   if (selectedFiles.value && selectedFiles.value.length > 0) {
     isUploading.value = true;
     const folder = crypto.randomUUID();
-    const uploads = selectedFiles.value.map((file: UploadFile) => upload(file, folder));
-    Promise.allSettled(uploads).then(() => {
+    const queue = [...selectedFiles.value];
+    const worker = (): Promise<void> => {
+      const file = queue.shift();
+      if (!file) {
+        return Promise.resolve();
+      }
+      return upload(file, folder)
+        .catch(() => undefined)
+        .then(worker);
+    };
+    const workers: Array<Promise<void>> = [];
+    for (let i = 0; i < Math.min(MAX_CONCURRENT_UPLOADS, queue.length); i++) {
+      workers.push(worker());
+    }
+    Promise.allSettled(workers).then(() => {
       emit("filesUpdated", selectedFiles.value);
       isUploading.value = false;
     });

@@ -159,7 +159,7 @@ const sortedFilteredAnnotations = computed<BotMetaInfo[]>(() => {
     dir = sorting.value.scheme;
   } else if (sorting.value.kind !== Sort.sort) {
     comparator = (p1: BotMetaInfo, p2: BotMetaInfo) => [p1.kind as string, p2.kind as string];
-    dir = sorting.value.open;
+    dir = sorting.value.kind;
   } else if (sorting.value.date !== Sort.sort) {
     comparator = (p1: BotMetaInfo, p2: BotMetaInfo) => [p1.time_created as string, p2.time_created as string];
     dir = sorting.value.date;

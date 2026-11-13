@@ -5,7 +5,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, onMounted, ref, watch } from "vue";
+import { computed, onMounted, onUnmounted, ref, watch } from "vue";
 import type { PropType } from "vue";
 import { scaleLinear } from "d3-scale";
 import { zoom as d3zoom, D3ZoomEvent } from "d3-zoom";
@@ -92,9 +92,11 @@ svg
   .attr("transform", "rotate(-90)")
   .text("Number of relevant items");
 
+let containerObserver: ResizeObserver | null = null;
+
 onMounted(() => {
   if (chart.value) {
-    const containerObserver = new ResizeObserver((r) => {
+    containerObserver = new ResizeObserver((r) => {
       outerWidth.value = Math.max(0, r[0].contentRect.width);
     });
     containerObserver.observe(chart.value);
@@ -103,16 +105,24 @@ onMounted(() => {
   }
 });
 
+onUnmounted(() => {
+  containerObserver?.disconnect();
+  containerObserver = null;
+  // detach the d3-zoom listeners registered via svg.call(zoom)
+  svg.on(".zoom", null);
+});
+
 function mouseIn(e: MouseEvent) {
   // @ts-expect-error
   if (e.target && e.target.classList.contains("bar")) {
     // the original compared/indexed this string value against numbers unchecked
     const pos = xScale.invert(e.offsetX - vPad).toFixed(0) as unknown as number;
     let lastBus = 1;
-    for (let run = 0; run < props.buscar.length; run++) {
-      // console.log(pos, props.buscar[run][0])
-      lastBus = props.buscar[run][1];
-      if (pos < props.buscar[run][0]) {
+    const buscar = props.buscar ?? [];
+    for (let run = 0; run < buscar.length; run++) {
+      // console.log(pos, buscar[run][0])
+      lastBus = buscar[run][1];
+      if (pos < buscar[run][0]) {
         break;
       }
     }
@@ -232,7 +242,7 @@ const totalRelDocs = computed<number>(() => {
   return Math.max(1, nRelDocs.value[nRelDocs.value.length - 1]);
 });
 const buscars = computed<Array<Point>>(() => {
-  return props.buscar //
+  return (props.buscar ?? []) //
     .map((d: [number, number]) => ({ x: d[0], y: d[1] }))
     .filter((e: Point) => notNone(e.y));
 });
@@ -246,6 +256,13 @@ watch(
 );
 watch(
   flatLabels,
+  () => {
+    redraw();
+  },
+  { immediate: true },
+);
+watch(
+  buscars,
   () => {
     redraw();
   },

@@ -26,6 +26,7 @@
 import { computed } from "vue";
 import { currentProjectStore, interfaceSettingsStore } from "@/stores";
 import { marked } from "marked";
+import { sanitizeHtml } from "@/util";
 
 defineOptions({ name: "TextComponent" });
 
@@ -49,7 +50,7 @@ const props = defineProps({
 
 const htmlText = computed(() => {
   // Provided html trumps internal parsing
-  if (props.html) return props.html;
+  if (props.html) return sanitizeHtml(props.html);
   // Return placeholder for missing texts
   if (!props.text) return props.missingText;
   let txt = props.text;
@@ -58,7 +59,8 @@ const htmlText = computed(() => {
   // highlighters return a string; same unchecked assumptions as the original
   txt = marked.parse(txt) as string;
   txt = currentProjectStore.highlighters.applyActiveHighlighters(txt) as string;
-  return txt.replaceAll("\n", "<br />");
+  // item data is user-supplied, so the final html must be sanitized before v-html
+  return sanitizeHtml(txt.replaceAll("\n", "<br />"));
 });
 const columnStyle = computed((): Record<string, string> => {
   return interfaceSettingsStore.itemColumnStyle;

@@ -30,7 +30,7 @@
     </td>
     <td v-if="visibleColumns.spearman" :class="colClass">
       {{ prettyNum(quality.spearman) }}
-      <span class="text-muted small" v-if="quality.spearman"> (p={{ prettyNum(quality.spearman) }}) </span>
+      <span class="text-muted small" v-if="quality.spearman_p"> (p={{ prettyNum(quality.spearman_p) }}) </span>
     </td>
     <td v-if="visibleColumns.precision" :class="colClass">{{ prettyNum(quality.precision) }}</td>
     <td v-if="visibleColumns.recall" :class="colClass">{{ prettyNum(quality.recall) }}</td>

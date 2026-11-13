@@ -374,8 +374,8 @@ async function save() {
       });
     schemeCopy.labels = removeEmptyAnnotations(labelsCopy);
 
-    // Send data to the server
-    API.annotations
+    // Send data to the server; return the promise so callers can await the save
+    return API.annotations
       .saveAnnotationApiAnnotationsAnnotateSavePost({
         headers: { "x-project-id": currentProjectStore.projectId as string },
         body: {
@@ -390,13 +390,15 @@ async function save() {
         }
         EventBus.emit(new ToastEvent("SUCCESS", "Successfully saved your annotation!"));
       })
-      .catch(() => {
+      .catch((error) => {
         EventBus.emit(
           new ToastEvent(
             "ERROR",
             "Failed to save your annotation. Sorry. " + "Please try reloading the page and saving again.",
           ),
         );
+        // propagate the error so callers (e.g. saveAndGoto) can abort on a failed save
+        throw error;
       })
       .finally(() => {
         if (
@@ -404,11 +406,12 @@ async function save() {
           currentProjectStore.project?.setting_motivational_quotes &&
           Math.random() < 0.2
         ) {
-          const quoteIndex = Math.floor(Math.random() * (motivationalQuotes.length + 1));
+          const quoteIndex = Math.floor(Math.random() * motivationalQuotes.length);
           EventBus.emit(new ToastEvent("INFO", motivationalQuotes[quoteIndex]));
         }
       });
   }
+  return Promise.resolve();
 }
 
 async function setCurrentAssignment(annotationItem: AnnotationItem) {
@@ -418,6 +421,11 @@ async function setCurrentAssignment(annotationItem: AnnotationItem) {
   scope.value = annotationItem.scope;
   item.value = annotationItem.item;
   labels.value = populateEmptyAnnotations(scheme.value.labels);
+  // reset the dirty counter synchronously: the labels watcher is flushed sync while
+  // replacing the labels, so it has already fired at this point; doing it here (and
+  // not after the async indicator fetch below) keeps user edits that land during the
+  // fetch from being wiped
+  dirty.value = 0;
   rerenderCounter.value += 1;
 
   // update the assignments progress bar
@@ -436,23 +444,48 @@ async function setCurrentAssignment(annotationItem: AnnotationItem) {
           assignment_id: assignment.value!.assignment_id,
         },
       });
-      dirty.value = 0;
     })
     .catch(ignore);
 }
 
-async function saveAndGoto(targetAssignmentId: string) {
-  await save();
+let assignmentRequestSeq = 0;
 
-  API.annotations
-    .getAssignmentApiAnnotationsAnnotateAssignmentAssignmentIdGet({
-      headers: { "x-project-id": currentProjectStore.projectId as string },
-      path: { assignment_id: targetAssignmentId },
-    })
-    .then((response) => {
-      setCurrentAssignment(response.data);
-    })
-    .catch(ignore);
+async function loadAssignment(assignmentScopeId: string, currentAssignmentId: string) {
+  // sequence guard: responses of superseded requests must not replace the assignment
+  const requestSeq = ++assignmentRequestSeq;
+  try {
+    let response: AnnotationItem;
+    if (currentAssignmentId) {
+      response = (
+        await API.annotations.getAssignmentApiAnnotationsAnnotateAssignmentAssignmentIdGet({
+          headers: { "x-project-id": currentProjectStore.projectId as string },
+          path: { assignment_id: currentAssignmentId },
+        })
+      ).data;
+    } else {
+      response = (
+        await API.annotations.getNextOpenAssignmentForScopeForUserApiAnnotationsAnnotateNextAssignmentScopeIdGet({
+          headers: { "x-project-id": currentProjectStore.projectId as string },
+          path: { assignment_scope_id: assignmentScopeId },
+        })
+      ).data;
+    }
+    if (requestSeq === assignmentRequestSeq) {
+      await setCurrentAssignment(response);
+    }
+  } catch (e) {
+    console.error(e);
+  }
+}
+
+async function saveAndGoto(targetAssignmentId: string) {
+  try {
+    await save();
+  } catch {
+    // the save failed (an error toast was shown): abort the navigation
+    return;
+  }
+  await loadAssignment(scope.value?.assignment_scope_id as string, targetAssignmentId);
 }
 
 async function saveAndPrevious() {
@@ -602,41 +635,34 @@ const indicatorLabelColourMapper = computed<(indicator: UserAssignmentInfo) => s
 });
 
 // equivalent of the `watch: { labels: { deep: true, handler() {...} } }` option
+// flushed sync so setCurrentAssignment can reset `dirty` right after (programmatically)
+// replacing the labels, instead of a stale async reset wiping user edits
 
 watch(
   labels,
   () => {
     dirty.value += 1;
   },
-  { deep: true },
+  { deep: true, flush: "sync" },
 );
 
-onMounted(async () => {
-  const assignmentScopeId = route.params.scope_id as string;
-  const currentAssignmentId = route.params.assignment_id as string;
-  document.addEventListener("keydown", onKeyPress, false);
-  try {
-    let response: AnnotationItem;
-    if (currentAssignmentId) {
-      response = (
-        await API.annotations.getAssignmentApiAnnotationsAnnotateAssignmentAssignmentIdGet({
-          headers: { "x-project-id": currentProjectStore.projectId as string },
-          path: { assignment_id: currentAssignmentId },
-        })
-      ).data;
-    } else {
-      response = (
-        await API.annotations.getNextOpenAssignmentForScopeForUserApiAnnotationsAnnotateNextAssignmentScopeIdGet({
-          headers: { "x-project-id": currentProjectStore.projectId as string },
-          path: { assignment_scope_id: assignmentScopeId },
-        })
-      ).data;
+// the component is reused when the user navigates back/forward through the history
+// entries created while saving/navigating; onMounted does not run again, so reload
+// the assignment when the route param changes
+watch(
+  () => route.params.assignment_id,
+  (newAssignmentId: string | string[]) => {
+    if ((newAssignmentId as string) === assignment.value?.assignment_id) {
+      // the push in setCurrentAssignment after loading this very assignment
+      return;
     }
+    void loadAssignment(route.params.scope_id as string, newAssignmentId as string);
+  },
+);
 
-    await setCurrentAssignment(response);
-  } catch (e) {
-    console.error(e);
-  }
+onMounted(() => {
+  document.addEventListener("keydown", onKeyPress, false);
+  void loadAssignment(route.params.scope_id as string, route.params.assignment_id as string);
 });
 
 onUnmounted(() => {

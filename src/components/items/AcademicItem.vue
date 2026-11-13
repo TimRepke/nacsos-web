@@ -91,6 +91,7 @@ import type { AcademicAuthorModel, AcademicItemModel, AffiliationModel } from "@
 import { currentProjectStore } from "@/stores";
 import TextComponent from "@/components/items/TextComponent.vue";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
+import { sanitizeHtml } from "@/util";
 
 defineOptions({ name: "AcademicItem" });
 
@@ -104,8 +105,9 @@ const props = defineProps({
 
 const showRaw = ref(false);
 
-const htmlTitle = computed(
-  () => currentProjectStore.highlighters.applyActiveHighlighters(props.item.title) ?? "[Missing title]",
+const htmlTitle = computed(() =>
+  // item data is user-supplied, so the highlighter html must be sanitized before v-html
+  sanitizeHtml(currentProjectStore.highlighters.applyActiveHighlighters(props.item.title) ?? "[Missing title]"),
 );
 
 function authorInstitutions(author: AcademicAuthorModel): string | undefined {

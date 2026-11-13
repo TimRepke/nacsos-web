@@ -52,7 +52,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, ref } from "vue";
+import { computed, ref, watch } from "vue";
 import type { PropType } from "vue";
 import { AssignmentInfo, AssignmentScopeEntry } from "@/plugins/api/types";
 import { API, toastReject, toastSuccess } from "@/plugins/api";
@@ -91,6 +91,15 @@ currentProjectStore.users.ensureLoaded();
 
 const assiEditMode = ref(false);
 const entries = ref(JSON.parse(JSON.stringify(props.assignmentEntries)));
+
+// re-sync the local copy when the parent refetches the assignment entries,
+// otherwise the grid keeps rendering the one-time snapshot from mount
+watch(
+  () => props.assignmentEntries,
+  (assignmentEntries: AssignmentScopeEntry[]) => {
+    entries.value = JSON.parse(JSON.stringify(assignmentEntries));
+  },
+);
 
 const assignedUsers = computed<Record<string, number>>(() => {
   const count: Record<string, number> = {};

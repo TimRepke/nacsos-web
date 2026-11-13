@@ -166,18 +166,24 @@ function updateQuery(newQuery: object[]) {
 
 type PaginationInfo = Pick<UnwrapNestedRefs<UseOffsetPaginationReturn>, "currentPage" | "currentPageSize">;
 
+let fetchSeq = 0;
+
 function fetchData({ currentPage, currentPageSize }: PaginationInfo): void {
+  const seq = ++fetchSeq;
   if (queryParsed.value.length > 0) {
     API.search
       .nqlQueryApiSearchNqlQueryPost({
         headers: { "x-project-id": currentProjectStore.projectId as string },
         body: queryParsed.value[0] as NqlQueryApiSearchNqlQueryPostData["body"],
         query: {
-          limit: (route.query.pageSize || 20) as number,
-          page: (route.query.page || 1) as number,
+          limit: currentPageSize,
+          page: currentPage,
         },
       })
       .then((response) => {
+        if (seq !== fetchSeq) {
+          return;
+        }
         const { data } = response;
         itemList.value = data.docs;
         queryNumItems.value = data.n_docs;
@@ -189,12 +195,15 @@ function fetchData({ currentPage, currentPageSize }: PaginationInfo): void {
       .listProjectDataPagedApiProjectItemsItemTypeListPagePageSizeGet({
         headers: { "x-project-id": currentProjectStore.projectId as string },
         path: {
-          page: pagination.value.currentPage,
-          page_size: pagination.value.currentPageSize,
+          page: currentPage,
+          page_size: currentPageSize,
           item_type: currentProjectStore.project!.type,
         },
       })
       .then((response) => {
+        if (seq !== fetchSeq) {
+          return;
+        }
         itemList.value = response.data;
         router.push({ query: { page: currentPage, pageSize: currentPageSize } });
       })
@@ -203,11 +212,11 @@ function fetchData({ currentPage, currentPageSize }: PaginationInfo): void {
 }
 
 function resetQuery(): void {
-  pagination.value.currentPage = 1;
-  fetchData(pagination.value);
   queryStr.value = "";
   queryParsed.value = [];
   queryNumItems.value = null;
+  pagination.value.currentPage = 1;
+  fetchData(pagination.value);
   //router.push({ query: { page: 1, pageSize: 20 } });
 }
 

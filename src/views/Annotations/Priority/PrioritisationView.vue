@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from "vue";
+import { computed, onMounted, onUnmounted, ref } from "vue";
 import { useRoute } from "vue-router";
 import { dt2str, isElem, pyDTNow, timestampNow } from "@/util";
 import { currentProjectStore, currentUserStore } from "@/stores";
@@ -172,7 +172,30 @@ onMounted(async () => {
   }
 });
 
+const loadedImages = new Map<string, { url: string; img: HTMLImageElement }>();
+const loadedFrames = new Map<string, { el: HTMLElement; destroy: () => void }>();
+
+function clearLoadedArtefact(filename: string) {
+  const image = loadedImages.get(filename);
+  if (image) {
+    image.img.remove();
+    URL.revokeObjectURL(image.url);
+    loadedImages.delete(filename);
+  }
+  const frame = loadedFrames.get(filename);
+  if (frame) {
+    frame.destroy();
+    frame.el.remove();
+    loadedFrames.delete(filename);
+  }
+}
+
+onUnmounted(() => {
+  [...loadedImages.keys(), ...loadedFrames.keys()].forEach(clearLoadedArtefact);
+});
+
 async function loadImage(event: MouseEvent, filename: string) {
+  clearLoadedArtefact(filename);
   const res = await API.prio.getFileApiPrioArtefactsFileGet(
     {
       headers: {
@@ -183,11 +206,21 @@ async function loadImage(event: MouseEvent, filename: string) {
     },
     //{ responseType: "blob" },
   );
+  if (loadedImages.has(filename)) {
+    // a newer load for this file already registered while we were fetching
+    return;
+  }
   const url = URL.createObjectURL(res.data as Blob);
   const img = new Image();
   img.src = url;
   img.style.width = "90%";
+  loadedImages.set(filename, { url, img });
   img.onload = () => {
+    if (loadedImages.get(filename)?.img !== img) {
+      // superseded by a newer load while we were fetching
+      URL.revokeObjectURL(url);
+      return;
+    }
     const { target } = event;
     if (isElem(target)) {
       (target as HTMLElement).closest("li")?.appendChild(img);
@@ -197,6 +230,7 @@ async function loadImage(event: MouseEvent, filename: string) {
 }
 
 async function loadDF(event: MouseEvent, filename: string) {
+  clearLoadedArtefact(filename);
   const res = (
     await API.prio.getFileApiPrioArtefactsFileGet({
       headers: {
@@ -206,10 +240,17 @@ async function loadDF(event: MouseEvent, filename: string) {
       query: { filename },
     })
   ).data;
-  const { el } = mount(DataFrame, { props: { df: res } });
+  if (loadedFrames.has(filename)) {
+    // a newer load for this file already registered while we were fetching
+    return;
+  }
+  const { el, destroy } = mount(DataFrame, { props: { df: res } });
   const { target } = event;
   if (isElem(target)) {
     (target as HTMLElement).closest("li")?.appendChild(el);
+    loadedFrames.set(filename, { el, destroy });
+  } else {
+    destroy();
   }
 }
 </script>

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { currentProjectStore, platformUsersStore } from "@/stores";
 import { useRoute } from "vue-router";
-import { type Component, computed, defineAsyncComponent, markRaw, onMounted, ref } from "vue";
+import { type Component, computed, defineAsyncComponent, markRaw, ref, watch } from "vue";
 import type {
   AcademicItemModel,
   AnnotationModel,
@@ -11,7 +11,7 @@ import type {
   ItemType,
   ProjectModel,
 } from "@/plugins/api/spec";
-import { API } from "@/plugins/api";
+import { API, toastReject } from "@/plugins/api";
 import { Revision } from "@/types/imports";
 import SortedTableHead from "@/components/SortableTable/SortedTableHead.vue";
 import SortedTable from "@/components/SortableTable/SortedTable.vue";
@@ -32,34 +32,42 @@ const m2ms = ref<ImportM2m[]>([]);
 const annotations = ref<AnnotationModel[]>([]);
 const botAnnotations = ref<BotAnnotationModel[]>([]);
 
-onMounted(async () => {
-  item.value = (
-    await API.item.getItemInfoApiItemInfoItemIdGet({
-      path: { item_id: route.params.item_id as string },
+function loadItem(itemId: string) {
+  Promise.all([
+    API.item.getItemInfoApiItemInfoItemIdGet({
+      path: { item_id: itemId },
       headers: { "x-project-id": currentProjectStore.projectId as string },
+    }),
+    API.imports.getProjectImportsApiImportsListDetailsGet({
+      headers: { "x-project-id": currentProjectStore.projectId as string },
+    }),
+    API.item.getItemLabelsApiItemLabelsItemIdGet({
+      path: { item_id: itemId },
+      headers: { "x-project-id": currentProjectStore.projectId as string },
+    }),
+    API.item.getItemM2MsApiItemM2MsItemIdGet({
+      path: { item_id: itemId },
+      headers: { "x-project-id": currentProjectStore.projectId as string },
+    }),
+  ])
+    .then(([itemRes, importsRes, labelsRes, m2mRes]) => {
+      item.value = itemRes.data;
+      imports.value = importsRes.data;
+      [annotations.value, botAnnotations.value] = labelsRes.data as [AnnotationModel[], BotAnnotationModel[]];
+      m2ms.value = m2mRes.data;
     })
-  ).data;
+    .catch(toastReject);
+}
 
-  imports.value = (
-    await API.imports.getProjectImportsApiImportsListDetailsGet({
-      headers: { "x-project-id": currentProjectStore.projectId as string },
-    })
-  ).data;
-
-  [annotations.value, botAnnotations.value] = (
-    await API.item.getItemLabelsApiItemLabelsItemIdGet({
-      path: { item_id: route.params.item_id as string },
-      headers: { "x-project-id": currentProjectStore.projectId as string },
-    })
-  ).data as [AnnotationModel[], BotAnnotationModel[]];
-
-  m2ms.value = (
-    await API.item.getItemM2MsApiItemM2MsItemIdGet({
-      path: { item_id: route.params.item_id as string },
-      headers: { "x-project-id": currentProjectStore.projectId as string },
-    })
-  ).data;
-});
+watch(
+  () => route.params.item_id,
+  (itemId) => {
+    if (itemId) {
+      loadItem(itemId as string);
+    }
+  },
+  { immediate: true },
+);
 
 const revisions = computed<Record<string, Revision>>(() =>
   Object.fromEntries(

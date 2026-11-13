@@ -171,7 +171,7 @@ function saveHighlighter(highlighter: HighlighterModel) {
   API.highlighters
     .upsertHighlighterApiHighlightersProjectPut({
       headers: { "x-project-id": currentProjectStore.projectId as string },
-      body: highlighter,
+      body: highlighterCopy,
     })
     .then((response) => {
       EventBus.emit(new ToastEvent("SUCCESS", `Saved highlighter with ID: ${response.data}`));

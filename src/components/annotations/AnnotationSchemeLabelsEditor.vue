@@ -3,8 +3,8 @@
   <div>
     <ul class="ps-0 list-unstyled">
       <li
-        v-for="(schemeLabel, schemeLabelIndex) in schemeLabelsWithKey"
-        :key="schemeLabel.tmpKey"
+        v-for="(schemeLabel, schemeLabelIndex) in schemeLabels"
+        :key="tmpKeyFor(schemeLabel)"
         class="border m-2 p-2 position-relative"
       >
         <div
@@ -87,11 +87,11 @@
               </select>
             </div>
             <div class="col-auto">
-              <label :for="`max-repeat-${schemeLabel.tmpKey}`">Max. Repeat</label>
+              <label :for="`max-repeat-${tmpKeyFor(schemeLabel)}`">Max. Repeat</label>
               <input
                 type="number"
                 class="form-control"
-                :id="`max-repeat-${schemeLabel.tmpKey}`"
+                :id="`max-repeat-${tmpKeyFor(schemeLabel)}`"
                 v-model="schemeLabel.max_repeat"
               />
             </div>
@@ -100,23 +100,23 @@
                 <input
                   type="checkbox"
                   role="switch"
-                  :id="`label-required-${schemeLabel.tmpKey}`"
+                  :id="`label-required-${tmpKeyFor(schemeLabel)}`"
                   class="form-check-input"
                   :aria-checked="schemeLabel.required"
                   v-model="schemeLabel.required"
                 />
-                <label class="form-check-label" :for="`label-required-${schemeLabel.tmpKey}`">Required</label>
+                <label class="form-check-label" :for="`label-required-${tmpKeyFor(schemeLabel)}`">Required</label>
               </div>
               <div class="form-check form-switch" v-if="schemeLabel.kind === 'single' || schemeLabel.kind === 'multi'">
                 <input
                   type="checkbox"
                   role="switch"
-                  :id="`label-dropdown-${schemeLabel.tmpKey}`"
+                  :id="`label-dropdown-${tmpKeyFor(schemeLabel)}`"
                   class="form-check-input"
                   :aria-checked="schemeLabel.dropdown"
                   v-model="schemeLabel.dropdown"
                 />
-                <label class="form-check-label" :for="`label-required-${schemeLabel.tmpKey}`">Use dropdown</label>
+                <label class="form-check-label" :for="`label-required-${tmpKeyFor(schemeLabel)}`">Use dropdown</label>
               </div>
             </div>
           </div>
@@ -125,7 +125,7 @@
           <div class="row ms-2" v-if="schemeLabel.kind === 'single' || schemeLabel.kind === 'multi'">
             <strong>Choices:</strong>
             <ul class="ps-2 ms-2 list-unstyled">
-              <li v-for="(choice, choiceIndex) in schemeLabel.choices" :key="choice.tmpKey">
+              <li v-for="(choice, choiceIndex) in schemeLabel.choices" :key="tmpKeyFor(choice)">
                 <div class="row mb-2">
                   <div class="col-auto">
                     <span class="input-group">
@@ -222,7 +222,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, ref, watch } from "vue";
+import { ref, watch } from "vue";
 import type { PropType } from "vue";
 import ToolTip from "@/components/ToolTip.vue";
 import {
@@ -230,19 +230,6 @@ import {
   type AnnotationSchemeLabelChoice,
   AnnotationSchemeLabelKindEnum,
 } from "@/plugins/api/types";
-
-// editor-local view over the API types: labels/choices get a transient `tmpKey` for
-// v-for keys and `children` is always present (null, never undefined) as the original
-// component assumed
-interface KeyedAnnotationSchemeLabelChoice extends Omit<AnnotationSchemeLabelChoice, "children"> {
-  tmpKey?: string;
-  children: KeyedAnnotationSchemeLabel[] | null;
-}
-
-interface KeyedAnnotationSchemeLabel extends Omit<AnnotationSchemeLabel, "choices"> {
-  tmpKey?: string;
-  choices?: KeyedAnnotationSchemeLabelChoice[] | null;
-}
 
 // TODO flatten list of all keys and make sure they are all unique (probably in AnnotationConfigEditView)
 // TODO general input validation
@@ -260,9 +247,21 @@ const props = defineProps({
 const annotationSchemeLabelKinds = ref(AnnotationSchemeLabelKindEnum);
 const schemeLabels = ref(props.labels);
 
+// Stable v-for keys: each label/choice object gets its uuid exactly once (kept in a
+// WeakMap keyed by object identity, so neither re-renders nor row moves remount the
+// editor subtree and the keys never leak into the saved payload)
+const tmpKeys = new WeakMap<object, string>();
+function tmpKeyFor(obj: object): string {
+  let tmpKey = tmpKeys.get(obj);
+  if (!tmpKey) {
+    tmpKey = crypto.randomUUID();
+    tmpKeys.set(obj, tmpKey);
+  }
+  return tmpKey;
+}
+
 function addLabel() {
   schemeLabels.value.push({
-    tmpKey: crypto.randomUUID(),
     name: "",
     key: "newKey",
     hint: "",
@@ -279,7 +278,6 @@ function addChild(labelIndex: number, choiceIndex: number) {
   // TODO
   schemeLabels.value[labelIndex].choices![choiceIndex].children = [
     {
-      tmpKey: crypto.randomUUID(),
       name: "",
       key: "newKey",
       hint: "",
@@ -292,7 +290,6 @@ function addChild(labelIndex: number, choiceIndex: number) {
 }
 function addChoice(schemeLabelIndex: number) {
   schemeLabels.value[schemeLabelIndex].choices!.push({
-    tmpKey: crypto.randomUUID(),
     children: null,
     hint: null,
     name: "",
@@ -345,21 +342,13 @@ function moveLabelDown(currentSchemeLabelIndex: number) {
   }
 }
 
-const schemeLabelsWithKey = computed(() => {
-  return (schemeLabels.value as KeyedAnnotationSchemeLabel[]).map((schemeLabel: KeyedAnnotationSchemeLabel) => {
-    schemeLabel.tmpKey = crypto.randomUUID();
-    return schemeLabel;
-  });
-});
-
+// the parent may replace the whole labels array (e.g. after loading/saving the
+// scheme); re-sync the local ref in that case
 watch(
   () => props.labels,
-  // FIXME: somehow the props reference between schemeLabels and props.labels broke
-  //        this should be fixed, since this watch hack makes the config very slow!
   (labels: AnnotationSchemeLabel[]) => {
     schemeLabels.value = labels;
   },
-  // { deep: true },
 );
 </script>
 

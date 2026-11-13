@@ -5,6 +5,21 @@ import { DeferredValue, useDeferredValue } from "@/stores/storeHelpers";
 import { Optional } from "@/types";
 import { EventBus } from "@/plugins/events";
 import { CurrentProjectSetEvent } from "@/plugins/events/events/projects";
+import { sanitizeHtml } from "@/util";
+
+function escapeRegExp(s: string): string {
+  // escape all regex metacharacters -> also kills ReDoS via pathological nesting like "(a+)+$"
+  return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+function escapeHtml(s: string): string {
+  return s
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
 
 export interface ProjectHighlighterStore extends DeferredValue<HighlighterModel[]> {
   applyActiveHighlighters: (txt: Optional<string>) => string | null;
@@ -43,15 +58,21 @@ export function useProjectHighlighters(): ProjectHighlighterStore {
       base.value.value.forEach((highlighter: HighlighterModel) => {
         if (activeHighlighters.has(highlighter.highlighter_id)) {
           try {
-            const regex = new RegExp(highlighter.keywords.join("|"), "gi");
-            txt = (txt as string).replaceAll(regex, `<span style="${highlighter.style}">$&</span>`);
+            const keywords = highlighter.keywords.map((k) => k.trim()).filter((k) => k.length > 0);
+            if (keywords.length === 0) return;
+            const regex = new RegExp(keywords.map((k) => `(?:${escapeRegExp(k)})`).join("|"), "gi");
+            const style = escapeHtml(highlighter.style ?? "");
+            txt = (txt as string).replaceAll(
+              regex,
+              (match: string) => `<span style="${style}">${escapeHtml(match)}</span>`,
+            );
           } catch (e) {
             console.warn("Ignoring illegal regex!");
             console.error(e);
           }
         }
       });
-      return txt;
+      return sanitizeHtml(txt as string);
     },
   };
 }

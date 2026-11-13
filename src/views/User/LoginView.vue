@@ -50,7 +50,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, onUnmounted } from "vue";
 import { useRouter } from "vue-router";
 import NacsosLogo from "@/components/NacsosLogo.vue";
 import { EventBus } from "@/plugins/events";
@@ -66,18 +66,45 @@ const username = ref("");
 const password = ref("");
 const error = ref<string | null>(null);
 
+let authFailedListener: [string, number] | null = null;
+let loginSuccessListener: [string, number] | null = null;
+
+function removeLoginSuccessListener() {
+  if (loginSuccessListener) {
+    EventBus.off(loginSuccessListener);
+    loginSuccessListener = null;
+  }
+}
+
+// at most one success handler exists at any time: it self-destructs on success and is
+// removed on failure, so failed attempts can't queue up stale router.push handlers
+function armLoginSuccessListener() {
+  if (!loginSuccessListener) {
+    loginSuccessListener = EventBus.once(LoginSuccessEvent, () => {
+      loginSuccessListener = null;
+      router.push({ name: "project-list" });
+    });
+  }
+}
+
 onMounted(() => {
-  EventBus.on(AuthFailedEvent, (reason: { reason: ErrorDetails }) => {
+  authFailedListener = EventBus.on(AuthFailedEvent, (reason: { reason: ErrorDetails }) => {
     error.value = reason?.reason.type === "KeyError" ? "Username not in the system." : (error.value = "Login failed.");
+    // the login attempt failed -> drop the queued success handler
+    removeLoginSuccessListener();
   });
+  armLoginSuccessListener();
+});
+
+onUnmounted(() => {
+  if (authFailedListener) EventBus.off(authFailedListener);
+  removeLoginSuccessListener();
 });
 
 async function login() {
   error.value = null;
+  armLoginSuccessListener();
   EventBus.emit(new UserLoginEvent(username.value, password.value));
-  EventBus.once(LoginSuccessEvent, () => {
-    router.push({ name: "project-list" });
-  });
 }
 
 async function reset() {

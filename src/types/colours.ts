@@ -85,7 +85,7 @@ export function lookupMakerChoice<T>(
     colourTable = Object.fromEntries(
       choices
         .map((choice: AnnotationSchemeLabelChoice) => choice.value)
-        .sort()
+        .sort((a: number, b: number) => a - b)
         .map((value: number, idx: number): [number, string] => {
           const altValue: number = idx % Object.keys(cmap).length;
           return [value, cmap[altValue]];

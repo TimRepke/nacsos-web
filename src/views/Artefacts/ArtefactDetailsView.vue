@@ -91,7 +91,7 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted, ref } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 import { useRoute } from "vue-router";
 import type { FileOnDisk, TaskModel } from "@/plugins/api/types";
 import { API, toastReject } from "@/plugins/api";
@@ -104,7 +104,7 @@ defineOptions({ name: "ArtefactsListView" });
 
 const route = useRoute();
 
-const { taskId } = route.params as { taskId: string };
+const taskId = computed(() => (route.params as { taskId: string }).taskId);
 // the task details response carries fields the generated TaskModel does not declare
 type TaskDetails = TaskModel & { location?: string | null; dependencies?: string[] | null };
 
@@ -124,10 +124,12 @@ const slog = ref("");
 //   })
 //   .catch(toastReject);
 
-onMounted(() => {
+function loadTask() {
+  task.value = undefined;
+  log.value = undefined;
   API.pipes
     .getTaskApiPipesTaskGet({
-      headers: { "x-project-id": currentProjectStore.projectId as string, "x-task-id": taskId },
+      headers: { "x-project-id": currentProjectStore.projectId as string, "x-task-id": taskId.value },
     })
     .then((response) => {
       task.value = response.data;
@@ -136,18 +138,22 @@ onMounted(() => {
 
   API.pipes
     .getArtefactsApiPipesArtefactsListGet({
-      headers: { "x-project-id": currentProjectStore.projectId as string, "x-task-id": taskId },
+      headers: { "x-project-id": currentProjectStore.projectId as string, "x-task-id": taskId.value },
     })
     .then((response) => {
       artefacts.value = response.data;
     })
     .catch(toastReject);
-});
+}
+
+onMounted(loadTask);
+
+watch(taskId, loadTask);
 
 function downloadArchive() {
   API.pipes
     .getArchiveApiPipesArtefactsFilesGet({
-      headers: { "x-project-id": currentProjectStore.projectId as string, "x-task-id": taskId },
+      headers: { "x-project-id": currentProjectStore.projectId as string, "x-task-id": taskId.value },
     })
     .then((response) => {
       const file = new File([response.data as Blob], "archive.zip", { type: "application/zip;charset=utf-8" });
@@ -162,7 +168,7 @@ function downloadFile(filename: string) {
   API.pipes
     .getFileApiPipesArtefactsFileGet({
       query: { filename },
-      headers: { "x-project-id": currentProjectStore.projectId as string, "x-task-id": taskId },
+      headers: { "x-project-id": currentProjectStore.projectId as string, "x-task-id": taskId.value },
     })
     .then((response) => {
       const file = new File([response.data as Blob], parts[parts.length - 1]);
@@ -175,7 +181,7 @@ function downloadFile(filename: string) {
 function loadLog() {
   API.pipes
     .getTaskLogApiPipesArtefactsLogGet({
-      headers: { "x-project-id": currentProjectStore.projectId as string, "x-task-id": taskId },
+      headers: { "x-project-id": currentProjectStore.projectId as string, "x-task-id": taskId.value },
     })
     .then((response) => {
       log.value = response.data;

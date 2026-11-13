@@ -3,7 +3,7 @@ import type { RemovableRef } from "@vueuse/core";
 import { useStorage } from "@vueuse/core";
 import Serializer from "@/types/serializer";
 import type { AuthTokenModel, UserModel } from "@/plugins/api/spec/types.gen";
-import { API, toastReject, OpenAPI } from "@/plugins/api";
+import { API, toastReject, OpenAPI, ErrorLevel } from "@/plugins/api";
 import { EventBus } from "@/plugins/events";
 import { AuthFailedEvent, LoginSuccessEvent, LogoutSuccessEvent } from "@/plugins/events/events/auth";
 
@@ -59,13 +59,22 @@ export const useCurrentUserStore = defineStore("CurrentUserStore", {
       OpenAPI.setToken(token);
       try {
         const userTokens = (await API.oauth.readTokensMeApiLoginMyTokensGet()).data;
-        if (userTokens[0].token_id === token) {
-          this.setAuthToken(userTokens[0]);
+        const matchingToken = userTokens.find((userToken) => userToken.token_id === token);
+        if (matchingToken) {
+          this.setAuthToken(matchingToken);
           const me = await API.oauth.readUsersMeApiLoginMeGet();
           this.setUser(me.data);
           EventBus.emit(new LoginSuccessEvent(me.data));
         } else {
-          throw Error("Invalid token!");
+          this.clear();
+          console.error("Invalid token!");
+          EventBus.emit(
+            new AuthFailedEvent({
+              level: ErrorLevel.ERROR,
+              type: "InvalidToken",
+              message: "The provided token is not valid for this account.",
+            }),
+          );
         }
       } catch (reason) {
         this.clear();

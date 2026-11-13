@@ -36,8 +36,8 @@ const props = defineProps({
 });
 
 const background = computed<string | undefined>(() => {
-  if (props.bgOverride !== undefined) return `text-bg-${props.colour}`;
-  return undefined;
+  if (props.bgOverride) return undefined;
+  return `text-bg-${props.colour}`;
 });
 </script>
 
