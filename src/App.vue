@@ -39,7 +39,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, onMounted } from "vue";
+import { computed, defineAsyncComponent, onMounted } from "vue";
 import { useRoute } from "vue-router";
 import TopBar from "@/components/topbar/TopBar.vue";
 import SideBar from "@/components/SideBar.vue";
@@ -47,7 +47,7 @@ import ToastsViewer from "@/components/ToastsViewer.vue";
 import ConfirmationModal from "@/components/ConfirmationModal.vue";
 import { currentProjectStore, currentUserStore } from "@/stores";
 import { isOnRoute } from "@/util";
-import LoginView from "@/views/User/LoginView.vue";
+const LoginView = defineAsyncComponent(() => import("@/views/User/LoginView.vue"));
 
 const route = useRoute();
 

@@ -5,7 +5,7 @@
     </div>
     <div class="card-footer d-flex justify-content-between small text-muted" v-if="item.meta">
       <div class="position-absolute end-0">
-        <font-awesome-icon :icon="['fas', 'info-circle']" class="me-2" @click="showAll = !showAll" />
+        <font-awesome-icon :icon="['fas', 'circle-info']" class="me-2" @click="showAll = !showAll" />
       </div>
       <ul class="list-unstyled">
         <template v-for="(value, key) in item.meta" :key="key">

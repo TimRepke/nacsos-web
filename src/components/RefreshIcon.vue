@@ -5,7 +5,7 @@ import { ref } from "vue";
 const props = defineProps({
   refresh: { type: Function, required: true },
   timeout: { type: Number, required: false, default: 1000 },
-  icon: { type: String, required: false, default: "refresh" },
+  icon: { type: String, required: false, default: "arrows-rotate" },
 });
 
 enum IconState {
