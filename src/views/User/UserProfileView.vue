@@ -7,8 +7,7 @@
     <div class="container-md">
       <div class="row mb-2">
         <div class="col">
-          <strong>Unique ID:</strong> <code>{{ user.user_id }}</code
-          ><br />
+          <strong>Unique ID:</strong> <code>{{ user.user_id }}</code><br />
           <strong>Username:</strong> {{ user.username }}
           <span class="fst-italic text-muted">(not editable)</span>
         </div>

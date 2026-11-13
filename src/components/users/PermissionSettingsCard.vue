@@ -1,11 +1,9 @@
 <template>
   <ExpandableBox :initially-open="false">
     <template v-slot:head>
-      <strong>{{ permission.user.username }}</strong
-      >&nbsp;
+      <strong>{{ permission.user.username }}</strong>&nbsp;
       <span class="text-muted">
-        ({{ permission.user.full_name }}&nbsp;| <span class="font-monospace">{{ permission.user.email }}</span
-        >)
+        ({{ permission.user.full_name }}&nbsp;| <span class="font-monospace">{{ permission.user.email }}</span>)
       </span>
     </template>
     <template v-slot:body>
