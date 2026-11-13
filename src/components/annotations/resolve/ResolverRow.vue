@@ -7,6 +7,7 @@
       </td>
       <td>
         <div
+          ref="itemCell"
           class="text-muted font-monospace fs-fn text-break me-2 d-inline-block"
           style="width: 20ch"
           role="button"
@@ -136,9 +137,53 @@ export default defineComponent({
     return {
       item: null as AnyItem | null,
       showItem: false,
+      itemRequested: false,
+      itemObserver: null as IntersectionObserver | null,
     };
   },
+  unmounted() {
+    this.itemObserver?.disconnect();
+    this.itemObserver = null;
+  },
   methods: {
+    /**
+     * Defer the item detail fetch until the row is actually (about to be) visible.
+     * Without this, toggling "show text" fires one request per row and keeps every
+     * full text in memory, even for rows nobody scrolled to.
+     */
+    scheduleItemFetch() {
+      if (this.itemRequested) return;
+      this.itemRequested = true;
+      const target = this.$refs.itemCell as HTMLElement | undefined;
+      if (!target || typeof IntersectionObserver === "undefined") {
+        this.fetchItem();
+        return;
+      }
+      this.itemObserver = new IntersectionObserver(
+        (entries) => {
+          if (entries.some((entry) => entry.isIntersecting)) {
+            this.itemObserver?.disconnect();
+            this.itemObserver = null;
+            this.fetchItem();
+          }
+        },
+        { rootMargin: "400px" }, // start loading slightly before the row enters the viewport
+      );
+      this.itemObserver.observe(target);
+    },
+    fetchItem() {
+      API.project
+        .getDetailForItemApiProjectItemsDetailItemIdGet({
+          headers: { "x-project-id": currentProjectStore.projectId as string },
+          path: { item_id: this.ordering.item_id },
+        })
+        .then((response) => {
+          this.item = response.data;
+        })
+        .catch(() => {
+          // ignore
+        });
+    },
     isValid(label: FlatLabel): boolean {
       /**
        * This function checks the validity of the resolved label for an item.
@@ -200,17 +245,7 @@ export default defineComponent({
     },
     showItem(newValue: boolean) {
       if (newValue && !this.item) {
-        API.project
-          .getDetailForItemApiProjectItemsDetailItemIdGet({
-            headers: { "x-project-id": currentProjectStore.projectId as string },
-            path: { item_id: this.ordering.item_id },
-          })
-          .then((response) => {
-            this.item = response.data;
-          })
-          .catch(() => {
-            // ignore
-          });
+        this.scheduleItemFetch();
       }
     },
   },
