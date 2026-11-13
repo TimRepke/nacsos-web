@@ -117,9 +117,9 @@ COMP ->
   | "!="  {% id %}
 
 COMP_EXT ->
-    "LIKE"     {% id %}
-  | "SIMILAR"  {% id %}
-  | COMP       {% id %}
+    "LIKE"i     {% (d) => "LIKE" %}
+  | "SIMILAR"i  {% (d) => "SIMILAR" %}
+  | COMP        {% id %}
 
 COMP_SET ->
     "=="  {% id %}
