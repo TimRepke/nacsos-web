@@ -33,12 +33,12 @@
 </template>
 
 <script setup lang="ts">
-import { marked } from "marked";
+import { md2html } from "@/util";
 import { currentProjectStore } from "@/stores";
 import PermissionSettingsCardReadOnly from "@/components/users/PermissionSettingsCardReadOnly.vue";
 
 function markdownToHtml(txt: string | null | undefined): string {
-  return txt ? marked(txt, { async: false }) : "";
+  return txt ? md2html(txt) : "";
 }
 </script>
 

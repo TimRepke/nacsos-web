@@ -2,10 +2,7 @@
   <div>
     <!-- User Annotations -->
     <span v-for="user in users" :key="user.user_id as string">
-      <span
-        v-for="annotation in proposal.labels[user.user_id as string]"
-        :key="annotation.annotation!.annotation_id as string"
-      >
+      <span v-for="(annotation, idx) in proposal.labels[user.user_id as string] ?? []" :key="`${user.user_id}-${idx}`">
         <InlineToolTip :info="getPrettyIntLabelInfo(annotation)" placement="bottom">
           <span
             class="border text-light p-1 ps-2 pe-2"
@@ -62,9 +59,9 @@
   </div>
 </template>
 
-<script lang="ts">
+<script lang="ts" setup>
 import type { PropType } from "vue";
-import { defineComponent } from "vue";
+import { computed, ref } from "vue";
 import "core-js/modules/es.array.to-sorted";
 import type {
   AnnotationModel,
@@ -86,99 +83,82 @@ function hasValue(
   return model.value_int !== undefined && model.value_int !== null;
 }
 
-interface ChoiceLabelData {
-  changed: boolean;
-  editMode: boolean;
-}
+defineOptions({ name: "ChoiceLabel" });
 
-export default defineComponent({
-  name: "ChoiceLabel",
-  components: { InlineToolTip },
-  data(): ChoiceLabelData {
-    return {
-      changed: false,
-      editMode: false,
-    };
+const emit = defineEmits(["botAnnotationChanged"]);
+
+const props = defineProps({
+  botAnnotationMetaDataId: { type: String, required: false, default: undefined },
+  itemId: { type: String, required: true },
+  label: {
+    type: Object as PropType<FlatLabel>,
+    required: true,
   },
-  emits: ["botAnnotationChanged"],
-  props: {
-    botAnnotationMetaDataId: { type: String, required: false, default: undefined },
-    itemId: { type: String, required: true },
-    label: {
-      type: Object as PropType<FlatLabel>,
-      required: true,
-    },
-    usersLookup: {
-      type: Object as PropType<Record<string, UserModel>>,
-      required: true,
-    },
-    users: {
-      type: Array as PropType<Array<UserModel>>,
-      required: true,
-    },
-    proposal: {
-      type: Object as PropType<ResolutionCell>,
-      required: true,
-    },
-    proposalRow: {
-      type: Object as PropType<Record<string, ResolutionCell>>,
-      required: true,
-    },
+  usersLookup: {
+    type: Object as PropType<Record<string, UserModel>>,
+    required: true,
   },
-  methods: {
-    isNone,
-    hasValue(
-      model: AnnotationModel | BotAnnotationModel | undefined | null,
-    ): model is (AnnotationModel | BotAnnotationModel) & { value_int: number } {
-      return hasValue(model);
-    },
-    annotation2bgColor(val: AnnotationModel | BotAnnotationModel | undefined | null) {
-      if (hasValue(val)) {
-        return cmap[val.value_int % cmap.length];
-      }
-      return "transparent";
-    },
-    setBotAnnotation(value: number | undefined | null) {
-      const { resolution } = this.proposal;
-      if (is<BotAnnotationModel>(resolution)) {
-        resolution.value_int = value;
-        this.$emit("botAnnotationChanged", resolution);
-        this.changed = true;
-      }
-      this.editMode = false;
-    },
-    getPrettyIntLabelInfo(userEntry: ResolutionUserEntry): string {
-      let username: string | null | undefined;
-      let valueInt: number | null | undefined = null;
-      if (!userEntry.annotation) {
-        if (!userEntry.assignment) {
-          return "No data";
-        }
-        username = userEntry.assignment.user_id;
-      } else {
-        username = this.usersLookup[userEntry.annotation.user_id]?.username;
-        valueInt = userEntry.annotation.value_int;
-      }
-      let ret = "";
-      if (username) {
-        ret += username;
-      } else {
-        ret += "??";
-      }
-      if (is<number>(valueInt) && is<FlatLabelChoice>(this.choiceLookup[valueInt])) {
-        ret += `: ${this.choiceLookup[valueInt].name}`;
-      }
-      return ret;
-    },
+  users: {
+    type: Array as PropType<Array<UserModel>>,
+    required: true,
   },
-  computed: {
-    choiceLookup(): Record<number, FlatLabelChoice> {
-      const { choices } = this.label;
-      if (!choices) return {};
-      return Object.fromEntries(choices.map((choice: FlatLabelChoice) => [choice.value, choice]));
-    },
+  proposal: {
+    type: Object as PropType<ResolutionCell>,
+    required: true,
+  },
+  proposalRow: {
+    type: Object as PropType<Record<string, ResolutionCell>>,
+    required: true,
   },
 });
+
+const changed = ref(false);
+const editMode = ref(false);
+
+const choiceLookup = computed<Record<number, FlatLabelChoice>>(() => {
+  const { choices } = props.label;
+  if (!choices) return {};
+  return Object.fromEntries(choices.map((choice: FlatLabelChoice) => [choice.value, choice]));
+});
+
+function annotation2bgColor(val: AnnotationModel | BotAnnotationModel | undefined | null) {
+  if (hasValue(val)) {
+    return cmap[val.value_int % cmap.length];
+  }
+  return "transparent";
+}
+function setBotAnnotation(value: number | undefined | null) {
+  const { resolution } = props.proposal;
+  if (is<BotAnnotationModel>(resolution)) {
+    resolution.value_int = value;
+    emit("botAnnotationChanged", resolution);
+    changed.value = true;
+  }
+  editMode.value = false;
+}
+function getPrettyIntLabelInfo(userEntry: ResolutionUserEntry): string {
+  let username: string | null | undefined;
+  let valueInt: number | null | undefined = null;
+  if (!userEntry.annotation) {
+    if (!userEntry.assignment) {
+      return "No data";
+    }
+    username = userEntry.assignment.user_id;
+  } else {
+    username = props.usersLookup[userEntry.annotation.user_id]?.username;
+    valueInt = userEntry.annotation.value_int;
+  }
+  let ret = "";
+  if (username) {
+    ret += username;
+  } else {
+    ret += "??";
+  }
+  if (is<number>(valueInt) && is<FlatLabelChoice>(choiceLookup.value[valueInt])) {
+    ret += `: ${choiceLookup.value[valueInt].name}`;
+  }
+  return ret;
+}
 </script>
 
 <style scoped></style>

@@ -55,13 +55,15 @@
   </div>
 </template>
 
-<script lang="ts">
+<script lang="ts" setup>
 import type { PropType } from "vue";
-import { defineComponent } from "vue";
+import { ref, watch } from "vue";
 import { type OpenAlexSolrImport, DefTypeEnum, OpEnum, SearchFieldEnum, ImportConfigEnum } from "@/plugins/api/types";
 import useVuelidate, { type ValidationRule } from "@vuelidate/core";
 import { errorsToString } from "@/util/validators";
 import { Overwrite } from "@/util";
+
+defineOptions({ name: "ConfigOpenAlex" });
 
 type StringifiedOpenAlexSolrImport = Overwrite<OpenAlexSolrImport, { params: string }>;
 
@@ -77,96 +79,94 @@ const isJSON: ValidationRule = {
   },
   $message: "Invalid JSON!",
 };
-export default defineComponent({
-  name: "ConfigOpenAlex",
-  emits: ["configChanged"],
-  props: {
-    existingConfig: {
-      type: Object as PropType<OpenAlexSolrImport>,
-      required: false,
-      default: null,
-    },
-    projectId: {
-      type: String,
-      required: false,
-      default: null,
-    },
-    importId: {
-      type: String,
-      required: false,
-      default: null,
-    },
-    editable: {
-      type: Boolean,
-      default: true,
-    },
+
+const emit = defineEmits(["configChanged"]);
+const props = defineProps({
+  existingConfig: {
+    type: Object as PropType<OpenAlexSolrImport>,
+    required: false,
+    default: null,
   },
-  setup() {
-    return { v$: useVuelidate() };
+  projectId: {
+    type: String,
+    required: false,
+    default: null,
   },
-  data() {
-    const emptyConfig: StringifiedOpenAlexSolrImport = {
-      kind: ImportConfigEnum.OA_SOLR,
-      query: "",
-      def_type: DefTypeEnum.LUCENE,
-      field: SearchFieldEnum.TITLE_ABSTRACT,
-      op: OpEnum.AND,
-      params: '{ "fq": "is_xpac: false" }',
-    };
-    if (!this.existingConfig || this.existingConfig.kind !== ImportConfigEnum.OA_SOLR) {
-      this.$emit("configChanged", this.parse(emptyConfig));
-      return { config: emptyConfig, debounceWatch: false };
-    }
-    return { config: this.stringify(this.existingConfig), debounceWatch: false };
+  importId: {
+    type: String,
+    required: false,
+    default: null,
   },
-  methods: {
-    errorsToString,
-    parse(conf: StringifiedOpenAlexSolrImport): OpenAlexSolrImport {
-      const copy = JSON.parse(JSON.stringify(conf));
-      copy.params = JSON.parse(copy.params || "");
-      return copy;
-    },
-    stringify(conf: OpenAlexSolrImport): StringifiedOpenAlexSolrImport {
-      const copy = JSON.parse(JSON.stringify(conf));
-      copy.params = copy.params ? JSON.stringify(copy.params) : null;
-      return copy;
-    },
-  },
-  watch: {
-    config: {
-      handler(newValue: OpenAlexSolrImport) {
-        if (this.debounceWatch) {
-          // prevent endless recursion
-          this.debounceWatch = false;
-          return;
-        }
-        try {
-          this.$emit("configChanged", this.parse(newValue));
-        } catch {
-          console.warn("Not updating config due to invalid json");
-        }
-      },
-      deep: true,
-    },
-    existingConfig: {
-      handler(newValue: OpenAlexSolrImport) {
-        this.debounceWatch = true;
-        this.config = this.stringify(newValue);
-      },
-      deep: true,
-    },
-    importId: {
-      handler(newValue: string) {
-        this.config.import_id = newValue;
-      },
-    },
-  },
-  validations() {
-    return {
-      config: { isJSON, $autoDirty: true },
-    };
+  editable: {
+    type: Boolean,
+    default: true,
   },
 });
+
+function parse(conf: StringifiedOpenAlexSolrImport): OpenAlexSolrImport {
+  const copy = JSON.parse(JSON.stringify(conf));
+  copy.params = JSON.parse(copy.params || "");
+  return copy;
+}
+
+function stringify(conf: OpenAlexSolrImport): StringifiedOpenAlexSolrImport {
+  const copy = JSON.parse(JSON.stringify(conf));
+  copy.params = copy.params ? JSON.stringify(copy.params) : null;
+  return copy;
+}
+
+const emptyConfig: StringifiedOpenAlexSolrImport = {
+  kind: ImportConfigEnum.OA_SOLR,
+  query: "",
+  def_type: DefTypeEnum.LUCENE,
+  field: SearchFieldEnum.TITLE_ABSTRACT,
+  op: OpEnum.AND,
+  params: '{ "fq": "is_xpac: false" }',
+};
+
+const config = ref<StringifiedOpenAlexSolrImport>(emptyConfig);
+const debounceWatch = ref(false);
+if (!props.existingConfig || props.existingConfig.kind !== ImportConfigEnum.OA_SOLR) {
+  emit("configChanged", parse(emptyConfig));
+} else {
+  config.value = stringify(props.existingConfig);
+}
+
+const rules = {
+  config: { isJSON, $autoDirty: true },
+};
+const v$ = useVuelidate(rules, { config });
+
+watch(
+  () => config.value,
+  (newValue) => {
+    if (debounceWatch.value) {
+      // prevent endless recursion
+      debounceWatch.value = false;
+      return;
+    }
+    try {
+      emit("configChanged", parse(newValue));
+    } catch {
+      console.warn("Not updating config due to invalid json");
+    }
+  },
+  { deep: true },
+);
+watch(
+  () => props.existingConfig,
+  (newValue) => {
+    debounceWatch.value = true;
+    config.value = stringify(newValue);
+  },
+  { deep: true },
+);
+watch(
+  () => props.importId,
+  (newValue) => {
+    (config.value as { import_id?: string | null }).import_id = newValue;
+  },
+);
 </script>
 
 <style scoped></style>

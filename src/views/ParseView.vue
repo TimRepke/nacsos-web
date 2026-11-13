@@ -51,94 +51,87 @@
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from "vue";
+<script lang="ts" setup>
+import { computed, ref } from "vue";
 import { parse, parseHist, debug, type Column } from "@/util/nql";
 import { currentProjectStore } from "@/stores";
 import { API, logReject } from "@/plugins/api";
 import NQLBox from "@/components/NQLBox.vue";
 
-export default defineComponent({
-  name: "ParseView",
-  components: { NQLBox },
-  data() {
-    // let res;
-    // res = debug('title: "hi"');
-    // // console.log(res);
-    // res = debug("PY: >2020");
-    // // console.log(res);
-    // res = debug('PY: >2020\n  OR\n  title: "carbon"\n');
-    //
-    // res = debug("import: abc, 12d, -af3");
-    //
-    // debug("label: key=3 FROM abc, 12d");
-    // debug("label: key=3");
-    // debug("label: key==3,4,5");
-    // debug("label: key !> 3,4,5");
-    // debug("label: key !> 3,4,5 FROM abc, -12d");
-    // debug("label: key <= 5 BY ~cde,123");
-    // debug("label: key > 2 FROM abc, -12d BY ~cde,123");
-    //
-    // debug('meta: extra LIKE "% test %"');
-    //
-    // debug("meta: extra <= 4");
-    //
-    // debug("(PY:>2000 AND (PY:<2100 OR PY:>2200))");
-    // debug("PY:>2000 AND PY:<2100 AND PY:>2200");
+defineOptions({ name: "ParseView" });
 
-    // import: 944f2985-503b-4aad-8af1-e48b694eba19
+// let res;
+// res = debug('title: "hi"');
+// // console.log(res);
+// res = debug("PY: >2020");
+// // console.log(res);
+// res = debug('PY: >2020\n  OR\n  title: "carbon"\n');
+//
+// res = debug("import: abc, 12d, -af3");
+//
+// debug("label: key=3 FROM abc, 12d");
+// debug("label: key=3");
+// debug("label: key==3,4,5");
+// debug("label: key !> 3,4,5");
+// debug("label: key !> 3,4,5 FROM abc, -12d");
+// debug("label: key <= 5 BY ~cde,123");
+// debug("label: key > 2 FROM abc, -12d BY ~cde,123");
+//
+// debug('meta: extra LIKE "% test %"');
+//
+// debug("meta: extra <= 4");
+//
+// debug("(PY:>2000 AND (PY:<2100 OR PY:>2200))");
+// debug("PY:>2000 AND PY:<2100 AND PY:>2200");
 
-    // 97a715be-7b40-4048-8c50-3c65132ec5ab
-    // 4c0e0c43-cc1c-4ff1-95e1-210ab0f1fc72
+// import: 944f2985-503b-4aad-8af1-e48b694eba19
 
-    // console.log(res);
-    return {
-      queryStr: 'title: "%hi%"',
-      count: -1,
-      output: "json",
-    };
-  },
-  methods: {
-    ask() {
-      const query = debug(this.queryStr);
-      this.count = -1;
-      API.search
-        .nqlQueryApiSearchNqlQueryPost({
-          headers: {'x-project-id': currentProjectStore.projectId as string},
-          body: query[0],
-        })
-        .then((response) => {
-          this.count = response.data.n_docs;
-        })
-        .catch(logReject);
-    },
-  },
-  computed: {
-    dump(): string {
-      const query = parse(this.queryStr);
-      if (query.length === 0) {
-        return "[No result]";
-      }
+// 97a715be-7b40-4048-8c50-3c65132ec5ab
+// 4c0e0c43-cc1c-4ff1-95e1-210ab0f1fc72
 
-      if (this.output === "python") {
-        return `QUERY = NQLFilterParser.validate_python(json.loads('''\n${JSON.stringify(query[0], null, "  ")}\n'''))`;
-      } else if (this.output === "python-compact") {
-        return `QUERY = NQLFilterParser.validate_python(json.loads('${JSON.stringify(query[0])}'))`;
-      } else if (this.output === "json") {
-        return JSON.stringify(query, null, "  ");
-      } else {
-        return "[Error]";
-      }
-    },
-    table(): Array<Column> {
-      try {
-        const parser = parseHist(this.queryStr);
-        if (!parser) return [];
-        return parser.table;
-      } catch (e) {
-        return [];
-      }
-    },
-  },
+// console.log(res);
+const queryStr = ref('title: "%hi%"');
+const count = ref(-1);
+const output = ref("json");
+
+const dump = computed<string>(() => {
+  const query = parse(queryStr.value);
+  if (query.length === 0) {
+    return "[No result]";
+  }
+
+  if (output.value === "python") {
+    return `QUERY = NQLFilterParser.validate_python(json.loads('''\n${JSON.stringify(query[0], null, "  ")}\n'''))`;
+  } else if (output.value === "python-compact") {
+    return `QUERY = NQLFilterParser.validate_python(json.loads('${JSON.stringify(query[0])}'))`;
+  } else if (output.value === "json") {
+    return JSON.stringify(query, null, "  ");
+  } else {
+    return "[Error]";
+  }
 });
+
+const table = computed<Array<Column>>(() => {
+  try {
+    const parser = parseHist(queryStr.value);
+    if (!parser) return [];
+    return parser.table;
+  } catch (e) {
+    return [];
+  }
+});
+
+function ask() {
+  const query = debug(queryStr.value);
+  count.value = -1;
+  API.search
+    .nqlQueryApiSearchNqlQueryPost({
+      headers: {'x-project-id': currentProjectStore.projectId as string},
+      body: query[0],
+    })
+    .then((response) => {
+      count.value = response.data.n_docs;
+    })
+    .catch(logReject);
+}
 </script>

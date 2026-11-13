@@ -2,6 +2,8 @@ import { createRouter, createWebHashHistory } from "vue-router";
 import type { RouteRecordRaw } from "vue-router";
 import { currentProjectStore, currentUserStore } from "@/stores";
 import { isOnRoute } from "@/util";
+import { EventBus } from "@/plugins/events";
+import { ToastEvent } from "@/plugins/events/events/toast";
 import HomeView from "../views/HomeView.vue";
 
 const routes: Array<RouteRecordRaw> = [
@@ -264,6 +266,7 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: "/admin",
     name: "admin",
+    meta: { requiresSudo: true },
     component: () => import(/* webpackChunkName: "AdminContainer" */ "../views/Admin/AdminContainer.vue"),
     children: [
       {
@@ -329,6 +332,12 @@ router.beforeEach(async (to) => {
   // prevent infinite redirects if user isn't logged in
   if (!currentUserStore.isLoggedIn && to.name !== "user-login" && to.name !== "about") {
     return { name: "user-login" };
+  }
+
+  // routes that require a superuser (e.g. the admin subtree) -> redirect everyone else to home
+  if (to.matched.some((record) => record.meta.requiresSudo === true) && !currentUserStore.isSudo) {
+    EventBus.emit(new ToastEvent("WARN", "You don't have the permissions to access this page."));
+    return { name: "home" };
   }
 
   // if no project is selected (and it isn't on purpose) --> redirect to project selection page

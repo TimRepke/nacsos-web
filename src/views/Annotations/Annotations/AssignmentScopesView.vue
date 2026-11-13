@@ -37,7 +37,7 @@
                 v-slot="{ navigate }"
               >
                 <tr @click.stop="navigate" role="button">
-                  <td class="col-2 text-muted small">{{ $util.dt2str(scope.scope.time_created) }}</td>
+                  <td class="col-2 text-muted small">{{ dt2str(scope.scope.time_created) }}</td>
                   <td class="col-3">{{ scope.scope.name }}</td>
                   <td
                     class="col-1 text-center"
@@ -95,8 +95,9 @@
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from "vue";
+<script lang="ts" setup>
+import { dt2str } from "@/util";
+import { computed, onMounted, ref } from "vue";
 import { currentProjectStore } from "@/stores";
 import type { UserProjectAssignmentScope } from "@/plugins/api/types";
 import { API, ignore } from "@/plugins/api";
@@ -107,98 +108,92 @@ enum Sort {
   "sort-down" = "sort-down", // descending
 }
 
-export default defineComponent({
-  name: "AssignmentScopesView",
-  data() {
-    return {
-      sorting: {
-        name: Sort.sort,
-        scheme: Sort.sort,
-        open: Sort.sort,
-        date: Sort["sort-down"],
-      } as Record<string, Sort>,
-      annotationScopes: [] as UserProjectAssignmentScope[],
-    };
-  },
-  async mounted() {
-    API.annotations
-      .getAssignmentScopesForUserApiAnnotationsAssignmentsScopesProjectIdGet({
-        path: { project_id: currentProjectStore.projectId as string },
-        headers: { "x-project-id": currentProjectStore.projectId as string },
-      })
-      .then((response) => {
-        this.annotationScopes = response.data;
-      })
-      .catch(ignore);
-  },
-  methods: {
-    resort(field: string) {
-      const currentVal: Sort = this.sorting[field];
-      // reset all other column sorters
-      if (field !== "name") this.sorting.name = Sort.sort;
-      if (field !== "scheme") this.sorting.scheme = Sort.sort;
-      if (field !== "open") this.sorting.open = Sort.sort;
-      if (field !== "date") this.sorting.date = Sort.sort;
+defineOptions({ name: "AssignmentScopesView" });
 
-      // cycle through states
-      if (currentVal === Sort.sort) {
-        this.sorting[field] = Sort["sort-up"];
-      } else if (currentVal === Sort["sort-up"]) {
-        this.sorting[field] = Sort["sort-down"];
-      } else if (currentVal === Sort["sort-down"]) {
-        this.sorting[field] = Sort.sort;
-      }
-    },
-  },
-  computed: {
-    filteredScopes(): UserProjectAssignmentScope[] {
-      return this.annotationScopes;
-      // this.annotationScopes.filter(
-      //   (scope: UserProjectAssignmentScope) => scope.scope.name.toLowerCase().indexOf(this.projectSearch.toLowerCase()) >= 0,
-      // );
-    },
-    sortedFilteredScopes(): UserProjectAssignmentScope[] {
-      let comparator: (
-        p1: UserProjectAssignmentScope,
-        p2: UserProjectAssignmentScope,
-      ) => [string, string] | [number, number];
-      let dir: Sort;
-      if (this.sorting.name !== Sort.sort) {
-        comparator = (p1: UserProjectAssignmentScope, p2: UserProjectAssignmentScope) => [
-          p1.scope.name as string,
-          p2.scope.name as string,
-        ];
-        dir = this.sorting.name;
-      } else if (this.sorting.scheme !== Sort.sort) {
-        comparator = (p1: UserProjectAssignmentScope, p2: UserProjectAssignmentScope) => [
-          p1.scheme_name as string,
-          p2.scheme_name as string,
-        ];
-        dir = this.sorting.scheme;
-      } else if (this.sorting.open !== Sort.sort) {
-        comparator = (p1: UserProjectAssignmentScope, p2: UserProjectAssignmentScope) => [
-          p1.num_open as number,
-          p2.num_open as number,
-        ];
-        dir = this.sorting.open;
-      } else if (this.sorting.date !== Sort.sort) {
-        comparator = (p1: UserProjectAssignmentScope, p2: UserProjectAssignmentScope) => [
-          p1.scope.time_created as string,
-          p2.scope.time_created as string,
-        ];
-        dir = this.sorting.date;
-      } else {
-        return this.filteredScopes;
-      }
+const sorting = ref({
+  name: Sort.sort,
+  scheme: Sort.sort,
+  open: Sort.sort,
+  date: Sort["sort-down"],
+} as Record<string, Sort>);
+const annotationScopes = ref<UserProjectAssignmentScope[]>([]);
 
-      return this.filteredScopes.toSorted((p1: UserProjectAssignmentScope, p2: UserProjectAssignmentScope) => {
-        const [v1, v2] = comparator(p1, p2);
-        if (v1 < v2) return dir === Sort["sort-up"] ? -1 : 1;
-        if (v1 > v2) return dir === Sort["sort-up"] ? 1 : -1;
-        return 0;
-      });
-    },
-  },
+onMounted(() => {
+  API.annotations
+    .getAssignmentScopesForUserApiAnnotationsAssignmentsScopesProjectIdGet({
+      path: { project_id: currentProjectStore.projectId as string },
+      headers: { "x-project-id": currentProjectStore.projectId as string },
+    })
+    .then((response) => {
+      annotationScopes.value = response.data;
+    })
+    .catch(ignore);
+});
+
+function resort(field: string) {
+  const currentVal: Sort = sorting.value[field];
+  // reset all other column sorters
+  if (field !== "name") sorting.value.name = Sort.sort;
+  if (field !== "scheme") sorting.value.scheme = Sort.sort;
+  if (field !== "open") sorting.value.open = Sort.sort;
+  if (field !== "date") sorting.value.date = Sort.sort;
+
+  // cycle through states
+  if (currentVal === Sort.sort) {
+    sorting.value[field] = Sort["sort-up"];
+  } else if (currentVal === Sort["sort-up"]) {
+    sorting.value[field] = Sort["sort-down"];
+  } else if (currentVal === Sort["sort-down"]) {
+    sorting.value[field] = Sort.sort;
+  }
+}
+
+const filteredScopes = computed<UserProjectAssignmentScope[]>(() => {
+  return annotationScopes.value;
+  // annotationScopes.value.filter(
+  //   (scope: UserProjectAssignmentScope) => scope.scope.name.toLowerCase().indexOf(this.projectSearch.toLowerCase()) >= 0,
+  // );
+});
+const sortedFilteredScopes = computed<UserProjectAssignmentScope[]>(() => {
+  let comparator: (
+    p1: UserProjectAssignmentScope,
+    p2: UserProjectAssignmentScope,
+  ) => [string, string] | [number, number];
+  let dir: Sort;
+  if (sorting.value.name !== Sort.sort) {
+    comparator = (p1: UserProjectAssignmentScope, p2: UserProjectAssignmentScope) => [
+      p1.scope.name as string,
+      p2.scope.name as string,
+    ];
+    dir = sorting.value.name;
+  } else if (sorting.value.scheme !== Sort.sort) {
+    comparator = (p1: UserProjectAssignmentScope, p2: UserProjectAssignmentScope) => [
+      p1.scheme_name as string,
+      p2.scheme_name as string,
+    ];
+    dir = sorting.value.scheme;
+  } else if (sorting.value.open !== Sort.sort) {
+    comparator = (p1: UserProjectAssignmentScope, p2: UserProjectAssignmentScope) => [
+      p1.num_open as number,
+      p2.num_open as number,
+    ];
+    dir = sorting.value.open;
+  } else if (sorting.value.date !== Sort.sort) {
+    comparator = (p1: UserProjectAssignmentScope, p2: UserProjectAssignmentScope) => [
+      p1.scope.time_created as string,
+      p2.scope.time_created as string,
+    ];
+    dir = sorting.value.date;
+  } else {
+    return filteredScopes.value;
+  }
+
+  return filteredScopes.value.toSorted((p1: UserProjectAssignmentScope, p2: UserProjectAssignmentScope) => {
+    const [v1, v2] = comparator(p1, p2);
+    if (v1 < v2) return dir === Sort["sort-up"] ? -1 : 1;
+    if (v1 > v2) return dir === Sort["sort-up"] ? 1 : -1;
+    return 0;
+  });
 });
 </script>
 

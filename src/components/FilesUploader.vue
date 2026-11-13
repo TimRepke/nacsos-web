@@ -34,19 +34,6 @@
                   <!--"file.status==='PENDING'"-->
                 </InlineToolTip>
               </span>
-              <div class="progress">
-                <div
-                  role="progressbar"
-                  :style="{ width: `${file.percentage}%` }"
-                  class="progress-bar"
-                  aria-label="File upload progress"
-                  :aria-valuenow="file.percentage"
-                  aria-valuemin="0"
-                  aria-valuemax="100"
-                >
-                  {{ file.percentage }}%
-                </div>
-              </div>
             </div>
           </li>
         </ul>
@@ -55,14 +42,16 @@
   </div>
 </template>
 
-<script lang="ts">
+<script lang="ts" setup>
 /* eslint no-param-reassign: "off" */
-import { defineComponent } from "vue";
+import { ref } from "vue";
 import { ToastEvent } from "@/plugins/events/events/toast";
 import { EventBus } from "@/plugins/events";
 import InlineToolTip from "@/components/InlineToolTip.vue";
 import { API } from "@/plugins/api";
 import { currentProjectStore } from "@/stores";
+
+defineOptions({ name: "FilesUploader" });
 
 type UploadStatus = "PENDING" | "UPLOADING" | "SUCCESS" | "FAILED";
 
@@ -74,69 +63,76 @@ export interface UploadFile {
   status: UploadStatus;
 }
 
-export default defineComponent({
-  name: "FilesUploader",
-  components: { InlineToolTip },
-  emits: ["filesUpdated"],
-  props: {
-    uploadEnabled: {
-      type: Boolean,
-      default: true,
-    },
-  },
-  data() {
-    return {
-      selectedFiles: undefined as UploadFile[] | undefined,
-      isUploading: false,
-    };
-  },
-  methods: {
-    selectFile(event: { target: { files: FileList } }) {
-      this.selectedFiles = Array.from(event.target.files).map(
-        (file: File) => ({ id: crypto.randomUUID(), file, percentage: 0, status: "PENDING" }) as UploadFile,
-      );
-    },
-    upload(uploadFile: UploadFile, folder?: string) {
-      uploadFile.status = "UPLOADING";
-      if (!folder) {
-        folder = crypto.randomUUID();
-      }
+const emit = defineEmits(["filesUpdated"]);
 
-      return new Promise((resolve, reject) => {
-        API.pipes
-          .uploadFileApiPipesArtefactsFilesUploadPost({
-            headers: { "x-project-id": currentProjectStore.projectId as string },
-            query: { folder },
-            body: { file: uploadFile.file },
-            // FIXME
-            // onUploadProgress: (event: { loaded: number; total?: number }) => {
-            //   uploadFile.percentage = Math.round(100 * (event.loaded / (event.total || 1)));
-            // },
-          })
-          .then((response) => {
-            uploadFile.status = "SUCCESS";
-            uploadFile.percentage = 100;
-            uploadFile.serverPath = response.data;
-            resolve(response.data);
-          })
-          .catch(() => {
-            uploadFile.status = "FAILED";
-            EventBus.emit(new ToastEvent("ERROR", `Failed to upload file "${uploadFile.file.name}"`));
-            reject();
-          });
-      });
-    },
-    uploadFiles() {
-      if (this.selectedFiles && this.selectedFiles.length > 0) {
-        this.isUploading = true;
-        const folder = crypto.randomUUID();
-        const uploads = this.selectedFiles.map((file: UploadFile) => this.upload(file, folder));
-        Promise.allSettled(uploads).then(() => {
-          this.$emit("filesUpdated", this.selectedFiles);
-          this.isUploading = false;
-        });
-      }
-    },
+defineProps({
+  uploadEnabled: {
+    type: Boolean,
+    default: true,
   },
 });
+
+const selectedFiles = ref<UploadFile[] | undefined>(undefined);
+const isUploading = ref(false);
+
+function selectFile(event: { target: { files: FileList } }) {
+  selectedFiles.value = Array.from(event.target.files).map(
+    (file: File) => ({ id: crypto.randomUUID(), file, percentage: 0, status: "PENDING" }) as UploadFile,
+  );
+}
+
+function upload(uploadFile: UploadFile, folder?: string) {
+  uploadFile.status = "UPLOADING";
+  if (!folder) {
+    folder = crypto.randomUUID();
+  }
+
+  return new Promise((resolve, reject) => {
+    API.pipes
+      .uploadFileApiPipesArtefactsFilesUploadPost({
+        headers: { "x-project-id": currentProjectStore.projectId as string },
+        query: { folder },
+        body: { file: uploadFile.file },
+      })
+      .then((response) => {
+        uploadFile.status = "SUCCESS";
+        uploadFile.percentage = 100;
+        uploadFile.serverPath = response.data;
+        resolve(response.data);
+      })
+      .catch(() => {
+        uploadFile.status = "FAILED";
+        EventBus.emit(new ToastEvent("ERROR", `Failed to upload file "${uploadFile.file.name}"`));
+        reject();
+      });
+  });
+}
+
+// max number of files uploaded concurrently
+const MAX_CONCURRENT_UPLOADS = 3;
+
+function uploadFiles() {
+  if (selectedFiles.value && selectedFiles.value.length > 0) {
+    isUploading.value = true;
+    const folder = crypto.randomUUID();
+    const queue = [...selectedFiles.value];
+    const worker = (): Promise<void> => {
+      const file = queue.shift();
+      if (!file) {
+        return Promise.resolve();
+      }
+      return upload(file, folder)
+        .catch(() => undefined)
+        .then(worker);
+    };
+    const workers: Array<Promise<void>> = [];
+    for (let i = 0; i < Math.min(MAX_CONCURRENT_UPLOADS, queue.length); i++) {
+      workers.push(worker());
+    }
+    Promise.allSettled(workers).then(() => {
+      emit("filesUpdated", selectedFiles.value);
+      isUploading.value = false;
+    });
+  }
+}
 </script>

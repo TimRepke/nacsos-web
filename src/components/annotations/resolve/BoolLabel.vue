@@ -1,11 +1,11 @@
 <template>
   <div>
     <span v-for="user in users" :key="user.user_id">
-      <span v-for="annotation in proposal.labels[user.user_id as string]" :key="annotation.annotation.annotation_id">
-        <InlineToolTip :info="getPrettyUsername(user)" placement="bottom">
+      <span v-for="(annotation, idx) in proposal.labels[user.user_id as string] ?? []" :key="`${user.user_id}-${idx}`">
+        <InlineToolTip :info="getPrettyLabelInfo(annotation)" placement="bottom">
           <font-awesome-icon
-            :icon="['fas', annotation2icon(annotation.annotation.value_bool)]"
-            :class="[val2classes(annotation.annotation.value_bool)]"
+            :icon="['fas', annotation2icon(annotation.annotation?.value_bool)]"
+            :class="[val2classes(annotation.annotation?.value_bool)]"
             class="border text-light p-1"
             style="height: 1rem; width: 1rem"
           />
@@ -33,80 +33,89 @@
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from "vue";
+<script lang="ts" setup>
+import { ref } from "vue";
 import type { PropType } from "vue";
-import type { BotAnnotationModel, FlatLabel, ResolutionCell, UserModel } from "@/plugins/api/types";
+import type {
+  BotAnnotationModel,
+  FlatLabel,
+  ResolutionCell,
+  ResolutionUserEntry,
+  UserModel,
+} from "@/plugins/api/types";
 import InlineToolTip from "@/components/InlineToolTip.vue";
 import { is, isNone } from "@/util";
 
-export default defineComponent({
-  name: "BoolLabel",
-  components: { InlineToolTip },
-  data() {
-    return {
-      // set to true when bot annotation was manipulated
-      changed: false,
-      editMode: false,
-    };
-  },
-  emits: ["botAnnotationChanged"],
-  props: {
-    botAnnotationMetaDataId: { type: String, required: false, default: undefined },
-    itemId: { type: String, required: true },
-    label: {
-      type: Object as PropType<FlatLabel>,
-      required: true,
-    },
-    usersLookup: {
-      type: Object as PropType<Record<string, UserModel>>,
-      required: true,
-    },
-    users: {
-      type: Array as PropType<Array<UserModel>>,
-      required: true,
-    },
-    proposal: {
-      type: Object as PropType<ResolutionCell>,
-      required: true,
-    },
-    proposalRow: {
-      type: Object as PropType<Record<string, ResolutionCell>>,
-      required: true,
-    },
-  },
-  methods: {
-    annotation2icon(val: boolean | undefined | null): string {
-      if (isNone(val)) return "question";
-      return val ? "check" : "xmark";
-    },
-    val2classes(value: boolean | undefined | null) {
-      if (isNone(value)) return ["bg-light", "text-dark"];
-      return value ? ["bg-success", "text-light"] : ["bg-danger", "text-light"];
-    },
-    proposal2classes(proposal: ResolutionCell): string[] {
-      let classes: string[] = [];
-      if (proposal.status === "NEW") {
-        classes = ["resolve-label-new"];
-      } else if (proposal.status === "CHANGED") {
-        classes = ["resolve-label-changed"];
-      }
-      return classes.concat(this.val2classes(proposal.resolution?.value_bool));
-    },
-    setBotAnnotation(value: boolean | undefined | null) {
-      const { resolution } = this.proposal;
-      if (is<BotAnnotationModel>(resolution)) {
-        resolution.value_bool = value;
-        this.$emit("botAnnotationChanged", resolution);
+defineOptions({ name: "BoolLabel" });
 
-        this.changed = true;
-      }
-      this.editMode = false;
-    },
-    getPrettyUsername(user: UserModel | undefined | null): string {
-      if (!is<UserModel>(user)) return "??";
-      return `${user.username} (${user.full_name})`;
-    },
+const emit = defineEmits(["botAnnotationChanged"]);
+
+const props = defineProps({
+  botAnnotationMetaDataId: { type: String, required: false, default: undefined },
+  itemId: { type: String, required: true },
+  label: {
+    type: Object as PropType<FlatLabel>,
+    required: true,
+  },
+  usersLookup: {
+    type: Object as PropType<Record<string, UserModel>>,
+    required: true,
+  },
+  users: {
+    type: Array as PropType<Array<UserModel>>,
+    required: true,
+  },
+  proposal: {
+    type: Object as PropType<ResolutionCell>,
+    required: true,
+  },
+  proposalRow: {
+    type: Object as PropType<Record<string, ResolutionCell>>,
+    required: true,
   },
 });
+
+// set to true when bot annotation was manipulated
+const changed = ref(false);
+const editMode = ref(false);
+
+function annotation2icon(val: boolean | undefined | null): string {
+  if (isNone(val)) return "question";
+  return val ? "check" : "xmark";
+}
+function val2classes(value: boolean | undefined | null) {
+  if (isNone(value)) return ["bg-light", "text-dark"];
+  return value ? ["bg-success", "text-light"] : ["bg-danger", "text-light"];
+}
+function proposal2classes(proposal: ResolutionCell): string[] {
+  let classes: string[] = [];
+  if (proposal.status === "NEW") {
+    classes = ["resolve-label-new"];
+  } else if (proposal.status === "CHANGED") {
+    classes = ["resolve-label-changed"];
+  }
+  return classes.concat(val2classes(proposal.resolution?.value_bool));
+}
+function setBotAnnotation(value: boolean | undefined | null) {
+  const { resolution } = props.proposal;
+  if (is<BotAnnotationModel>(resolution)) {
+    resolution.value_bool = value;
+    emit("botAnnotationChanged", resolution);
+
+    changed.value = true;
+  }
+  editMode.value = false;
+}
+function getPrettyLabelInfo(userEntry: ResolutionUserEntry): string {
+  // entries without annotation exist (the resolver fetches with include_empty: true)
+  if (isNone(userEntry.annotation)) {
+    return "No data";
+  }
+  const username = props.usersLookup[userEntry.annotation.user_id]?.username ?? "??";
+  const valueBool = userEntry.annotation.value_bool;
+  let value = "undetermined";
+  if (valueBool === true) value = "true";
+  else if (valueBool === false) value = "false";
+  return `${username}: ${value}`;
+}
 </script>

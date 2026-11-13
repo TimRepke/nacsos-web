@@ -49,50 +49,75 @@
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from "vue";
+<script lang="ts" setup>
+import { ref, onMounted, onUnmounted } from "vue";
+import { useRouter } from "vue-router";
 import NacsosLogo from "@/components/NacsosLogo.vue";
 import { EventBus } from "@/plugins/events";
 import { AuthFailedEvent, UserLoginEvent, LoginSuccessEvent } from "@/plugins/events/events/auth";
 import { API, ErrorDetails, toastReject } from "@/plugins/api";
 import { ToastEvent } from "@/plugins/events/events/toast";
 
-export default defineComponent({
-  name: "LoginView",
-  components: { NacsosLogo },
-  data() {
-    return {
-      username: "",
-      password: "",
-      error: null,
-    };
-  },
-  mounted() {
-    EventBus.on(AuthFailedEvent, (reason: { reason: ErrorDetails }) => {
-      this.error = reason?.reason.type === "KeyError" ? "Username not in the system." : (this.error = "Login failed.");
+defineOptions({ name: "LoginView" });
+
+const router = useRouter();
+
+const username = ref("");
+const password = ref("");
+const error = ref<string | null>(null);
+
+let authFailedListener: [string, number] | null = null;
+let loginSuccessListener: [string, number] | null = null;
+
+function removeLoginSuccessListener() {
+  if (loginSuccessListener) {
+    EventBus.off(loginSuccessListener);
+    loginSuccessListener = null;
+  }
+}
+
+// at most one success handler exists at any time: it self-destructs on success and is
+// removed on failure, so failed attempts can't queue up stale router.push handlers
+function armLoginSuccessListener() {
+  if (!loginSuccessListener) {
+    loginSuccessListener = EventBus.once(LoginSuccessEvent, () => {
+      loginSuccessListener = null;
+      router.push({ name: "project-list" });
     });
-  },
-  methods: {
-    async login() {
-      this.error = null;
-      EventBus.emit(new UserLoginEvent(this.username, this.password));
-      EventBus.once(LoginSuccessEvent, () => {
-        this.$router.push({ name: "project-list" });
-      });
-    },
-    async reset() {
-      this.error = null;
-      API.mailing
-        .resetPasswordApiMailResetPasswordUsernamePost({
-          path: { username: this.username as string },
-        })
-        .then(() => {
-          EventBus.emit(new ToastEvent("SUCCESS", "I sent you a password reset link. Please check your email inbox."));
-        })
-        .catch(toastReject);
-    },
-  },
+  }
+}
+
+onMounted(() => {
+  authFailedListener = EventBus.on(AuthFailedEvent, (reason: { reason: ErrorDetails }) => {
+    error.value = reason?.reason.type === "KeyError" ? "Username not in the system." : (error.value = "Login failed.");
+    // the login attempt failed -> drop the queued success handler
+    removeLoginSuccessListener();
+  });
+  armLoginSuccessListener();
 });
+
+onUnmounted(() => {
+  if (authFailedListener) EventBus.off(authFailedListener);
+  removeLoginSuccessListener();
+});
+
+async function login() {
+  error.value = null;
+  armLoginSuccessListener();
+  EventBus.emit(new UserLoginEvent(username.value, password.value));
+}
+
+async function reset() {
+  error.value = null;
+  API.mailing
+    .resetPasswordApiMailResetPasswordUsernamePost({
+      path: { username: username.value as string },
+    })
+    .then(() => {
+      EventBus.emit(new ToastEvent("SUCCESS", "I sent you a password reset link. Please check your email inbox."));
+    })
+    .catch(toastReject);
+}
 </script>
 
 <style scoped>

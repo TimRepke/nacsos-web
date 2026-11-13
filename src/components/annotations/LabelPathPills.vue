@@ -31,40 +31,37 @@
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from "vue";
+<script lang="ts" setup>
+import { computed } from "vue";
 import type { PropType } from "vue";
 import type { FlatLabelChoice, Label } from "@/plugins/api/types";
 import { FlatLabel, FlattenedAnnotationSchemeLabel } from "@/plugins/api/types";
 
-export default defineComponent({
-  name: "LabelPathPills",
-  props: {
-    label: {
-      type: Object as PropType<FlatLabel | Label[]>,
-      required: true,
-    },
-    schemeLookup: {
-      type: Object as PropType<Record<string, FlattenedAnnotationSchemeLabel>>,
-      required: false,
-      default: undefined,
-    },
+defineOptions({ name: "LabelPathPills" });
+
+const props = defineProps({
+  label: {
+    type: Object as PropType<FlatLabel | Label[]>,
+    required: true,
   },
-  methods: {
-    hasChoices(value: FlatLabelChoice[] | undefined | null) {
-      return value !== undefined && value !== null && Array.isArray(value) && value.length > 0;
-    },
+  schemeLookup: {
+    type: Object as PropType<Record<string, FlattenedAnnotationSchemeLabel>>,
+    required: false,
+    default: undefined,
   },
-  computed: {
-    labelPath(): Label[] {
-      if ("path" in this.label) return this.label.path.slice().reverse();
-      return this.label;
-    },
-    labelChoices(): Array<FlatLabelChoice> | null {
-      if ("choices" in this.label && this.label.choices) return this.label.choices;
-      return null;
-    },
-  },
+});
+
+function hasChoices(value: FlatLabelChoice[] | undefined | null) {
+  return value !== undefined && value !== null && Array.isArray(value) && value.length > 0;
+}
+
+const labelPath = computed<Label[]>(() => {
+  if ("path" in props.label) return props.label.path.slice().reverse();
+  return props.label;
+});
+const labelChoices = computed<Array<FlatLabelChoice> | null>(() => {
+  if ("choices" in props.label && props.label.choices) return props.label.choices;
+  return null;
 });
 </script>
 

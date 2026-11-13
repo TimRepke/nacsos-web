@@ -117,8 +117,8 @@
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from "vue";
+<script lang="ts" setup>
+import { onMounted, ref } from "vue";
 import { currentProjectStore } from "@/stores";
 import { EventBus } from "@/plugins/events";
 import { ToastEvent } from "@/plugins/events/events/toast";
@@ -128,80 +128,74 @@ import ClosablePill from "@/components/ClosablePill.vue";
 
 type Highlighter = HighlighterModel & { keywordsStr: string; error?: string };
 
-export default defineComponent({
-  name: "HighlighterView",
-  components: { ClosablePill },
-  data() {
-    return {
-      highlighters: [] as Highlighter[],
-      styleTemplates: [
-        "background-color: #ff9aa2;",
-        "background-color: #ffb7b2;",
-        "background-color: #ffdac1;",
-        "background-color: #ff9aa2; text-decoration: underline;",
-        "background-color: #ffb7b2; text-decoration: underline;",
-        "background-color: #ffdac1; text-decoration: underline;",
-      ],
-    };
-  },
-  async mounted() {
-    API.highlighters
-      .getProjectHighlightersApiHighlightersProjectGet({
-        headers: { "x-project-id": currentProjectStore.projectId as string },
-      })
-      .then((result) => {
-        this.highlighters = result.data.map((highlighter: HighlighterModel): Highlighter => ({
-          ...highlighter,
-          keywordsStr: highlighter.keywords.join("|"),
-        }));
-      })
-      .catch(toastReject);
-  },
-  methods: {
-    addHighlighter() {
-      this.highlighters.push({
-        highlighter_id: crypto.randomUUID(),
-        project_id: currentProjectStore.projectId,
-        name: "New Highlighter",
-        keywords: [],
-        keywordsStr: "",
-        style: "",
-      } as Highlighter);
-    },
-    saveHighlighter(highlighter: HighlighterModel) {
-      const highlighterCopy = JSON.parse(JSON.stringify(highlighter));
-      delete highlighterCopy.keywordsStr;
-      delete highlighterCopy.error;
-      API.highlighters
-        .upsertHighlighterApiHighlightersProjectPut({
-          headers: { "x-project-id": currentProjectStore.projectId as string },
-          body: highlighter,
-        })
-        .then((response) => {
-          EventBus.emit(new ToastEvent("SUCCESS", `Saved highlighter with ID: ${response.data}`));
-        })
-        .catch(() => {
-          EventBus.emit(new ToastEvent("ERROR", "Failed to save"));
-        });
-    },
-    str2lst(str: string): string[] {
-      return [...new Set(str.split("|").map((part: string) => part.trim()))];
-    },
-    onKeywordsStrChange(highlighter: Highlighter) {
-      highlighter.keywords = this.str2lst(highlighter.keywordsStr);
-      highlighter.error = undefined;
-      try {
-        new RegExp(highlighter.keywords.join("|"), "g");
-      } catch (e: unknown) {
-        highlighter.error = (e as Error).toString();
-      }
-    },
-    onDropKeyword(highlighter: Highlighter, keyword: string) {
-      highlighter.keywords = highlighter.keywords.filter((fKeyword: string) => fKeyword !== keyword);
-      highlighter.keywordsStr = highlighter.keywords.join("|");
-    },
-  },
+defineOptions({ name: "HighlighterView" });
+
+const highlighters = ref<Highlighter[]>([]);
+const styleTemplates = ref([
+  "background-color: #ff9aa2;",
+  "background-color: #ffb7b2;",
+  "background-color: #ffdac1;",
+  "background-color: #ff9aa2; text-decoration: underline;",
+  "background-color: #ffb7b2; text-decoration: underline;",
+  "background-color: #ffdac1; text-decoration: underline;",
+]);
+
+onMounted(() => {
+  API.highlighters
+    .getProjectHighlightersApiHighlightersProjectGet({
+      headers: { "x-project-id": currentProjectStore.projectId as string },
+    })
+    .then((result) => {
+      highlighters.value = result.data.map((highlighter: HighlighterModel): Highlighter => ({
+        ...highlighter,
+        keywordsStr: highlighter.keywords.join("|"),
+      }));
+    })
+    .catch(toastReject);
 });
+
+function addHighlighter() {
+  highlighters.value.push({
+    highlighter_id: crypto.randomUUID(),
+    project_id: currentProjectStore.projectId,
+    name: "New Highlighter",
+    keywords: [],
+    keywordsStr: "",
+    style: "",
+  } as Highlighter);
+}
+function saveHighlighter(highlighter: HighlighterModel) {
+  const highlighterCopy = JSON.parse(JSON.stringify(highlighter));
+  delete highlighterCopy.keywordsStr;
+  delete highlighterCopy.error;
+  API.highlighters
+    .upsertHighlighterApiHighlightersProjectPut({
+      headers: { "x-project-id": currentProjectStore.projectId as string },
+      body: highlighterCopy,
+    })
+    .then((response) => {
+      EventBus.emit(new ToastEvent("SUCCESS", `Saved highlighter with ID: ${response.data}`));
+    })
+    .catch(() => {
+      EventBus.emit(new ToastEvent("ERROR", "Failed to save"));
+    });
+}
+function str2lst(str: string): string[] {
+  return [...new Set(str.split("|").map((part: string) => part.trim()))];
+}
+function onKeywordsStrChange(highlighter: Highlighter) {
+  highlighter.keywords = str2lst(highlighter.keywordsStr);
+  highlighter.error = undefined;
+  try {
+    new RegExp(highlighter.keywords.join("|"), "g");
+  } catch (e: unknown) {
+    highlighter.error = (e as Error).toString();
+  }
+}
+function onDropKeyword(highlighter: Highlighter, keyword: string) {
+  highlighter.keywords = highlighter.keywords.filter((fKeyword: string) => fKeyword !== keyword);
+  highlighter.keywordsStr = highlighter.keywords.join("|");
+}
 </script>
 
 <style scoped></style>

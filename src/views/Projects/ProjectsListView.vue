@@ -82,16 +82,18 @@
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from "vue";
-import { marked } from "marked";
+<script lang="ts" setup>
+import { ref, reactive, computed, onMounted } from "vue";
+import { useRouter } from "vue-router";
+import { md2html } from "@/util";
 import "core-js/modules/es.array.to-sorted";
 import { EventBus } from "@/plugins/events";
 import { CurrentProjectSelectedEvent, CurrentProjectSetEvent } from "@/plugins/events/events/projects";
 import type { ProjectInfo } from "@/plugins/api/types";
 import { API, toastReject } from "@/plugins/api";
-import { ItemType } from "@/plugins/api/types";
 import ProjectTypeIcon from "@/components/ProjectTypeIcon.vue";
+
+defineOptions({ name: "ProjectListView" });
 
 enum Sort {
   sort = "sort", // ignored
@@ -108,90 +110,98 @@ interface Sorting {
 
 type ProjectInfoExt = ProjectInfo & { showDesc?: boolean };
 
-export default defineComponent({
-  name: "ProjectListView",
-  components: { ProjectTypeIcon },
-  data() {
-    return {
-      projectList: [] as ProjectInfoExt[],
-      projectSearch: "",
-      sorting: {
-        name: Sort.sort,
-        owner: Sort.sort,
-        assi: Sort.sort,
-        date: Sort["sort-down"],
-      } as Sorting,
-      projectTypes: ItemType,
-    };
-  },
-  async mounted() {
-    // clear the currentProjectStore to prevent side effects
-    // currentProjectStore.clear();
-    // get all projects from the server (that we have permission to access)
-    API.projects
-      .getAllProjectsApiProjectsListGet()
-      .then((response) => {
-        this.projectList = response.data;
-      })
-      .catch(toastReject);
-  },
-  methods: {
-    selectProject(projectId: string | null | undefined) {
-      if (projectId) {
-        EventBus.emit(new CurrentProjectSelectedEvent(projectId));
-        EventBus.once(CurrentProjectSetEvent, () => {
-          this.$router.push({ name: "project-overview" });
-        });
-      }
-    },
-    resort(field: keyof Sorting) {
-      const currentVal = this.sorting[field];
-      // reset all other column sorters
-      if (field !== "name") this.sorting.name = Sort.sort;
-      if (field !== "date") this.sorting.date = Sort.sort;
-      if (field !== "owner") this.sorting.owner = Sort.sort;
-      if (field !== "assi") this.sorting.assi = Sort.sort;
+const router = useRouter();
 
-      // cycle through states
-      if (currentVal === Sort.sort) {
-        this.sorting[field] = Sort["sort-up"];
-      } else if (currentVal === Sort["sort-up"]) {
-        this.sorting[field] = Sort["sort-down"];
-      } else if (currentVal === Sort["sort-down"]) {
-        this.sorting[field] = Sort.sort;
-      }
-    },
-    renderMD(txt: string): string {
-      return marked.parse(txt, { async: false }) as string;
-    },
-  },
-  computed: {
-    filteredProjects(): ProjectInfoExt[] {
-      return this.projectList.filter(
-        (project: ProjectInfoExt) => project.name.toLowerCase().indexOf(this.projectSearch.toLowerCase()) >= 0,
-      );
-    },
-    sortedFilteredProjects(): ProjectInfoExt[] {
-      let comparator: (p1: ProjectInfoExt, p2: ProjectInfoExt) => [string, string];
-      let dir: Sort;
-      if (this.sorting.name !== Sort.sort) {
-        comparator = (p1: ProjectInfoExt, p2: ProjectInfoExt) => [p1.name as string, p2.name as string];
-        dir = this.sorting.name;
-      } else if (this.sorting.date !== Sort.sort) {
-        comparator = (p1: ProjectInfoExt, p2: ProjectInfoExt) => [p1.time_created as string, p2.time_created as string];
-        dir = this.sorting.date;
-      } else {
-        return this.filteredProjects;
-      }
+const projectList = ref<ProjectInfoExt[]>([]);
+const projectSearch = ref("");
+const sorting = reactive<Sorting>({
+  name: Sort.sort,
+  owner: Sort.sort,
+  assi: Sort.sort,
+  date: Sort["sort-down"],
+});
 
-      return this.filteredProjects.toSorted((p1: ProjectInfoExt, p2: ProjectInfoExt) => {
-        const [v1, v2] = comparator(p1, p2);
-        if (v1 < v2) return dir === Sort["sort-up"] ? -1 : 1;
-        if (v1 > v2) return dir === Sort["sort-up"] ? 1 : -1;
-        return 0;
-      });
-    },
-  },
+onMounted(async () => {
+  // clear the currentProjectStore to prevent side effects
+  // currentProjectStore.clear();
+  // get all projects from the server (that we have permission to access)
+  API.projects
+    .getAllProjectsApiProjectsListGet()
+    .then((response) => {
+      projectList.value = response.data;
+    })
+    .catch(toastReject);
+});
+
+function selectProject(projectId: string | null | undefined) {
+  if (projectId) {
+    EventBus.emit(new CurrentProjectSelectedEvent(projectId));
+    EventBus.once(CurrentProjectSetEvent, () => {
+      router.push({ name: "project-overview" });
+    });
+  }
+}
+
+function resort(field: keyof Sorting) {
+  const currentVal = sorting[field];
+  // reset all other column sorters
+  if (field !== "name") sorting.name = Sort.sort;
+  if (field !== "date") sorting.date = Sort.sort;
+  if (field !== "owner") sorting.owner = Sort.sort;
+  if (field !== "assi") sorting.assi = Sort.sort;
+
+  // cycle through states
+  if (currentVal === Sort.sort) {
+    sorting[field] = Sort["sort-up"];
+  } else if (currentVal === Sort["sort-up"]) {
+    sorting[field] = Sort["sort-down"];
+  } else if (currentVal === Sort["sort-down"]) {
+    sorting[field] = Sort.sort;
+  }
+}
+
+function renderMD(txt: string): string {
+  return md2html(txt);
+}
+
+function ownerNames(p: ProjectInfoExt): string {
+  return (p.owners ?? []).map((owner) => owner.full_name ?? "").join(" ");
+}
+
+const filteredProjects = computed<ProjectInfoExt[]>(() => {
+  return projectList.value.filter(
+    (project: ProjectInfoExt) => project.name.toLowerCase().indexOf(projectSearch.value.toLowerCase()) >= 0,
+  );
+});
+
+const sortedFilteredProjects = computed<ProjectInfoExt[]>(() => {
+  let comparator: (p1: ProjectInfoExt, p2: ProjectInfoExt) => [string, string];
+  let dir: Sort;
+  if (sorting.name !== Sort.sort) {
+    comparator = (p1: ProjectInfoExt, p2: ProjectInfoExt) => [p1.name as string, p2.name as string];
+    dir = sorting.name;
+  } else if (sorting.assi !== Sort.sort) {
+    comparator = (p1: ProjectInfoExt, p2: ProjectInfoExt) => [
+      (p1.project_id ?? "") as string,
+      (p2.project_id ?? "") as string,
+    ];
+    dir = sorting.assi;
+  } else if (sorting.owner !== Sort.sort) {
+    comparator = (p1: ProjectInfoExt, p2: ProjectInfoExt) => [ownerNames(p1), ownerNames(p2)];
+    dir = sorting.owner;
+  } else if (sorting.date !== Sort.sort) {
+    comparator = (p1: ProjectInfoExt, p2: ProjectInfoExt) => [p1.time_created as string, p2.time_created as string];
+    dir = sorting.date;
+  } else {
+    return filteredProjects.value;
+  }
+
+  return filteredProjects.value.toSorted((p1: ProjectInfoExt, p2: ProjectInfoExt) => {
+    const [v1, v2] = comparator(p1, p2);
+    if (v1 < v2) return dir === Sort["sort-up"] ? -1 : 1;
+    if (v1 > v2) return dir === Sort["sort-up"] ? 1 : -1;
+    return 0;
+  });
 });
 </script>
 

@@ -37,8 +37,8 @@
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from "vue";
+<script lang="ts" setup>
+import { computed } from "vue";
 import type { PropType } from "vue";
 import type { TwitterItemModel, Hashtag, Mention, Url } from "@/plugins/api/types";
 import TextComponent from "@/components/items/TextComponent.vue";
@@ -49,64 +49,61 @@ interface Replacement {
   html: string;
 }
 
-export default defineComponent({
-  name: "TwitterItem",
-  components: { TextComponent },
-  props: {
-    item: {
-      type: Object as PropType<TwitterItemModel>,
-      required: true,
-      default: null,
-    },
-  },
-  computed: {
-    renderedStatus() {
-      const replacements: Replacement[] = [];
-      if (this.item.hashtags) {
-        this.item.hashtags.forEach((hashtag: Hashtag) => {
-          replacements.push({
-            start: hashtag.start,
-            end: hashtag.end,
-            html: `<a target="_blank" href="https://twitter.com/hashtag/${hashtag.tag}">#${hashtag.tag}</a>`,
-          });
-        });
-      }
-      if (this.item.mentions) {
-        this.item.mentions.forEach((mention: Mention) => {
-          replacements.push({
-            start: mention.start,
-            end: mention.end,
-            html: `<a target="_blank" href="https://twitter.com/${mention.username}">@${mention.username}</a>`,
-          });
-        });
-      }
-      if (this.item.urls) {
-        this.item.urls.forEach((url: Url) => {
-          replacements.push({
-            start: url.start,
-            end: url.end,
-            html: `<a target="_blank" href="${url.url_expanded}">${url.url}</a>`,
-          });
-        });
-      }
-      let ret = "";
-      let prevEnd = 0;
-      const { text } = this.item;
-      if (text) {
-        replacements
-          .sort((a, b) => a.start - b.start)
-          .forEach((replacement) => {
-            // FIXME: something has to be done with the slicing offsets... sometimes they are off
-            ret += text.slice(prevEnd, replacement.start);
-            ret += replacement.html;
-            prevEnd = replacement.end;
-          });
+defineOptions({ name: "TwitterItem" });
 
-        ret += text.slice(prevEnd, text.length);
-      }
-      return ret;
-    },
+const props = defineProps({
+  item: {
+    type: Object as PropType<TwitterItemModel>,
+    required: true,
+    default: null,
   },
+});
+
+const renderedStatus = computed(() => {
+  const replacements: Replacement[] = [];
+  if (props.item.hashtags) {
+    props.item.hashtags.forEach((hashtag: Hashtag) => {
+      replacements.push({
+        start: hashtag.start,
+        end: hashtag.end,
+        html: `<a target="_blank" href="https://twitter.com/hashtag/${hashtag.tag}">#${hashtag.tag}</a>`,
+      });
+    });
+  }
+  if (props.item.mentions) {
+    props.item.mentions.forEach((mention: Mention) => {
+      replacements.push({
+        start: mention.start,
+        end: mention.end,
+        html: `<a target="_blank" href="https://twitter.com/${mention.username}">@${mention.username}</a>`,
+      });
+    });
+  }
+  if (props.item.urls) {
+    props.item.urls.forEach((url: Url) => {
+      replacements.push({
+        start: url.start,
+        end: url.end,
+        html: `<a target="_blank" href="${url.url_expanded}">${url.url}</a>`,
+      });
+    });
+  }
+  let ret = "";
+  let prevEnd = 0;
+  const { text } = props.item;
+  if (text) {
+    replacements
+      .sort((a, b) => a.start - b.start)
+      .forEach((replacement) => {
+        // FIXME: something has to be done with the slicing offsets... sometimes they are off
+        ret += text.slice(prevEnd, replacement.start);
+        ret += replacement.html;
+        prevEnd = replacement.end;
+      });
+
+    ret += text.slice(prevEnd, text.length);
+  }
+  return ret;
 });
 </script>
 

@@ -83,46 +83,38 @@
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from "vue";
+<script lang="ts" setup>
+import { computed, ref } from "vue";
 import type { PropType } from "vue";
 import InlineToolTip from "@/components/InlineToolTip.vue";
 import type { AcademicAuthorModel, AcademicItemModel, AffiliationModel } from "@/plugins/api/types";
-import { currentProjectStore, interfaceSettingsStore } from "@/stores";
+import { currentProjectStore } from "@/stores";
 import TextComponent from "@/components/items/TextComponent.vue";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
+import { sanitizeHtml } from "@/util";
 
-export default defineComponent({
-  name: "AcademicItem",
-  components: { FontAwesomeIcon, TextComponent, InlineToolTip },
-  props: {
-    item: {
-      type: Object as PropType<AcademicItemModel>,
-      required: true,
-      default: null,
-    },
-  },
-  data() {
-    return {
-      showRaw: false,
-    };
-  },
-  computed: {
-    htmlTitle() {
-      return currentProjectStore.highlighters.applyActiveHighlighters(this.item.title) ?? "[Missing title]";
-    },
-    columnStyle(): Record<string, string> {
-      return interfaceSettingsStore.itemColumnStyle;
-    },
-  },
-  methods: {
-    authorInstitutions(author: AcademicAuthorModel): string | undefined {
-      return author.affiliations
-        ?.map((affiliation: AffiliationModel) => `${affiliation.name}, ${affiliation.country}`)
-        .join(";");
-    },
+defineOptions({ name: "AcademicItem" });
+
+const props = defineProps({
+  item: {
+    type: Object as PropType<AcademicItemModel>,
+    required: true,
+    default: null,
   },
 });
+
+const showRaw = ref(false);
+
+const htmlTitle = computed(() =>
+  // item data is user-supplied, so the highlighter html must be sanitized before v-html
+  sanitizeHtml(currentProjectStore.highlighters.applyActiveHighlighters(props.item.title) ?? "[Missing title]"),
+);
+
+function authorInstitutions(author: AcademicAuthorModel): string | undefined {
+  return author.affiliations
+    ?.map((affiliation: AffiliationModel) => `${affiliation.name}, ${affiliation.country}`)
+    .join(";");
+}
 </script>
 
 <style scoped>

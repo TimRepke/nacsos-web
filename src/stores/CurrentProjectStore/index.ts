@@ -57,9 +57,14 @@ export const useCurrentProjectStore = defineStore("CurrentProjectStore", () => {
     schemes.clear();
   }
 
+  // sequence counter to drop responses of superseded loads (rapid project switches)
+  let loadSeq = 0;
+
   async function refreshInfo(): Promise<ProjectModel | undefined> {
-    if (projectId.value) {
-      const { data } = await API.project.getProjectApiProjectInfoGet({ headers: { "x-project-id": projectId.value } });
+    const requestedId = projectId.value;
+    if (requestedId) {
+      const { data } = await API.project.getProjectApiProjectInfoGet({ headers: { "x-project-id": requestedId } });
+      if (projectId.value !== requestedId) return data; // project switched while loading -> don't write stale data
       project.value = data;
       return data;
     }
@@ -67,10 +72,12 @@ export const useCurrentProjectStore = defineStore("CurrentProjectStore", () => {
   }
 
   async function refreshPermissions(): Promise<ProjectPermissionsModel | undefined> {
-    if (projectId.value) {
+    const requestedId = projectId.value;
+    if (requestedId) {
       const { data } = await API.project.getProjectPermissionsCurrentUserApiProjectPermissionsMeGet({
-        headers: { "x-project-id": projectId.value },
+        headers: { "x-project-id": requestedId },
       });
+      if (projectId.value !== requestedId) return data; // project switched while loading -> don't write stale data
       permissions.value = data;
       return data;
     }
@@ -85,6 +92,7 @@ export const useCurrentProjectStore = defineStore("CurrentProjectStore", () => {
   }
 
   async function load(newProjectId: string) {
+    const seq = ++loadSeq;
     // clear the current project from the store temporarily to prevent side effects
     clear();
     // set the projectId first, so it can be used during the following requests
@@ -92,6 +100,8 @@ export const useCurrentProjectStore = defineStore("CurrentProjectStore", () => {
 
     const project = await refreshInfo();
     const permissions = await refreshPermissions();
+    // a newer load superseded this one -> drop the (possibly stale) responses
+    if (seq !== loadSeq || projectId.value !== newProjectId) return;
     if (permissions && project) {
       users.ensureLoaded();
       highlighters.ensureLoaded();

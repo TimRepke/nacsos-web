@@ -12,29 +12,27 @@
   </template>
 </template>
 
-<script lang="ts">
+<script lang="ts" setup>
 // type Placement = 'top' | 'left' | 'bottom' | 'right';
 // type Size = 'small' | 'medium' | 'wide';
-import { defineComponent } from "vue";
 
-export default defineComponent({
-  name: "InlineToolTip",
-  props: {
-    info: {
-      type: String,
-      required: false,
-      default: undefined,
-    },
-    placement: {
-      type: String,
-      required: false,
-      default: "top",
-    },
-    size: {
-      type: String,
-      required: false,
-      default: "small",
-    },
+defineOptions({ name: "InlineToolTip" });
+
+defineProps({
+  info: {
+    type: String,
+    required: false,
+    default: undefined,
+  },
+  placement: {
+    type: String,
+    required: false,
+    default: "top",
+  },
+  size: {
+    type: String,
+    required: false,
+    default: "small",
   },
 });
 </script>

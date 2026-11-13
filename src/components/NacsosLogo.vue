@@ -208,26 +208,21 @@
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from "vue";
+<script lang="ts" setup>
+import { computed } from "vue";
 import { requestsStore } from "@/stores";
 
-export default defineComponent({
-  name: "NacsosLogo",
-  props: {
-    animated: {
-      type: Boolean,
-      default: false,
-    },
+defineOptions({ name: "NacsosLogo" });
+
+const props = defineProps({
+  animated: {
+    type: Boolean,
+    default: false,
   },
-  created() {
-    // pass
-  },
-  computed: {
-    loading() {
-      return this.animated || requestsStore.hasActiveRequest;
-    },
-  },
+});
+
+const loading = computed(() => {
+  return props.animated || requestsStore.hasActiveRequest;
 });
 </script>
 

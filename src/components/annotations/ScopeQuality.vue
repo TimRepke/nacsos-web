@@ -128,8 +128,8 @@
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from "vue";
+<script lang="ts" setup>
+import { computed, onMounted, ref } from "vue";
 import type { PropType } from "vue";
 import type {
   AnnotationQualityModel,
@@ -141,7 +141,7 @@ import { currentProjectStore, interfaceSettingsStore } from "@/stores";
 import { API, ignore, toastReject } from "@/plugins/api";
 import type { AssignmentScopeModel } from "@/plugins/api/types";
 import AssignmentsVisualiser from "@/components/annotations/AssignmentsVisualiser.vue";
-import { isArray, isNone } from "@/util";
+import { isNone } from "@/util";
 import ScopeQualityEntry from "@/components/annotations/ScopeQualityEntry.vue";
 
 type MetricLabelLookup = {
@@ -151,167 +151,137 @@ type MetricLabelLookup = {
 };
 type MetricLookup = Record<string, MetricLabelLookup>;
 
-export default defineComponent({
-  name: "ScopeQuality",
-  components: { ScopeQualityEntry, AssignmentsVisualiser },
-  props: {
-    scope: {
-      type: Object as PropType<AssignmentScopeModel>,
-      required: true,
-    },
-    editMode: {
-      type: Boolean,
-      required: false,
-      default: false,
-    },
-  },
-  data() {
-    return {
-      inFocus: false,
-      assignmentsVisible: false,
-      onlyMean: true,
-      focusedMetric: null as null | string,
-      counts: null as AssignmentCounts | null,
-      Metric: null as Array<AnnotationQualityModel> | null,
-      assignments: null as Array<AssignmentScopeEntry> | null,
-      resolutions: [] as Array<BotAnnotationMetaDataBaseModel>,
-      selected_resolution: null as string | null | undefined,
-      visibleColumns: interfaceSettingsStore.qualityColumns,
-      pickColumns: false,
-    };
-  },
-  async mounted() {
-    API.annotations
-      .getNumAssignmentsForScopeApiAnnotationsAnnotateScopeCountsAssignmentScopeIdGet({
-        headers: { "x-project-id": currentProjectStore.projectId as string },
-        path: { assignment_scope_id: this.scope.assignment_scope_id as string },
-      })
-      .then((response) => {
-        this.counts = response.data;
-      })
-      .catch(ignore);
-  },
-  methods: {
-    prettyNum(v: number | null | undefined): string {
-      if (isNone(v)) return "—";
-      return v.toLocaleString(undefined, { maximumFractionDigits: 2 });
-    },
-    prettyAnno(v: number | null | undefined): string | number {
-      if (isNone(v)) return "–";
-      return v;
-    },
-    annotationMatchBackground(
-      v1: number[] | number | null | undefined,
-      v2: number[] | number | null | undefined,
-    ): string {
-      if (isNone(v1) && isNone(v2)) return "";
-      if (isArray(v1) && JSON.stringify(v1) === JSON.stringify(v1)) return "bg-success";
-      if (v1 === v2) return "bg-success";
-      if (isNone(v1) || isNone(v2)) return "bg-warning";
-      return "bg-danger";
-    },
-    toggleAnnotations(annotation_quality_id: string) {
-      if (annotation_quality_id !== this.focusedMetric) this.focusedMetric = annotation_quality_id;
-      else this.focusedMetric = null;
-    },
-    focus() {
-      if (!this.inFocus) {
-        if (this.Metric === null) {
-          this.loadMetric();
-        }
-        if (this.resolutions.length === 0) {
-          API.evaluation
-            .getResolutionsForScopeApiEvalResolutionsGet({
-              query: { assignment_scope_id: this.scope.assignment_scope_id as string },
-              headers: { "x-project-id": currentProjectStore.projectId as string },
-            })
-            .then((response) => {
-              this.resolutions = response.data;
-            })
-            .catch(toastReject);
-        }
-      }
-      this.inFocus = !this.inFocus;
-    },
-    loadMetric() {
-      API.evaluation
-        .getIrrApiEvalQualityLoadAssignmentScopeIdGet({
-          path: { assignment_scope_id: this.scope.assignment_scope_id as string },
-          headers: { "x-project-id": currentProjectStore.projectId as string },
-        })
-        .then((response) => {
-          this.Metric = response.data;
+defineOptions({ name: "ScopeQuality" });
 
-          // select the last used resolution
-          if (this.Metric && this.Metric.length > 0) {
-            this.selected_resolution = this.Metric[0].bot_annotation_metadata_id;
-          }
-        })
-        .catch(toastReject);
-    },
-    recomputeMetric() {
+const props = defineProps({
+  scope: {
+    type: Object as PropType<AssignmentScopeModel>,
+    required: true,
+  },
+  editMode: {
+    type: Boolean,
+    required: false,
+    default: false,
+  },
+});
+
+const inFocus = ref(false);
+const assignmentsVisible = ref(false);
+const counts = ref<AssignmentCounts | null>(null);
+const Metric = ref<Array<AnnotationQualityModel> | null>(null);
+const assignments = ref<Array<AssignmentScopeEntry> | null>(null);
+const resolutions = ref<Array<BotAnnotationMetaDataBaseModel>>([]);
+const selected_resolution = ref<string | null | undefined>(null);
+const visibleColumns = ref(interfaceSettingsStore.qualityColumns);
+const pickColumns = ref(false);
+
+onMounted(async () => {
+  API.annotations
+    .getNumAssignmentsForScopeApiAnnotationsAnnotateScopeCountsAssignmentScopeIdGet({
+      headers: { "x-project-id": currentProjectStore.projectId as string },
+      path: { assignment_scope_id: props.scope.assignment_scope_id as string },
+    })
+    .then((response) => {
+      counts.value = response.data;
+    })
+    .catch(ignore);
+});
+
+function focus() {
+  if (!inFocus.value) {
+    if (Metric.value === null) {
+      loadMetric();
+    }
+    if (resolutions.value.length === 0) {
       API.evaluation
-        .recomputeIrrApiEvalQualityComputeGet({
-          query: {
-            assignment_scope_id: this.scope.assignment_scope_id as string,
-            bot_annotation_metadata_id: this.selected_resolution,
-          },
+        .getResolutionsForScopeApiEvalResolutionsGet({
+          query: { assignment_scope_id: props.scope.assignment_scope_id as string },
           headers: { "x-project-id": currentProjectStore.projectId as string },
         })
         .then((response) => {
-          this.Metric = response.data;
+          resolutions.value = response.data;
         })
         .catch(toastReject);
-    },
-    toggleAssignments() {
-      this.assignmentsVisible = !this.assignmentsVisible;
-      if (!this.assignments) {
-        API.annotations
-          .getAssignmentIndicatorsForScopeApiAnnotationsAnnotateAssignmentProgressAssignmentScopeIdGet({
-            headers: { "x-project-id": currentProjectStore.projectId as string },
-            path: { assignment_scope_id: this.scope.assignment_scope_id as string },
-          })
-          .then(async (response) => {
-            this.assignments = response.data;
-          })
-          .catch(toastReject);
+    }
+  }
+  inFocus.value = !inFocus.value;
+}
+function loadMetric() {
+  API.evaluation
+    .getIrrApiEvalQualityLoadAssignmentScopeIdGet({
+      path: { assignment_scope_id: props.scope.assignment_scope_id as string },
+      headers: { "x-project-id": currentProjectStore.projectId as string },
+    })
+    .then((response) => {
+      Metric.value = response.data;
+
+      // select the last used resolution
+      if (Metric.value && Metric.value.length > 0) {
+        selected_resolution.value = Metric.value[0].bot_annotation_metadata_id;
       }
-    },
-  },
-  computed: {
-    nestedMetric(): MetricLookup | undefined {
-      if (this.Metric && this.Metric.length > 0) {
-        const lookup: MetricLookup = {};
-        this.Metric.forEach((metric: AnnotationQualityModel) => {
-          const key = metric.label_key as string;
-          if (!(key in lookup)) {
-            lookup[key] = { MEAN: null, USERS: [], LABELS: null } as MetricLabelLookup;
-          }
-          if (!metric.user_base && !metric.user_target && isNone(metric.label_value)) {
-            lookup[key].MEAN = metric;
-          } else if (!isNone(metric.label_value)) {
-            let lkpLabels = lookup[key].LABELS;
-            if (lkpLabels === null) {
-              lkpLabels = {};
-            }
-            if (!(metric.label_value in lkpLabels)) {
-              lkpLabels[metric.label_value as number] = { MEAN: null, USERS: [] };
-            }
-            if (!metric.user_base && !metric.user_target) {
-              lkpLabels[metric.label_value as number].MEAN = metric;
-            } else {
-              lkpLabels[metric.label_value as number].USERS.push(metric);
-            }
-            lookup[key].LABELS = lkpLabels;
-          } else {
-            lookup[key].USERS.push(metric);
-          }
-        });
-        return lookup;
+    })
+    .catch(toastReject);
+}
+function recomputeMetric() {
+  API.evaluation
+    .recomputeIrrApiEvalQualityComputeGet({
+      query: {
+        assignment_scope_id: props.scope.assignment_scope_id as string,
+        bot_annotation_metadata_id: selected_resolution.value,
+      },
+      headers: { "x-project-id": currentProjectStore.projectId as string },
+    })
+    .then((response) => {
+      Metric.value = response.data;
+    })
+    .catch(toastReject);
+}
+function toggleAssignments() {
+  assignmentsVisible.value = !assignmentsVisible.value;
+  if (!assignments.value) {
+    API.annotations
+      .getAssignmentIndicatorsForScopeApiAnnotationsAnnotateAssignmentProgressAssignmentScopeIdGet({
+        headers: { "x-project-id": currentProjectStore.projectId as string },
+        path: { assignment_scope_id: props.scope.assignment_scope_id as string },
+      })
+      .then(async (response) => {
+        assignments.value = response.data;
+      })
+      .catch(toastReject);
+  }
+}
+
+const nestedMetric = computed<MetricLookup | undefined>(() => {
+  if (Metric.value && Metric.value.length > 0) {
+    const lookup: MetricLookup = {};
+    Metric.value.forEach((metric: AnnotationQualityModel) => {
+      const key = metric.label_key as string;
+      if (!(key in lookup)) {
+        lookup[key] = { MEAN: null, USERS: [], LABELS: null } as MetricLabelLookup;
       }
-      return undefined;
-    },
-  },
+      if (!metric.user_base && !metric.user_target && isNone(metric.label_value)) {
+        lookup[key].MEAN = metric;
+      } else if (!isNone(metric.label_value)) {
+        let lkpLabels = lookup[key].LABELS;
+        if (lkpLabels === null) {
+          lkpLabels = {};
+        }
+        if (!(metric.label_value in lkpLabels)) {
+          lkpLabels[metric.label_value as number] = { MEAN: null, USERS: [] };
+        }
+        if (!metric.user_base && !metric.user_target) {
+          lkpLabels[metric.label_value as number].MEAN = metric;
+        } else {
+          lkpLabels[metric.label_value as number].USERS.push(metric);
+        }
+        lookup[key].LABELS = lkpLabels;
+      } else {
+        lookup[key].USERS.push(metric);
+      }
+    });
+    return lookup;
+  }
+  return undefined;
 });
 </script>
 

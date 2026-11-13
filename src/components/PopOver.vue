@@ -27,31 +27,27 @@
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from "vue";
-import { marked } from "marked";
+<script lang="ts" setup>
+import { computed, ref } from "vue";
+import { md2html } from "@/util";
 
-export default defineComponent({
-  name: "PopOver",
-  props: {
-    title: {
-      type: String,
-      required: false,
-      default: undefined,
-    },
-    bodyMD: {
-      type: String,
-      required: false,
-      default: undefined,
-    },
+defineOptions({ name: "PopOver" });
+
+const props = defineProps({
+  title: {
+    type: String,
+    required: false,
+    default: undefined,
   },
-  data() {
-    return {
-      body: this.bodyMD ? marked(this.bodyMD) : null,
-      visible: false,
-    };
+  bodyMD: {
+    type: String,
+    required: false,
+    default: undefined,
   },
 });
+
+const body = computed<string | null>(() => (props.bodyMD ? md2html(props.bodyMD) : null));
+const visible = ref(false);
 </script>
 
 <style scoped>

@@ -17,25 +17,21 @@
   </div>
 </template>
 
-<script lang="ts">
+<script lang="ts" setup>
+import { ref } from "vue";
 import type { PropType } from "vue";
-import { defineComponent } from "vue";
 import type { ProjectPermissionsModel } from "@/plugins/api/types";
 import type { PermissionKeys } from "@/types/permissions";
 import { ProjectPermissionHints } from "@/types/permissions";
 
-export default defineComponent({
-  name: "PermissionSettingsCardReadOnly",
-  props: {
-    permissions: {
-      type: Object as PropType<ProjectPermissionsModel>,
-      required: true,
-    },
-  },
-  data() {
-    return {
-      hints: ProjectPermissionHints as Record<PermissionKeys, string>,
-    };
+defineOptions({ name: "PermissionSettingsCardReadOnly" });
+
+defineProps({
+  permissions: {
+    type: Object as PropType<ProjectPermissionsModel>,
+    required: true,
   },
 });
+
+const hints = ref(ProjectPermissionHints as Record<PermissionKeys, string>);
 </script>

@@ -15,9 +15,26 @@ class EventBus {
 
   private listenerCounter: number;
 
+  // Maps an event class to a unique registry key. Keying by constructor.name alone would let two
+  // different event classes with the same class name fire each other's handlers.
+  private readonly eventKeys: WeakMap<Class, string>;
+
+  private eventKeyCounter: number;
+
   private constructor() {
     this.listeners = {};
     this.listenerCounter = 0;
+    this.eventKeys = new WeakMap();
+    this.eventKeyCounter = 0;
+  }
+
+  private keyFor(eventType: Class): string {
+    let key = this.eventKeys.get(eventType);
+    if (!key) {
+      key = `${eventType.name}#${(this.eventKeyCounter += 1)}`;
+      this.eventKeys.set(eventType, key);
+    }
+    return key;
   }
 
   static getInstance() {
@@ -36,7 +53,7 @@ class EventBus {
    * @param selfDestruct Set to true, so the event listener will be deleted after first occurrence.
    */
   on(eventType: Class, callback: CallbackHandler, ctx?: any, selfDestruct?: boolean): [string, number] {
-    const { name } = eventType;
+    const name = this.keyFor(eventType);
     if (!(name in this.listeners)) {
       this.listeners[name] = {};
     }
@@ -86,7 +103,7 @@ class EventBus {
    * @param payload
    */
   emit(payload: BaseEvent) {
-    const { name } = payload.constructor;
+    const name = this.keyFor(payload.constructor as Class);
     if (name in this.listeners) {
       Object.entries(this.listeners[name]).forEach(([key, listener]) => {
         listener.fn.apply(listener.ctx, [payload]);
@@ -112,8 +129,10 @@ class EventBus {
    * @param listener Class of the event to remove or the identifier returned by on or once.
    */
   off(listener: [string, number | string] | Class) {
-    const [name, counter] = listener instanceof Array ? listener : [listener.name, null];
-    if (counter) delete this.listeners[name][counter];
+    const [name, counter] =
+      listener instanceof Array ? listener : ([this.keyFor(listener), undefined] as [string, undefined]);
+    // counter === 0 is a valid listener id (the first registered listener), so check for undefined
+    if (counter !== undefined) delete this.listeners[name][counter];
     else delete this.listeners[name];
   }
 

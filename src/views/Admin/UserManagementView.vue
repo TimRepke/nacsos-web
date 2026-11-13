@@ -135,12 +135,14 @@
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from "vue";
+<script lang="ts" setup>
+import { onMounted, ref } from "vue";
 import { API, toastReject } from "@/plugins/api";
 import { EventBus } from "@/plugins/events";
 import { ToastEvent } from "@/plugins/events/events/toast";
 import type { UserBaseModel } from "@/plugins/api/spec/types.gen";
+
+defineOptions({ name: "UserManagementView" });
 
 type UserModel = UserBaseModel & {
   password?: string;
@@ -148,105 +150,100 @@ type UserModel = UserBaseModel & {
   hasNewPassword?: boolean;
 };
 
-type UserManagementViewData = {
-  users: Array<UserModel>;
-};
+const users = ref<UserModel[]>([]);
 
-export default defineComponent({
-  name: "UserManagementView",
-  data(): UserManagementViewData {
-    return {
-      users: [] as UserModel[],
-    };
-  },
-  mounted() {
-    API.users
-      .getAllUsersApiUsersListAllGet()
-      .then((response) => {
-        this.users = response.data;
-      })
-      .catch(() => {
-        EventBus.emit(new ToastEvent("WARN", "Failed to load list of users."));
-      });
-  },
-  methods: {
-    addUser() {
-      this.users.push({
-        user_id: crypto.randomUUID(),
-        username: "",
-        email: "",
-        full_name: "",
-        affiliation: "",
-        is_superuser: false,
-        is_active: true,
-        password: this.generateRandomPassword(),
-        isNew: true,
-      });
-    },
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    deleteUser(user: UserBaseModel) {
-      EventBus.emit(
-        new ToastEvent(
-          "WARN",
-          "This is not implemented, because it can cause big problems." +
-            "Rather consider deactivating the user or ask a DB admin to delete the row in the table.",
-        ),
-      );
-    },
-    saveUser(user: UserBaseModel) {
-      API.users
-        .saveUserApiUsersDetailsPut({
-          body: user,
-        })
-        .then((response) => {
-          EventBus.emit(new ToastEvent("SUCCESS", `Successfully saved user with id: ${response.data}!`));
-        })
-        .catch((reason) => {
-          console.error(reason);
-          EventBus.emit(new ToastEvent("ERROR", "Failed to save user."));
-        });
-    },
-    resetPassword(user: UserModel) {
-      user.password = this.generateRandomPassword();
-      user.hasNewPassword = true;
-      console.log(user);
-    },
-    resetPasswordMail(user: UserModel) {
-      API.mailing
-        .resetPasswordApiMailResetPasswordUsernamePost({
-          path: {
-            username: user.username as string,
-          },
-        })
-        .then(() => {
-          EventBus.emit(new ToastEvent("SUCCESS", "Sent password reset mail to user."));
-        })
-        .catch(toastReject);
-    },
-    sendWelcome(user: UserModel) {
-      API.mailing
-        .welcomeMailApiMailWelcomePost({
-          query: {
-            username: user.username as string,
-            password: user.password as string,
-          },
-        })
-        .then(() => {
-          EventBus.emit(new ToastEvent("SUCCESS", "Sent onboarding mail to user."));
-        })
-        .catch(toastReject);
-    },
-    generateRandomPassword() {
-      return (
-        Math.random().toString(36).slice(2) +
-        Math.random().toString(36).slice(2) +
-        Math.random().toString(36).slice(2) +
-        Math.random().toString(36).slice(2) +
-        Math.random().toString(36).slice(2) +
-        Math.random().toString(36).slice(2)
-      );
-    },
-  },
+function addUser() {
+  users.value.push({
+    user_id: crypto.randomUUID(),
+    username: "",
+    email: "",
+    full_name: "",
+    affiliation: "",
+    is_superuser: false,
+    is_active: true,
+    password: generateRandomPassword(),
+    isNew: true,
+  });
+}
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+function deleteUser(_user: UserBaseModel) {
+  EventBus.emit(
+    new ToastEvent(
+      "WARN",
+      "This is not implemented, because it can cause big problems." +
+        "Rather consider deactivating the user or ask a DB admin to delete the row in the table.",
+    ),
+  );
+}
+
+function saveUser(user: UserBaseModel) {
+  API.users
+    .saveUserApiUsersDetailsPut({
+      body: user,
+    })
+    .then((response) => {
+      EventBus.emit(new ToastEvent("SUCCESS", `Successfully saved user with id: ${response.data}!`));
+    })
+    .catch((reason) => {
+      console.error(reason);
+      EventBus.emit(new ToastEvent("ERROR", "Failed to save user."));
+    });
+}
+
+function resetPassword(user: UserModel) {
+  user.password = generateRandomPassword();
+  user.hasNewPassword = true;
+  console.log(user);
+}
+
+function resetPasswordMail(user: UserModel) {
+  API.mailing
+    .resetPasswordApiMailResetPasswordUsernamePost({
+      path: {
+        username: user.username as string,
+      },
+    })
+    .then(() => {
+      EventBus.emit(new ToastEvent("SUCCESS", "Sent password reset mail to user."));
+    })
+    .catch(toastReject);
+}
+
+function sendWelcome(user: UserModel) {
+  API.mailing
+    .welcomeMailApiMailWelcomePost({
+      query: {
+        username: user.username as string,
+        password: user.password as string,
+      },
+    })
+    .then(() => {
+      EventBus.emit(new ToastEvent("SUCCESS", "Sent onboarding mail to user."));
+    })
+    .catch(toastReject);
+}
+
+function generateRandomPassword() {
+  return (
+    Math.random().toString(36).slice(2) +
+    Math.random().toString(36).slice(2) +
+    Math.random().toString(36).slice(2) +
+    Math.random().toString(36).slice(2) +
+    Math.random().toString(36).slice(2) +
+    Math.random().toString(36).slice(2)
+  );
+}
+
+onMounted(() => {
+  API.users
+    .getAllUsersApiUsersListAllGet()
+    .then((response) => {
+      users.value = response.data;
+    })
+    .catch(() => {
+      EventBus.emit(new ToastEvent("WARN", "Failed to load list of users."));
+    });
 });
 </script>
 

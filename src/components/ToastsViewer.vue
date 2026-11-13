@@ -29,12 +29,13 @@
   <!--  </div>-->
 </template>
 
-<script lang="ts">
-import { defineComponent } from "vue";
+<script lang="ts" setup>
+import { ref } from "vue";
 import { ToastEvent } from "@/plugins/events/events/toast";
 import type { ToastType } from "@/plugins/events/events/toast";
 import { md2html } from "@/util";
 import { interfaceSettingsStore } from "@/stores";
+import { EventBus } from "@/plugins/events";
 
 interface Toast {
   key: number;
@@ -57,51 +58,44 @@ const textColorClass = {
   WARN: "text-dark",
   ERROR: "text-white",
 };
-export default defineComponent({
-  name: "ToastsViewer",
-  created() {
-    this.$eventBus.on(ToastEvent, (event: ToastEvent) => {
-      const toast: Toast = {
-        key: this.runningCount,
-        level: event.level,
-        message: event.message,
-        htmlMessage: md2html(event.message),
-        bg: backgroundClass[event.level],
-        col: textColorClass[event.level],
-      };
+defineOptions({ name: "ToastsViewer" });
 
-      // Skip toasts if they are turned off in the UI settings
-      if (
-        (!interfaceSettingsStore.toasts.showSuccess && toast.level === "SUCCESS") ||
-        (!interfaceSettingsStore.toasts.showError && toast.level === "ERROR") ||
-        (!interfaceSettingsStore.toasts.showInfo && toast.level === "INFO") ||
-        (!interfaceSettingsStore.toasts.showWarn && toast.level === "WARN")
-      )
-        return;
+const hangtime = ref(8 * 1000); // time in ms before notification is removed automatically
+const runningCount = ref<number>(0); // used to generate unique "IDs" for toasts
+const toasts = ref<Toast[]>([]);
 
-      // add toast to list
-      this.toasts.push(toast);
-      // set up timer to automatically remove toast after hangtime
-      setTimeout(() => this.remove(toast.key), this.hangtime);
-      // increment counter to keep track of unique "IDs" for toasts
-      this.runningCount += 1;
-    });
-  },
-  data() {
-    return {
-      hangtime: 8 * 1000, // time in ms before notification is removed automatically
-      runningCount: 0 as number, // used to generate unique "IDs" for toasts
-      toasts: [] as Toast[],
-    };
-  },
-  methods: {
-    remove(key: number) {
-      // find the index corresponding to the key
-      const index = this.toasts.map((toast: Toast) => toast.key).indexOf(key);
-      if (index >= 0) {
-        this.toasts.splice(index, 1);
-      }
-    },
-  },
+function remove(key: number) {
+  // find the index corresponding to the key
+  const index = toasts.value.map((toast: Toast) => toast.key).indexOf(key);
+  if (index >= 0) {
+    toasts.value.splice(index, 1);
+  }
+}
+
+EventBus.on(ToastEvent, (event: ToastEvent) => {
+  const toast: Toast = {
+    key: runningCount.value,
+    level: event.level,
+    message: event.message,
+    htmlMessage: md2html(event.message),
+    bg: backgroundClass[event.level],
+    col: textColorClass[event.level],
+  };
+
+  // Skip toasts if they are turned off in the UI settings
+  if (
+    (!interfaceSettingsStore.toasts.showSuccess && toast.level === "SUCCESS") ||
+    (!interfaceSettingsStore.toasts.showError && toast.level === "ERROR") ||
+    (!interfaceSettingsStore.toasts.showInfo && toast.level === "INFO") ||
+    (!interfaceSettingsStore.toasts.showWarn && toast.level === "WARN")
+  )
+    return;
+
+  // add toast to list
+  toasts.value.push(toast);
+  // set up timer to automatically remove toast after hangtime
+  setTimeout(() => remove(toast.key), hangtime.value);
+  // increment counter to keep track of unique "IDs" for toasts
+  runningCount.value += 1;
 });
 </script>

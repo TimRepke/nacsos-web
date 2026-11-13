@@ -38,7 +38,7 @@
             <template v-for="bot in sortedFilteredAnnotations" :key="bot.bot_annotation_metadata_id as string">
               <tr>
                 <td class="col-1 text-center small">{{ bot.kind }}</td>
-                <td class="col-2 text-muted small">{{ $util.dt2str(bot.time_created) }}</td>
+                <td class="col-2 text-muted small">{{ dt2str(bot.time_created) }}</td>
                 <td class="col-3">
                   {{ bot.name }}<br /><code>{{ bot.bot_annotation_metadata_id }}</code>
                 </td>
@@ -88,8 +88,9 @@
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from "vue";
+<script lang="ts" setup>
+import { dt2str } from "@/util";
+import { computed, onMounted, ref } from "vue";
 import { currentProjectStore } from "@/stores";
 import type { BotMetaInfo } from "@/plugins/api/types";
 import { API, ignore } from "@/plugins/api";
@@ -100,84 +101,78 @@ enum Sort {
   "sort-down" = "sort-down", // descending
 }
 
-export default defineComponent({
-  name: "BotAnnotationsListView",
-  data() {
-    return {
-      includeResolve: false,
-      sorting: {
-        name: Sort.sort,
-        scheme: Sort.sort,
-        kind: Sort.sort,
-        date: Sort["sort-down"],
-      } as Record<string, Sort>,
-      annotations: [] as BotMetaInfo[],
-    };
-  },
-  async mounted() {
-    API.annotations
-      .getBotAnnotationsApiAnnotationsBotAnnotationsGet({
-        query: { include_resolve: true },
-        headers: { "x-project-id": currentProjectStore.projectId as string },
-      })
-      .then((response) => {
-        this.annotations = response.data;
-      })
-      .catch(ignore);
-  },
-  methods: {
-    resort(field: string) {
-      const currentVal: Sort = this.sorting[field];
-      // reset all other column sorters
-      if (field !== "name") this.sorting.name = Sort.sort;
-      if (field !== "scheme") this.sorting.scheme = Sort.sort;
-      if (field !== "kind") this.sorting.kind = Sort.sort;
-      if (field !== "date") this.sorting.date = Sort.sort;
+defineOptions({ name: "BotAnnotationsListView" });
 
-      // cycle through states
-      if (currentVal === Sort.sort) {
-        this.sorting[field] = Sort["sort-up"];
-      } else if (currentVal === Sort["sort-up"]) {
-        this.sorting[field] = Sort["sort-down"];
-      } else if (currentVal === Sort["sort-down"]) {
-        this.sorting[field] = Sort.sort;
-      }
-    },
-  },
-  computed: {
-    filteredAnnotations(): BotMetaInfo[] {
-      return this.annotations.filter((bot: BotMetaInfo) => (!this.includeResolve ? bot.kind != "RESOLVE" : true));
-    },
-    sortedFilteredAnnotations(): BotMetaInfo[] {
-      let comparator: (p1: BotMetaInfo, p2: BotMetaInfo) => [string, string] | [number, number];
-      let dir: Sort;
-      if (this.sorting.name !== Sort.sort) {
-        comparator = (p1: BotMetaInfo, p2: BotMetaInfo) => [p1.name as string, p2.name as string];
-        dir = this.sorting.name;
-      } else if (this.sorting.scheme !== Sort.sort) {
-        comparator = (p1: BotMetaInfo, p2: BotMetaInfo) => [
-          p1.annotation_scheme_id as string,
-          p2.annotation_scheme_id as string,
-        ];
-        dir = this.sorting.scheme;
-      } else if (this.sorting.kind !== Sort.sort) {
-        comparator = (p1: BotMetaInfo, p2: BotMetaInfo) => [p1.kind as string, p2.kind as string];
-        dir = this.sorting.open;
-      } else if (this.sorting.date !== Sort.sort) {
-        comparator = (p1: BotMetaInfo, p2: BotMetaInfo) => [p1.time_created as string, p2.time_created as string];
-        dir = this.sorting.date;
-      } else {
-        return this.filteredAnnotations;
-      }
+const includeResolve = ref(false);
+const sorting = ref({
+  name: Sort.sort,
+  scheme: Sort.sort,
+  kind: Sort.sort,
+  date: Sort["sort-down"],
+} as Record<string, Sort>);
+const annotations = ref<BotMetaInfo[]>([]);
 
-      return this.filteredAnnotations.toSorted((p1: BotMetaInfo, p2: BotMetaInfo) => {
-        const [v1, v2] = comparator(p1, p2);
-        if (v1 < v2) return dir === Sort["sort-up"] ? -1 : 1;
-        if (v1 > v2) return dir === Sort["sort-up"] ? 1 : -1;
-        return 0;
-      });
-    },
-  },
+onMounted(() => {
+  API.annotations
+    .getBotAnnotationsApiAnnotationsBotAnnotationsGet({
+      query: { include_resolve: true },
+      headers: { "x-project-id": currentProjectStore.projectId as string },
+    })
+    .then((response) => {
+      annotations.value = response.data;
+    })
+    .catch(ignore);
+});
+
+function resort(field: string) {
+  const currentVal: Sort = sorting.value[field];
+  // reset all other column sorters
+  if (field !== "name") sorting.value.name = Sort.sort;
+  if (field !== "scheme") sorting.value.scheme = Sort.sort;
+  if (field !== "kind") sorting.value.kind = Sort.sort;
+  if (field !== "date") sorting.value.date = Sort.sort;
+
+  // cycle through states
+  if (currentVal === Sort.sort) {
+    sorting.value[field] = Sort["sort-up"];
+  } else if (currentVal === Sort["sort-up"]) {
+    sorting.value[field] = Sort["sort-down"];
+  } else if (currentVal === Sort["sort-down"]) {
+    sorting.value[field] = Sort.sort;
+  }
+}
+
+const filteredAnnotations = computed<BotMetaInfo[]>(() => {
+  return annotations.value.filter((bot: BotMetaInfo) => (!includeResolve.value ? bot.kind != "RESOLVE" : true));
+});
+const sortedFilteredAnnotations = computed<BotMetaInfo[]>(() => {
+  let comparator: (p1: BotMetaInfo, p2: BotMetaInfo) => [string, string] | [number, number];
+  let dir: Sort;
+  if (sorting.value.name !== Sort.sort) {
+    comparator = (p1: BotMetaInfo, p2: BotMetaInfo) => [p1.name as string, p2.name as string];
+    dir = sorting.value.name;
+  } else if (sorting.value.scheme !== Sort.sort) {
+    comparator = (p1: BotMetaInfo, p2: BotMetaInfo) => [
+      p1.annotation_scheme_id as string,
+      p2.annotation_scheme_id as string,
+    ];
+    dir = sorting.value.scheme;
+  } else if (sorting.value.kind !== Sort.sort) {
+    comparator = (p1: BotMetaInfo, p2: BotMetaInfo) => [p1.kind as string, p2.kind as string];
+    dir = sorting.value.kind;
+  } else if (sorting.value.date !== Sort.sort) {
+    comparator = (p1: BotMetaInfo, p2: BotMetaInfo) => [p1.time_created as string, p2.time_created as string];
+    dir = sorting.value.date;
+  } else {
+    return filteredAnnotations.value;
+  }
+
+  return filteredAnnotations.value.toSorted((p1: BotMetaInfo, p2: BotMetaInfo) => {
+    const [v1, v2] = comparator(p1, p2);
+    if (v1 < v2) return dir === Sort["sort-up"] ? -1 : 1;
+    if (v1 > v2) return dir === Sort["sort-up"] ? 1 : -1;
+    return 0;
+  });
 });
 </script>
 

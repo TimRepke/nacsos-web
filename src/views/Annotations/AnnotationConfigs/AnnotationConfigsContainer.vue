@@ -7,19 +7,14 @@
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from "vue";
+<script lang="ts" setup>
+import { ref } from "vue";
 import { currentProjectStore } from "@/stores";
 import type { ProjectPermissionsModel } from "@/plugins/api/spec/types.gen";
 
-export default defineComponent({
-  name: "AnnotationConfigsContainer",
-  data() {
-    return {
-      projectPermissions: currentProjectStore.permissions as ProjectPermissionsModel,
-    };
-  },
-});
+defineOptions({ name: "AnnotationConfigsContainer" });
+
+const projectPermissions = ref(currentProjectStore.permissions as ProjectPermissionsModel);
 </script>
 
 <style scoped></style>

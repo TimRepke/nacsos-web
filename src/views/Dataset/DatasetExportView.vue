@@ -182,9 +182,11 @@ import { API, ApiResponseReject, toastReject } from "@/plugins/api";
 import { currentProjectStore } from "@/stores";
 import { LabelOptions, ExportTypeEnum, ScopeInfo, RisLabelFormat, ProjectBaseInfo } from "@/plugins/api/types";
 import NQLBox from "@/components/NQLBox.vue";
-import { type Filter } from "@/util/nql";
+import { type Filter, tryParse } from "@/util/nql";
 import { isEmpty } from "@/util";
 import DebounceButton from "@/components/DebounceButton.vue";
+import { EventBus } from "@/plugins/events";
+import { ToastEvent } from "@/plugins/events/events/toast";
 interface Scheme {
   scheme_id: string;
   name: string;
@@ -279,26 +281,42 @@ onMounted(async () => {
       headers: { "x-project-id": currentProjectStore.projectId as string },
     });
     baseInfo.value = response.data;
+    // Default the scheme select to the first scheme so a Download without any
+    // user interaction still carries labels and scopes.
+    if (selectedSchemeId.value === "") {
+      const firstSchemeId = Object.keys(schemes.value)[0];
+      if (firstSchemeId !== undefined) selectedSchemeId.value = firstSchemeId;
+    }
   } catch (e) {
     toastReject(e as ApiResponseReject);
   }
 });
+let labelOptionsRequestId = 0;
 watch(selectedScheme, () => {
   if (!selectedScheme.value) return;
   labelExportSettings.assignmentScopeIds = selectedScheme.value.scopes.map((scope) => scope.scope_id);
   labelExportSettings.botAnnotationMetadataIds = selectedScheme.value.resolutions.map((scope) => scope.scope_id);
+  const requestId = ++labelOptionsRequestId;
   API.export
     .getExportLabelOptionsApiExportProjectLabelOptionsSchemeIdGet({
       headers: { "x-project-id": currentProjectStore.projectId as string },
       path: { scheme_id: selectedSchemeId.value },
     })
     .then((response) => {
+      if (requestId !== labelOptionsRequestId) return; // a newer request overrode this one
       labelExportSettings.labels = response.data;
     })
-    .catch(toastReject);
+    .catch((e) => {
+      if (requestId === labelOptionsRequestId) toastReject(e as ApiResponseReject);
+    });
 });
 
 const downloadAnnotations = () => {
+  const trimmedQuery = nqlQuery.value.trim();
+  if (trimmedQuery.length > 0 && !tryParse(trimmedQuery).valid) {
+    EventBus.emit(new ToastEvent("ERROR", "Cannot export: the NQL item filter is not a valid query."));
+    return;
+  }
   const lValues: Array<LabelOptions> = Object.values(labelExportSettings.labels);
   const labels = lValues.map(
     (label: LabelOptions) =>

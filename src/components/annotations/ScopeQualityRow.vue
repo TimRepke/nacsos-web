@@ -30,7 +30,7 @@
     </td>
     <td v-if="visibleColumns.spearman" :class="colClass">
       {{ prettyNum(quality.spearman) }}
-      <span class="text-muted small" v-if="quality.spearman"> (p={{ prettyNum(quality.spearman) }}) </span>
+      <span class="text-muted small" v-if="quality.spearman_p"> (p={{ prettyNum(quality.spearman_p) }}) </span>
     </td>
     <td v-if="visibleColumns.precision" :class="colClass">{{ prettyNum(quality.precision) }}</td>
     <td v-if="visibleColumns.recall" :class="colClass">{{ prettyNum(quality.recall) }}</td>
@@ -75,74 +75,64 @@
   </tr>
 </template>
 
-<script lang="ts">
-import { defineComponent } from "vue";
+<script lang="ts" setup>
+import { computed, onMounted, ref } from "vue";
 import type { PropType } from "vue";
 import type { AnnotationQualityModel } from "@/plugins/api/types";
 import { interfaceSettingsStore } from "@/stores";
 import { isArray, isNone } from "@/util";
 
-export default defineComponent({
-  name: "ScopeQualityRow",
-  props: {
-    quality: {
-      type: Object as PropType<AnnotationQualityModel>,
-      required: false,
-      default: () => null,
-    },
-    firstColClass: {
-      type: Object as PropType<string[]>,
-      required: false,
-      default: () => [] as string[],
-    },
-    colClass: {
-      type: Object as PropType<string[]>,
-      required: false,
-      default: () => [] as string[],
-    },
+defineOptions({ name: "ScopeQualityRow" });
+
+const props = defineProps({
+  quality: {
+    type: Object as PropType<AnnotationQualityModel>,
+    required: false,
+    default: () => null,
   },
-  data() {
-    return {
-      numColumns: interfaceSettingsStore.numQualityColumns,
-      visibleColumns: interfaceSettingsStore.qualityColumns,
-      showAnnotations: false,
-    };
+  firstColClass: {
+    type: Object as PropType<string[]>,
+    required: false,
+    default: () => [] as string[],
   },
-  async mounted() {
-    //pass
-  },
-  methods: {
-    prettyNum(v: number | null | undefined): string {
-      if (isNone(v)) return "—";
-      return v.toLocaleString(undefined, { maximumFractionDigits: 2 });
-    },
-    prettyAnno(v: number | null | undefined): string | number {
-      if (isNone(v)) return "–";
-      return v;
-    },
-    annotationMatchBackground(
-      v1: number[] | number | null | undefined,
-      v2: number[] | number | null | undefined,
-    ): string {
-      if (isNone(v1) && isNone(v2)) return "";
-      if (
-        isArray(v1) &&
-        v1 &&
-        v2 &&
-        JSON.stringify((v1 as number[]).sort()) === JSON.stringify((v2 as number[]).sort())
-      )
-        return "bg-success";
-      if (v1 === v2) return "bg-success";
-      if (isNone(v1) || isNone(v2)) return "bg-warning";
-      return "bg-danger";
-    },
-  },
-  computed: {
-    hasLabels(): boolean {
-      return !isNone(this.quality.annotations_base) && !isNone(this.quality.annotations_target);
-    },
+  colClass: {
+    type: Object as PropType<string[]>,
+    required: false,
+    default: () => [] as string[],
   },
 });
+
+const numColumns = ref(interfaceSettingsStore.numQualityColumns);
+const visibleColumns = ref(interfaceSettingsStore.qualityColumns);
+const showAnnotations = ref(false);
+
+onMounted(async () => {
+  //pass
+});
+
+const hasLabels = computed<boolean>(
+  () => !isNone(props.quality.annotations_base) && !isNone(props.quality.annotations_target),
+);
+
+function prettyNum(v: number | null | undefined): string {
+  if (isNone(v)) return "—";
+  return v.toLocaleString(undefined, { maximumFractionDigits: 2 });
+}
+function prettyAnno(v: number | null | undefined): string | number {
+  if (isNone(v)) return "–";
+  return v;
+}
+function annotationMatchBackground(
+  v1: number[] | number | null | undefined,
+  v2: number[] | number | null | undefined,
+): string {
+  if (isNone(v1) && isNone(v2)) return "";
+  if (isArray(v1) && v1 && v2 && JSON.stringify((v1 as number[]).sort()) === JSON.stringify((v2 as number[]).sort()))
+    return "bg-success";
+  if (v1 === v2) return "bg-success";
+  if (isNone(v1) || isNone(v2)) return "bg-warning";
+  return "bg-danger";
+}
 </script>
 
 <style scoped></style>

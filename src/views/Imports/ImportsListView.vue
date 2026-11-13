@@ -39,7 +39,7 @@
                     />
                     {{ importDetails.name }}
                   </td>
-                  <td class="col-2 text-muted text-start small">{{ $util.dt2str(importDetails.time_created) }}</td>
+                  <td class="col-2 text-muted text-start small">{{ dt2str(importDetails.time_created) }}</td>
                   <td class="col-2 text-muted text-start small">{{ importDetails.num_revisions }}</td>
                   <td class="col-2 text-muted text-start small">{{ importDetails.num_items ?? "--" }}</td>
                   <td class="col-1 text-end">
@@ -89,9 +89,10 @@
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from "vue";
-import type { ImportModel } from "@/plugins/api/types";
+<script lang="ts" setup>
+import { dt2str } from "@/util";
+import { computed, onMounted, ref } from "vue";
+import type { ImportInfo } from "@/plugins/api/types";
 import InlineToolTip from "@/components/InlineToolTip.vue";
 import { EventBus } from "@/plugins/events";
 import { ToastEvent } from "@/plugins/events/events/toast";
@@ -107,106 +108,99 @@ enum Sort {
   "sort-down" = "sort-down", // descending
 }
 
-export default defineComponent({
-  name: "ProjectListView",
-  components: { ImportMutexStatus, PopOver, InlineToolTip },
-  data() {
-    return {
-      sorting: {
-        name: Sort.sort,
-        date: Sort["sort-down"],
-      } as Record<string, Sort>,
-      imports: {} as Record<string, ImportModel>,
-    };
-  },
-  async mounted() {
-    API.imports
-      .getAllImportsForProjectApiImportsListGet({
-        headers: { "x-project-id": currentProjectStore.projectId as string },
-      })
-      .then((response) => {
-        this.imports = Object.fromEntries(response.data.map((i) => [i.import_id, i]));
-      })
-      .catch(toastReject);
-  },
-  methods: {
-    resort(field: string) {
-      const currentVal: Sort = this.sorting[field];
-      // reset all other column sorters
-      if (field !== "name") this.sorting.name = Sort.sort;
-      if (field !== "date") this.sorting.date = Sort.sort;
+defineOptions({ name: "ProjectListView" });
 
-      // cycle through states
-      if (currentVal === Sort.sort) {
-        this.sorting[field] = Sort["sort-up"];
-      } else if (currentVal === Sort["sort-up"]) {
-        this.sorting[field] = Sort["sort-down"];
-      } else if (currentVal === Sort["sort-down"]) {
-        this.sorting[field] = Sort.sort;
-      }
-    },
-    removeImport(importDetails: ImportModel) {
-      EventBus.emit(
-        new ConfirmationRequestEvent(
-          "Are you absolutely sure you want to delete this import?  \n" +
-            "Doing so will also delete all items that are attached to this (as long as they are not associated with any " +
-            "other imports). Any annotations associated with these items will also be lost.",
-          (confirmationResponse) => {
-            if (confirmationResponse === "ACCEPT") {
-              API.imports
-                .deleteImportDetailsApiImportsImportDeleteImportIdDelete({
-                  path: { import_id: importDetails.import_id as string },
-                  headers: { "x-project-id": currentProjectStore.projectId as string },
-                })
-                .then(() => {
-                  // drop from the list of import objects
-                  delete this.imports[importDetails.import_id as string];
-
-                  EventBus.emit(
-                    new ToastEvent("SUCCESS", "You successfully deleted this import and its related data."),
-                  );
-                })
-                .catch((reason) => {
-                  console.error(reason);
-                  EventBus.emit(new ToastEvent("ERROR", "Could not delete this import."));
-                });
-            } else {
-              EventBus.emit(new ToastEvent("WARN", "OK, did not delete your import."));
-            }
-          },
-          "Delete import",
-          "I understand, delete it anyway!",
-          "Cancel",
-        ),
-      );
-    },
-  },
-  computed: {
-    filteredImports(): ImportModel[] {
-      return Object.values(this.imports);
-    },
-    sortedFilteredImports(): ImportModel[] {
-      let comparator: (p1: ImportModel, p2: ImportModel) => [string, string] | [number, number];
-      let dir: Sort;
-      if (this.sorting.name !== Sort.sort) {
-        comparator = (p1: ImportModel, p2: ImportModel) => [p1.name as string, p2.name as string];
-        dir = this.sorting.name;
-      } else if (this.sorting.date !== Sort.sort) {
-        comparator = (p1: ImportModel, p2: ImportModel) => [p1.time_created as string, p2.time_created as string];
-        dir = this.sorting.date;
-      } else {
-        return this.filteredImports;
-      }
-
-      return this.filteredImports.toSorted((p1: ImportModel, p2: ImportModel) => {
-        const [v1, v2] = comparator(p1, p2);
-        if (v1 < v2) return dir === Sort["sort-up"] ? -1 : 1;
-        if (v1 > v2) return dir === Sort["sort-up"] ? 1 : -1;
-        return 0;
-      });
-    },
-  },
+const sorting = ref<Record<string, Sort>>({
+  name: Sort.sort,
+  date: Sort["sort-down"],
 });
+const imports = ref<Record<string, ImportInfo>>({});
+
+const filteredImports = computed<ImportInfo[]>(() => {
+  return Object.values(imports.value);
+});
+
+const sortedFilteredImports = computed<ImportInfo[]>(() => {
+  let comparator: (p1: ImportInfo, p2: ImportInfo) => [string, string] | [number, number];
+  let dir: Sort;
+  if (sorting.value.name !== Sort.sort) {
+    comparator = (p1: ImportInfo, p2: ImportInfo) => [p1.name as string, p2.name as string];
+    dir = sorting.value.name;
+  } else if (sorting.value.date !== Sort.sort) {
+    comparator = (p1: ImportInfo, p2: ImportInfo) => [p1.time_created as string, p2.time_created as string];
+    dir = sorting.value.date;
+  } else {
+    return filteredImports.value;
+  }
+
+  return filteredImports.value.toSorted((p1: ImportInfo, p2: ImportInfo) => {
+    const [v1, v2] = comparator(p1, p2);
+    if (v1 < v2) return dir === Sort["sort-up"] ? -1 : 1;
+    if (v1 > v2) return dir === Sort["sort-up"] ? 1 : -1;
+    return 0;
+  });
+});
+
+onMounted(() => {
+  API.imports
+    .getAllImportsForProjectApiImportsListGet({
+      headers: { "x-project-id": currentProjectStore.projectId as string },
+    })
+    .then((response) => {
+      imports.value = Object.fromEntries(response.data.map((i) => [i.import_id, i]));
+    })
+    .catch(toastReject);
+});
+
+function resort(field: string) {
+  const currentVal: Sort = sorting.value[field];
+  // reset all other column sorters
+  if (field !== "name") sorting.value.name = Sort.sort;
+  if (field !== "date") sorting.value.date = Sort.sort;
+
+  // cycle through states
+  if (currentVal === Sort.sort) {
+    sorting.value[field] = Sort["sort-up"];
+  } else if (currentVal === Sort["sort-up"]) {
+    sorting.value[field] = Sort["sort-down"];
+  } else if (currentVal === Sort["sort-down"]) {
+    sorting.value[field] = Sort.sort;
+  }
+}
+
+function removeImport(importDetails: ImportInfo) {
+  EventBus.emit(
+    new ConfirmationRequestEvent(
+      "Are you absolutely sure you want to delete this import?  \n" +
+        "Doing so will also delete all items that are attached to this (as long as they are not associated with any " +
+        "other imports). Any annotations associated with these items will also be lost.",
+      (confirmationResponse) => {
+        if (confirmationResponse === "ACCEPT") {
+          API.imports
+            .deleteImportDetailsApiImportsImportDeleteImportIdDelete({
+              path: { import_id: importDetails.import_id as string },
+              headers: { "x-project-id": currentProjectStore.projectId as string },
+            })
+            .then(() => {
+              // drop from the list of import objects
+              delete imports.value[importDetails.import_id as string];
+
+              EventBus.emit(new ToastEvent("SUCCESS", "You successfully deleted this import and its related data."));
+            })
+            .catch((reason) => {
+              console.error(reason);
+              EventBus.emit(new ToastEvent("ERROR", "Could not delete this import."));
+            });
+        } else {
+          EventBus.emit(new ToastEvent("WARN", "OK, did not delete your import."));
+        }
+      },
+      "Delete import",
+      "I understand, delete it anyway!",
+      "Cancel",
+    ),
+  );
+}
 </script>
 
 <style scoped></style>

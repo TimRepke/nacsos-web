@@ -61,85 +61,54 @@
   </template>
 </template>
 
-<script lang="ts">
-import { defineComponent } from "vue";
+<script lang="ts" setup>
+import { computed, onMounted, ref } from "vue";
 import type { PropType } from "vue";
 import type { AnnotationQualityModel } from "@/plugins/api/types";
-import { interfaceSettingsStore } from "@/stores";
-import { isArray, isNone } from "@/util";
+import { isNone } from "@/util";
 import ScopeQualityRow from "@/components/annotations/ScopeQualityRow.vue";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 
-export default defineComponent({
-  name: "ScopeQualityEntry",
-  components: { FontAwesomeIcon, ScopeQualityRow },
-  props: {
-    quality: {
-      type: Object as PropType<AnnotationQualityModel>,
-      required: true,
-    },
-    userQualities: {
-      type: Object as PropType<AnnotationQualityModel[]>,
-      required: true,
-    },
-    choiceQualities: {
-      type: Object as PropType<
-        Record<number, { MEAN: AnnotationQualityModel | null; USERS: AnnotationQualityModel[] }>
-      >,
-      required: false,
-      default: () => null,
-    },
-    bgClass: {
-      type: String,
-      required: false,
-      default: () => "table-success",
-    },
+defineOptions({ name: "ScopeQualityEntry" });
+
+const props = defineProps({
+  quality: {
+    type: Object as PropType<AnnotationQualityModel>,
+    required: true,
   },
-  data() {
-    return {
-      numColumns: interfaceSettingsStore.numQualityColumns,
-      visibleColumns: interfaceSettingsStore.qualityColumns,
-      showUsers: false,
-      showChoices: false,
-    };
+  userQualities: {
+    type: Object as PropType<AnnotationQualityModel[]>,
+    required: true,
   },
-  async mounted() {
-    //pass
+  choiceQualities: {
+    type: Object as PropType<Record<number, { MEAN: AnnotationQualityModel | null; USERS: AnnotationQualityModel[] }>>,
+    required: false,
+    default: () => null,
   },
-  methods: {
-    toggleChoices() {
-      this.showChoices = !this.showChoices;
-      this.showUsers = false;
-    },
-    toggleUsers() {
-      this.showUsers = !this.showUsers;
-      this.showChoices = false;
-    },
-    prettyNum(v: number | null | undefined): string {
-      if (isNone(v)) return "—";
-      return v.toLocaleString(undefined, { maximumFractionDigits: 2 });
-    },
-    prettyAnno(v: number | null | undefined): string | number {
-      if (isNone(v)) return "–";
-      return v;
-    },
-    annotationMatchBackground(
-      v1: number[] | number | null | undefined,
-      v2: number[] | number | null | undefined,
-    ): string {
-      if (isNone(v1) && isNone(v2)) return "";
-      if (isArray(v1) && JSON.stringify(v1) === JSON.stringify(v1)) return "bg-success";
-      if (v1 === v2) return "bg-success";
-      if (isNone(v1) || isNone(v2)) return "bg-warning";
-      return "bg-danger";
-    },
-  },
-  computed: {
-    isChoice(): boolean {
-      return this.quality && !isNone(this.quality.label_value);
-    },
+  bgClass: {
+    type: String,
+    required: false,
+    default: () => "table-success",
   },
 });
+
+const showUsers = ref(false);
+const showChoices = ref(false);
+
+onMounted(async () => {
+  //pass
+});
+
+const isChoice = computed<boolean>(() => props.quality && !isNone(props.quality.label_value));
+
+function toggleChoices() {
+  showChoices.value = !showChoices.value;
+  showUsers.value = false;
+}
+function toggleUsers() {
+  showUsers.value = !showUsers.value;
+  showChoices.value = false;
+}
 </script>
 
 <style scoped></style>

@@ -421,8 +421,8 @@ function makeAssignments() {
                       <strong>{{ availablePrioritisedItems[config.config.priority_id] }}</strong> prioritised items.
                       Going to use the first <strong>{{ numAssignedItems }}</strong> items in the ranking, starting at
                       position <strong>{{ config.config.prio_offset }}</strong> until
-                      <strong>{{ config.config.prio_offset + numAssignedItems }}</strong
-                      >. Make sure the offset leaves enough items in the ranking!
+                      <strong>{{ config.config.prio_offset + numAssignedItems }}</strong>. Make sure the offset leaves
+                      enough items in the ranking!
                     </template>
                   </div>
                 </div>

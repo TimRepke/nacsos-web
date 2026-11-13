@@ -39,15 +39,17 @@
   </div>
 </template>
 
-<script lang="ts">
+<script lang="ts" setup>
 import type { PropType } from "vue";
-import { defineComponent } from "vue";
+import { computed, ref, watch } from "vue";
 import useVuelidate from "@vuelidate/core";
 import { required } from "@vuelidate/validators";
 import type { BaseValidation, ValidationRule } from "@vuelidate/core";
 import { ImportConfigEnum, type WoSImport } from "@/plugins/api/types";
 import FilesUploader from "@/components/FilesUploader.vue";
 import type { UploadFile } from "@/components/FilesUploader.vue";
+
+defineOptions({ name: "ConfigWoS" });
 
 const areFilesUploaded: ValidationRule = {
   $validator(value?: UploadFile[]) {
@@ -63,83 +65,75 @@ const emptyConfig: WoSImport = {
   kind: ImportConfigEnum.WOS,
   sources: [] as string[],
 };
-export default defineComponent({
-  name: "ConfigWoS",
-  components: { FilesUploader },
-  emits: ["configChanged"],
-  props: {
-    existingConfig: {
-      type: Object as PropType<WoSImport>,
-      required: false,
-      default: null,
-    },
-    projectId: {
-      type: String,
-      required: false,
-      default: null,
-    },
-    importId: {
-      type: String,
-      required: false,
-      default: null,
-    },
-    editable: {
-      type: Boolean,
-      default: true,
-    },
+
+const emit = defineEmits(["configChanged"]);
+const props = defineProps({
+  existingConfig: {
+    type: Object as PropType<WoSImport>,
+    required: false,
+    default: null,
   },
-  setup() {
-    return {
-      v$: useVuelidate(),
-    };
+  projectId: {
+    type: String,
+    required: false,
+    default: null,
   },
-  data() {
-    if (!this.existingConfig || this.existingConfig.kind !== ImportConfigEnum.WOS) {
-      this.$emit("configChanged", emptyConfig);
-      return { files: [] as UploadFile[], config: emptyConfig };
-    }
-    return { files: [] as UploadFile[], config: this.existingConfig };
+  importId: {
+    type: String,
+    required: false,
+    default: null,
   },
-  methods: {
-    errorsToString(field: BaseValidation): string {
-      return field.$errors.map((error) => error.$message).join("; ");
-    },
-    onFilesChange(files: UploadFile[]) {
-      this.files = files;
-      const filenames = files.map((file) => file.serverPath).filter((filename) => !!filename);
-      this.config.sources = filenames.length === 0 ? undefined : filenames;
-    },
-  },
-  computed: {
-    uploadsEnabled(): boolean {
-      return this.editable && this.config;
-    },
-  },
-  watch: {
-    config: {
-      handler(newValue: WoSImport) {
-        this.$emit("configChanged", newValue);
-      },
-      deep: true,
-    },
-    existingConfig: {
-      handler(newValue: WoSImport) {
-        this.config = newValue;
-      },
-      deep: true,
-    },
-    importId: {
-      handler(newValue: string) {
-        this.config.import_id = newValue;
-      },
-    },
-  },
-  validations() {
-    return {
-      files: { required, areFilesUploaded, $autoDirty: true },
-    };
+  editable: {
+    type: Boolean,
+    default: true,
   },
 });
+
+const files = ref<UploadFile[]>([]);
+const config = ref<WoSImport>(emptyConfig);
+if (!props.existingConfig || props.existingConfig.kind !== ImportConfigEnum.WOS) {
+  emit("configChanged", emptyConfig);
+} else {
+  config.value = props.existingConfig;
+}
+
+const rules = {
+  files: { required, areFilesUploaded, $autoDirty: true },
+};
+const v$ = useVuelidate(rules, { files });
+
+function errorsToString(field: BaseValidation): string {
+  return field.$errors.map((error) => error.$message).join("; ");
+}
+
+function onFilesChange(newFiles: UploadFile[]) {
+  files.value = newFiles;
+  const filenames = newFiles.map((file) => file.serverPath).filter((filename) => !!filename);
+  config.value.sources = (filenames.length === 0 ? undefined : filenames) as string[];
+}
+
+const uploadsEnabled = computed<boolean>(() => (props.editable && config.value) as boolean);
+
+watch(
+  () => config.value,
+  (newValue) => {
+    emit("configChanged", newValue);
+  },
+  { deep: true },
+);
+watch(
+  () => props.existingConfig,
+  (newValue) => {
+    config.value = newValue;
+  },
+  { deep: true },
+);
+watch(
+  () => props.importId,
+  (newValue) => {
+    (config.value as { import_id?: string | null }).import_id = newValue;
+  },
+);
 </script>
 
 <style scoped></style>

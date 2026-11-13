@@ -14,38 +14,35 @@
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from "vue";
+<script lang="ts" setup>
+import { ref } from "vue";
 
-export default defineComponent({
-  name: "ConfirmationButton",
-  emits: ["cancelled", "accepted"],
-  props: {
-    disabled: {
-      type: Boolean,
-      default: false,
-      required: false,
-    },
-    btnStyle: {
-      type: String,
-      default: "btn-outline-primary",
-      required: false,
-    },
+defineOptions({ name: "ConfirmationButton" });
+
+const emit = defineEmits(["cancelled", "accepted"]);
+
+defineProps({
+  disabled: {
+    type: Boolean,
+    default: false,
+    required: false,
   },
-  data() {
-    return {
-      confirming: false,
-    };
-  },
-  methods: {
-    accept() {
-      this.confirming = false;
-      this.$emit("accepted");
-    },
-    reject() {
-      this.confirming = false;
-      this.$emit("cancelled");
-    },
+  btnStyle: {
+    type: String,
+    default: "btn-outline-primary",
+    required: false,
   },
 });
+
+const confirming = ref(false);
+
+function accept() {
+  confirming.value = false;
+  emit("accepted");
+}
+
+function reject() {
+  confirming.value = false;
+  emit("cancelled");
+}
 </script>

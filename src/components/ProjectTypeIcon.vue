@@ -4,41 +4,38 @@
   </inline-tool-tip>
 </template>
 
-<script lang="ts">
-import { defineComponent } from "vue";
+<script lang="ts" setup>
+import { computed } from "vue";
 import type { PropType } from "vue";
 import InlineToolTip from "@/components/InlineToolTip.vue";
 
+defineOptions({ name: "ProjectTypeIcon" });
+
 type ProjectType = "generic" | "twitter" | "academic" | "lexis" | "patents";
 
-export default defineComponent({
-  name: "ProjectTypeIcon",
-  components: { InlineToolTip },
-  props: {
-    projectType: {
-      type: String as PropType<ProjectType>,
-      default: () => "generic",
-    },
+const props = defineProps({
+  projectType: {
+    type: String as PropType<ProjectType>,
+    default: () => "generic",
   },
-  computed: {
-    icon() {
-      if (this.projectType === "generic") {
-        return ["fas", "book-atlas"];
-      }
-      if (this.projectType === "twitter") {
-        return ["fab", "twitter"];
-      }
-      if (this.projectType === "academic") {
-        return ["fas", "flask-vial"];
-      }
-      if (this.projectType === "patents") {
-        return ["fas", "scale-balanced"];
-      }
-      if (this.projectType === "lexis") {
-        return ["fas", "newspaper"];
-      }
-      return ["fas", "question"];
-    },
-  },
+});
+
+const icon = computed(() => {
+  if (props.projectType === "generic") {
+    return ["fas", "book-atlas"];
+  }
+  if (props.projectType === "twitter") {
+    return ["fab", "twitter"];
+  }
+  if (props.projectType === "academic") {
+    return ["fas", "flask-vial"];
+  }
+  if (props.projectType === "patents") {
+    return ["fas", "scale-balanced"];
+  }
+  if (props.projectType === "lexis") {
+    return ["fas", "newspaper"];
+  }
+  return ["fas", "question"];
 });
 </script>

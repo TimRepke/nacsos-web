@@ -22,6 +22,7 @@ watch(dummyModel, (newValue: string) => {
   if (newValue.trim().length === 0) {
     isValid.value = true;
     model.value = null;
+    return;
   }
   try {
     model.value = JSON.parse(dummyModel.value);

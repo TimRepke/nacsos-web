@@ -254,8 +254,8 @@
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from "vue";
+<script lang="ts" setup>
+import { ref, reactive, computed, watch } from "vue";
 import useVuelidate from "@vuelidate/core";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import { Bar } from "vue-chartjs";
@@ -271,6 +271,8 @@ import { isJSON, errorsToString } from "@/util/validators";
 
 ChartJS.register(Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale);
 
+defineOptions({ name: "OpenAlexSearchView" });
+
 interface ChartInfo {
   chartData: ChartData;
   chartOptions: ChartOptions;
@@ -280,128 +282,113 @@ type DefType = "edismax" | "lucene" | "dismax";
 type SearchField = "title" | "abstract" | "title_abstract";
 type OpType = "OR" | "AND";
 
-export default defineComponent({
-  name: "OpenAlexSearchView",
-  components: { Bar, FontAwesomeIcon, AcademicItemComponent },
-  setup() {
-    return { v$: useVuelidate() };
-  },
-  data() {
-    return {
-      query: "",
-      limit: 20,
-      offset: 0,
-      op: "AND" as OpType,
-      defType: "lucene" as DefType,
-      field: "title_abstract" as SearchField,
-      hist: false,
-      histStart: 2000,
-      histEnd: 2026,
-      includeXPAC: false,
-      params: '{ "fq": "is_xpac: false" }',
-      advanced: false,
-      histogram: null as Record<string, number> | null | undefined,
-      qTime: null as number | null,
-      nDocs: null as number | null,
-      results: null as Array<AcademicItemModel> | null,
-      showTokenExpandModal: false,
-      tokenSearchPrefix: "",
-      tokenSearchLimit: 300,
-      tokenSearchResult: [] as Array<TermStats>,
-    };
-  },
-  async mounted() {
-    // pass
-  },
-  watch: {
-    includeXPAC(newValue: boolean) {
-      this.params = !newValue ? '{ "fq": "is_xpac: false" }' : null;
-    },
-  },
-  methods: {
-    errorsToString,
-    paginate(step: number) {
-      this.offset = Math.max(0, this.offset + step);
-      // if we already ran the query, run it again with the updated offset
-      if (this.nDocs !== null) {
-        this.runSearch();
-      }
-    },
-    runSearch() {
-      API.search
-        .searchOpenalexApiSearchOpenalexSelectPost({
-          body: {
-            query: this.query,
-            limit: this.limit,
-            offset: this.offset,
-            field: this.field,
-            def_type: this.defType,
-            histogram: this.hist,
-            histogram_from: this.histStart,
-            histogram_to: this.histEnd + 1,
-            params: JSON.parse(this.params),
-          },
-          headers: { "x-project-id": currentProjectStore.projectId as string },
-        })
-        .then((response) => {
-          const { data } = response;
+const query = ref("");
+const limit = ref(20);
+const offset = ref(0);
+const op = ref<OpType>("AND");
+const defType = ref<DefType>("lucene");
+const field = ref<SearchField>("title_abstract");
+const hist = ref(false);
+const histStart = ref(2000);
+const histEnd = ref(2026);
+const includeXPAC = ref(false);
+const params = ref<string | null>('{ "fq": "is_xpac: false" }');
+const advanced = ref(false);
+const histogram = ref<Record<string, number> | null | undefined>(null);
+const qTime = ref<number | null>(null);
+const nDocs = ref<number | null>(null);
+const results = ref<Array<AcademicItemModel> | null>(null);
+const showTokenExpandModal = ref(false);
+const tokenSearchPrefix = ref("");
+const tokenSearchLimit = ref(300);
+const tokenSearchResult = ref<Array<TermStats>>([]);
 
-          this.results = data.docs;
-          this.qTime = data.query_time;
-          this.nDocs = data.num_found;
-          this.histogram = data.histogram;
-        })
-        .catch(() => {
-          EventBus.emit(new ToastEvent("ERROR", "Query failed. Retry or fix your query."));
-          this.results = null;
-        });
-    },
-    expandTokens() {
-      API.search
-        .termExpansionApiSearchOpenalexTermsGet({
-          headers: { "x-project-id": currentProjectStore.projectId as string },
-          query: { term_prefix: this.tokenSearchPrefix, limit: this.tokenSearchLimit },
-        })
-        .then((response) => {
-          const { data } = response;
+const rules = {
+  params: { isJSON, $autoDirty: true },
+};
+const state = reactive({ params });
+const v$ = useVuelidate(rules, state);
 
-          this.tokenSearchResult = data;
-        })
-        .catch(() => {
-          EventBus.emit(new ToastEvent("ERROR", "Query failed. Retry or fix your query."));
-          this.tokenSearchResult = [];
-        });
-    },
-  },
-  computed: {
-    histogramChart(): ChartInfo | undefined {
-      if (this.histogram) {
-        return {
-          chartData: {
-            labels: Object.keys(this.histogram),
-            datasets: [{ data: Object.values(this.histogram), label: "Works" }],
-          },
-          chartOptions: {
-            responsive: true,
-            aspectRatio: 3,
-            plugins: {
-              legend: {
-                display: false,
-                position: "right",
-              },
-            },
-          },
-        };
-      }
-      return undefined;
-    },
-  },
-  validations() {
-    return {
-      params: { isJSON, $autoDirty: true },
-    };
-  },
+watch(includeXPAC, (newValue: boolean) => {
+  params.value = !newValue ? '{ "fq": "is_xpac: false" }' : null;
 });
+
+const histogramChart = computed<ChartInfo | undefined>(() => {
+  if (histogram.value) {
+    return {
+      chartData: {
+        labels: Object.keys(histogram.value),
+        datasets: [{ data: Object.values(histogram.value), label: "Works" }],
+      },
+      chartOptions: {
+        responsive: true,
+        aspectRatio: 3,
+        plugins: {
+          legend: {
+            display: false,
+            position: "right",
+          },
+        },
+      },
+    };
+  }
+  return undefined;
+});
+
+function paginate(step: number) {
+  offset.value = Math.max(0, offset.value + step);
+  // if we already ran the query, run it again with the updated offset
+  if (nDocs.value !== null) {
+    runSearch();
+  }
+}
+
+function runSearch() {
+  API.search
+    .searchOpenalexApiSearchOpenalexSelectPost({
+      body: {
+        query: query.value,
+        limit: limit.value,
+        offset: offset.value,
+        field: field.value,
+        def_type: defType.value,
+        histogram: hist.value,
+        histogram_from: histStart.value,
+        histogram_to: histEnd.value + 1,
+        params: JSON.parse(params.value as string),
+      },
+      headers: { "x-project-id": currentProjectStore.projectId as string },
+    })
+    .then((response) => {
+      const { data } = response;
+
+      results.value = data.docs;
+      qTime.value = data.query_time;
+      nDocs.value = data.num_found;
+      histogram.value = data.histogram;
+    })
+    .catch(() => {
+      EventBus.emit(new ToastEvent("ERROR", "Query failed. Retry or fix your query."));
+      results.value = null;
+    });
+}
+
+function expandTokens() {
+  API.search
+    .termExpansionApiSearchOpenalexTermsGet({
+      headers: { "x-project-id": currentProjectStore.projectId as string },
+      query: { term_prefix: tokenSearchPrefix.value, limit: tokenSearchLimit.value },
+    })
+    .then((response) => {
+      const { data } = response;
+
+      tokenSearchResult.value = data;
+    })
+    .catch(() => {
+      EventBus.emit(new ToastEvent("ERROR", "Query failed. Retry or fix your query."));
+      tokenSearchResult.value = [];
+    });
+}
 </script>
 
 <style scoped></style>

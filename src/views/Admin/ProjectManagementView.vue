@@ -69,8 +69,9 @@
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from "vue";
+<script lang="ts" setup>
+import { computed, onMounted, ref } from "vue";
+import { useRouter } from "vue-router";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import { API } from "@/plugins/api";
 import { EventBus } from "@/plugins/events";
@@ -81,90 +82,89 @@ import ProjectTypeIcon from "@/components/ProjectTypeIcon.vue";
 import { CurrentProjectSelectedEvent, CurrentProjectSetEvent } from "@/plugins/events/events/projects";
 import { ConfirmationRequestEvent } from "@/plugins/events/events/confirmation";
 
+defineOptions({ name: "ProjectManagementView" });
+
 type ProjectModelExt = ProjectModel & { isNew?: boolean };
 
-export default defineComponent({
-  name: "ProjectManagementView",
-  components: { FontAwesomeIcon, ProjectTypeIcon },
-  data() {
-    return {
-      projectSearch: "",
-      projects: [] as ProjectModelExt[],
-      projectTypes: ItemType,
-    };
-  },
-  mounted() {
-    this.refreshData();
-  },
-  methods: {
-    refreshData() {
-      API.projects
-        .getAllProjectsApiProjectsListGet()
-        .then((response) => {
-          this.projects = response.data;
-        })
-        .catch(() => {
-          EventBus.emit(new ToastEvent("WARN", "Failed to load list of projects."));
-        });
-    },
-    addProject() {
-      this.projects.unshift({
-        isNew: true,
-        name: "",
-        description: "",
-        type: "generic",
-      } as ProjectModelExt);
-    },
-    manageUsers(project: ProjectModelExt) {
-      if (!project.project_id) {
-        EventBus.emit(new ToastEvent("WARN", "Save first."));
-      } else {
-        EventBus.emit(new CurrentProjectSelectedEvent(project.project_id));
-        EventBus.once(CurrentProjectSetEvent, () => {
-          this.$router.push({ name: "project-settings-settings" });
-        });
-      }
-    },
-    saveProject(project: ProjectModelExt) {
-      API.projects
-        .createProjectApiProjectsCreatePut({
-          body: project,
-        })
-        .then((response) => {
-          project.project_id = response.data;
-          project.isNew = false;
-          EventBus.emit(new ToastEvent("SUCCESS", `New project created with ID ${project.project_id}`));
-        })
-        .catch((reason) => {
-          console.error(reason);
-          EventBus.emit(new ToastEvent("ERROR", "Failed to save."));
-        });
-    },
-    dropProject(project: ProjectModelExt) {
-      EventBus.emit(
-        new ConfirmationRequestEvent(
-          "Do you really want to **permanently delete** this project?\n" +
-            "This will also delete **all data** related to this project in any way!\n" +
-            "This action is extremely dangerous!!\n" +
-            `- "${project.name}"\n` +
-            `- ID: ${project.project_id}`,
-          (confirmationResponse) => {
-            if (confirmationResponse === "ACCEPT") {
-              EventBus.emit(new ToastEvent("WARN", "Not implemented yet, too dangerous."));
-            }
-          },
-          "Delete project",
-        ),
-      );
-    },
-  },
-  computed: {
-    filteredProjects(): ProjectModelExt[] {
-      return this.projects.filter(
-        (project: ProjectModelExt) =>
-          project.isNew || project.name.toLowerCase().indexOf(this.projectSearch.toLowerCase()) >= 0,
-      );
-    },
-  },
+const router = useRouter();
+
+const projectSearch = ref("");
+const projects = ref<ProjectModelExt[]>([]);
+const projectTypes = ref(ItemType);
+
+const filteredProjects = computed<ProjectModelExt[]>(() =>
+  projects.value.filter(
+    (project: ProjectModelExt) =>
+      project.isNew || project.name.toLowerCase().indexOf(projectSearch.value.toLowerCase()) >= 0,
+  ),
+);
+
+function refreshData() {
+  API.projects
+    .getAllProjectsApiProjectsListGet()
+    .then((response) => {
+      projects.value = response.data;
+    })
+    .catch(() => {
+      EventBus.emit(new ToastEvent("WARN", "Failed to load list of projects."));
+    });
+}
+
+function addProject() {
+  projects.value.unshift({
+    isNew: true,
+    name: "",
+    description: "",
+    type: "generic",
+  } as ProjectModelExt);
+}
+
+function manageUsers(project: ProjectModelExt) {
+  if (!project.project_id) {
+    EventBus.emit(new ToastEvent("WARN", "Save first."));
+  } else {
+    EventBus.emit(new CurrentProjectSelectedEvent(project.project_id));
+    EventBus.once(CurrentProjectSetEvent, () => {
+      router.push({ name: "project-settings-settings" });
+    });
+  }
+}
+
+function saveProject(project: ProjectModelExt) {
+  API.projects
+    .createProjectApiProjectsCreatePut({
+      body: project,
+    })
+    .then((response) => {
+      project.project_id = response.data;
+      project.isNew = false;
+      EventBus.emit(new ToastEvent("SUCCESS", `New project created with ID ${project.project_id}`));
+    })
+    .catch((reason) => {
+      console.error(reason);
+      EventBus.emit(new ToastEvent("ERROR", "Failed to save."));
+    });
+}
+
+function dropProject(project: ProjectModelExt) {
+  EventBus.emit(
+    new ConfirmationRequestEvent(
+      "Do you really want to **permanently delete** this project?\n" +
+        "This will also delete **all data** related to this project in any way!\n" +
+        "This action is extremely dangerous!!\n" +
+        `- "${project.name}"\n` +
+        `- ID: ${project.project_id}`,
+      (confirmationResponse) => {
+        if (confirmationResponse === "ACCEPT") {
+          EventBus.emit(new ToastEvent("WARN", "Not implemented yet, too dangerous."));
+        }
+      },
+      "Delete project",
+    ),
+  );
+}
+
+onMounted(() => {
+  refreshData();
 });
 </script>

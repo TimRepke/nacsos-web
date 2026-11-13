@@ -28,10 +28,18 @@ const urlPrefix: string | null = {
   text: null,
 }[props.field];
 
+const nonEmptyVariants = computed<AcademicItemVariantModel[]>(() =>
+  (props.variants as AcademicItemVariantModel[]).filter((variant) => !isEmpty(variant[props.field])),
+);
 const variations = computed<(AcademicItemVariantModel & { diff: Change[] })[]>(() =>
-  (props.variants as AcademicItemVariantModel[])
-    .filter((variant) => !isEmpty(variant[props.field]))
-    .map((variant) => ({ ...variant, diff: diffChars(model.value as string, variant[props.field] as string) })),
+  nonEmptyVariants.value.map((variant) => ({
+    ...variant,
+    // the character-level diff is expensive; only compute it while the diff panel is open
+    diff:
+      showVariants.value && showDiff.value
+        ? diffChars(model.value as string, variant[props.field] as string)
+        : ([] as Change[]),
+  })),
 );
 </script>
 

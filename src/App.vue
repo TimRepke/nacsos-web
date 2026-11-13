@@ -38,9 +38,9 @@
   </template>
 </template>
 
-<script lang="ts">
-import { defineComponent } from "vue";
-import NacsosLogo from "@/components/NacsosLogo.vue";
+<script lang="ts" setup>
+import { computed, onMounted } from "vue";
+import { useRoute } from "vue-router";
 import TopBar from "@/components/topbar/TopBar.vue";
 import SideBar from "@/components/SideBar.vue";
 import ToastsViewer from "@/components/ToastsViewer.vue";
@@ -49,44 +49,24 @@ import { currentProjectStore, currentUserStore } from "@/stores";
 import { isOnRoute } from "@/util";
 import LoginView from "@/views/User/LoginView.vue";
 
-export default defineComponent({
-  components: {
-    NacsosLogo,
-    ConfirmationModal,
-    SideBar,
-    TopBar,
-    ToastsViewer,
-    LoginView,
-  },
-  data() {
-    return {
-      projectStore: currentProjectStore,
-      userStore: currentUserStore,
-    };
-  },
-  async mounted() {
-    await currentProjectStore.highlighters.reload();
-  },
-  computed: {
-    viewNeedsSidebar(): boolean {
-      return (
-        currentProjectStore.projectSelected &&
-        currentUserStore.isLoggedIn &&
-        !(
-          isOnRoute(this.$route, "admin") ||
-          isOnRoute(this.$route, "user") ||
-          this.$route.name === "project-list" ||
-          this.$route.name === "about"
-        )
-      );
-    },
-    viewNeedsTopNav(): boolean {
-      return currentUserStore.isLoggedIn;
-    },
-    isLoggedIn(): boolean {
-      return currentUserStore.isLoggedIn;
-    },
-  },
+const route = useRoute();
+
+onMounted(async () => {
+  await currentProjectStore.highlighters.reload();
+});
+
+const viewNeedsSidebar = computed<boolean>(() => {
+  return (
+    currentProjectStore.projectSelected &&
+    currentUserStore.isLoggedIn &&
+    !(isOnRoute(route, "admin") || isOnRoute(route, "user") || route.name === "project-list" || route.name === "about")
+  );
+});
+const viewNeedsTopNav = computed<boolean>(() => {
+  return currentUserStore.isLoggedIn;
+});
+const isLoggedIn = computed<boolean>(() => {
+  return currentUserStore.isLoggedIn;
 });
 </script>
 

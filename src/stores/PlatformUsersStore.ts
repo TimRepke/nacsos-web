@@ -13,6 +13,9 @@ export type PlatformUsersStoreType = {
 };
 const MAX_LIFETIME = 5 * 60 * 1000; // 5min
 
+// in-flight dedup so concurrent callers share a single request (kept out of the reactive state)
+let refreshPromise: Promise<void> | null = null;
+
 export const usePlatformUsersStore = defineStore("PlatformUsersStore", {
   state(): PlatformUsersStoreType {
     const users = useStorage<Array<DehydratedUser>>("nacsos:cache:users", [], undefined, {
@@ -35,9 +38,14 @@ export const usePlatformUsersStore = defineStore("PlatformUsersStore", {
       }
     },
     async maybeRefresh(): Promise<void> {
-      if (Date.now() - (this.lastUpdate || 0) > MAX_LIFETIME || !this.users) {
-        await this.refresh();
+      // lastUpdate is always set (0 when never fetched), so the age check is the real staleness signal
+      if (Date.now() - (this.lastUpdate || 0) <= MAX_LIFETIME) return;
+      if (!refreshPromise) {
+        refreshPromise = this.refresh().finally(() => {
+          refreshPromise = null;
+        });
       }
+      await refreshPromise;
     },
     async getUsernameLookup(): Promise<Record<string, DehydratedUser>> {
       await this.maybeRefresh();

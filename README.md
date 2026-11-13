@@ -32,6 +32,24 @@ Once you edit the `grammar.ne` file, you need to compile it to javascript via `n
 npm run serve
 ```
 
+### Running against the public API (CORS proxy)
+The browser blocks cross-origin calls to the public API, so for local development against it you can
+run the dev server behind a proxy. Enable it by setting two variables (e.g. in `.env.development`):
+
+```
+# point the app's core URL at the dev server itself, under a path prefix
+VITE_NACSOS_CORE_URL=http://127.0.0.1:8080/proxy-core
+# the public API the dev server should forward that prefix to
+VITE_PROXY_CORE_TARGET=https://<public-api-host>
+```
+
+With both set, `vite.config.ts` starts the dev server on the host/port of `VITE_NACSOS_CORE_URL` and
+proxies every request under its path prefix (`/proxy-core` above) to `VITE_PROXY_CORE_TARGET`,
+stripping the prefix, rewriting the `Origin`/`Host` headers and the response cookie domains.
+The browser therefore only ever talks to `http://127.0.0.1:8080`, so no CORS errors occur.
+
+Leave `VITE_PROXY_CORE_TARGET` unset (the default) to disable the proxy and use the variables as before.
+
 ### Compiles and minifies for production
 ```
 npm run build
