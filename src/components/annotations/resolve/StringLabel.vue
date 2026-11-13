@@ -51,7 +51,8 @@ export default defineComponent({
     setBotAnnotation(value: string | undefined | null) {
       const { resolution } = this.proposalRow[this.label.path_key];
       if (is<BotAnnotationModel>(resolution)) {
-        resolution.value_str = value;
+        // Do not store empty/whitespace-only text: that would create an annotation without content.
+        resolution.value_str = value && value.trim().length > 0 ? value : undefined;
         this.$emit("botAnnotationChanged", resolution);
         this.changed = true;
       }

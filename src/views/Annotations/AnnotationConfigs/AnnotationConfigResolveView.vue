@@ -174,6 +174,7 @@ import type {
   FlatLabel,
   BotMetaResolveBase,
   DehydratedUser,
+  ResolutionCell,
 } from "@/plugins/api/spec/types.gen";
 import { ResolutionMethod } from "@/plugins/api/spec/types.gen";
 import { API, toastReject } from "@/plugins/api";
@@ -299,6 +300,30 @@ export default defineComponent({
         }
       }
     },
+    /**
+     * Copy of the matrix with empty (or whitespace-only) text resolutions dropped, so that
+     * saving never creates annotations without text content.
+     */
+    sanitizedMatrix(): ResolutionProposal["matrix"] {
+      const result: ResolutionProposal["matrix"] = {};
+      const matrix = this.proposal?.matrix;
+      if (!matrix) return result;
+      for (const itemId of Object.keys(matrix)) {
+        const row: Record<string, ResolutionCell> = matrix[itemId];
+        const cleanRow: Record<string, ResolutionCell> = {};
+        for (const pathKey of Object.keys(row)) {
+          const cell = row[pathKey];
+          const valueStr: string | null | undefined = cell?.resolution?.value_str;
+          if (cell?.resolution && typeof valueStr === "string" && valueStr.trim().length === 0) {
+            cleanRow[pathKey] = { ...cell, resolution: { ...cell.resolution, value_str: undefined } };
+          } else {
+            cleanRow[pathKey] = cell;
+          }
+        }
+        result[itemId] = cleanRow;
+      }
+      return result;
+    },
     update() {
       if (!this.proposal?.matrix) {
         EventBus.emit(new ToastEvent("WARN", "Nothing to save (yet)!"));
@@ -311,7 +336,7 @@ export default defineComponent({
               name: this.name,
             },
             headers: { "x-project-id": currentProjectStore.projectId as string },
-            body: this.proposal.matrix,
+            body: this.sanitizedMatrix(),
           })
           .then(() => EventBus.emit(new ToastEvent("SUCCESS", "Updated resolution")))
           .catch(toastReject)
@@ -335,7 +360,7 @@ export default defineComponent({
             },
             body: {
               settings: this.settings,
-              matrix: this.proposal.matrix,
+              matrix: this.sanitizedMatrix(),
             },
           })
           .then((response) => {

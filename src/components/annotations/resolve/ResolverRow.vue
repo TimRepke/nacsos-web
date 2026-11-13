@@ -148,14 +148,17 @@ export default defineComponent({
       // entries w/o parents are always valid
       if (!label.parent_key) return true;
       // empty bot annotations are always valid (independent of parent label)
+      // empty or whitespace-only text counts as empty
+      const resolution = this.row[label.path_key]?.resolution;
+      const valueStr = resolution?.value_str;
+      const hasText = is<string>(valueStr) && valueStr.trim().length > 0;
       if (
-        isNone(this.row[label.path_key]) ||
-        isNone(this.row[label.path_key].resolution) ||
-        (isNone(this.row[label.path_key].resolution?.value_int) &&
-          isNone(this.row[label.path_key].resolution?.value_bool) &&
-          isNone(this.row[label.path_key].resolution?.value_str) &&
-          isNone(this.row[label.path_key].resolution?.value_float) &&
-          isNone(this.row[label.path_key].resolution?.multi_int))
+        isNone(resolution) ||
+        (isNone(resolution?.value_int) &&
+          isNone(resolution?.value_bool) &&
+          !hasText &&
+          isNone(resolution?.value_float) &&
+          isNone(resolution?.multi_int))
       )
         return true;
 
