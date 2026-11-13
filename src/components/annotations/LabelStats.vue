@@ -44,36 +44,35 @@ const groupedResolutions = computed(() =>
 
 const schemes = computed(() => new Set(Object.keys(groupedResolutions.value).concat(Object.keys(groupedLabels.value))));
 
-function refresh() {
-  API.stats
-    .labelStatsRawApiStatsLabelsHumanPost({
-      headers: { "x-project-id": currentProjectStore.projectId as string },
-      body: query.value[0],
-    })
-    .then((response) => {
-      labels.value = response.data;
-    })
-    .catch(ignore);
-
-  API.stats
-    .labelStatsResApiStatsLabelsResolvedPost({
-      headers: { "x-project-id": currentProjectStore.projectId as string },
-      body: query.value[0],
-    })
-    .then((response) => {
-      resolutions.value = response.data;
-    })
-    .catch(ignore);
+function refresh(): Promise<unknown> {
+  return Promise.all([
+    API.stats
+      .labelStatsRawApiStatsLabelsHumanPost({
+        headers: { "x-project-id": currentProjectStore.projectId as string },
+        body: query.value[0],
+      })
+      .then((response) => {
+        labels.value = response.data;
+      }),
+    API.stats
+      .labelStatsResApiStatsLabelsResolvedPost({
+        headers: { "x-project-id": currentProjectStore.projectId as string },
+        body: query.value[0],
+      })
+      .then((response) => {
+        resolutions.value = response.data;
+      }),
+  ]);
 }
 
-onMounted(refresh);
+onMounted(() => refresh().catch(ignore));
 </script>
 
 <template>
   <div>
     <div class="d-flex flex-row mb-2">
       <RefreshIcon :refresh="refresh" class="me-2" />
-      <ToggleIcon v-model:model="showNql" icon="search" />
+      <ToggleIcon v-model:model="showNql" icon="magnifying-glass" />
     </div>
 
     <NQLBox v-show="showNql" :query="nql" :rows="2" @update:query-parsed="(nq) => (query = nq)" class="mb-2" />
