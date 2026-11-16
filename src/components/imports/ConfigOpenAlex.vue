@@ -157,7 +157,11 @@ watch(
   () => props.existingConfig,
   (newValue) => {
     debounceWatch.value = true;
-    config.value = stringify(newValue);
+    if (!newValue || newValue.kind !== ImportConfigEnum.OA_SOLR) {
+      config.value = { ...emptyConfig };
+    } else {
+      config.value = stringify(newValue);
+    }
   },
   { deep: true },
 );

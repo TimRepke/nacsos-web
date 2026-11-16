@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, reactive, ref } from "vue";
+import { computed, nextTick, onMounted, onUnmounted, reactive, ref, watch } from "vue";
 import { onBeforeRouteLeave, useRoute, useRouter } from "vue-router";
 import { currentProjectStore, platformUsersStore } from "@/stores";
 import type {
@@ -12,6 +12,7 @@ import type {
   DehydratedUser,
   ResolutionCell,
   ResolutionOrdering,
+  BotAnnotationModel,
 } from "@/plugins/api/spec/types.gen";
 import { ResolutionMethod } from "@/plugins/api/spec/types.gen";
 import { API, toastReject } from "@/plugins/api";
@@ -57,6 +58,29 @@ function freezeCellLabels(p: ResolutionProposal) {
   }
 }
 
+/**
+ * Canonical string form of a cell's resolution value, used to compare the current
+ * matrix against the snapshot taken at load/save time. Whitespace-only text counts
+ * as empty (mirrors sanitizedMatrix() on save).
+ */
+function canonicalResolution(res: BotAnnotationModel | null | undefined): string {
+  if (!res) return "";
+  const valueStr = typeof res.value_str === "string" && res.value_str.trim().length > 0 ? res.value_str : null;
+  const multi = Array.isArray(res.multi_int) ? res.multi_int.join(",") : null;
+  return `${res.value_bool ?? ""}|${res.value_int ?? ""}|${res.value_float ?? ""}|${valueStr ?? ""}|${multi ?? ""}`;
+}
+
+function snapshotMatrix(matrix: ResolutionProposal["matrix"]): Map<string, string> {
+  const snapshot = new Map<string, string>();
+  for (const itemId of Object.keys(matrix)) {
+    const row = matrix[itemId];
+    for (const pathKey of Object.keys(row)) {
+      snapshot.set(`${itemId}|${pathKey}`, canonicalResolution(row[pathKey]?.resolution));
+    }
+  }
+  return snapshot;
+}
+
 const route = useRoute();
 const router = useRouter();
 
@@ -87,6 +111,32 @@ const focusItem = ref<string | undefined>(undefined);
 const loadingProposals = ref(false);
 const savingAllowed = ref(true);
 
+// Diff state: `savedValues` holds the canonical value of every cell as it was at the
+// last load from / save to the backend. `changedCells` lists the cells whose value the
+// user has since modified (by any of the label editors).
+const savedValues = ref<Map<string, string>>(new Map());
+const hasSavedBaseline = ref(false);
+const changedCells = ref(new Set<string>());
+const changedCellCount = computed<number>(() => changedCells.value.size);
+
+function refreshSavedBaseline() {
+  if (proposal.value) savedValues.value = snapshotMatrix(sanitizedMatrix());
+  changedCells.value = new Set();
+  hasSavedBaseline.value = true;
+}
+
+function markCellChanged(anno: BotAnnotationModel) {
+  if (!hasSavedBaseline.value || !proposal.value) return;
+  const pathKey = `${anno.key}-${anno.repeat}`;
+  const key = `${anno.item_id}|${pathKey}`;
+  const current = canonicalResolution(proposal.value.matrix[anno.item_id]?.[pathKey]?.resolution);
+  if (current === (savedValues.value.get(key) ?? "")) {
+    changedCells.value.delete(key);
+  } else {
+    changedCells.value.add(key);
+  }
+}
+
 // Settings
 const showText = ref(false);
 const itemIdSearch = ref("");
@@ -115,6 +165,8 @@ onMounted(async () => {
       settings.ignore_hierarchy = meta.meta.ignore_hierarchy;
       freezeCellLabels(savedProposal);
       proposal.value = savedProposal;
+      savedValues.value = snapshotMatrix(savedProposal.matrix);
+      hasSavedBaseline.value = true;
     }
     if (annotation_scheme_id.value) {
       annotationScheme.value = (
@@ -200,7 +252,10 @@ function update() {
         headers: { "x-project-id": currentProjectStore.projectId as string },
         body: sanitizedMatrix(),
       })
-      .then(() => EventBus.emit(new ToastEvent("SUCCESS", "Updated resolution")))
+      .then(() => {
+        refreshSavedBaseline();
+        EventBus.emit(new ToastEvent("SUCCESS", "Updated resolution"));
+      })
       .catch(toastReject)
       .finally(() => {
         savingAllowed.value = true;
@@ -228,6 +283,7 @@ function saveNew() {
       })
       .then((response) => {
         const { data } = response;
+        refreshSavedBaseline();
         EventBus.emit(new ToastEvent("SUCCESS", `Saved new annotation resolution as ${data}`));
         isNew.value = false;
         bot_annotation_metadata_id.value = data;
@@ -261,6 +317,10 @@ function fetchProposal() {
       const { data } = response;
       if (data) freezeCellLabels(data);
       proposal.value = data;
+      // freshly computed proposal: nothing saved yet, so no baseline to diff against
+      savedValues.value = new Map();
+      changedCells.value = new Set();
+      hasSavedBaseline.value = false;
       loadingProposals.value = false;
     })
     .catch((reason) => {
@@ -295,6 +355,24 @@ const labels = computed<Record<string, FlatLabel>>(() => {
 });
 
 const isTableReady = computed<boolean>(() => !!proposal.value);
+
+// Mounting the (potentially huge) table blocks the main thread for a while, during which
+// the browser cannot paint anything and the page looks blank. So we first show a
+// placeholder, wait until it has actually been painted, and only then mount the table.
+const rendererReady = ref(false);
+
+watch(
+  () => proposal.value,
+  async (newProposal) => {
+    rendererReady.value = false;
+    if (!newProposal) return;
+    // Let Vue commit the placeholder-only state, then wait two frames to ensure the
+    // browser has painted it before the expensive table mount begins.
+    await nextTick();
+    await new Promise<void>((resolve) => requestAnimationFrame(() => requestAnimationFrame(() => resolve())));
+    rendererReady.value = true;
+  },
+);
 
 const schemeLookup = computed<Record<string, FlattenedAnnotationSchemeLabel>>(() => {
   if (!annotationScheme.value || !annotationScheme.value.labels) return {};
@@ -436,7 +514,14 @@ onBeforeRouteLeave(
       </div>
     </div>
 
-    <div class="row mb-5 mt-2" v-if="isTableReady && proposal">
+    <div class="row mb-5 mt-2" v-if="isTableReady && !rendererReady">
+      <div class="d-flex flex-column align-items-center justify-content-center text-muted py-5">
+        <div class="spinner-border" role="status" aria-hidden="true" />
+        <span class="mt-3">Preparing view...</span>
+      </div>
+    </div>
+
+    <div class="row mb-5 mt-2" v-if="rendererReady && proposal">
       <div class="table-responsive-sm position-relative">
         <table class="table" style="width: calc(100% - 1rem)">
           <thead class="sticky-top bg-light">
@@ -469,14 +554,23 @@ onBeforeRouteLeave(
             :labels="proposal.labels"
             :show-text="showText"
             :bot-annotation-meta-data-id="bot_annotation_metadata_id"
+            :changed-keys="changedCells"
             @request-focus-item="(val: string) => (focusItem = val)"
+            @bot-annotation-changed="markCellChanged"
           />
         </table>
       </div>
     </div>
 
-    <div v-if="isTableReady" class="bg-light p-1" style="position: absolute; right: 2rem; bottom: 1rem">
+    <div v-if="rendererReady" class="bg-light p-1" style="position: absolute; right: 2rem; bottom: 1rem">
       <div class="col">
+        <span
+          v-if="hasSavedBaseline && changedCellCount > 0"
+          class="badge text-bg-warning m-2 d-block text-center"
+          role="status"
+        >
+          {{ changedCellCount }} unsaved change{{ changedCellCount === 1 ? "" : "s" }}
+        </span>
         <button @click="save" :disabled="!savingAllowed || name.length < 3" type="button" class="btn btn-success m-2">
           Save
         </button>
