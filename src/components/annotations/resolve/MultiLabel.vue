@@ -184,15 +184,15 @@ const choiceUsers = computed<Record<number, UserModel[]>>(() => {
   }, {});
 });
 const choiceInfo = computed<Record<number, string>>(() => {
-  const userEntries = Object.entries(choiceUsers.value) as unknown as Array<[number, UserModel[]]>;
   return Object.fromEntries(
-    userEntries.map((entry: [number, UserModel[]]) => {
-      const [choice, entryUsers] = entry;
+    tags.value.map((choice: number): [number, string] => {
+      const choiceName = choiceLookup.value[choice]?.name ?? String(choice);
+      const entryUsers = choiceUsers.value[choice] ?? [];
       const usernames = entryUsers
         .filter((user) => !!user)
         .map((user) => user.username)
         .join(", ");
-      const choiceName = choiceLookup.value[choice].name;
+      if (!usernames) return [choice, `"${choiceName}" added during resolution`];
       return [choice, `${usernames}: "${choiceName}"`];
     }),
   );
@@ -203,9 +203,10 @@ const choiceAgreements = computed<Record<number, Agreement>>(() => {
 
   if (isNone(resolution) || isNone(resolution.multi_int)) return {};
   return Object.fromEntries(
-    Object.entries<UserModel[]>(choiceUsers.value).map((entry: [string, UserModel[]]): [number, Agreement] => {
-      const [choice_str, users] = entry;
-      const choice = parseInt(choice_str);
+    tags.value.map((choice: number): [number, Agreement] => {
+      // Choices added during consolidation are absent from choiceUsers; an empty
+      // user list below marks them as NOVEL.
+      const users = choiceUsers.value[choice] ?? [];
       const usernames = users.filter((user) => !!user).map((user) => user.username);
       const count = new Set(usernames).size;
       if (!count) return [choice, Agreement.NOVEL]; // undefined, 0, null

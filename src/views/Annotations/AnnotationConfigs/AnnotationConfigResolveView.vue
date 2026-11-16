@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, reactive, ref } from "vue";
+import { computed, nextTick, onMounted, onUnmounted, reactive, ref, watch } from "vue";
 import { onBeforeRouteLeave, useRoute, useRouter } from "vue-router";
 import { currentProjectStore, platformUsersStore } from "@/stores";
 import type {
@@ -296,6 +296,24 @@ const labels = computed<Record<string, FlatLabel>>(() => {
 
 const isTableReady = computed<boolean>(() => !!proposal.value);
 
+// Mounting the (potentially huge) table blocks the main thread for a while, during which
+// the browser cannot paint anything and the page looks blank. So we first show a
+// placeholder, wait until it has actually been painted, and only then mount the table.
+const rendererReady = ref(false);
+
+watch(
+  () => proposal.value,
+  async (newProposal) => {
+    rendererReady.value = false;
+    if (!newProposal) return;
+    // Let Vue commit the placeholder-only state, then wait two frames to ensure the
+    // browser has painted it before the expensive table mount begins.
+    await nextTick();
+    await new Promise<void>((resolve) => requestAnimationFrame(() => requestAnimationFrame(() => resolve())));
+    rendererReady.value = true;
+  },
+);
+
 const schemeLookup = computed<Record<string, FlattenedAnnotationSchemeLabel>>(() => {
   if (!annotationScheme.value || !annotationScheme.value.labels) return {};
   return Object.fromEntries(
@@ -436,7 +454,14 @@ onBeforeRouteLeave(
       </div>
     </div>
 
-    <div class="row mb-5 mt-2" v-if="isTableReady && proposal">
+    <div class="row mb-5 mt-2" v-if="isTableReady && !rendererReady">
+      <div class="d-flex flex-column align-items-center justify-content-center text-muted py-5">
+        <div class="spinner-border" role="status" aria-hidden="true" />
+        <span class="mt-3">Preparing view...</span>
+      </div>
+    </div>
+
+    <div class="row mb-5 mt-2" v-if="rendererReady && proposal">
       <div class="table-responsive-sm position-relative">
         <table class="table" style="width: calc(100% - 1rem)">
           <thead class="sticky-top bg-light">
@@ -475,7 +500,7 @@ onBeforeRouteLeave(
       </div>
     </div>
 
-    <div v-if="isTableReady" class="bg-light p-1" style="position: absolute; right: 2rem; bottom: 1rem">
+    <div v-if="rendererReady" class="bg-light p-1" style="position: absolute; right: 2rem; bottom: 1rem">
       <div class="col">
         <button @click="save" :disabled="!savingAllowed || name.length < 3" type="button" class="btn btn-success m-2">
           Save
