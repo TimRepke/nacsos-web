@@ -213,7 +213,8 @@ async function loadImage(event: MouseEvent, filename: string) {
   const url = URL.createObjectURL(res.data as Blob);
   const img = new Image();
   img.src = url;
-  img.style.width = "90%";
+  img.style.maxHeight = "400px";
+  img.style.display = "block";
   loadedImages.set(filename, { url, img });
   img.onload = () => {
     if (loadedImages.get(filename)?.img !== img) {
@@ -251,6 +252,32 @@ async function loadDF(event: MouseEvent, filename: string) {
     loadedFrames.set(filename, { el, destroy });
   } else {
     destroy();
+  }
+}
+
+async function loadTXT(event: MouseEvent, filename: string) {
+  clearLoadedArtefact(filename);
+  const res = (
+    await API.prio.getFileApiPrioArtefactsFileGet({
+      headers: {
+        "x-project-id": currentProjectStore.projectId as string,
+        "x-priority-id": route.query.priority_id as string,
+      },
+      query: { filename },
+    })
+  ).data;
+  if (loadedFrames.has(filename)) {
+    // a newer load for this file already registered while we were fetching
+    return;
+  }
+  const el: HTMLTextAreaElement = document.createElement("textarea");
+  el.classList.add("font-monospace", "form-control");
+  el.setAttribute("rows", "10");
+  el.value = res as string;
+  el.style.display = "block";
+  const { target } = event;
+  if (isElem(target)) {
+    (target as HTMLElement).closest("li")?.appendChild(el);
   }
 }
 </script>
@@ -455,6 +482,13 @@ async function loadDF(event: MouseEvent, filename: string) {
                   icon="table"
                   class="clickable-icon ms-2"
                   @click="(event) => loadDF(event, file.path)"
+                />
+
+                <font-awesome-icon
+                  v-else-if="file.path.endsWith('.txt')"
+                  icon="table"
+                  class="clickable-icon ms-2"
+                  @click="(event) => loadTXT(event, file.path)"
                 />
               </li>
             </ul>
