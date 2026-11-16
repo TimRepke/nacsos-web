@@ -17,7 +17,15 @@
           {{ ordering.item_id }}
         </div>
       </td>
-      <td v-for="label in labels" :key="label.path_key" class="text-end" :class="{ 'bg-warning': !isValid(label) }">
+      <td
+        v-for="label in labels"
+        :key="label.path_key"
+        class="text-end"
+        :class="{
+          'bg-warning': !isValid(label),
+          'cell-changed': changedKeys.has(`${ordering.item_id}|${label.path_key}`),
+        }"
+      >
         <template v-if="label.kind === 'bool' && row[label.path_key]">
           <BoolLabel
             class="d-flex justify-content-end"
@@ -131,6 +139,10 @@ const props = defineProps({
   showText: {
     type: Boolean,
     required: true,
+  },
+  changedKeys: {
+    type: Object as PropType<Set<string>>,
+    default: () => new Set<string>(),
   },
 });
 
@@ -251,3 +263,11 @@ watch(
   },
 );
 </script>
+
+<style scoped>
+/* cell whose resolved value differs from the last saved state */
+td.cell-changed {
+  background-color: rgba(13, 110, 253, 0.08);
+  box-shadow: inset 0 0 0 2px rgba(13, 110, 253, 0.35);
+}
+</style>
