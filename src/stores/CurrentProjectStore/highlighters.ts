@@ -54,7 +54,6 @@ export function useProjectHighlighters(): ProjectHighlighterStore {
           if (keywords.length === 0) return;
           const regex = new RegExp(keywords.join("|"), "gi");
           const style = escapeHtml(highlighter.style ?? "");
-          console.log(regex);
           mapped[highlighter.highlighter_id] = (txt: string) => {
             return txt.replaceAll(regex, (match: string) => `<span style="${style}">${escapeHtml(match)}</span>`);
           };
