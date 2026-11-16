@@ -23,7 +23,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed } from "vue";
+import { computed, type PropType } from "vue";
 import { currentProjectStore, interfaceSettingsStore } from "@/stores";
 import { marked } from "marked";
 import { sanitizeHtml } from "@/util";
@@ -32,12 +32,12 @@ defineOptions({ name: "TextComponent" });
 
 const props = defineProps({
   text: {
-    type: String,
+    type: String as PropType<string | null>,
     required: false,
     default: null,
   },
   html: {
-    type: String,
+    type: String as PropType<string | null>,
     required: false,
     default: null,
   },
@@ -58,7 +58,8 @@ const htmlText = computed(() => {
   // the parser runs synchronously here (marked's async mode is never enabled) and the
   // highlighters return a string; same unchecked assumptions as the original
   txt = marked.parse(txt) as string;
-  txt = currentProjectStore.highlighters.applyActiveHighlighters(txt) as string;
+  // returns null for blank/whitespace-only text -> keep the parsed markdown in that case
+  txt = (currentProjectStore.highlighters.applyActiveHighlighters(txt) as string | null) ?? txt;
   // item data is user-supplied, so the final html must be sanitized before v-html
   return sanitizeHtml(txt.replaceAll("\n", "<br />"));
 });

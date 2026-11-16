@@ -6,11 +6,7 @@ import { Optional } from "@/types";
 import { EventBus } from "@/plugins/events";
 import { CurrentProjectSetEvent } from "@/plugins/events/events/projects";
 import { sanitizeHtml } from "@/util";
-
-function escapeRegExp(s: string): string {
-  // escape all regex metacharacters -> also kills ReDoS via pathological nesting like "(a+)+$"
-  return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-}
+import { computed } from "vue";
 
 function escapeHtml(s: string): string {
   return s
@@ -41,36 +37,42 @@ export function useProjectHighlighters(): ProjectHighlighterStore {
     base.reload().then().catch();
   });
 
+  const applicableHighlighters = computed(() => {
+    // Get active highlighters for this project
+    const activeHighlighters = new Set(
+      interfaceSettingsStore.highlighters.active[currentProjectStore.projectId as string] ?? [],
+    );
+    const mapped: Record<string, (txt: string) => string> = {};
+
+    // Highlighters globally turned off --> return raw
+    if (!interfaceSettingsStore.highlighters.enabled) return mapped;
+
+    base.value.value.forEach((highlighter: HighlighterModel) => {
+      if (activeHighlighters.has(highlighter.highlighter_id)) {
+        try {
+          const keywords = highlighter.keywords.map((k) => k.trim()).filter((k) => k.length > 0);
+          if (keywords.length === 0) return;
+          const regex = new RegExp(keywords.join("|"), "gi");
+          const style = escapeHtml(highlighter.style ?? "");
+          mapped[highlighter.highlighter_id] = (txt: string) => {
+            return txt.replaceAll(regex, (match: string) => `<span style="${style}">${escapeHtml(match)}</span>`);
+          };
+        } catch (e) {
+          console.warn("Ignoring illegal regex!");
+          console.error(e);
+        }
+      }
+    });
+    return mapped;
+  });
+
   return {
     ...base,
     applyActiveHighlighters(txt: Optional<string>): string | null {
       if (txt === null || txt === undefined || txt.trim().length === 0) return null;
-
-      // Highlighters globally turned off --> return raw
-      if (!interfaceSettingsStore.highlighters.enabled) return txt;
-
-      // Get active highlighters for this project
-      const activeHighlighters = new Set(
-        interfaceSettingsStore.highlighters.active[currentProjectStore.projectId as string] ?? [],
-      );
-
       // Apply each highlighter
-      base.value.value.forEach((highlighter: HighlighterModel) => {
-        if (activeHighlighters.has(highlighter.highlighter_id)) {
-          try {
-            const keywords = highlighter.keywords.map((k) => k.trim()).filter((k) => k.length > 0);
-            if (keywords.length === 0) return;
-            const regex = new RegExp(keywords.map((k) => `(?:${escapeRegExp(k)})`).join("|"), "gi");
-            const style = escapeHtml(highlighter.style ?? "");
-            txt = (txt as string).replaceAll(
-              regex,
-              (match: string) => `<span style="${style}">${escapeHtml(match)}</span>`,
-            );
-          } catch (e) {
-            console.warn("Ignoring illegal regex!");
-            console.error(e);
-          }
-        }
+      Object.values(applicableHighlighters.value).forEach((highlighter) => {
+        txt = highlighter(txt as string);
       });
       return sanitizeHtml(txt as string);
     },

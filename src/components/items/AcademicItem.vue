@@ -118,7 +118,7 @@ function authorInstitutions(author: AcademicAuthorModel): string | undefined {
 </script>
 
 <style scoped>
-/deep/ a {
+:deep() a {
   text-decoration: none !important;
 }
 

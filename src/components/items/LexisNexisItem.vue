@@ -91,7 +91,7 @@ const htmlTeaser = computed((): string | null => {
 </script>
 
 <style scoped>
-/deep/ a {
+:deep() a {
   text-decoration: none !important;
 }
 

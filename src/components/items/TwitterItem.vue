@@ -108,7 +108,7 @@ const renderedStatus = computed(() => {
 </script>
 
 <style scoped>
-/deep/ a {
+:deep() a {
   text-decoration: none !important;
 }
 </style>
