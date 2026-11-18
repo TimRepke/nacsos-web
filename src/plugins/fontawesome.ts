@@ -146,6 +146,7 @@ import {
   faPaperPlane as farFaPaperPlane,
   faSquarePlus as farFaSquarePlus,
   faTrashCan as farFaTrashCan,
+  faFileLines as farFileLines,
 } from "@fortawesome/free-regular-svg-icons";
 
 import { faTwitter as farFaTwitter } from "@fortawesome/free-brands-svg-icons";
@@ -292,4 +293,5 @@ library.add(
   farFaSquarePlus,
   farFaTrashCan,
   farFaTwitter,
+  farFileLines,
 );

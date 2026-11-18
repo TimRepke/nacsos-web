@@ -486,7 +486,7 @@ async function loadTXT(event: MouseEvent, filename: string) {
 
                 <font-awesome-icon
                   v-else-if="file.path.endsWith('.txt')"
-                  icon="table"
+                  icon="file-lines"
                   class="clickable-icon ms-2"
                   @click="(event) => loadTXT(event, file.path)"
                 />
