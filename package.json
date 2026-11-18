@@ -16,7 +16,7 @@
     "preview": "vite preview --host 127.0.0.1 --port 8080",
     "build": "vite build --outDir dist",
     "type-check": "npx vue-tsc --noEmit -p tsconfig.vitest.json --composite false",
-    "lint": "eslint .",
+    "lint": "eslint . --fix",
     "test": "vitest run",
     "test:watch": "vitest",
     "nql": "nearleyc src/util/nql/grammar.ne --out src/util/nql/grammar.ts",
